@@ -520,12 +520,12 @@ When a scenario is loaded, for each turn:
 If any parameter validation or construction fails, the scenario load fails with a clear error.
 
 **Acceptance Criteria**:
-- [ ] Schema has no field for raw payoffs
-- [ ] Schema enforces `matrix_parameters` ranges via Pydantic validators
-- [ ] Schema supports branching structure
-- [ ] Loading a scenario automatically constructs matrices
-- [ ] Invalid parameter combinations fail at load time with clear errors
-- [ ] Scenario round-trips: save → load → save produces identical JSON
+- [x] Schema has no field for raw payoffs
+- [x] Schema enforces `matrix_parameters` ranges via Pydantic validators
+- [x] Schema supports branching structure
+- [x] Loading a scenario automatically constructs matrices
+- [x] Invalid parameter combinations fail at load time with clear errors
+- [x] Scenario round-trips: save → load → save produces identical JSON
 
 ### Milestone 3.2: Scenario Generator (Constructor Pattern)
 
@@ -581,13 +581,13 @@ The generator classifies user prompts by theme, then selects game types appropri
 - Act III (turns 9+): Delta scaling ×1.3, high-stakes decisive games
 
 **Acceptance Criteria**:
-- [ ] Generator uses `claude-agent-sdk` for LLM calls
-- [ ] LLM never outputs raw payoffs, only types and parameters
-- [ ] All generated parameters pass validation before storage
-- [ ] Generated scenarios use 8+ distinct matrix types
-- [ ] Generated scenarios have 12-16 turn maximum (randomized)
-- [ ] Three-act structure reflected in game type and parameter choices
-- [ ] Generated scenarios load successfully (matrices construct without error)
+- [x] Generator uses `claude-agent-sdk` for LLM calls
+- [x] LLM never outputs raw payoffs, only types and parameters
+- [x] All generated parameters pass validation before storage
+- [x] Generated scenarios use 8+ distinct matrix types
+- [x] Generated scenarios have 12-16 turn maximum (randomized)
+- [x] Three-act structure reflected in game type and parameter choices
+- [x] Generated scenarios load successfully (matrices construct without error)
 
 ### Milestone 3.3: Scenario Validator (Deterministic Python)
 
@@ -652,17 +652,17 @@ def validate_scenario(scenario_path: str) -> ValidationResult:
 6. Optional: Add `--check-narrative` flag for LLM narrative check
 
 **Acceptance Criteria**:
-- [ ] Validator does NOT use LLM to reason about game theory or balance
-- [ ] Balance analysis runs 50+ actual game simulations
-- [ ] CLI returns structured JSON with pass/fail for each check
-- [ ] Dominant strategy check fails if any pairing >60% win rate
-- [ ] All checks complete in <30 seconds
-- [ ] Dominant strategy detection: statistical threshold (>60% win rate), not LLM judgment
-- [ ] Game type variety check: deterministic Python code
-- [ ] Act structure check: deterministic Python code
-- [ ] LLM checks focus on narrative consistency ONLY
-- [ ] Validation is fast for structural checks (< 100ms)
-- [ ] Validation report includes statistical tables from simulations
+- [x] Validator does NOT use LLM to reason about game theory or balance
+- [x] Balance analysis runs 50+ actual game simulations
+- [x] CLI returns structured JSON with pass/fail for each check
+- [x] Dominant strategy check fails if any pairing >60% win rate
+- [x] All checks complete in <30 seconds
+- [x] Dominant strategy detection: statistical threshold (>60% win rate), not LLM judgment
+- [x] Game type variety check: deterministic Python code
+- [x] Act structure check: deterministic Python code
+- [x] LLM checks focus on narrative consistency ONLY
+- [x] Validation is fast for structural checks (< 100ms)
+- [x] Validation report includes statistical tables from simulations
 
 ---
 
