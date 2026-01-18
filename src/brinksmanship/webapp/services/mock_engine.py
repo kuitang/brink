@@ -33,35 +33,113 @@ class MockGameEngine:
     ]
 
     OPPONENT_TYPES = [
+        # Algorithmic opponents
         {
-            "id": "tit-for-tat",
+            "id": "tit_for_tat",
             "name": "Tit-for-Tat",
             "category": "algorithmic",
             "description": "Cooperates first, then mirrors your last action.",
         },
         {
-            "id": "always-defect",
-            "name": "Always Defect",
+            "id": "nash_calculator",
+            "name": "Nash Calculator",
             "category": "algorithmic",
-            "description": "Always chooses competitive actions.",
+            "description": "Plays game-theoretic optimal strategy with risk awareness.",
         },
         {
-            "id": "nash",
-            "name": "Nash Equilibrium",
+            "id": "security_seeker",
+            "name": "Security Seeker",
             "category": "algorithmic",
-            "description": "Plays game-theoretic optimal strategy.",
+            "description": "Defaults to cooperation; escalates only defensively.",
         },
         {
-            "id": "khrushchev",
-            "name": "Nikita Khrushchev",
-            "category": "persona",
-            "description": "Mercurial Soviet leader. Alternates bluster and pragmatism.",
+            "id": "opportunist",
+            "name": "Opportunist",
+            "category": "algorithmic",
+            "description": "Probes for weakness and exploits when opponent appears weak.",
         },
+        {
+            "id": "grim_trigger",
+            "name": "Grim Trigger",
+            "category": "algorithmic",
+            "description": "Cooperates until betrayed, then defects forever.",
+        },
+        {
+            "id": "erratic",
+            "name": "Erratic",
+            "category": "algorithmic",
+            "description": "Unpredictable: 60% competitive, 40% cooperative.",
+        },
+        # Historical Political
         {
             "id": "bismarck",
             "name": "Otto von Bismarck",
-            "category": "persona",
-            "description": "Master of realpolitik. Seeks advantageous settlements.",
+            "category": "historical_political",
+            "description": "Master of realpolitik. Seeks advantageous settlements through calculated pressure.",
+        },
+        {
+            "id": "richelieu",
+            "name": "Cardinal Richelieu",
+            "category": "historical_political",
+            "description": "Patient schemer. Builds coalitions while undermining rivals.",
+        },
+        {
+            "id": "metternich",
+            "name": "Prince Metternich",
+            "category": "historical_political",
+            "description": "Architect of balance. Prefers stability over dramatic gains.",
+        },
+        # Cold War
+        {
+            "id": "khrushchev",
+            "name": "Nikita Khrushchev",
+            "category": "historical_cold_war",
+            "description": "Mercurial Soviet leader. Alternates bluster and pragmatism.",
+        },
+        {
+            "id": "kissinger",
+            "name": "Henry Kissinger",
+            "category": "historical_cold_war",
+            "description": "Strategic realist. Pursues détente while maintaining leverage.",
+        },
+        {
+            "id": "nixon",
+            "name": "Richard Nixon",
+            "category": "historical_cold_war",
+            "description": "Unpredictable strategist. Uses madman theory for advantage.",
+        },
+        # Corporate
+        {
+            "id": "carl_icahn",
+            "name": "Carl Icahn",
+            "category": "historical_corporate",
+            "description": "Corporate raider. Aggressive pressure for maximum extraction.",
+        },
+        {
+            "id": "warren_buffett",
+            "name": "Warren Buffett",
+            "category": "historical_corporate",
+            "description": "Patient value investor. Seeks win-win through fair dealing.",
+        },
+        # Palace Intrigue
+        {
+            "id": "empress_wu",
+            "name": "Empress Wu Zetian",
+            "category": "historical_palace",
+            "description": "Ruthless climber. Eliminates threats while appearing virtuous.",
+        },
+        {
+            "id": "livia",
+            "name": "Livia Drusilla",
+            "category": "historical_palace",
+            "description": "Shadow power. Achieves goals through influence over others.",
+        },
+        # Custom persona option
+        {
+            "id": "custom",
+            "name": "Custom Persona",
+            "category": "custom",
+            "description": "Describe any historical or fictional figure for AI-powered gameplay.",
         },
     ]
 

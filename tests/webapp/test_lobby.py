@@ -39,8 +39,9 @@ def test_new_game_page_shows_opponents(auth_client):
     response = auth_client.get("/new")
     assert response.status_code == 200
     assert b"Tit-for-Tat" in response.data
-    assert b"Nash Equilibrium" in response.data
-    assert b"Bismarck" in response.data
+    assert b"Nash Calculator" in response.data
+    assert b"Otto von Bismarck" in response.data
+    assert b"Custom Persona" in response.data
 
 
 def test_create_game(auth_client, app):

@@ -7,8 +7,8 @@
     <h1>Start New Game</h1>
 </div>
 
-<div class="box" style="max-width: 600px;">
-    <form method="POST">
+<div class="box" style="max-width: 700px;">
+    <form method="POST" id="new-game-form">
         <div class="form-group">
             <label for="scenario_id">Scenario</label>
             <select id="scenario_id" name="scenario_id" required>
@@ -19,18 +19,21 @@
                 </option>
                 {% endfor %}
             </select>
-            <div id="scenario-description" class="text-muted mt-md"></div>
         </div>
 
         <div class="form-group">
             <label>Opponent</label>
 
             <h4 class="mt-md">Algorithmic Opponents</h4>
+            <p class="text-muted" style="margin-bottom: 8px; font-size: 0.9em;">
+                Rule-based strategies with predictable behavior patterns.
+            </p>
             {% for opponent in opponent_types if opponent.category == 'algorithmic' %}
             <div class="mb-md">
                 <label style="display: flex; align-items: flex-start; font-weight: normal;">
                     <input type="radio" name="opponent_type" value="{{ opponent.id }}"
-                           style="width: auto; margin-right: 8px; margin-top: 4px;">
+                           style="width: auto; margin-right: 8px; margin-top: 4px;"
+                           onchange="toggleCustomPersona(this.value)">
                     <span>
                         <strong>{{ opponent.name }}</strong><br>
                         <span class="text-muted">{{ opponent.description }}</span>
@@ -40,11 +43,17 @@
             {% endfor %}
 
             <h4 class="mt-md">Historical Personas</h4>
-            {% for opponent in opponent_types if opponent.category == 'persona' %}
+            <p class="text-muted" style="margin-bottom: 8px; font-size: 0.9em;">
+                AI-powered opponents embodying documented historical figures.
+            </p>
+
+            <h5 style="margin-top: 12px; color: var(--text-muted);">Political Figures</h5>
+            {% for opponent in opponent_types if opponent.category == 'historical_political' %}
             <div class="mb-md">
                 <label style="display: flex; align-items: flex-start; font-weight: normal;">
                     <input type="radio" name="opponent_type" value="{{ opponent.id }}"
-                           style="width: auto; margin-right: 8px; margin-top: 4px;">
+                           style="width: auto; margin-right: 8px; margin-top: 4px;"
+                           onchange="toggleCustomPersona(this.value)">
                     <span>
                         <strong>{{ opponent.name }}</strong><br>
                         <span class="text-muted">{{ opponent.description }}</span>
@@ -52,10 +61,96 @@
                 </label>
             </div>
             {% endfor %}
+
+            <h5 style="margin-top: 12px; color: var(--text-muted);">Cold War Era</h5>
+            {% for opponent in opponent_types if opponent.category == 'historical_cold_war' %}
+            <div class="mb-md">
+                <label style="display: flex; align-items: flex-start; font-weight: normal;">
+                    <input type="radio" name="opponent_type" value="{{ opponent.id }}"
+                           style="width: auto; margin-right: 8px; margin-top: 4px;"
+                           onchange="toggleCustomPersona(this.value)">
+                    <span>
+                        <strong>{{ opponent.name }}</strong><br>
+                        <span class="text-muted">{{ opponent.description }}</span>
+                    </span>
+                </label>
+            </div>
+            {% endfor %}
+
+            <h5 style="margin-top: 12px; color: var(--text-muted);">Corporate Leaders</h5>
+            {% for opponent in opponent_types if opponent.category == 'historical_corporate' %}
+            <div class="mb-md">
+                <label style="display: flex; align-items: flex-start; font-weight: normal;">
+                    <input type="radio" name="opponent_type" value="{{ opponent.id }}"
+                           style="width: auto; margin-right: 8px; margin-top: 4px;"
+                           onchange="toggleCustomPersona(this.value)">
+                    <span>
+                        <strong>{{ opponent.name }}</strong><br>
+                        <span class="text-muted">{{ opponent.description }}</span>
+                    </span>
+                </label>
+            </div>
+            {% endfor %}
+
+            <h5 style="margin-top: 12px; color: var(--text-muted);">Palace Intrigue</h5>
+            {% for opponent in opponent_types if opponent.category == 'historical_palace' %}
+            <div class="mb-md">
+                <label style="display: flex; align-items: flex-start; font-weight: normal;">
+                    <input type="radio" name="opponent_type" value="{{ opponent.id }}"
+                           style="width: auto; margin-right: 8px; margin-top: 4px;"
+                           onchange="toggleCustomPersona(this.value)">
+                    <span>
+                        <strong>{{ opponent.name }}</strong><br>
+                        <span class="text-muted">{{ opponent.description }}</span>
+                    </span>
+                </label>
+            </div>
+            {% endfor %}
+
+            <h4 class="mt-md">Custom Persona</h4>
+            <p class="text-muted" style="margin-bottom: 8px; font-size: 0.9em;">
+                Describe any historical or fictional figure. AI will research and roleplay them.
+            </p>
+            <div class="mb-md">
+                <label style="display: flex; align-items: flex-start; font-weight: normal;">
+                    <input type="radio" name="opponent_type" value="custom"
+                           style="width: auto; margin-right: 8px; margin-top: 4px;"
+                           onchange="toggleCustomPersona(this.value)">
+                    <span>
+                        <strong>Custom Persona</strong><br>
+                        <span class="text-muted">Enter a name or description below</span>
+                    </span>
+                </label>
+            </div>
+
+            <div id="custom-persona-input" style="display: none; margin-left: 24px;">
+                <div class="form-group">
+                    <label for="custom_persona">Persona Description</label>
+                    <textarea id="custom_persona" name="custom_persona" rows="3"
+                              placeholder="e.g., 'Napoleon Bonaparte', 'Machiavelli', 'A paranoid medieval king', or describe a fictional character..."></textarea>
+                    <small class="text-muted">
+                        AI will research this figure (if historical) and embody their documented strategic patterns.
+                    </small>
+                </div>
+            </div>
         </div>
 
         <button type="submit" class="btn btn-primary">Start Game</button>
         <a href="{{ url_for('lobby.index') }}" class="btn">Cancel</a>
     </form>
 </div>
+
+<script>
+function toggleCustomPersona(value) {
+    const customInput = document.getElementById('custom-persona-input');
+    const textarea = document.getElementById('custom_persona');
+    if (value === 'custom') {
+        customInput.style.display = 'block';
+        textarea.required = true;
+    } else {
+        customInput.style.display = 'none';
+        textarea.required = false;
+    }
+}
+</script>
 {% endblock %}

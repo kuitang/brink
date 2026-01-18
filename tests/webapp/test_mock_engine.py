@@ -37,11 +37,12 @@ def test_get_opponent_types():
     engine = MockGameEngine()
     opponents = engine.get_opponent_types()
 
-    assert len(opponents) >= 5
-    assert any(o["id"] == "tit-for-tat" for o in opponents)
-    assert any(o["id"] == "nash" for o in opponents)
+    assert len(opponents) >= 15  # 6 algorithmic + historical + custom
+    assert any(o["id"] == "tit_for_tat" for o in opponents)
+    assert any(o["id"] == "nash_calculator" for o in opponents)
     assert any(o["category"] == "algorithmic" for o in opponents)
-    assert any(o["category"] == "persona" for o in opponents)
+    assert any(o["category"] == "historical_political" for o in opponents)
+    assert any(o["category"] == "custom" for o in opponents)
 
 
 def test_get_available_actions_low_risk():
