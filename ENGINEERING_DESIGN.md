@@ -93,11 +93,11 @@ brinksmanship/
 6. Implement state serialization/deserialization to JSON
 
 **Acceptance Criteria**:
-- [ ] `GameState` contains: position_a, position_b, resources_a, resources_b, cooperation_score, stability, risk_level, turn, previous_type_a, previous_type_b
-- [ ] All numeric fields are clamped to valid ranges on assignment
-- [ ] State can be serialized to JSON and deserialized without loss
-- [ ] State includes computed properties for variance calculation
-- [ ] Unit tests pass for all state transitions
+- [x] `GameState` contains: position_a, position_b, resources_a, resources_b, cooperation_score, stability, risk_level, turn, previous_type_a, previous_type_b
+- [x] All numeric fields are clamped to valid ranges on assignment
+- [x] State can be serialized to JSON and deserialized without loss
+- [x] State includes computed properties for variance calculation
+- [x] Unit tests pass for all state transitions
 
 ### Milestone 1.2: Matrix Definitions (Constructor Pattern)
 
@@ -150,12 +150,12 @@ brinksmanship/
 - Game-type-specific constraints (e.g., `defection_temptation > cooperation_bonus` for PD-family)
 
 **Acceptance Criteria**:
-- [ ] `MatrixParameters.__post_init__` rejects invalid parameter combinations
-- [ ] Each constructor enforces ordinal constraints (cannot produce invalid matrix)
-- [ ] `PayoffMatrix` is never serialized; only `(MatrixType, MatrixParameters)` pairs persist
-- [ ] Unit tests: random valid parameters always produce correct ordinal structure
-- [ ] Unit tests: verify Nash equilibria match expected (computed once at test time)
-- [ ] No runtime Nash equilibrium computation exists in codebase
+- [x] `MatrixParameters.__post_init__` rejects invalid parameter combinations
+- [x] Each constructor enforces ordinal constraints (cannot produce invalid matrix)
+- [x] `PayoffMatrix` is never serialized; only `(MatrixType, MatrixParameters)` pairs persist
+- [x] Unit tests: random valid parameters always produce correct ordinal structure
+- [x] Unit tests: verify Nash equilibria match expected (computed once at test time)
+- [x] No runtime Nash equilibrium computation exists in codebase
 
 ### Milestone 1.3: Action Definitions
 
@@ -169,11 +169,11 @@ brinksmanship/
 5. Define special actions (Settlement, Reconnaissance)
 
 **Acceptance Criteria**:
-- [ ] Actions are correctly classified as COOPERATIVE or COMPETITIVE
-- [ ] Action menus vary by Risk Level as specified in GAME_MANUAL.md
-- [ ] Resource costs are enforced (cannot take action if insufficient resources)
-- [ ] Settlement action has special handling (bypasses matrix resolution)
-- [ ] Unit tests verify action classification
+- [x] Actions are correctly classified as COOPERATIVE or COMPETITIVE
+- [x] Action menus vary by Risk Level as specified in GAME_MANUAL.md
+- [x] Resource costs are enforced (cannot take action if insufficient resources)
+- [x] Settlement action has special handling (bypasses matrix resolution)
+- [x] Unit tests verify action classification
 
 ### Milestone 1.4: Storage Repository
 
@@ -252,13 +252,13 @@ DATABASE_URI = "sqlite:///instance/brinksmanship.db"
 ```
 
 **Acceptance Criteria**:
-- [ ] `ScenarioRepository` interface defined with list/get/save/delete
-- [ ] `FileScenarioRepository` reads/writes JSON files
-- [ ] `SQLiteScenarioRepository` uses SQLAlchemy models
-- [ ] `GameRecordRepository` interface defined
-- [ ] Both backends pass identical integration tests
-- [ ] Factory function returns correct backend based on config
-- [ ] CLI and webapp use repository, not direct file access
+- [x] `ScenarioRepository` interface defined with list/get/save/delete
+- [x] `FileScenarioRepository` reads/writes JSON files
+- [x] `SQLiteScenarioRepository` uses sqlite3 (simplified from SQLAlchemy)
+- [x] `GameRecordRepository` interface defined
+- [x] Both backends pass identical integration tests
+- [x] Factory function returns correct backend based on config
+- [x] CLI and webapp use repository, not direct file access
 
 ### Milestone 1.5: InformationState Model
 
@@ -297,12 +297,12 @@ class InformationState:
 ```
 
 **Acceptance Criteria**:
-- [ ] `InformationState` dataclass defined with all fields
-- [ ] `get_position_estimate` returns (estimate, uncertainty_radius)
-- [ ] Uncertainty grows at 0.8 per turn, capped at 5.0
-- [ ] Initial bounds are (0.0, 10.0) for both position and resources
-- [ ] Information from successful Reconnaissance/Inspection games can update known values
-- [ ] Unit tests verify decay calculation
+- [x] `InformationState` dataclass defined with all fields
+- [x] `get_position_estimate` returns (estimate, uncertainty_radius)
+- [x] Uncertainty grows at 0.8 per turn, capped at 5.0
+- [x] Initial bounds are (0.0, 10.0) for both position and resources
+- [x] Information from successful Reconnaissance/Inspection games can update known values
+- [x] Unit tests verify decay calculation
 
 ---
 
