@@ -1,0 +1,518 @@
+/* Brinksmanship - Kingdom of Loathing inspired theme */
+/* Design: Serif fonts, earth tones, box borders, text-heavy, minimal */
+
+/* ===== CSS CUSTOM PROPERTIES ===== */
+:root {
+    /* Colors - Muted earth-tone palette */
+    --bg: #f5f0e6;
+    --bg-alt: #ebe5d8;
+    --text: #2c2416;
+    --text-muted: #6b5d4d;
+    --border: #8b7355;
+    --border-light: #c4b59d;
+    --accent: #5c4a32;
+    --link: #4a6741;
+    --link-hover: #2d3f28;
+
+    /* Semantic colors */
+    --danger: #8b3a3a;
+    --danger-bg: #f5e0e0;
+    --success: #3a6b3a;
+    --success-bg: #e0f0e0;
+    --warning: #8b6b3a;
+    --warning-bg: #f5ebe0;
+    --info: #3a5a8b;
+    --info-bg: #e0e8f5;
+
+    /* Game-specific colors */
+    --cooperative: #4a6741;
+    --competitive: #8b3a3a;
+    --risk-low: #4a6741;
+    --risk-medium: #8b6b3a;
+    --risk-high: #8b3a3a;
+
+    /* Typography */
+    --font-body: Georgia, "Times New Roman", serif;
+    --font-mono: "Courier New", Courier, monospace;
+    --font-size-base: 15px;
+    --line-height: 1.5;
+
+    /* Spacing */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+
+    /* Box styling */
+    --border-width: 2px;
+    --box-padding: var(--spacing-md);
+}
+
+/* ===== THEME VARIATIONS ===== */
+body.theme-crisis {
+    --bg: #f0e6e6;
+    --bg-alt: #e8dada;
+    --accent: #6b3a3a;
+    --border: #8b5555;
+}
+
+body.theme-cold-war {
+    --bg: #e6eaf0;
+    --bg-alt: #dce0e8;
+    --accent: #3a4a6b;
+    --border: #556688;
+}
+
+/* ===== RESET & BASE ===== */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+html {
+    font-size: var(--font-size-base);
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-body);
+    line-height: var(--line-height);
+    color: var(--text);
+    background-color: var(--bg);
+}
+
+a {
+    color: var(--link);
+    text-decoration: underline;
+}
+
+a:hover {
+    color: var(--link-hover);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin: 0 0 var(--spacing-md) 0;
+    font-weight: bold;
+    line-height: 1.2;
+}
+
+h1 { font-size: 1.75rem; }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.25rem; }
+
+p {
+    margin: 0 0 var(--spacing-md) 0;
+}
+
+/* ===== LAYOUT ===== */
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: var(--spacing-md);
+}
+
+.page-header {
+    margin-bottom: var(--spacing-lg);
+    padding-bottom: var(--spacing-md);
+    border-bottom: var(--border-width) solid var(--border);
+}
+
+/* ===== HEADER & NAV ===== */
+header {
+    background-color: var(--bg-alt);
+    border-bottom: var(--border-width) solid var(--border);
+    padding: var(--spacing-md);
+}
+
+header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0;
+}
+
+.site-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--accent);
+    text-decoration: none;
+}
+
+.site-title:hover {
+    color: var(--text);
+}
+
+nav {
+    display: flex;
+    gap: var(--spacing-md);
+}
+
+nav a {
+    color: var(--text);
+    text-decoration: none;
+    padding: var(--spacing-xs) var(--spacing-sm);
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+/* ===== BOX COMPONENTS ===== */
+.box {
+    border: var(--border-width) solid var(--border);
+    background-color: var(--bg-alt);
+    padding: var(--box-padding);
+    margin-bottom: var(--spacing-md);
+}
+
+.box-header {
+    margin: calc(-1 * var(--box-padding));
+    margin-bottom: var(--spacing-md);
+    padding: var(--spacing-sm) var(--box-padding);
+    background-color: var(--accent);
+    color: var(--bg);
+    font-weight: bold;
+    border-bottom: var(--border-width) solid var(--border);
+}
+
+.box-header h2,
+.box-header h3 {
+    margin: 0;
+    font-size: 1rem;
+}
+
+/* ===== BUTTONS ===== */
+.btn {
+    display: inline-block;
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    text-decoration: none;
+    cursor: pointer;
+    border: var(--border-width) solid var(--border);
+    background-color: var(--bg);
+    color: var(--text);
+}
+
+.btn:hover {
+    background-color: var(--bg-alt);
+}
+
+.btn-primary {
+    background-color: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+}
+
+.btn-primary:hover {
+    background-color: var(--text);
+}
+
+.btn-cooperative {
+    background-color: var(--cooperative);
+    color: var(--bg);
+    border-color: var(--cooperative);
+}
+
+.btn-cooperative:hover {
+    opacity: 0.9;
+}
+
+.btn-competitive {
+    background-color: var(--competitive);
+    color: var(--bg);
+    border-color: var(--competitive);
+}
+
+.btn-competitive:hover {
+    opacity: 0.9;
+}
+
+.btn-small {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: 0.875rem;
+}
+
+/* ===== FORMS ===== */
+.form-group {
+    margin-bottom: var(--spacing-md);
+}
+
+label {
+    display: block;
+    margin-bottom: var(--spacing-xs);
+    font-weight: bold;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"],
+select,
+textarea {
+    width: 100%;
+    padding: var(--spacing-sm);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    border: var(--border-width) solid var(--border);
+    background-color: var(--bg);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+}
+
+/* ===== FLASH MESSAGES ===== */
+.flash {
+    padding: var(--spacing-sm) var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    border: var(--border-width) solid;
+}
+
+.flash-error {
+    background-color: var(--danger-bg);
+    border-color: var(--danger);
+    color: var(--danger);
+}
+
+.flash-success {
+    background-color: var(--success-bg);
+    border-color: var(--success);
+    color: var(--success);
+}
+
+.flash-info {
+    background-color: var(--info-bg);
+    border-color: var(--info);
+    color: var(--info);
+}
+
+.flash-warning {
+    background-color: var(--warning-bg);
+    border-color: var(--warning);
+    color: var(--warning);
+}
+
+/* ===== GAME STATUS BAR ===== */
+.status-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    background-color: var(--bg-alt);
+    border: var(--border-width) solid var(--border);
+    margin-bottom: var(--spacing-md);
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+}
+
+.status-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.status-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+.status-value {
+    font-weight: bold;
+}
+
+.status-value.risk-low { color: var(--risk-low); }
+.status-value.risk-medium { color: var(--risk-medium); }
+.status-value.risk-high { color: var(--risk-high); }
+
+/* ===== NARRATIVE ===== */
+.narrative {
+    padding: var(--spacing-md);
+    background-color: var(--bg);
+    border: var(--border-width) solid var(--border-light);
+    border-left: 4px solid var(--accent);
+    margin-bottom: var(--spacing-md);
+    font-style: italic;
+}
+
+.narrative-outcome {
+    margin-top: var(--spacing-md);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--border-light);
+    font-style: normal;
+    font-weight: bold;
+}
+
+/* ===== ACTION MENU ===== */
+.action-menu {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-sm);
+}
+
+.action-btn {
+    display: flex;
+    flex-direction: column;
+    padding: var(--spacing-md);
+    text-align: left;
+    border: var(--border-width) solid var(--border);
+    background-color: var(--bg);
+    cursor: pointer;
+    font-family: var(--font-body);
+}
+
+.action-btn:hover {
+    background-color: var(--bg-alt);
+}
+
+.action-btn.cooperative {
+    border-left: 4px solid var(--cooperative);
+}
+
+.action-btn.competitive {
+    border-left: 4px solid var(--competitive);
+}
+
+.action-name {
+    font-weight: bold;
+    margin-bottom: var(--spacing-xs);
+}
+
+.action-cost {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+/* ===== HISTORY ===== */
+.history {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+}
+
+.history-turn {
+    display: inline-block;
+    padding: 2px 6px;
+    margin: 2px;
+    background-color: var(--bg);
+    border: 1px solid var(--border-light);
+}
+
+.history-turn .cooperative { color: var(--cooperative); }
+.history-turn .competitive { color: var(--competitive); }
+
+/* ===== GAME LIST ===== */
+.game-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.game-list li {
+    padding: var(--spacing-sm) 0;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.game-list li:last-child {
+    border-bottom: none;
+}
+
+.game-list a {
+    display: flex;
+    justify-content: space-between;
+    text-decoration: none;
+    color: var(--text);
+}
+
+.game-list a:hover {
+    color: var(--link);
+}
+
+.game-meta {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+/* ===== HTMX INTEGRATION ===== */
+.htmx-indicator {
+    display: none;
+}
+
+.htmx-request .htmx-indicator {
+    display: block;
+}
+
+.htmx-request .hide-on-request {
+    display: none;
+}
+
+/* ===== THINKING INDICATOR ===== */
+.thinking {
+    padding: var(--spacing-md);
+    text-align: center;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+.thinking::after {
+    content: "";
+    animation: thinking-dots 1.5s infinite;
+}
+
+@keyframes thinking-dots {
+    0%, 20% { content: "."; }
+    40% { content: ".."; }
+    60%, 100% { content: "..."; }
+}
+
+/* ===== GAME OVER ===== */
+.game-result {
+    text-align: center;
+    padding: var(--spacing-xl);
+}
+
+.vp-display {
+    font-size: 3rem;
+    font-weight: bold;
+    margin: var(--spacing-md) 0;
+}
+
+.vp-player {
+    color: var(--cooperative);
+}
+
+.vp-opponent {
+    color: var(--competitive);
+}
+
+/* ===== TWO COLUMN LAYOUT ===== */
+.two-column {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-lg);
+}
+
+@media (max-width: 700px) {
+    .two-column {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ===== FOOTER ===== */
+footer {
+    margin-top: var(--spacing-xl);
+    padding: var(--spacing-md);
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    border-top: 1px solid var(--border-light);
+}
+
+/* ===== UTILITY CLASSES ===== */
+.text-center { text-align: center; }
+.text-muted { color: var(--text-muted); }
+.mt-md { margin-top: var(--spacing-md); }
+.mb-md { margin-bottom: var(--spacing-md); }
+.mb-lg { margin-bottom: var(--spacing-lg); }

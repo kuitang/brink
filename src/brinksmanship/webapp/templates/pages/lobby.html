@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Games - Brinksmanship{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Your Games</h1>
+    <a href="{{ url_for('lobby.new_game') }}" class="btn btn-primary">Start New Game</a>
+</div>
+
+<div class="two-column">
+    <div class="box">
+        <div class="box-header">
+            <h3>Active Games</h3>
+        </div>
+        {% if active_games %}
+            <ul class="game-list">
+                {% for game in active_games %}
+                <li>
+                    <a href="{{ url_for('game.play', game_id=game.game_id) }}">
+                        <span>
+                            <strong>{{ game.state.get('scenario_name', game.scenario_id) }}</strong>
+                            vs {{ game.opponent_type }}
+                        </span>
+                        <span class="game-meta">
+                            Turn {{ game.state.get('turn', 1) }}
+                        </span>
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-muted">No active games. Start a new game to begin!</p>
+        {% endif %}
+    </div>
+
+    <div class="box">
+        <div class="box-header">
+            <h3>Recent Completed Games</h3>
+        </div>
+        {% if finished_games %}
+            <ul class="game-list">
+                {% for game in finished_games %}
+                <li>
+                    <a href="{{ url_for('game.game_over', game_id=game.game_id) }}">
+                        <span>
+                            <strong>{{ game.state.get('scenario_name', game.scenario_id) }}</strong>
+                            vs {{ game.opponent_type }}
+                        </span>
+                        <span class="game-meta">
+                            {{ game.final_vp_player }} VP | {{ game.ending_type }}
+                        </span>
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-muted">No completed games yet.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

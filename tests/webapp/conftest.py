@@ -1,0 +1,54 @@
+"""Pytest fixtures for webapp tests."""
+
+import pytest
+
+from brinksmanship.webapp import create_app
+from brinksmanship.webapp.config import TestConfig
+from brinksmanship.webapp.extensions import db
+from brinksmanship.webapp.models import User
+
+
+@pytest.fixture
+def app():
+    """Create test application."""
+    app = create_app(TestConfig)
+    with app.app_context():
+        db.create_all()
+        yield app
+        db.drop_all()
+
+
+@pytest.fixture
+def client(app):
+    """Create test client."""
+    return app.test_client()
+
+
+@pytest.fixture
+def runner(app):
+    """Create test CLI runner."""
+    return app.test_cli_runner()
+
+
+@pytest.fixture
+def user(app):
+    """Create a test user and return user_id."""
+    with app.app_context():
+        user = User(username="testuser")
+        user.set_password("testpassword123")
+        db.session.add(user)
+        db.session.commit()
+        # Return just the ID to avoid DetachedInstanceError
+        user_id = user.id
+    return user_id
+
+
+@pytest.fixture
+def auth_client(client, user):
+    """Create authenticated test client."""
+    # user is now a user_id, login works the same
+    client.post(
+        "/auth/login",
+        data={"username": "testuser", "password": "testpassword123"},
+    )
+    return client

@@ -1,0 +1,10 @@
+{# Narrative briefing and last outcome #}
+<div class="narrative">
+    {{ state.briefing }}
+
+    {% if state.last_outcome %}
+    <div class="narrative-outcome">
+        {{ state.last_outcome }}
+    </div>
+    {% endif %}
+</div>

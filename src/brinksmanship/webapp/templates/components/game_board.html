@@ -1,0 +1,26 @@
+{# Main game board component - swapped via htmx #}
+
+{% include "components/status_bar.html" %}
+
+<div class="box">
+    <div class="box-header">
+        <h3>Turn {{ state.turn }}</h3>
+    </div>
+    {% include "components/narrative.html" %}
+</div>
+
+<div class="box">
+    <div class="box-header">
+        <h3>Choose Your Action</h3>
+    </div>
+    {% include "components/action_menu.html" %}
+</div>
+
+{% if state.history %}
+<div class="box">
+    <div class="box-header">
+        <h3>History</h3>
+    </div>
+    {% include "components/history.html" %}
+</div>
+{% endif %}

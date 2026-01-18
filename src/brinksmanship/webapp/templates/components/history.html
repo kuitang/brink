@@ -1,0 +1,14 @@
+{# Turn history display #}
+<div class="history">
+    {% if state.history %}
+        {% for turn in state.history %}
+        <span class="history-turn">
+            T{{ turn.turn }}:
+            <span class="{{ 'cooperative' if turn.player == 'C' else 'competitive' }}">{{ turn.player }}</span>
+            <span class="{{ 'cooperative' if turn.opponent == 'C' else 'competitive' }}">{{ turn.opponent }}</span>
+        </span>
+        {% endfor %}
+    {% else %}
+        <p class="text-muted">No history yet.</p>
+    {% endif %}
+</div>

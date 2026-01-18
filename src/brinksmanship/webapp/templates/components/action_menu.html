@@ -1,0 +1,24 @@
+{# Action selection menu with htmx #}
+<form hx-post="{{ url_for('game.submit_action', game_id=game_id) }}"
+      hx-target="#game-board"
+      hx-swap="innerHTML"
+      hx-indicator="#thinking">
+
+    <div class="hide-on-request">
+        <div class="action-menu">
+            {% for action in actions %}
+            <button type="submit" name="action_id" value="{{ action.id }}"
+                    class="action-btn {{ action.type }}">
+                <span class="action-name">{{ action.name }}</span>
+                {% if action.cost > 0 %}
+                <span class="action-cost">Cost: {{ action.cost }} resources</span>
+                {% endif %}
+            </button>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div id="thinking" class="htmx-indicator">
+        {% include "components/opponent_thinking.html" %}
+    </div>
+</form>

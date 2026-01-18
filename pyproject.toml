@@ -34,9 +34,15 @@ dev = [
     "mypy>=1.0.0",
     "ruff>=0.1.0",
 ]
+webapp = [
+    "flask>=3.0.0",
+    "flask-login>=0.6.0",
+    "flask-sqlalchemy>=3.1.0",
+]
 
 [project.scripts]
 brinksmanship = "brinksmanship.cli.app:main"
+brinksmanship-web = "brinksmanship.webapp.app:main"
 
 [build-system]
 requires = ["hatchling"]

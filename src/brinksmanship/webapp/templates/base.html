@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Brinksmanship{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/htmx.min.js') }}" defer></script>
+</head>
+<body class="{% block body_class %}{% endblock %}">
+    <header>
+        <div class="container">
+            <a href="{{ url_for('lobby.index') }}" class="site-title">Brinksmanship</a>
+            <nav>
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('lobby.index') }}">Games</a>
+                    <a href="{{ url_for('lobby.new_game') }}">New Game</a>
+                    <a href="{{ url_for('auth.logout') }}">Logout ({{ current_user.username }})</a>
+                {% else %}
+                    <a href="{{ url_for('auth.login') }}">Login</a>
+                    <a href="{{ url_for('auth.register') }}">Register</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash flash-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <div class="container">
+            A game-theoretic strategy simulation
+        </div>
+    </footer>
+</body>
+</html>

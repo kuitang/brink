@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Game Over - Brinksmanship{% endblock %}
+
+{% block content %}
+<div class="page-header text-center">
+    <h1>Game Over</h1>
+    <p class="text-muted">{{ state.scenario_name }} vs {{ state.opponent_type }}</p>
+</div>
+
+<div class="box game-result">
+    <h2>
+        {% if game.ending_type == 'mutual_destruction' %}
+            Mutual Destruction
+        {% elif game.ending_type == 'player_eliminated' %}
+            Defeat
+        {% elif game.ending_type == 'opponent_eliminated' %}
+            Victory
+        {% elif game.ending_type == 'settlement' %}
+            Settlement Reached
+        {% else %}
+            Final Resolution
+        {% endif %}
+    </h2>
+
+    <div class="vp-display">
+        <span class="vp-player">{{ game.final_vp_player }}</span>
+        <span class="text-muted"> - </span>
+        <span class="vp-opponent">{{ game.final_vp_opponent }}</span>
+    </div>
+    <p class="text-muted">Your VP - Opponent VP</p>
+
+    {% if state.last_outcome %}
+    <div class="narrative mt-md">
+        {{ state.last_outcome }}
+    </div>
+    {% endif %}
+
+    <p>Final turn: {{ state.turn }}</p>
+</div>
+
+<div class="box">
+    <div class="box-header">
+        <h3>Final State</h3>
+    </div>
+    {% include "components/status_bar.html" %}
+</div>
+
+<div class="box">
+    <div class="box-header">
+        <h3>Game History</h3>
+    </div>
+    {% include "components/history.html" %}
+</div>
+
+<div class="text-center mt-md">
+    <a href="{{ url_for('lobby.new_game') }}" class="btn btn-primary">New Game</a>
+    <a href="{{ url_for('lobby.index') }}" class="btn">Back to Lobby</a>
+</div>
+{% endblock %}

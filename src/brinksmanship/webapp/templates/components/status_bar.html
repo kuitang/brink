@@ -1,0 +1,34 @@
+{# Status bar showing game state variables #}
+<div class="status-bar">
+    <div class="status-item">
+        <span class="status-label">Turn</span>
+        <span class="status-value">{{ state.turn }} / ~{{ state.max_turns }}</span>
+    </div>
+
+    <div class="status-item">
+        <span class="status-label">Your Position</span>
+        <span class="status-value">{{ "%.1f"|format(state.position_player) }}</span>
+    </div>
+
+    <div class="status-item">
+        <span class="status-label">Your Resources</span>
+        <span class="status-value">{{ "%.1f"|format(state.resources_player) }}</span>
+    </div>
+
+    <div class="status-item">
+        <span class="status-label">Risk Level</span>
+        <span class="status-value {% if state.risk_level >= 7 %}risk-high{% elif state.risk_level >= 4 %}risk-medium{% else %}risk-low{% endif %}">
+            {{ "%.1f"|format(state.risk_level) }} / 10
+        </span>
+    </div>
+
+    <div class="status-item">
+        <span class="status-label">Cooperation</span>
+        <span class="status-value">{{ state.cooperation_score }} / 10</span>
+    </div>
+
+    <div class="status-item">
+        <span class="status-label">Stability</span>
+        <span class="status-value">{{ state.stability }} / 10</span>
+    </div>
+</div>
