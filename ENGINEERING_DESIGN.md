@@ -722,10 +722,10 @@ class Opponent(ABC):
 ```
 
 **Acceptance Criteria**:
-- [ ] All opponents implement the same interface
-- [ ] Interface supports both human and AI opponents
-- [ ] `evaluate_settlement` processes both numeric offer AND argument text
-- [ ] Factory function creates opponent by type name
+- [x] All opponents implement the same interface
+- [x] Interface supports both human and AI opponents
+- [x] `evaluate_settlement` processes both numeric offer AND argument text
+- [x] Factory function creates opponent by type name
 
 ### Milestone 4.2: Deterministic Opponents
 
@@ -771,11 +771,11 @@ class DeterministicOpponent(Opponent):
 ```
 
 **Acceptance Criteria**:
-- [ ] Strategic actions are purely deterministic (testable, reproducible)
-- [ ] Settlement evaluation uses LLM with persona-specific prompts
-- [ ] Opponents use only observable game state (no cheating)
-- [ ] Unit tests verify strategic behavior patterns
-- [ ] Settlement behavior matches persona descriptions
+- [x] Strategic actions are purely deterministic (testable, reproducible)
+- [x] Settlement evaluation uses LLM with persona-specific prompts
+- [x] Opponents use only observable game state (no cheating)
+- [x] Unit tests verify strategic behavior patterns
+- [x] Settlement behavior matches persona descriptions
 
 ### Milestone 4.3: Historical Personas (LLM-based)
 
@@ -825,11 +825,11 @@ class DeterministicOpponent(Opponent):
 5. Implement `generate_new_persona` function using LLM
 
 **Acceptance Criteria**:
-- [ ] Each persona has documented historical basis
-- [ ] Persona prompts are in `prompts.py`
-- [ ] LLM responses are parsed to valid actions
-- [ ] Personas maintain consistent behavior within a game
-- [ ] Unit tests verify personas make reasonable choices
+- [x] Each persona has documented historical basis
+- [x] Persona prompts are in `prompts.py`
+- [x] LLM responses are parsed to valid actions
+- [x] Personas maintain consistent behavior within a game
+- [x] Unit tests verify personas make reasonable choices
 
 ### Milestone 4.4: Custom Persona Generator (LLM-based)
 
@@ -966,12 +966,12 @@ async def generate_persona(
 6. Log evaluation results to track which figures benefit from web search
 
 **Acceptance Criteria**:
-- [ ] Personas include all required fields: worldview, patterns, risk, triggers, settlement_style
-- [ ] Evaluation step runs for new personas and logs whether web search added value
-- [ ] Famous figures (Gates, Jobs, etc.) show measurable improvement with web search due to lawsuit documentation
-- [ ] LLM-only path completes in <10 seconds
-- [ ] WebSearch path completes in <60 seconds
-- [ ] WebSearch results are cached by figure name
+- [x] Personas include all required fields: worldview, patterns, risk, triggers, settlement_style
+- [x] Evaluation step runs for new personas and logs whether web search added value
+- [x] Famous figures (Gates, Jobs, etc.) show measurable improvement with web search due to lawsuit documentation
+- [x] LLM-only path completes in <10 seconds
+- [x] WebSearch path completes in <60 seconds
+- [x] WebSearch results are cached by figure name
 
 ---
 
@@ -995,10 +995,13 @@ async def generate_persona(
 - Personality (cooperative, competitive, erratic)
 
 **Acceptance Criteria**:
-- [ ] Simulated humans make varied, realistic decisions
-- [ ] Different personas exhibit different play patterns
-- [ ] Simulated humans occasionally make suboptimal choices (realistic)
-- [ ] Personas are generated fresh for each playtest session
+- [x] HumanPersona Pydantic model with all attributes (risk_tolerance, sophistication, emotional_state, personality) - TESTED
+- [x] Mistake probability calculation (novice=30%, intermediate=15%, expert=5%, with emotional modifiers) - TESTED
+- [x] Prompts added to prompts.py (HUMAN_SIMULATOR_SYSTEM_PROMPT, HUMAN_PERSONA_GENERATION_PROMPT, HUMAN_ACTION_SELECTION_PROMPT, MISTAKE_CHECK_PROMPT, HUMAN_SETTLEMENT_EVALUATION_PROMPT) - IMPLEMENTED
+- [ ] Simulated humans make varied, realistic decisions - AWAITS LLM integration testing
+- [ ] Different personas exhibit different play patterns - AWAITS LLM integration testing
+- [ ] Simulated humans occasionally make suboptimal choices - AWAITS LLM integration testing
+- [ ] Personas are generated fresh for each playtest session - AWAITS LLM integration testing
 
 ### Milestone 5.2: Playtester Framework (Deterministic Python)
 
@@ -1059,13 +1062,13 @@ def run_playtest(scenario_path: str, pairings: list, games: int, output: str):
 ```
 
 **Acceptance Criteria**:
-- [ ] Pure Python scripts handle game execution (deterministic, fast)
-- [ ] Parallel execution via ProcessPoolExecutor (not LLM subagents)
-- [ ] Can run N games with specified opponent pairings via CLI
-- [ ] Aggregates statistics: win rates, average VP, turn counts, ending types
-- [ ] Exports complete game logs for analysis
-- [ ] Generates summary report as structured JSON
-- [ ] 100 games complete in <60 seconds for deterministic opponents
+- [x] Pure Python scripts handle game execution (deterministic, fast)
+- [x] Parallel execution via ProcessPoolExecutor (not LLM subagents)
+- [x] Can run N games with specified opponent pairings via CLI
+- [x] Aggregates statistics: win rates, average VP, turn counts, ending types
+- [x] Exports complete game logs for analysis
+- [x] Generates summary report as structured JSON
+- [x] 100 games complete in <60 seconds for deterministic opponents
 
 ### Milestone 5.3: Mechanics Analysis (Deterministic Python)
 
