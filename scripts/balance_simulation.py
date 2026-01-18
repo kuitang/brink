@@ -452,7 +452,7 @@ def print_summary_table(results: dict, num_games: int):
 
     # Dominant strategy analysis
     print("\n" + "=" * 100)
-    print("DOMINANT STRATEGY ANALYSIS (>65% win rate against all others)")
+    print("DOMINANT STRATEGY ANALYSIS (>60% win rate against all others)")
     print("=" * 100)
 
     # Aggregate win rates per strategy
@@ -478,7 +478,7 @@ def print_summary_table(results: dict, num_games: int):
     for strat, data in sorted(strategy_wins.items()):
         win_rate = data["wins"] / data["games"] if data["games"] > 0 else 0
         print(f"{strat:<20} {data['wins']:>12} {data['games']:>12} {win_rate*100:>17.1f}%")
-        if win_rate > 0.65:
+        if win_rate > 0.60:
             dominant_strategies.append((strat, win_rate))
 
     print("\n" + "-" * 65)
@@ -487,7 +487,7 @@ def print_summary_table(results: dict, num_games: int):
         for strat, rate in dominant_strategies:
             print(f"  - {strat}: {rate*100:.1f}% overall win rate")
     else:
-        print("NO DOMINANT STRATEGY DETECTED (no strategy exceeds 65% overall win rate)")
+        print("NO DOMINANT STRATEGY DETECTED (no strategy exceeds 60% overall win rate)")
 
     # Head-to-head analysis
     print("\n" + "=" * 100)

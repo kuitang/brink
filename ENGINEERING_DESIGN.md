@@ -6,12 +6,13 @@
 
 ## Overview
 
-This document provides a step-by-step implementation plan for building Brinksmanship, a game-theoretic strategy simulation. The implementation uses Python with the Claude Agent SDK for all LLM tasks.
+This document provides an implementation plan for Brinksmanship, a game-theoretic strategy simulation.
 
 **Target Runtime**: Python 3.11+
-**LLM Integration**: Claude Agent SDK (claude-agent-sdk)
+**LLM Integration**: Claude Agent SDK for personas and settlement evaluation
 **CLI Framework**: Textual
-**Configuration**: All prompts stored in `prompts.py`
+**Storage**: SQLite (webapp), JSON files (CLI)
+**Validation/Testing**: Deterministic Python scripts (no LLM orchestration)
 
 ---
 
@@ -629,7 +630,7 @@ def validate_scenario(scenario_path: str) -> ValidationResult:
 
     # 2. Balance simulation (pure Python)
     sim_results = run_balance_simulation(scenario, games=50)
-    results.balance = check_dominant_strategy(sim_results)  # No >70% win rate
+    results.balance = check_dominant_strategy(sim_results)  # No >60% win rate
 
     # 3. Optional: Narrative consistency (requires LLM)
     if args.check_narrative:
@@ -647,16 +648,16 @@ def validate_scenario(scenario_path: str) -> ValidationResult:
 2. Implement `scripts/validate_scenario.py` (CLI entry point)
 3. Implement structural checks (variety, acts, branching)
 4. Implement balance simulation runner
-5. Implement dominant strategy detection (>70% win rate = fail)
+5. Implement dominant strategy detection (>60% win rate = fail)
 6. Optional: Add `--check-narrative` flag for LLM narrative check
 
 **Acceptance Criteria**:
 - [ ] Validator does NOT use LLM to reason about game theory or balance
 - [ ] Balance analysis runs 50+ actual game simulations
 - [ ] CLI returns structured JSON with pass/fail for each check
-- [ ] Dominant strategy check fails if any pairing >70% win rate
+- [ ] Dominant strategy check fails if any pairing >60% win rate
 - [ ] All checks complete in <30 seconds
-- [ ] Dominant strategy detection: statistical threshold (>70% win rate), not LLM judgment
+- [ ] Dominant strategy detection: statistical threshold (>60% win rate), not LLM judgment
 - [ ] Game type variety check: deterministic Python code
 - [ ] Act structure check: deterministic Python code
 - [ ] LLM checks focus on narrative consistency ONLY
@@ -787,20 +788,32 @@ class DeterministicOpponent(Opponent):
 2. Define persona prompt templates in `prompts.py` (include characteristic quotes)
 3. Implement persona library with the following figures:
 
-**Political/Military Personas**:
+**Political/Military Personas (Pre-20th Century)**:
 - **Otto von Bismarck**: Realpolitik, flexible alliances, never fights unwinnable wars
-- **Nikita Khrushchev**: Probes for weakness, bold gestures, backs down if opponent holds firm
 - **Cardinal Richelieu**: Raison d'état, long game, weakens rivals through proxies
 - **Metternich**: Concert of Europe, stability over hegemony, endless negotiation
-- **Thucydides' Athenians**: "The strong do what they can, the weak suffer what they must"
-- **Machiavelli's Prince**: Fox and lion, strike decisively, maintain appearance of trustworthiness
+- **Pericles** (Athens): Defensive grand strategy, avoids pitched battles, leverages naval superiority, manages alliance through soft power, patient attrition
 
-**Corporate Personas**:
-- **Jack Welch**: "Neutron Jack" - aggressive, results-oriented, "rank and yank" mentality, constructive conflict, "be #1 or #2 or get out", speed and simplicity
-- **Michael Milken**: Information asymmetry exploitation, high-risk/high-reward, network effects, aggressive deal-making, finds value where others see only risk
-- **Warren Buffett**: Long-term value, patience, reputation for fairness, reluctant to engage in hostile actions, strong when position is strong
-- **Carl Icahn**: Corporate raider, aggressive pressure, exploits weakness, forces action through confrontation
-- **Jamie Dimon**: Calculated risk, fortress balance sheet, opportunistic in crisis
+**Cold War / Small State Personas**:
+- **Richard Nixon**: Triangular diplomacy, exploits rival divisions, pragmatic dealmaker, comfortable with ambiguity, "madman theory" unpredictability
+- **Henry Kissinger**: Realpolitik architect, linkage diplomacy, balance of power, prefers stability over ideology, back-channel negotiations
+- **Nikita Khrushchev**: Probes for weakness, bold gestures, backs down if opponent holds firm, brinkmanship but knows limits
+- **Josip Broz Tito**: Non-alignment, plays superpowers against each other, builds third-world coalitions, leverages unique position, fiercely independent
+- **Urho Kekkonen** (Finland): "Finlandization" - survival through strategic accommodation, "bowing to the East without mooning the West", preserves independence through perceived compliance
+- **Lee Kuan Yew** (Singapore): Small state survival, cold realpolitik assessment, balance of power engagement, exceptionalism, makes self indispensable to larger powers
+
+**Corporate/Tech Personas** (selected for documented evidence from lawsuits, depositions, internal emails):
+- **Bill Gates**: Predatory competitor, leverages market dominance, bundles/forecloses, "cut off their air supply", evasive when cornered (Microsoft antitrust trial emails)
+- **Steve Jobs**: Hard-nosed negotiator, confident silence, walk-away credibility, social proof leverage, lays out opponent's options unfavorably (DOJ ebook lawsuit emails)
+- **Carl Icahn**: Corporate raider, hostile pressure, proxy fights, greenmail, finds unexpected allies (e.g., unions at TWA), exploits weakness
+- **Mark Zuckerberg**: Strategic acquirer, "buy or bury", identifies threats early, neutralizes competition through acquisition without creating market holes (FTC antitrust emails)
+- **Warren Buffett**: Patient cooperator, reputation for fairness, avoids hostile actions, "favorite holding period is forever", strong from prepared position, contrarian in crisis
+
+**Palace Intrigue Personas**:
+- **Empress Theodora** (Byzantine): Rose from actress to co-ruler, "purple makes the best shroud", stands firm in crisis, champions her faction, ruthless when threatened but builds genuine loyalty
+- **Wu Zetian** (Tang China): Only female Emperor of China, rose from concubine through intelligence and elimination of rivals, merit-based promotions, extensive spy networks, patient but decisive
+- **Empress Dowager Cixi** (Qing China): De facto ruler for 47 years, masterful at playing factions, controls through regency and influence, modernizes selectively, consolidates power through perceived weakness
+- **Livia Drusilla** (Rome): Wife of Augustus, exercises immense influence without formal power, patient multi-decade strategy, rumored poisoner (probably unjust), maintains appearances while controlling outcomes
 
 4. Implement persona prompt that includes:
    - Historical context and worldview
@@ -822,60 +835,143 @@ class DeterministicOpponent(Opponent):
 
 **Deliverable**: `src/brinksmanship/opponents/persona_generator.py` and addition to `prompts.py`
 
-**Design Principle**: New personas can be created from a figure name/description. LLM training data is sufficient for all well-known historical figures. Fast execution (~5s) with no external dependencies.
+**Design Principle**: New personas can be created from a figure name/description.
+- **Famous figures** (Bismarck, Gates, Buffett): LLM training data suffices (~5s)
+- **Obscure/arbitrary figures**: WebSearch grounds persona in documented behavior (~30s)
+- **Evaluation step**: Compare web-searched vs non-web-searched personas to validate quality
 
-**Persona Generation**:
+**Model Selection** (all use Claude Agent SDK):
+- Research phase (WebSearch synthesis): **Opus** (extended thinking enabled automatically)
+- Persona generation: **Opus** (extended thinking enabled automatically)
+- Persona evaluation: **Opus** (requires nuanced judgment)
+
+**Persona Generation with Evaluation** (using Claude Agent SDK):
 ```python
-from brinksmanship.llm import generate_json
-from brinksmanship.prompts import PERSONA_GENERATION_PROMPT
+from claude_agent_sdk import query, ClaudeAgentOptions, AssistantMessage, TextBlock
+import json
 
-async def generate_persona(figure_name: str) -> dict:
+async def generate_persona(
+    figure_name: str,
+    use_web_search: bool = False,
+    evaluate_quality: bool = True
+) -> dict:
     """Generate a persona definition from a figure name.
 
-    Uses LLM training knowledge - sufficient for famous figures.
-    Execution time: ~5 seconds.
+    When evaluate_quality=True, generates both web-searched and non-web-searched
+    versions and uses Opus to evaluate which is more detailed and accurate.
     """
-    return await generate_json(
-        prompt=PERSONA_GENERATION_PROMPT.format(figure_name=figure_name),
-        system_prompt="You are an expert on historical and fictional strategists.",
+    # Always generate baseline persona from training knowledge (Opus)
+    options = ClaudeAgentOptions(
+        model="opus",
+        system_prompt=HISTORICAL_PERSONA_SYSTEM_PROMPT
     )
+
+    baseline_text = ""
+    async for message in query(
+        prompt=PERSONA_GENERATION_PROMPT.format(figure_name=figure_name),
+        options=options
+    ):
+        if isinstance(message, AssistantMessage):
+            for block in message.content:
+                if isinstance(block, TextBlock):
+                    baseline_text += block.text
+
+    baseline_persona = json.loads(baseline_text)
+
+    if not use_web_search:
+        return baseline_persona
+
+    # Research phase: use WebSearch tool with Opus
+    research_options = ClaudeAgentOptions(
+        model="opus",
+        allowed_tools=["WebSearch", "WebFetch"],
+        system_prompt="Research this figure's strategic behavior, negotiation tactics, and documented decisions."
+    )
+
+    research_text = ""
+    async for message in query(
+        prompt=f"Research {figure_name}: find documented strategic decisions, negotiation tactics, quotes about strategy, emails/memos if available.",
+        options=research_options
+    ):
+        if isinstance(message, AssistantMessage):
+            for block in message.content:
+                if isinstance(block, TextBlock):
+                    research_text += block.text
+
+    # Generate researched persona
+    researched_text = ""
+    async for message in query(
+        prompt=PERSONA_GENERATION_PROMPT.format(
+            figure_name=figure_name,
+            research_context=research_text
+        ),
+        options=options
+    ):
+        if isinstance(message, AssistantMessage):
+            for block in message.content:
+                if isinstance(block, TextBlock):
+                    researched_text += block.text
+
+    researched_persona = json.loads(researched_text)
+
+    if not evaluate_quality:
+        return researched_persona
+
+    # Evaluation step: compare both personas (Opus)
+    eval_text = ""
+    async for message in query(
+        prompt=PERSONA_EVALUATION_PROMPT.format(
+            figure_name=figure_name,
+            baseline_persona=json.dumps(baseline_persona, indent=2),
+            researched_persona=json.dumps(researched_persona, indent=2)
+        ),
+        options=options
+    ):
+        if isinstance(message, AssistantMessage):
+            for block in message.content:
+                if isinstance(block, TextBlock):
+                    eval_text += block.text
+
+    evaluation = json.loads(eval_text)
+
+    return {
+        "persona": researched_persona,
+        "evaluation": evaluation,
+        "web_search_beneficial": evaluation.get("web_search_added_value", False)
+    }
 ```
 
-**Example output**:
-```json
-{
-  "name": "Otto von Bismarck",
-  "worldview": "Realpolitik - pursue national interest through pragmatic means",
-  "strategic_patterns": [
-    "Probes opponent's resolve before committing",
-    "Creates situations where opponents appear as aggressors",
-    "Maintains multiple alliance options, commits only when advantageous",
-    "Avoids fights he cannot win; patient when odds unfavorable"
-  ],
-  "risk_tolerance": 4,
-  "characteristic_quotes": [
-    "Politics is the art of the possible",
-    "The great questions of the day will not be settled by speeches and majority decisions but by iron and blood"
-  ],
-  "trigger_conditions": {
-    "escalate": "When opponent shows weakness or isolation",
-    "de_escalate": "When facing strong coalition or uncertain odds"
-  },
-  "settlement_style": "Pragmatic - accepts fair deals, drives hard bargains when strong"
-}
-```
+**Evaluation Criteria** (PERSONA_EVALUATION_PROMPT):
+- Does web search add specific quotes, dates, or decisions not in baseline?
+- Does web search correct any factual errors in baseline?
+- Does web search provide more nuanced strategic patterns?
+- Is the researched persona more actionable for game decisions?
+
+**When to use WebSearch**:
+| Figure Type | Use WebSearch | Rationale |
+|-------------|---------------|-----------|
+| Famous historical (Bismarck, Napoleon) | Optional | LLM knows them well; evaluate to confirm |
+| Famous tech/business (Gates, Jobs, Icahn) | Yes | Lawsuit emails add specific documented tactics |
+| Fictional characters | No | LLM knows them from training |
+| Obscure historical figures | Yes | LLM may have incomplete info |
+| Contemporary figures (post-2024) | Yes | LLM cutoff may miss recent behavior |
+| User-specified arbitrary person | Yes | Grounds persona in real data |
 
 **Implementation Tasks**:
-1. Implement `PersonaGenerator` class using `generate_json`
-2. Create `PERSONA_GENERATION_PROMPT` in `prompts.py`
-3. Implement structured output parsing for persona definitions
-4. Validate generated personas have all required fields
+1. Implement `PersonaGenerator` class with `use_web_search` and `evaluate_quality` flags
+2. Implement `web_search_persona_research()` targeting: strategic decisions, quotes, negotiation tactics, documented emails/memos
+3. Create `PERSONA_GENERATION_PROMPT` with optional `research_context` field
+4. Create `PERSONA_EVALUATION_PROMPT` for comparing baseline vs researched personas
+5. Cache research results and evaluation outcomes
+6. Log evaluation results to track which figures benefit from web search
 
 **Acceptance Criteria**:
 - [ ] Personas include all required fields: worldview, patterns, risk, triggers, settlement_style
-- [ ] Generated personas are consistent with LLM's knowledge of the figure
-- [ ] Personas include appropriate risk tolerance characterization (1-10)
-- [ ] Generation completes in <10 seconds
+- [ ] Evaluation step runs for new personas and logs whether web search added value
+- [ ] Famous figures (Gates, Jobs, etc.) show measurable improvement with web search due to lawsuit documentation
+- [ ] LLM-only path completes in <10 seconds
+- [ ] WebSearch path completes in <60 seconds
+- [ ] WebSearch results are cached by figure name
 
 ---
 
@@ -984,7 +1080,7 @@ def run_playtest(scenario_path: str, pairings: list, games: int, output: str):
 
 # Expected ranges (from GAME_MANUAL.md)
 THRESHOLDS = {
-    "dominant_strategy": 0.70,  # Fail if any pairing >70% win rate
+    "dominant_strategy": 0.60,  # Fail if any pairing >60% win rate
     "variance_min": 10,  # VP std dev should be ≥10
     "variance_max": 40,  # VP std dev should be ≤40
     "settlement_rate_min": 0.30,  # At least 30% settlements
@@ -1113,21 +1209,45 @@ def analyze_mechanics(playtest_results: dict) -> AnalysisReport:
 │ BRIEFING                                                        │
 │ ─────────────────────────────────────────────────────────────── │
 │ The council has convened. Your opponent's delegates arrive      │
-│ with unexpected proposals...                                     │
-│                                                                 │
+│ with unexpected proposals...                                    │
 ├─────────────────────────────────────────────────────────────────┤
-│ YOUR STATUS           │ INTELLIGENCE                            │
-│ Position: 6           │ Opponent Position: ~5-7                 │
-│ Resources: 4          │ Opponent Resources: ~3-5                │
+│ YOUR STATUS (exact)    │ INTELLIGENCE ON OPPONENT               │
+│ Position: 6.0          │ Position: UNKNOWN                      │
+│ Resources: 4.2         │   Last recon: Turn 3, was 5.2          │
+│                        │   Uncertainty: ±1.6 (2 turns stale)    │
+│                        │   Estimate: 3.6 – 6.8                  │
+│                        │ Resources: UNKNOWN                     │
+│                        │   No inspection data                   │
 ├─────────────────────────────────────────────────────────────────┤
 │ ACTIONS                                                         │
 │ [1] Hold Position (Cooperative)                                 │
-│ [2] Escalate Pressure (Competitive) - 1 Resource                │
-│ [3] Propose Settlement                                          │
-│ [4] Back Channel (Cooperative) - 1 Resource                     │
-│ [5] Show of Force (Competitive) - 2 Resources                   │
+│ [2] Escalate Pressure (Competitive)                             │
+│ [3] Propose Settlement (replaces action, Risk +1 if rejected)   │
+│ [4] Initiate Reconnaissance (costs 0.5 Resources, replaces turn)│
+│ [5] Signal Strength (costs 0.3-1.2 Resources, no turn cost)     │
 ├─────────────────────────────────────────────────────────────────┤
-│ HISTORY: T1:CC→+1 | T2:CD→-1 | T3:CC→+1 | T4:CC→+1              │
+│ HISTORY: T1:CC | T2:CD | T3:Recon(success) | T4:CC              │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Settlement Proposal UI**:
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ PROPOSE SETTLEMENT                                              │
+├─────────────────────────────────────────────────────────────────┤
+│ Your suggested VP: 55 (based on position advantage)             │
+│ Valid range: 45-65                                              │
+│                                                                 │
+│ Enter VP for yourself: [55]                                     │
+│                                                                 │
+│ Argument (max 500 chars):                                       │
+│ ┌───────────────────────────────────────────────────────────┐   │
+│ │ Our positions are roughly equal, but I've demonstrated    │   │
+│ │ consistent good faith. The current risk level threatens   │   │
+│ │ us both - a fair settlement protects our mutual interests.│   │
+│ └───────────────────────────────────────────────────────────┘   │
+│                                                                 │
+│ [Enter] Submit  [Esc] Cancel                                    │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -1193,19 +1313,37 @@ SCENARIO_GENERATION_USER_PROMPT_TEMPLATE = """..."""
 SCENARIO_VALIDATION_SYSTEM_PROMPT = """..."""
 SCENARIO_VALIDATION_USER_PROMPT_TEMPLATE = """..."""
 
-# Historical Personas
+# Historical Personas (Pre-20th Century)
 HISTORICAL_PERSONA_SYSTEM_PROMPT = """..."""
 PERSONA_BISMARCK = """..."""
-PERSONA_KHRUSHCHEV = """..."""
 PERSONA_RICHELIEU = """..."""
 PERSONA_METTERNICH = """..."""
-PERSONA_ATHENIANS = """..."""
-PERSONA_PRINCE = """..."""
-PERSONA_WELCH = """..."""
-PERSONA_MILKEN = """..."""
-PERSONA_BUFFETT = """..."""
-PERSONA_ICAHN = """..."""
-PERSONA_DIMON = """..."""
+PERSONA_PERICLES = """..."""
+
+# Cold War / Small State Personas
+PERSONA_NIXON = """..."""
+PERSONA_KISSINGER = """..."""
+PERSONA_KHRUSHCHEV = """..."""
+PERSONA_TITO = """..."""
+PERSONA_KEKKONEN = """..."""
+PERSONA_LEE_KUAN_YEW = """..."""
+
+# Corporate/Tech Personas (selected for lawsuit/deposition documentation)
+PERSONA_GATES = """..."""      # Microsoft antitrust trial emails
+PERSONA_JOBS = """..."""       # DOJ ebook lawsuit emails
+PERSONA_ICAHN = """..."""      # Decades of documented corporate raids
+PERSONA_ZUCKERBERG = """...""" # FTC antitrust case emails
+PERSONA_BUFFETT = """..."""    # Annual letters, documented philosophy
+
+# Palace Intrigue Personas
+PERSONA_THEODORA = """..."""
+PERSONA_WU_ZETIAN = """..."""
+PERSONA_CIXI = """..."""
+PERSONA_LIVIA = """..."""
+
+# Persona Generation & Evaluation
+PERSONA_GENERATION_PROMPT = """..."""
+PERSONA_EVALUATION_PROMPT = """..."""  # Compares baseline vs web-searched personas
 
 # Persona Research
 PERSONA_RESEARCH_PROMPT = """..."""
@@ -1231,283 +1369,175 @@ MECHANICS_ANALYSIS_PROMPT_TEMPLATE = """..."""
 
 ---
 
-## Phase 9: Playtesting and Iteration (Full Agentic Workflow)
+## Phase 9: Playtesting Workflow
 
-### Milestone 9.1: Playtest Orchestration Agent
+### Milestone 9.1: Playtest Pipeline
 
-**Deliverable**: `scripts/full_playtest.py` - Agentic orchestrator for comprehensive playtesting
+**Deliverable**: Shell scripts for running the complete playtest pipeline
 
-**Design Principle**: The playtest workflow is a **fully autonomous agentic loop** that uses tools to:
-1. Generate scenarios (LLM + validation scripts)
-2. Run game simulations (Bash tool → Python scripts)
-3. Analyze results (Bash tool → statistics scripts + LLM interpretation)
-4. Produce actionable reports (Write tool)
+**Workflow** (all deterministic Python, no LLM orchestration):
+```bash
+# 1. Generate scenarios
+python scripts/generate_scenario.py --theme "Cold War" --output scenarios/cold_war.json
 
-**Full Agentic Workflow Implementation**:
-```python
-from brinksmanship.llm import agentic_query
+# 2. Validate scenarios
+python scripts/validate_scenario.py scenarios/cold_war.json
 
-PLAYTEST_ORCHESTRATION_PROMPT = """
-# Playtest Analysis Task (Agentic Workflow)
+# 3. Run playtests
+python scripts/run_playtest.py --scenario scenarios/cold_war.json \
+    --pairings "Nash:Nash,TitForTat:Opportunist" --games 100 --output results/
 
-You have full tool access. Execute each step using the appropriate tool.
-
-## Phase 1: Setup (Read Tools)
-1. Read GAME_MANUAL.md - understand intended mechanics
-2. Read src/brinksmanship/prompts.py - understand persona definitions
-3. Glob src/brinksmanship/engine/*.py - identify implementation files
-
-## Phase 2: Scenario Generation (Bash + Write Tools)
-For each theme in [Cold War, Corporate, Ancient]:
-1. Bash: python scripts/generate_scenario.py --theme "{theme}" --output scenarios/{theme}.json
-2. Bash: python scripts/quick_validate.py scenarios/{theme}.json
-3. If validation fails, regenerate with feedback
-
-## Phase 3: Batch Playtesting (Bash Tool - Parallel Execution)
-For each scenario, run these commands:
-```
-# Deterministic opponents (no LLM needed - fast)
-Bash: python scripts/run_playtest.py \
-    --scenario scenarios/{theme}.json \
-    --pairings "Nash:Nash,TitForTat:Opportunist,SecuritySeeker:GrimTrigger,TitForTat:GrimTrigger" \
-    --games 50 \
-    --output results/{theme}_deterministic.json
-
-# Historical personas (requires LLM - slower)
-Bash: python scripts/run_playtest.py \
-    --scenario scenarios/{theme}.json \
-    --pairings "Bismarck:Khrushchev,Buffett:Icahn,Welch:Dimon" \
-    --games 20 \
-    --output results/{theme}_personas.json
-
-# Simulated humans
-Bash: python scripts/run_playtest.py \
-    --scenario scenarios/{theme}.json \
-    --human-sim \
-    --games 30 \
-    --output results/{theme}_human_sim.json
+# 4. Analyze mechanics
+python scripts/analyze_mechanics.py results/ --output analysis.json
 ```
 
-## Phase 4: Statistical Analysis (Bash + Read Tools)
-1. Bash: python scripts/compute_stats.py results/ --output results/aggregate_stats.json
-2. Read: results/aggregate_stats.json
-3. Check thresholds:
-   - Dominant strategy: any pairing >70% win rate? → CRITICAL
-   - VP std dev outside 15-25 range? → MAJOR
-   - Settlement rate outside 40-60%? → MAJOR
-   - Average turns < 8 or > 15? → MINOR
-
-## Phase 5: Analysis Questions (LLM Interpretation of Data)
-Using the statistical data from Phase 4, answer:
-
-1. **Dominant Strategies**: Check aggregate_stats.json win rates. If Nash:Nash
-   always wins, that's a problem. If win rates are 45-55%, mechanics are balanced.
-
-2. **Variance Calibration**: Check vp_std_dev field. Compare to intended 15-25.
-
-3. **Settlement Incentives**: Check settlement_rate field. Compare to 40-60% target.
-
-4. **Historical Personas**: Check persona pairing results. Do they match
-   documented patterns? (e.g., Buffett should rarely initiate aggression)
-
-## Phase 6: Report Generation (Write Tool)
-Write: reports/playtest_analysis.md
-
-Include:
-1. Executive Summary (2-3 paragraphs)
-2. Statistical Tables (formatted from JSON data)
-3. Issue List with severity and statistical evidence
-4. Recommended Changes with specific parameter values
-5. Successful Mechanics with supporting data
-"""
-
-async def run_full_playtest():
-    """Run complete playtest analysis autonomously."""
-    return await agentic_query(
-        prompt=PLAYTEST_ORCHESTRATION_PROMPT,
-        allowed_tools=["Read", "Write", "Bash", "Glob", "Grep", "Task"],
-        max_turns=50,  # Allow for comprehensive analysis
-    )
-```
-
-**Tool Usage Summary**:
-| Phase | Tools Used | Purpose |
-|-------|-----------|---------|
-| Setup | Read, Glob | Understand codebase and rules |
-| Generation | Bash | Run scenario generation scripts |
-| Playtesting | Bash | Run game simulation scripts (parallel) |
-| Statistics | Bash, Read | Compute and read statistical results |
-| Analysis | (LLM reasoning) | Interpret statistical patterns |
-| Reporting | Write | Produce final report |
-
-**Key Principle**: LLM reasoning is used ONLY for:
-- Interpreting statistical patterns
-- Making qualitative judgments about persona behavior
-- Writing human-readable reports
-
-All numerical analysis, game execution, and data aggregation happens via **deterministic Python scripts** invoked through the Bash tool.
+**Thresholds** (from GAME_MANUAL.md):
+- Dominant strategy: >60% win rate → CRITICAL
+- VP std dev outside 10-40 range → MAJOR
+- Settlement rate outside 30-70% → MAJOR
+- Average turns < 8 or > 15 → MINOR
 
 **Acceptance Criteria**:
-- [ ] Agent executes complete workflow autonomously
-- [ ] All game simulations run via Bash tool (deterministic)
-- [ ] Statistical analysis runs via Bash tool (not LLM math)
-- [ ] LLM interprets results but doesn't compute them
-- [ ] Final report includes statistical evidence for all claims
-- [ ] Issues are actionable: "Change variance_factor from 1.2 to 1.0"
-- [ ] Workflow completes in under 30 minutes for standard test suite
+- [ ] All scripts run without LLM calls (except persona opponents)
+- [ ] Pipeline completes in <5 minutes for 100 games
+- [ ] Analysis output is machine-readable JSON
 
 ---
 
-## SDK Reference
+## LLM Integration Reference
 
-### Claude Agent SDK Usage
+### Claude Agent SDK
 
-**Installation**:
+**CRITICAL**: All LLM calls use the Claude Agent SDK (`claude-agent-sdk`), NOT the raw Anthropic API.
+
 ```bash
 pip install claude-agent-sdk
 ```
 
-### Using the LLM Utilities (Recommended)
+### Model Selection Guide
 
-This project provides `src/brinksmanship/llm.py` which wraps the Claude Agent SDK with convenient utilities.
+**Principle**: Default to Opus for any reasoning task. Only use Sonnet for simple, high-volume tasks where latency/cost matters more than quality.
 
-**Basic Text Generation** (no tools):
+**Model Versions** (latest as of January 2026):
+- **Opus 4.5**: `model="opus"` in ClaudeAgentOptions
+- **Sonnet 4.5**: `model="sonnet"` in ClaudeAgentOptions
+
+Extended thinking is enabled automatically by the SDK for supported models.
+
+### Model Selection by Task
+
+| Task | Model | Rationale |
+|------|-------|-----------|
+| **Persona Generation** | Opus | Complex synthesis of historical behavior |
+| **Persona Research Synthesis** | Opus | Synthesizing web search into coherent profile |
+| **Persona Evaluation** | Opus | Nuanced comparison of persona quality |
+| **Scenario Generation** | Opus | Creative narrative + strategic game selection |
+| **Settlement Evaluation** | Opus | Understanding argument quality, persona consistency |
+| **Post-Game Coaching** | Opus | Deep analysis of game history and strategy |
+| **Human Simulation** | Opus | Realistic human decision modeling |
+| **Narrative Consistency Check** | Opus | Thematic coherence judgment |
+| **Action Selection (Persona)** | Sonnet | High-volume, per-turn decision (latency-sensitive) |
+| **Simple Parsing/Extraction** | Sonnet | Structured output from clear input |
+
+### Claude Agent SDK Usage
+
 ```python
-from brinksmanship.llm import generate_text, generate_json
+from claude_agent_sdk import query, ClaudeAgentOptions, AssistantMessage, TextBlock
 
-# Simple text generation
-response = await generate_text(
-    prompt="What is game theory?",
-    system_prompt="You are a game theory expert. Be concise."
-)
-
-# Structured JSON output
-scenario = await generate_json(
-    prompt="Generate a game scenario with title and description.",
-    system_prompt="Output valid JSON only, no markdown."
-)
-```
-
-**Agentic Queries** (with tool access):
-```python
-from brinksmanship.llm import agentic_query
-
-# Research with WebSearch
-persona_data = await agentic_query(
-    prompt="Research Otto von Bismarck's negotiation style for a game AI.",
-    allowed_tools=["WebSearch", "WebFetch"],
-    max_turns=15,
-)
-
-# Run Python scripts with Bash
-validation_result = await agentic_query(
-    prompt="Validate scenario: python scripts/quick_validate.py test.json",
-    allowed_tools=["Bash", "Read"],
-)
-
-# Full agentic workflow with multiple tools
-playtest_report = await agentic_query(
-    prompt="""Run playtest analysis:
-1. Bash: python scripts/run_playtest.py --scenario test.json --games 50
-2. Read: playtest_results.json
-3. Analyze results for dominant strategies
-4. Write: reports/analysis.md""",
-    allowed_tools=["Bash", "Read", "Write", "Glob"],
-    max_turns=30,
-)
-```
-
-**LLMClient Class** (for consistent configuration):
-```python
-from brinksmanship.llm import LLMClient
-
-# Create client with defaults
-client = LLMClient(
-    system_prompt="You are a game designer specializing in game theory.",
-    allowed_tools=["Read", "Bash"],
-)
-
-# Use client methods
-response = await client.generate("Design a payoff matrix")
-scenario = await client.generate_json("Create a scenario as JSON")
-result = await client.agentic("Run: python scripts/validate.py scenario.json")
-```
-
-### Direct SDK Usage (Advanced)
-
-For advanced use cases, use the SDK directly:
-
-**Tool-Enabled Query**:
-```python
-from claude_agent_sdk import query, ClaudeAgentOptions
-
-async def validate_scenario_with_tools(scenario_path: str):
+# Opus for complex reasoning (persona generation, coaching, scenario design)
+async def generate_with_opus(prompt: str, system_prompt: str = None) -> str:
     options = ClaudeAgentOptions(
-        allowed_tools=["Read", "Bash", "Write"],
-        system_prompt="You are a game balance validator.",
-        max_turns=20,
+        model="opus",
+        system_prompt=system_prompt
     )
 
-    async for message in query(
-        prompt=f"Validate {scenario_path} by running python scripts/quick_validate.py",
-        options=options
-    ):
-        if hasattr(message, 'result'):
-            return message.result
-```
+    result = ""
+    async for message in query(prompt=prompt, options=options):
+        if isinstance(message, AssistantMessage):
+            for block in message.content:
+                if isinstance(block, TextBlock):
+                    result += block.text
+    return result
 
-**Subagent Orchestration**:
-```python
-from claude_agent_sdk import query, ClaudeAgentOptions, AgentDefinition
-
-async def run_parallel_tests():
+# Sonnet for high-volume tasks (per-turn action selection)
+async def generate_with_sonnet(prompt: str, system_prompt: str = None) -> str:
     options = ClaudeAgentOptions(
-        allowed_tools=["Bash", "Read", "Task"],
-        agents={
-            "validator": AgentDefinition(
-                description="Validates scenario files",
-                prompt="Run validation scripts and report issues.",
-                tools=["Bash", "Read"]
-            ),
-            "researcher": AgentDefinition(
-                description="Researches historical figures",
-                prompt="Use web search to find documented behaviors.",
-                tools=["WebSearch", "WebFetch"]
-            ),
-        }
+        model="sonnet",
+        system_prompt=system_prompt
     )
 
+    result = ""
+    async for message in query(prompt=prompt, options=options):
+        if isinstance(message, AssistantMessage):
+            for block in message.content:
+                if isinstance(block, TextBlock):
+                    result += block.text
+    return result
+
+# With tools (e.g., WebSearch for persona research)
+async def research_persona(figure_name: str) -> str:
+    options = ClaudeAgentOptions(
+        model="opus",
+        allowed_tools=["WebSearch", "WebFetch"],
+        system_prompt="Research strategic behavior and documented decisions."
+    )
+
+    result = ""
     async for message in query(
-        prompt="Spawn validator for scenario.json and researcher for Bismarck in parallel.",
+        prompt=f"Research {figure_name}: strategic decisions, negotiation tactics, documented emails/memos.",
         options=options
     ):
-        yield message
+        if isinstance(message, AssistantMessage):
+            for block in message.content:
+                if isinstance(block, TextBlock):
+                    result += block.text
+    return result
 ```
 
-### Available Tools
+### Subagent Definitions
 
-| Tool | Description | Use Case |
-|------|-------------|----------|
-| **Read** | Read file contents | Load scenarios, configs, results |
-| **Write** | Create/overwrite files | Generate reports, cache data |
-| **Edit** | Modify existing files | Update configurations |
-| **Bash** | Execute shell commands | Run Python scripts, git ops |
-| **Glob** | Find files by pattern | Discover test files, scenarios |
-| **Grep** | Search file contents | Find code patterns |
-| **WebSearch** | Search the web | Research historical figures |
-| **WebFetch** | Fetch web page content | Extract detailed information |
-| **Task** | Spawn subagents | Parallel task execution |
+For tasks requiring specialized agents, use `AgentDefinition`:
 
-### Tool Selection Guidelines
+```python
+from claude_agent_sdk import ClaudeAgentOptions, AgentDefinition
 
-| Task Type | Recommended Tools | Why |
-|-----------|-------------------|-----|
-| Scenario validation | Bash, Read | Run deterministic Python scripts |
-| Persona research | WebSearch, WebFetch | Ground in documented behavior |
-| Playtest execution | Bash | Run game simulations |
-| Statistical analysis | Bash, Read | Compute stats via Python |
-| Report generation | Read, Write | Interpret data, write reports |
-| Parallel testing | Task, Bash | Subagents for concurrent work |
+options = ClaudeAgentOptions(
+    model="opus",
+    agents={
+        "persona-researcher": AgentDefinition(
+            description="Research historical figures for persona creation",
+            prompt="Research strategic behavior, negotiation tactics, and documented decisions.",
+            tools=["WebSearch", "WebFetch"],
+            model="opus"  # Use opus for research
+        ),
+        "action-selector": AgentDefinition(
+            description="Select game actions based on persona",
+            prompt="Choose the best action given current game state and persona.",
+            tools=["Read"],
+            model="sonnet"  # Use sonnet for high-volume per-turn decisions
+        )
+    }
+)
+```
+
+**Use Cases Summary**:
+| Component | Model | Purpose |
+|-----------|-------|---------|
+| Scenario Generator | Opus | Generate narrative briefings and action menus |
+| Persona Opponents (action) | Sonnet | Choose actions based on persona prompt (high volume) |
+| Persona Generation | Opus | Create new persona from figure name |
+| Settlement Evaluation | Opus | Evaluate argument text for all opponent types |
+| Post-Game Coaching | Opus | Analyze game history and provide feedback |
+| Human Simulation | Opus | Model realistic human decision-making |
+| Narrative Check | Opus | Verify thematic consistency |
+
+**What Does NOT Use LLM**:
+- Matrix construction (deterministic from parameters)
+- State delta application (deterministic formulas)
+- Ending condition checks (deterministic thresholds)
+- Balance simulation (pure Python)
+- Validation (pure Python with threshold checks)
+- Playtest orchestration (pure Python multiprocessing)
 
 ---
 

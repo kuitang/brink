@@ -705,7 +705,7 @@ def final_resolution(state):
     base_sigma = 8 + (state.risk_level * 1.2)
     chaos_factor = 1.2 - (state.cooperation_score / 50)
     instability_factor = 1 + (10 - state.stability) / 20
-    act_multiplier = 1.2  # Act III
+    act_multiplier = 1.3  # Act III
 
     shared_sigma = base_sigma * chaos_factor * instability_factor * act_multiplier
 
@@ -1175,11 +1175,12 @@ uv run python scripts/balance_simulation.py --games 1000 --seed 42
 - Nash: Play Nash equilibrium (defect), with risk-awareness
 
 **Key Simulation Results** (validated mechanics):
-- No dominant strategy (no strategy exceeds 65% overall win rate)
+- No dominant strategy (no strategy exceeds 60% overall win rate)
 - Average game length: ~11 turns
-- Elimination rate: ~33% (position or resources hit 0)
-- Mutual destruction rate: ~20% (risk hits 10)
-- Games reaching max turns: ~47%
+- Elimination rate: ~32% (position or resources hit 0)
+- Mutual destruction rate: ~14% (risk hits 10)
+- Crisis termination rate: ~15% (random termination when Risk > 7, Turn ≥ 10)
+- Games reaching max turns: ~39%
 
 These results confirm the state delta constraints produce balanced gameplay.
 

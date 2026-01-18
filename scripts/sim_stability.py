@@ -356,6 +356,10 @@ def main():
         "--verbose", "-v", action="store_true",
         help="Print detailed turn-by-turn analysis"
     )
+    parser.add_argument(
+        "--seed", type=int, default=42,
+        help="Random seed (unused, for compatibility)"
+    )
     args = parser.parse_args()
 
     print("Running stability update simulation...")
