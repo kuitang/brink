@@ -321,13 +321,13 @@ class InformationState:
 6. Implement information game system (see GAME_MANUAL.md Section 3.6)
 
 **Acceptance Criteria**:
-- [ ] Engine loads scenario from JSON file
-- [ ] Turn sequence follows exact 8-phase structure from GAME_MANUAL.md
-- [ ] Cooperation Score updates correctly: CC→+1, DD→-1, mixed→0
-- [ ] Stability updates correctly based on switch count
-- [ ] Information games (Reconnaissance, Inspection) implemented per GAME_MANUAL.md Section 3.6
-- [ ] Information state tracking with decay (uncertainty = turns_elapsed × 0.8, max 5.0)
-- [ ] Complete turn history is available for coaching
+- [x] Engine loads scenario from JSON file
+- [x] Turn sequence follows exact 8-phase structure from GAME_MANUAL.md
+- [x] Cooperation Score updates correctly: CC→+1, DD→-1, mixed→0
+- [x] Stability updates correctly based on switch count
+- [x] Information games (Reconnaissance, Inspection) implemented per GAME_MANUAL.md Section 3.6
+- [x] Information state tracking with decay (uncertainty = turns_elapsed × 0.8, max 5.0)
+- [x] Complete turn history is available for coaching
 
 ### Milestone 2.2: Resolution System
 
@@ -341,11 +341,11 @@ class InformationState:
 5. Implement reconnaissance game (information as game)
 
 **Acceptance Criteria**:
-- [ ] Matrix resolution uses hidden payoff values from scenario
-- [ ] Payoffs are scaled by Act Multiplier (0.7×, 1.0×, 1.3×)
-- [ ] Settlement constraints are enforced (VP ranges based on Position)
-- [ ] Reconnaissance resolves as Matching Pennies variant
-- [ ] Resolution returns complete `ActionResult` with all changes
+- [x] Matrix resolution uses hidden payoff values from scenario
+- [x] Payoffs are scaled by Act Multiplier (0.7×, 1.0×, 1.3×)
+- [x] Settlement constraints are enforced (VP ranges based on Position)
+- [x] Reconnaissance resolves as Matching Pennies variant
+- [x] Resolution returns complete `ActionResult` with all changes
 
 ### Milestone 2.3: Variance and Final Resolution
 
@@ -367,10 +367,10 @@ shared_sigma = base_sigma * chaos_factor * instability_factor * act_multiplier
 ```
 
 **Acceptance Criteria**:
-- [ ] `Shared_σ` stays in range 10-40 for all valid states
-- [ ] Symmetric renormalization: both players clamped, then normalized to sum to 100
-- [ ] VP sum to 100 exactly after renormalization
-- [ ] Unit tests verify: peaceful ~10σ, neutral ~19σ, tense ~27σ, crisis ~37σ
+- [x] `Shared_σ` stays in range 10-40 for all valid states
+- [x] Symmetric renormalization: both players clamped, then normalized to sum to 100
+- [x] VP sum to 100 exactly after renormalization
+- [x] Unit tests verify: peaceful ~10σ, neutral ~19σ, tense ~27σ, crisis ~37σ
 
 ### Milestone 2.4: Ending Conditions
 
@@ -391,12 +391,12 @@ if turn >= 10 and risk_level > 7:
 ```
 
 **Acceptance Criteria**:
-- [ ] Risk=10 triggers Mutual Destruction (both get 20 VP)
-- [ ] Position=0 triggers loss (10 VP) for that player
-- [ ] Resources=0 triggers loss (15 VP) for that player
-- [ ] Crisis Termination probability = (Risk - 7) × 0.08 for Risk > 7
-- [ ] Crisis Termination only checked for Turn >= 10
-- [ ] Max turn range: 12-16 (hidden from players)
+- [x] Risk=10 triggers Mutual Destruction (both get 20 VP)
+- [x] Position=0 triggers loss (10 VP) for that player
+- [x] Resources=0 triggers loss (15 VP) for that player
+- [x] Crisis Termination probability = (Risk - 7) × 0.08 for Risk > 7
+- [x] Crisis Termination only checked for Turn >= 10
+- [x] Max turn range: 12-16 (hidden from players)
 
 ### Milestone 2.5: State Delta System
 
@@ -431,11 +431,11 @@ PD_DELTA_TEMPLATE = {
 ```
 
 **Acceptance Criteria**:
-- [ ] StateDeltas dataclass with pos_a, pos_b, res_cost_a, res_cost_b, risk_delta
-- [ ] Templates defined for all 13 viable game types
-- [ ] Validation rejects out-of-bounds deltas
-- [ ] Validation enforces ordinal consistency (T > R > P > S for PD)
-- [ ] Act scaling correctly applied to deltas
+- [x] StateDeltas dataclass with pos_a, pos_b, res_cost_a, res_cost_b, risk_delta
+- [x] Templates defined for all 14 viable game types
+- [x] Validation rejects out-of-bounds deltas
+- [x] Validation enforces ordinal consistency (T > R > P > S for PD)
+- [x] Act scaling correctly applied to deltas
 
 ---
 
