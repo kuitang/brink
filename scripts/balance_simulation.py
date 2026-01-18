@@ -39,6 +39,7 @@ class EndingType(Enum):
     RESOURCE_LOSS_A = "resource_loss_a"
     RESOURCE_LOSS_B = "resource_loss_b"
     MUTUAL_DESTRUCTION = "mutual_destruction"
+    CRISIS_TERMINATION = "crisis_termination"
 
 
 @dataclass
@@ -126,6 +127,21 @@ def apply_outcome(state: GameState, action_a: Action, action_b: Action, add_nois
     state.clamp()
 
 
+def check_crisis_termination(state: GameState) -> bool:
+    """Check if crisis terminates this turn (probabilistic).
+
+    From GAME_MANUAL.md:
+    - Only checked for Turn >= 10 and Risk > 7
+    - P(termination) = (Risk - 7) * 0.08
+    - Risk 8: 8%, Risk 9: 16%, Risk 10: 100% (handled by mutual destruction)
+    """
+    if state.turn < 10 or state.risk <= 7:
+        return False
+
+    p_termination = (state.risk - 7) * 0.08
+    return random.random() < p_termination
+
+
 def check_ending(state: GameState) -> Optional[EndingType]:
     """Check if game has ended."""
     # Check mutual destruction (risk = 10)
@@ -143,6 +159,10 @@ def check_ending(state: GameState) -> Optional[EndingType]:
         return EndingType.RESOURCE_LOSS_A
     if state.player_b.resources <= 0:
         return EndingType.RESOURCE_LOSS_B
+
+    # Check crisis termination (probabilistic, Turn >= 10, Risk > 7)
+    if check_crisis_termination(state):
+        return EndingType.CRISIS_TERMINATION
 
     # Check max turns
     if state.turn > state.max_turns:
@@ -317,6 +337,7 @@ class PairingStats:
     wins_b: int = 0
     ties: int = 0
     mutual_destructions: int = 0
+    crisis_terminations: int = 0
     eliminations: int = 0  # Position or resource = 0
     total_games: int = 0
     total_turns: int = 0
@@ -326,18 +347,22 @@ class PairingStats:
         self.total_games += 1
         self.total_turns += result.turns_played
 
+        # Track winner
         if result.winner == "A":
             self.wins_a += 1
         elif result.winner == "B":
             self.wins_b += 1
         elif result.winner == "tie":
             self.ties += 1
-        else:  # mutual_destruction
-            self.mutual_destructions += 1
+        # mutual_destruction winner is tracked separately via ending_type
 
-        # Check if ended in elimination
-        if result.ending_type in [EndingType.POSITION_LOSS_A, EndingType.POSITION_LOSS_B,
-                                   EndingType.RESOURCE_LOSS_A, EndingType.RESOURCE_LOSS_B]:
+        # Track ending types (mutually exclusive)
+        if result.ending_type == EndingType.MUTUAL_DESTRUCTION:
+            self.mutual_destructions += 1
+        elif result.ending_type == EndingType.CRISIS_TERMINATION:
+            self.crisis_terminations += 1
+        elif result.ending_type in [EndingType.POSITION_LOSS_A, EndingType.POSITION_LOSS_B,
+                                     EndingType.RESOURCE_LOSS_A, EndingType.RESOURCE_LOSS_B]:
             self.eliminations += 1
 
         # Record position spread
@@ -374,6 +399,12 @@ class PairingStats:
         return self.mutual_destructions / self.total_games
 
     @property
+    def crisis_termination_rate(self) -> float:
+        if self.total_games == 0:
+            return 0.0
+        return self.crisis_terminations / self.total_games
+
+    @property
     def avg_position_spread(self) -> float:
         if not self.position_spreads:
             return 0.0
@@ -408,14 +439,14 @@ def print_summary_table(results: dict, num_games: int):
 
     # Header
     print(f"\n{'Pairing':<35} {'Win A':>8} {'Win B':>8} {'Tie':>6} {'Avg Len':>8} "
-          f"{'Elim %':>8} {'MD %':>6} {'Pos Spread':>10}")
-    print("-" * 100)
+          f"{'Elim %':>8} {'MD %':>6} {'Crisis %':>8}")
+    print("-" * 110)
 
     for pairing, stats in sorted(results.items()):
         print(f"{pairing:<35} {stats.win_rate_a*100:>7.1f}% {stats.win_rate_b*100:>7.1f}% "
               f"{stats.ties/stats.total_games*100:>5.1f}% {stats.avg_game_length:>8.1f} "
               f"{stats.elimination_rate*100:>7.1f}% {stats.mutual_destruction_rate*100:>5.1f}% "
-              f"{stats.avg_position_spread:>10.2f}")
+              f"{stats.crisis_termination_rate*100:>7.1f}%")
 
     print("-" * 100)
 
@@ -507,15 +538,17 @@ def print_summary_table(results: dict, num_games: int):
 
     total_eliminations = sum(s.eliminations for s in results.values())
     total_mutual = sum(s.mutual_destructions for s in results.values())
+    total_crisis = sum(s.crisis_terminations for s in results.values())
     total_games = sum(s.total_games for s in results.values())
     total_turns = sum(s.total_turns for s in results.values())
+    total_max_turns = total_games - total_eliminations - total_mutual - total_crisis
 
     print(f"\nTotal games simulated: {total_games}")
     print(f"Average game length: {total_turns/total_games:.1f} turns")
     print(f"Games ending in elimination: {total_eliminations} ({total_eliminations/total_games*100:.1f}%)")
     print(f"Games ending in mutual destruction: {total_mutual} ({total_mutual/total_games*100:.1f}%)")
-    print(f"Games ending at max turns: {total_games - total_eliminations - total_mutual} "
-          f"({(total_games - total_eliminations - total_mutual)/total_games*100:.1f}%)")
+    print(f"Games ending in crisis termination: {total_crisis} ({total_crisis/total_games*100:.1f}%)")
+    print(f"Games ending at max turns: {total_max_turns} ({total_max_turns/total_games*100:.1f}%)")
 
 
 def main():

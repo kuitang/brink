@@ -343,7 +343,7 @@ Both name a number 2-100; lower number wins, plus bonus. Higher number gets lowe
 | Cooperation_Score | **Shared** | 0–10 | 5 | Overall relationship trajectory |
 | Stability | **Shared** | 1–10 | 5 | Predictability of both players' behavior |
 | Risk_Level | **Shared** | 0–10 | 2 | Position on escalation ladder |
-| Turn | Shared | 1–N | 1 | Current turn (N is uncertain, range 10–18) |
+| Turn | Shared | 1–N | 1 | Current turn (N is uncertain, range 12–16) |
 | Previous_Type_A | Per player | C/D | None | Player A's last action classification |
 | Previous_Type_B | Per player | C/D | None | Player B's last action classification |
 
@@ -368,7 +368,7 @@ TURN SEQUENCE
 1. BRIEFING
    - Narrative situation presented (from pre-generated scenario)
    - Current shared state displayed (Risk Level, Cooperation Score, Stability)
-   - Noisy intelligence on opponent's Position and Resources (±2)
+   - Your Intelligence on opponent (see Section 3.4 - uncertainty-bounded estimate)
    - Your own Position and Resources (exact)
 
 2. DECISION (Simultaneous)
@@ -415,6 +415,8 @@ TURN SEQUENCE
 
 ### 3.4 Information and Intelligence
 
+**Core Principle**: You never passively observe opponent state. Information is a strategic resource acquired through information games, and it decays over time.
+
 **What You Always Know (Perfect Information)**:
 - Your own Position (exact)
 - Your own Resources (exact)
@@ -423,26 +425,48 @@ TURN SEQUENCE
 - Current Stability
 - Turn number
 - History of your own actions
-- History of observable outcomes
+- History of observable outcomes (your own state changes)
 
 **What You Never Know Directly**:
-- Opponent's exact Position
-- Opponent's exact Resources
+- Opponent's exact Position (must acquire through information games)
+- Opponent's exact Resources (must acquire through information games)
 - Opponent's "type" (if playing vs. LLM)
 - Exact payoff values in current matrix
 - How many turns remain
 
-**Noisy Intelligence**:
-```
-Observed_Opponent_Position = clamp(True_Position + Uniform(−2, +2), 0, 10)
-Observed_Opponent_Resources = clamp(True_Resources + Uniform(−2, +2), 0, 10)
-```
-Note: Observed values are clamped to valid range [0, 10].
+**Information State Model**:
 
-**Information Games** (played as matrix games, not actions):
-- **Reconnaissance Game**: Probe vs. Mask against Vigilant vs. Project
-- **Signaling Games**: Costly signals that reveal or conceal type
-- **Cheap Talk**: Communication that may or may not be credible
+Each player maintains an `InformationState` about their opponent:
+
+```
+InformationState:
+  position_bounds: [0.0, 10.0]     # Hard bounds, always valid
+  resources_bounds: [0.0, 10.0]    # Hard bounds, always valid
+  known_position: Optional[float]  # From last successful recon
+  known_position_turn: Optional[int]
+  known_resources: Optional[float] # From last successful inspection
+  known_resources_turn: Optional[int]
+```
+
+**Information Decay**:
+
+Information becomes stale as opponent's state changes each turn:
+```
+uncertainty = min(turns_since_known × 0.8, 5.0)
+estimate_range = [known_value - uncertainty, known_value + uncertainty]
+```
+
+After ~6 turns, information is nearly useless (uncertainty = 5.0, which is half the scale).
+
+**Information Acquisition Methods**:
+
+1. **Reconnaissance Game** (learn opponent's Position)
+2. **Inspection Game** (learn opponent's Resources)
+3. **Costly Signaling** (reveal bounds on your own Position)
+4. **Inference from Outcomes** (learn opponent's action, not state)
+5. **Inference from Settlement Proposals** (cheap talk, may be unreliable)
+
+See Section 3.6 for detailed information game mechanics.
 
 ### 3.5 State Deltas (How Outcomes Affect State)
 
@@ -481,6 +505,115 @@ Each turn's matrix outcome produces **State Deltas**—changes to Position, Reso
 - Position changes are near-zero-sum: |Δpos_a + Δpos_b| ≤ 0.5
 - Resources never increase from outcomes (only decrease or stay same)
 - Mutual cooperation reduces Risk; mutual defection increases it
+
+### 3.6 Information Game Mechanics
+
+Information games allow players to acquire intelligence about their opponent's state. Playing an information game consumes your action for that turn—you cannot play both an information game AND a regular strategic game in the same turn.
+
+#### 3.6.1 Reconnaissance Game (Position Intelligence)
+
+**Purpose**: Learn opponent's exact Position.
+
+**Initiation**: Either player may choose "Initiate Reconnaissance" as their action. If chosen, BOTH players enter the Reconnaissance game that turn instead of the regular strategic game.
+
+**Cost**: The initiating player pays 0.5 Resources.
+
+**Matrix Structure** (Matching Pennies variant):
+
+|  | Opponent: Vigilant | Opponent: Project |
+|--|-------------------|-------------------|
+| **You: Probe** | Detected | Success |
+| **You: Mask** | Stalemate | Exposed |
+
+**Outcomes**:
+
+| Outcome | Your Info Gain | Opponent Info Gain | Other Effects |
+|---------|---------------|-------------------|---------------|
+| Probe + Vigilant (Detected) | None | Learns you attempted recon | Risk +0.5 |
+| Probe + Project (Success) | Learn opponent's exact Position | None | — |
+| Mask + Vigilant (Stalemate) | None | None | — |
+| Mask + Project (Exposed) | None | Learns your exact Position | — |
+
+**Nash Equilibrium**: Mixed strategy (50% Probe, 50% Mask) for both players.
+
+**Expected Value**:
+- 25% chance you learn their Position
+- 25% chance they learn your Position
+- 12.5% chance of escalation (Risk +0.5)
+- Cost: 0.5 Resources (initiator only)
+
+#### 3.6.2 Inspection Game (Resource Intelligence)
+
+**Purpose**: Learn opponent's exact Resources.
+
+**Initiation**: Either player may choose "Initiate Inspection" as their action.
+
+**Cost**: Initiating player pays 0.3 Resources.
+
+**Matrix Structure**:
+
+|  | Opponent: Comply | Opponent: Cheat |
+|--|-----------------|-----------------|
+| **You: Inspect** | Verified | Caught |
+| **You: Trust** | Nothing | Exploited |
+
+**Outcomes**:
+
+| Outcome | Your Info Gain | Opponent Effect | Other Effects |
+|---------|---------------|-----------------|---------------|
+| Inspect + Comply (Verified) | Learn opponent's exact Resources | — | — |
+| Inspect + Cheat (Caught) | Learn opponent's exact Resources | Opponent Risk +1, Position -0.5 | — |
+| Trust + Comply (Nothing) | None | — | — |
+| Trust + Cheat (Exploited) | None | Opponent Position +0.5 | — |
+
+**Nash Equilibrium**: Mixed strategy; inspection probability depends on cost-benefit ratio.
+
+#### 3.6.3 Costly Signaling (Voluntary Disclosure)
+
+**Purpose**: Credibly reveal information about your own Position.
+
+**Mechanism**: You may UNILATERALLY choose to signal alongside your regular action (no turn cost). You pay a resource cost that depends on your true Position:
+
+| Your Position | Signal Cost |
+|---------------|-------------|
+| ≥ 7 (Strong) | 0.3 Resources |
+| 4–6 (Medium) | 0.7 Resources |
+| ≤ 3 (Weak) | 1.2 Resources |
+
+**What Opponent Learns**:
+- If you signal successfully: Opponent learns "Your Position ≥ 4"
+- Bayesian inference: Given you signaled, P(Position ≥ 7) is elevated
+
+**Design Insight**: Only strong players can profitably signal because the cost is prohibitive for weak players. This is the "burning money" mechanism from Spence signaling theory.
+
+#### 3.6.4 Inference from Outcomes
+
+After each turn, you observe your own state changes. You can infer opponent's likely ACTION (not state):
+
+| Your Action | Your Position Change | Likely Opponent Action |
+|-------------|---------------------|----------------------|
+| Cooperate | -1.0 | Defect |
+| Cooperate | +0.5 | Cooperate |
+| Defect | +1.0 | Cooperate |
+| Defect | -0.3, Resources -0.5 | Defect |
+
+**Limitation**: This reveals what opponent DID, not what their Position/Resources ARE.
+
+#### 3.6.5 Information Display
+
+What players see each turn:
+
+```
+YOUR STATUS (exact)           INTELLIGENCE ON OPPONENT
+Position: 6.0                 Position: UNKNOWN
+Resources: 4.2                  Last recon: Turn 3, value was 5.2
+                                Uncertainty: ±2.4 (4 turns stale)
+                                Estimate: 2.8 – 7.6
+
+                              Resources: UNKNOWN
+                                No inspection data
+                                Estimate: 0.0 – 10.0
+```
 
 ---
 
@@ -539,9 +672,11 @@ Instability_Factor = 1 + (10 − Stability) / 20
 
 | Act | Turns | Multiplier |
 |-----|-------|------------|
-| I (Setup) | 1–4 | 0.8 |
+| I (Setup) | 1–4 | 0.7 |
 | II (Confrontation) | 5–8 | 1.0 |
-| III (Resolution) | 9+ | 1.2 |
+| III (Resolution) | 9+ | 1.3 |
+
+Note: This is the same multiplier used for state deltas, ensuring consistency.
 
 **Example Variance Values**:
 
@@ -595,7 +730,28 @@ def final_resolution(state):
 
 Available after Turn 4 unless Stability ≤ 2.
 
-**Offer Constraints**:
+**Core Principle**: Settlement proposals REPLACE your strategic action for that turn. You cannot both negotiate AND play the scheduled matrix game. A day spent negotiating is a day not spent fighting.
+
+#### 4.4.1 Settlement Proposal Structure
+
+Each settlement proposal includes:
+
+1. **Numeric Offer**: VP split (e.g., "I propose 55-45 in my favor")
+2. **Argument Text**: Free-form text explaining your rationale (max 500 characters)
+
+**Example Proposal**:
+```
+Offer: 55 VP for me, 45 VP for you
+Argument: "Our positions are roughly equal, but I've demonstrated
+consistent good faith throughout. The current risk level threatens
+us both - a fair settlement now protects our mutual interests better
+than continued brinkmanship."
+```
+
+**Argument Evaluation**: The opponent (whether human, LLM persona, or deterministic AI) reads and considers the argument. Even deterministic opponent types use an LLM to evaluate settlement arguments, as persuasion and framing matter in negotiation.
+
+#### 4.4.2 Offer Constraints
+
 ```
 Position_Difference = Your_Position − Opponent_Position
 Cooperation_Bonus = (Cooperation_Score − 5) × 2
@@ -607,20 +763,20 @@ Constraints:
   Your_Max_Offer = min(80, Your_Suggested_VP + 10)
 ```
 
-**Negotiation Protocol** (One Counteroffer Rule):
+#### 4.4.3 Negotiation Protocol (One Counteroffer Rule)
 
 ```
 SINGLE PROPOSER CASE:
-  1. Proposer offers X VP for themselves
+  1. Proposer offers X VP + argument text
   2. Recipient may:
      - ACCEPT → Game ends at (X, 100-X)
-     - COUNTER with Y VP for themselves
-     - REJECT → Game continues, Risk +1
+     - COUNTER with Y VP + counter-argument
+     - REJECT with explanation → Game continues, Risk +1
 
   3. If COUNTER:
      Proposer may:
      - ACCEPT counter → Game ends at (100-Y, Y)
-     - FINAL OFFER of Z VP
+     - FINAL OFFER of Z VP + final argument
 
   4. If FINAL OFFER:
      Recipient may:
@@ -637,7 +793,42 @@ SIMULTANEOUS PROPOSAL CASE:
 Maximum exchanges: Offer → Counter → Final Offer (3 total)
 ```
 
-**Design Rationale**: The one-counteroffer rule prevents endless negotiation while allowing meaningful back-and-forth. The Risk +1 penalty for rejection creates pressure to reach agreement rather than fish for information.
+#### 4.4.4 Failed Settlement and Scenario Branching
+
+When settlement fails (rejected at any stage):
+
+1. **Risk +1**: The failed negotiation increases tension
+2. **Turn is consumed**: The scheduled matrix game is NOT played
+3. **Scenario follows `default_next` branch**: Each turn in the scenario tree specifies a default branch for non-resolution outcomes
+
+**Scenario Structure**:
+```json
+{
+  "turn": 5,
+  "matrix_type": "CHICKEN",
+  "narrative_briefing": "The border standoff continues...",
+  "settlement_available": true,
+  "branches": {
+    "CC": "turn_6_deescalation",
+    "CD": "turn_6_tension",
+    "DC": "turn_6_tension",
+    "DD": "turn_6_crisis"
+  },
+  "default_next": "turn_6_tension",
+  "settlement_failed_narrative": "Your diplomatic initiative collapsed. The underlying crisis remains unresolved, and tensions have risen."
+}
+```
+
+**Rationale**: The `default_next` branch typically follows the "tension" or "stalemate" outcome—failed negotiation isn't de-escalation (CC) or mutual destruction (DD), but continued unresolved conflict.
+
+#### 4.4.5 Information Revealed by Settlement
+
+Failed settlement proposals reveal information to your opponent:
+- Your numeric offer reveals your assessment of relative positions
+- Your argument may reveal strategic priorities or concerns
+- This information cost is part of the settlement gamble
+
+**Design Rationale**: The one-counteroffer rule prevents endless negotiation while allowing meaningful back-and-forth. The Risk +1 penalty for rejection creates pressure to reach agreement rather than fish for information. The argument field adds a persuasion dimension that pure numbers cannot capture.
 
 ### 4.5 Deterministic Endings
 
@@ -765,9 +956,9 @@ At the end of each turn (Turn 2+):
 
 | Act | Turns | Stakes | Typical Games | Narrative Function |
 |-----|-------|--------|---------------|-------------------|
-| I (Setup) | 1–4 | Low (0.5× payoffs) | Coordination, Stag Hunt, early PD | Establish positions, learn opponent |
+| I (Setup) | 1–4 | Low (0.7× deltas) | Coordination, Stag Hunt, early PD | Establish positions, learn opponent |
 | II (Confrontation) | 5–8 | Standard (1.0×) | Chicken, Inspection, Signaling | Direct conflict, testing |
-| III (Resolution) | 9–end | High (1.5×) | War of Attrition, Ultimatum, high-stakes Chicken | Endgame, settlement attempts |
+| III (Resolution) | 9–end | High (1.3× deltas) | War of Attrition, Ultimatum, high-stakes Chicken | Endgame, settlement attempts |
 
 ### 6.2 Pre-Generated Scenarios
 
@@ -853,7 +1044,7 @@ The game supports multiple thematic settings:
 
 ### How the Game Works
 
-You and your opponent face a series of strategic dilemmas over 10–18 turns. Each turn, you choose from a menu of actions. Your choices and your opponent's choices are resolved using game theory—the outcome depends on what BOTH of you do.
+You and your opponent face a series of strategic dilemmas over 12–16 turns. Each turn, you choose from a menu of actions. Your choices and your opponent's choices are resolved using game theory—the outcome depends on what BOTH of you do.
 
 Your goal: Maximize your Victory Points (VP). VP are determined at game end by your Position relative to your opponent, modified by variance.
 

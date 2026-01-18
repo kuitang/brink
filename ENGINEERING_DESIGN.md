@@ -259,6 +259,50 @@ DATABASE_URI = "sqlite:///instance/brinksmanship.db"
 - [ ] Factory function returns correct backend based on config
 - [ ] CLI and webapp use repository, not direct file access
 
+### Milestone 1.5: InformationState Model
+
+**Deliverable**: Addition to `src/brinksmanship/models/state.py`
+
+**Design Principle**: Information is acquired through strategic games, not passive observation. Information decays over time as opponent state changes. This model tracks what each player knows about their opponent (see GAME_MANUAL.md Section 3.6).
+
+**Implementation Tasks**:
+1. Define `InformationState` dataclass for tracking knowledge about opponent
+2. Implement position estimate calculation with decay
+3. Implement resources estimate calculation with decay
+4. Integrate with GameState to track per-player information states
+
+**InformationState Definition**:
+```python
+@dataclass
+class InformationState:
+    """What one player knows about the other."""
+    position_bounds: tuple[float, float] = (0.0, 10.0)
+    resources_bounds: tuple[float, float] = (0.0, 10.0)
+    known_position: Optional[float] = None
+    known_position_turn: Optional[int] = None
+    known_resources: Optional[float] = None
+    known_resources_turn: Optional[int] = None
+
+    def get_position_estimate(self, current_turn: int) -> tuple[float, float]:
+        """Returns (estimate, uncertainty_radius)."""
+        if self.known_position is not None:
+            turns_elapsed = current_turn - self.known_position_turn
+            uncertainty = min(turns_elapsed * 0.8, 5.0)
+            return self.known_position, uncertainty
+        else:
+            midpoint = sum(self.position_bounds) / 2
+            radius = (self.position_bounds[1] - self.position_bounds[0]) / 2
+            return midpoint, radius
+```
+
+**Acceptance Criteria**:
+- [ ] `InformationState` dataclass defined with all fields
+- [ ] `get_position_estimate` returns (estimate, uncertainty_radius)
+- [ ] Uncertainty grows at 0.8 per turn, capped at 5.0
+- [ ] Initial bounds are (0.0, 10.0) for both position and resources
+- [ ] Information from successful Reconnaissance/Inspection games can update known values
+- [ ] Unit tests verify decay calculation
+
 ---
 
 ## Phase 2: Game Engine
@@ -273,14 +317,15 @@ DATABASE_URI = "sqlite:///instance/brinksmanship.db"
 3. Implement simultaneous action collection
 4. Implement state update logic (Cooperation Score, Stability)
 5. Implement turn history tracking
-6. Implement noisy intelligence generation
+6. Implement information game system (see GAME_MANUAL.md Section 3.6)
 
 **Acceptance Criteria**:
 - [ ] Engine loads scenario from JSON file
 - [ ] Turn sequence follows exact 8-phase structure from GAME_MANUAL.md
 - [ ] Cooperation Score updates correctly: CC→+1, DD→-1, mixed→0
 - [ ] Stability updates correctly based on switch count
-- [ ] Intelligence noise is ±2 uniform for opponent Position and Resources
+- [ ] Information games (Reconnaissance, Inspection) implemented per GAME_MANUAL.md Section 3.6
+- [ ] Information state tracking with decay (uncertainty = turns_elapsed × 0.8, max 5.0)
 - [ ] Complete turn history is available for coaching
 
 ### Milestone 2.2: Resolution System
@@ -296,7 +341,7 @@ DATABASE_URI = "sqlite:///instance/brinksmanship.db"
 
 **Acceptance Criteria**:
 - [ ] Matrix resolution uses hidden payoff values from scenario
-- [ ] Payoffs are scaled by Act Multiplier (0.5×, 1.0×, 1.5×)
+- [ ] Payoffs are scaled by Act Multiplier (0.7×, 1.0×, 1.3×)
 - [ ] Settlement constraints are enforced (VP ranges based on Position)
 - [ ] Reconnaissance resolves as Matching Pennies variant
 - [ ] Resolution returns complete `ActionResult` with all changes
@@ -316,7 +361,7 @@ DATABASE_URI = "sqlite:///instance/brinksmanship.db"
 base_sigma = 8 + (risk_level * 1.2)      # 8-20
 chaos_factor = 1.2 - (coop_score / 50)   # 1.0-1.2
 instability_factor = 1 + (10 - stability) / 20  # 1.0-1.45
-act_multiplier = {1: 0.8, 2: 1.0, 3: 1.2}[act]
+act_multiplier = {1: 0.7, 2: 1.0, 3: 1.3}[act]
 shared_sigma = base_sigma * chaos_factor * instability_factor * act_multiplier
 ```
 
@@ -350,7 +395,7 @@ if turn >= 10 and risk_level > 7:
 - [ ] Resources=0 triggers loss (15 VP) for that player
 - [ ] Crisis Termination probability = (Risk - 7) × 0.08 for Risk > 7
 - [ ] Crisis Termination only checked for Turn >= 10
-- [ ] Max turn range: 12-16 (narrower, hidden from players)
+- [ ] Max turn range: 12-16 (hidden from players)
 
 ### Milestone 2.5: State Delta System
 
@@ -429,12 +474,6 @@ PD_DELTA_TEMPLATE = {
         "punishment_severity": 0.5,
         "sucker_penalty": 2.0
       },
-      "state_deltas": {
-        "CC": {"pos_a": 0.5, "pos_b": 0.5, "risk": -0.5},
-        "CD": {"pos_a": -1.0, "pos_b": 1.0, "risk": 0.5},
-        "DC": {"pos_a": 1.0, "pos_b": -1.0, "risk": 0.5},
-        "DD": {"pos_a": -0.3, "pos_b": -0.3, "risk": 1.0, "res_cost": 0.5}
-      },
       "action_menu": ["action1", "action2"],
       "outcome_narratives": {
         "CC": "string",
@@ -444,20 +483,31 @@ PD_DELTA_TEMPLATE = {
       },
       "branches": {
         "CC": "turn_2a",
-        "default": "turn_2b"
-      }
+        "CD": "turn_2b",
+        "DC": "turn_2b",
+        "DD": "turn_2c"
+      },
+      "default_next": "turn_2b",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Negotiations collapsed. The crisis remains unresolved."
     }
   ],
   "branches": {
     "turn_2a": { ... },
-    "turn_2b": { ... }
+    "turn_2b": { ... },
+    "turn_2c": { ... }
   }
 }
 ```
 
 **What is NOT in the schema**:
-- ~~`matrix_payoffs`~~ — raw payoffs are never stored
-- ~~State deltas~~ — computed from constructor at load time
+- `matrix_payoffs` — raw payoffs are never stored (computed from constructor)
+- `state_deltas` — computed from constructor at load time based on matrix type
+
+**What IS in the schema** (new for settlement mechanics):
+- `default_next` — branch to follow if settlement fails or turn is skipped
+- `settlement_available` — whether settlement can be proposed this turn
+- `settlement_failed_narrative` — narrative text for failed settlement
 
 **Load-Time Behavior**:
 When a scenario is loaded, for each turn:
@@ -534,15 +584,15 @@ The generator classifies user prompts by theme, then selects game types appropri
 - [ ] LLM never outputs raw payoffs, only types and parameters
 - [ ] All generated parameters pass validation before storage
 - [ ] Generated scenarios use 8+ distinct matrix types
-- [ ] Generated scenarios have 10-18 turn maximum (randomized)
+- [ ] Generated scenarios have 12-16 turn maximum (randomized)
 - [ ] Three-act structure reflected in game type and parameter choices
 - [ ] Generated scenarios load successfully (matrices construct without error)
 
-### Milestone 3.3: Scenario Validator (Agentic with Tool Execution)
+### Milestone 3.3: Scenario Validator (Deterministic Python)
 
-**Deliverable**: `src/brinksmanship/generation/validator.py` and `scripts/quick_validate.py`
+**Deliverable**: `src/brinksmanship/generation/validator.py` and `scripts/validate_scenario.py`
 
-**Design Principle**: Matrix correctness is guaranteed by construction. The validator focuses on scenario-level quality using **tool execution for deterministic checks** and **game simulations for balance analysis**—NOT LLM reasoning about game theory.
+**Design Principle**: Matrix correctness is guaranteed by construction. The validator uses **deterministic Python scripts** for all checks—no agentic orchestration needed. LLM is used only for narrative consistency (optional).
 
 **What is NO LONGER validated** (guaranteed by constructors):
 - ~~Payoffs match game type~~ — impossible to fail
@@ -553,68 +603,59 @@ The generator classifies user prompts by theme, then selects game types appropri
 **What IS validated**:
 1. **Game type variety**: ≥8 distinct types across scenario (deterministic check)
 2. **Act structure compliance**: Turns map to correct acts (deterministic check)
-3. **Balance analysis**: **Run actual game simulations** to detect dominant strategies
-4. **Narrative consistency**: LLM check for thematic coherence (ONLY subjective check)
+3. **Balance analysis**: Run game simulations to detect dominant strategies
+4. **Branching structure**: All branches have valid targets, default_next exists
+5. **Narrative consistency**: Optional LLM check for thematic coherence
 
-**Agentic Tool Usage**:
+**Validation Script** (`scripts/validate_scenario.py`):
 ```python
-from claude_agent_sdk import query, ClaudeAgentOptions
+#!/usr/bin/env python3
+"""Deterministic scenario validation - no LLM required for core checks."""
 
-async def validate_scenario(scenario_path: str):
-    options = ClaudeAgentOptions(
-        allowed_tools=["Read", "Bash", "Write"],
-        system_prompt=SCENARIO_VALIDATION_SYSTEM_PROMPT,
-        permission_mode="acceptEdits"
-    )
+def validate_scenario(scenario_path: str) -> ValidationResult:
+    """Run all validation checks on a scenario.
 
-    # Agent executes these tools autonomously:
-    # 1. Bash: python scripts/quick_validate.py {scenario_path}
-    #    → Returns JSON with structural check results
-    # 2. Bash: python scripts/run_playtest.py --quick --games 50 {scenario_path}
-    #    → Returns JSON with win rates, turn lengths, ending distributions
-    # 3. Read: validation_results.json
-    #    → Agent analyzes statistical output
-    # 4. LLM reasoning: ONLY for narrative consistency
-    # 5. Write: validation_report.md
+    Returns structured result with pass/fail for each check.
+    """
+    scenario = load_scenario(scenario_path)
 
-    async for message in query(
-        prompt=f"""Validate scenario at {scenario_path}:
-1. Run: python scripts/quick_validate.py {scenario_path}
-2. Run: python scripts/run_playtest.py --quick --games 50 --scenario {scenario_path}
-3. Analyze simulation results statistically (dominant strategy = >70% win rate)
-4. Check narrative consistency (LLM judgment)
-5. Write validation report""",
-        options=options
-    ):
-        yield message
-```
+    results = ValidationResult()
 
-**Simulation-Based Balance Check**:
-```bash
-# Agent runs this via Bash tool:
-python scripts/run_playtest.py \
-    --quick \
-    --games 50 \
-    --scenario scenarios/test.json \
-    --pairings "Nash:Nash,TitForTat:Opportunist,SecuritySeeker:Opportunist" \
-    --output validation_results.json
+    # 1. Structural checks (pure Python)
+    results.game_variety = check_game_variety(scenario)  # ≥8 types
+    results.act_structure = check_act_structure(scenario)  # Turns in correct acts
+    results.branching = check_branching_validity(scenario)  # All branches valid
+    results.settlement = check_settlement_config(scenario)  # default_next exists
 
-# Dominant strategy detected if ANY pairing shows >70% win rate
-# Output is JSON that agent parses—no LLM game theory reasoning
+    # 2. Balance simulation (pure Python)
+    sim_results = run_balance_simulation(scenario, games=50)
+    results.balance = check_dominant_strategy(sim_results)  # No >70% win rate
+
+    # 3. Optional: Narrative consistency (requires LLM)
+    if args.check_narrative:
+        results.narrative = check_narrative_consistency(scenario)
+
+    return results
+
+# CLI usage:
+# python scripts/validate_scenario.py scenarios/cold_war.json
+# python scripts/validate_scenario.py scenarios/cold_war.json --check-narrative
 ```
 
 **Implementation Tasks**:
-1. Implement `ScenarioValidator` class using Claude Agent SDK **with tool access**
-2. Implement `scripts/quick_validate.py` (deterministic structural checks)
-3. Agent uses **Bash tool** to run Python validation scripts
-4. Agent uses **Bash tool** to run game simulations
-5. Agent uses **Read tool** to parse simulation output JSON
-6. LLM reasoning used ONLY for narrative consistency
-7. Agent uses **Write tool** to produce validation report
+1. Implement `ScenarioValidator` class (pure Python, no LLM)
+2. Implement `scripts/validate_scenario.py` (CLI entry point)
+3. Implement structural checks (variety, acts, branching)
+4. Implement balance simulation runner
+5. Implement dominant strategy detection (>70% win rate = fail)
+6. Optional: Add `--check-narrative` flag for LLM narrative check
 
 **Acceptance Criteria**:
 - [ ] Validator does NOT use LLM to reason about game theory or balance
-- [ ] Balance analysis runs 50+ actual game simulations via Bash tool
+- [ ] Balance analysis runs 50+ actual game simulations
+- [ ] CLI returns structured JSON with pass/fail for each check
+- [ ] Dominant strategy check fails if any pairing >70% win rate
+- [ ] All checks complete in <30 seconds
 - [ ] Dominant strategy detection: statistical threshold (>70% win rate), not LLM judgment
 - [ ] Game type variety check: deterministic Python code
 - [ ] Act structure check: deterministic Python code
@@ -634,18 +675,62 @@ python scripts/run_playtest.py \
 1. Define `Opponent` abstract base class
 2. Define `choose_action` method signature
 3. Define `receive_result` method for learning
-4. Define `get_settlement_response` method
+4. Define `evaluate_settlement` method for settlement negotiations
 5. Implement opponent factory function
+
+**Settlement Interface**:
+```python
+@dataclass
+class SettlementProposal:
+    """A settlement proposal with numeric offer and argument."""
+    offered_vp: int  # VP proposed for the proposer (0-100)
+    argument: str    # Free-text rationale (max 500 chars)
+
+@dataclass
+class SettlementResponse:
+    """Response to a settlement proposal."""
+    action: Literal["accept", "counter", "reject"]
+    counter_vp: Optional[int] = None  # If countering
+    counter_argument: Optional[str] = None
+    rejection_reason: Optional[str] = None
+
+class Opponent(ABC):
+    @abstractmethod
+    def choose_action(self, state: GameState, available_actions: list[Action]) -> Action:
+        """Choose strategic action for this turn."""
+        pass
+
+    @abstractmethod
+    def evaluate_settlement(
+        self,
+        proposal: SettlementProposal,
+        state: GameState,
+        is_final_offer: bool
+    ) -> SettlementResponse:
+        """Evaluate a settlement proposal and respond.
+
+        NOTE: Even deterministic opponents use LLM for this method,
+        as the argument text requires language understanding.
+        """
+        pass
+
+    @abstractmethod
+    def propose_settlement(self, state: GameState) -> Optional[SettlementProposal]:
+        """Optionally propose settlement. Returns None if not proposing."""
+        pass
+```
 
 **Acceptance Criteria**:
 - [ ] All opponents implement the same interface
 - [ ] Interface supports both human and AI opponents
-- [ ] Interface includes method for receiving turn results (for learning)
+- [ ] `evaluate_settlement` processes both numeric offer AND argument text
 - [ ] Factory function creates opponent by type name
 
 ### Milestone 4.2: Deterministic Opponents
 
 **Deliverable**: `src/brinksmanship/opponents/deterministic.py`
+
+**Design Principle**: Deterministic opponents use algorithmic rules for strategic actions (Cooperate/Defect), but use **LLM for settlement evaluation**. The argument text in settlement proposals requires language understanding that pure algorithms cannot provide.
 
 **Implementation Tasks**:
 1. Implement `NashCalculator` opponent (plays Nash equilibrium)
@@ -657,26 +742,45 @@ python scripts/run_playtest.py \
 
 **Opponent Type Specifications**:
 
-| Type | Description | Behavioral Pattern |
-|------|-------------|-------------------|
-| NashCalculator | Pure game theorist | Plays Nash equilibrium, exploits suboptimal play |
-| SecuritySeeker | Spiral model actor | Escalates only when threatened, responds to reassurance |
-| Opportunist | Deterrence model actor | Probes for weakness, respects demonstrated strength |
-| Erratic | Unpredictable | Mixes strategies with noise, can be spooked |
-| TitForTat | Reciprocator | Starts cooperative, mirrors opponent's last move |
-| GrimTrigger | Punisher | Cooperates until betrayed, then defects forever |
+| Type | Description | Strategic Pattern | Settlement Tendency |
+|------|-------------|-------------------|---------------------|
+| NashCalculator | Pure game theorist | Plays Nash equilibrium | Accepts if offer ≥ position-fair value |
+| SecuritySeeker | Spiral model actor | Escalates only when threatened | Prefers settlement, accepts generous offers |
+| Opportunist | Deterrence model actor | Probes for weakness | Rejects unless dominant, exploits weak arguments |
+| Erratic | Unpredictable | Mixes strategies with noise | Unpredictable acceptance |
+| TitForTat | Reciprocator | Mirrors opponent's last move | Accepts fair offers from cooperative opponents |
+| GrimTrigger | Punisher | Defects forever after betrayal | Never accepts after betrayal |
+
+**Settlement Evaluation (LLM-based)**:
+```python
+class DeterministicOpponent(Opponent):
+    def evaluate_settlement(self, proposal, state, is_final_offer):
+        # Even deterministic opponents use LLM for settlement
+        # The persona prompt shapes how the LLM evaluates arguments
+        return await evaluate_settlement_with_llm(
+            proposal=proposal,
+            state=state,
+            persona_prompt=self.settlement_persona_prompt,
+            is_final_offer=is_final_offer
+        )
+
+    # But strategic actions remain deterministic
+    def choose_action(self, state, actions):
+        return self._deterministic_choice(state, actions)
+```
 
 **Acceptance Criteria**:
-- [ ] Each opponent type follows documented behavioral pattern
+- [ ] Strategic actions are purely deterministic (testable, reproducible)
+- [ ] Settlement evaluation uses LLM with persona-specific prompts
 - [ ] Opponents use only observable game state (no cheating)
-- [ ] Opponents correctly handle settlement proposals
-- [ ] Unit tests verify expected behavior patterns
+- [ ] Unit tests verify strategic behavior patterns
+- [ ] Settlement behavior matches persona descriptions
 
-### Milestone 4.3: Historical Personas (Agentic with WebSearch)
+### Milestone 4.3: Historical Personas (LLM-based)
 
 **Deliverable**: `src/brinksmanship/opponents/historical.py` and `src/brinksmanship/opponents/personas/`
 
-**Design Principle**: Persona definitions are grounded in documented historical behavior. For well-known figures (Bismarck, Khrushchev, etc.), the LLM's training data is sufficient—WebSearch is unnecessary and adds latency. WebSearch is **optional** for user-created personas based on obscure figures.
+**Design Principle**: Persona definitions are grounded in documented historical behavior. For well-known figures (Bismarck, Khrushchev, etc.), the LLM's training data is sufficient. No WebSearch is needed—LLM knowledge covers all included personas.
 
 **Implementation Tasks**:
 1. Implement `HistoricalPersona` class using Claude Agent SDK
@@ -705,54 +809,39 @@ python scripts/run_playtest.py \
    - Current game state
    - Action options
 
-5. Implement `generate_new_persona` function using **WebSearch for research**
+5. Implement `generate_new_persona` function using LLM
 
 **Acceptance Criteria**:
 - [ ] Each persona has documented historical basis
 - [ ] Persona prompts are in `prompts.py`
 - [ ] LLM responses are parsed to valid actions
 - [ ] Personas maintain consistent behavior within a game
-- [ ] New personas can be generated from description + **WebSearch research**
 - [ ] Unit tests verify personas make reasonable choices
 
-### Milestone 4.4: Custom Persona Generator (Optional WebSearch)
+### Milestone 4.4: Custom Persona Generator (LLM-based)
 
 **Deliverable**: `src/brinksmanship/opponents/persona_generator.py` and addition to `prompts.py`
 
-**Design Principle**: New personas can be created from a figure name/description. For famous figures, LLM training data suffices. WebSearch is **opt-in** for obscure figures where LLM knowledge may be incomplete or outdated. Default to LLM-only for speed (~5s vs ~30s with search).
+**Design Principle**: New personas can be created from a figure name/description. LLM training data is sufficient for all well-known historical figures. Fast execution (~5s) with no external dependencies.
 
-**Persona Generation (LLM-only, fast)**:
+**Persona Generation**:
 ```python
 from brinksmanship.llm import generate_json
 from brinksmanship.prompts import PERSONA_GENERATION_PROMPT
 
-async def generate_persona(figure_name: str, use_search: bool = False) -> dict:
+async def generate_persona(figure_name: str) -> dict:
     """Generate a persona definition from a figure name.
 
-    Args:
-        figure_name: Name of historical/fictional figure
-        use_search: If True, use WebSearch for obscure figures (slower)
-
-    Default (use_search=False): ~5 seconds, uses LLM training knowledge
-    With search (use_search=True): ~30 seconds, for obscure figures
+    Uses LLM training knowledge - sufficient for famous figures.
+    Execution time: ~5 seconds.
     """
-    if use_search:
-        return await _research_persona_with_search(figure_name)
-
-    # Fast path: LLM already knows famous figures
     return await generate_json(
         prompt=PERSONA_GENERATION_PROMPT.format(figure_name=figure_name),
         system_prompt="You are an expert on historical and fictional strategists.",
     )
 ```
 
-**When to use WebSearch**:
-- Famous figures (Bismarck, Khrushchev, Machiavelli): **NO** - LLM knows them
-- Obscure historical figures: **YES** - LLM may have incomplete info
-- Contemporary business figures: **MAYBE** - for recent actions post-cutoff
-- Fictional characters: **NO** - LLM knows them from training
-
-**Example output** (generated from LLM knowledge alone):
+**Example output**:
 ```json
 {
   "name": "Otto von Bismarck",
@@ -771,24 +860,22 @@ async def generate_persona(figure_name: str, use_search: bool = False) -> dict:
   "trigger_conditions": {
     "escalate": "When opponent shows weakness or isolation",
     "de_escalate": "When facing strong coalition or uncertain odds"
-  }
+  },
+  "settlement_style": "Pragmatic - accepts fair deals, drives hard bargains when strong"
 }
 ```
 
 **Implementation Tasks**:
-1. Implement `PersonaResearcher` class using `agentic_query` with WebSearch
-2. Create `PERSONA_RESEARCH_SYSTEM_PROMPT` in `prompts.py`
+1. Implement `PersonaGenerator` class using `generate_json`
+2. Create `PERSONA_GENERATION_PROMPT` in `prompts.py`
 3. Implement structured output parsing for persona definitions
-4. Cache research results to avoid redundant web searches
-5. Implement source citation tracking for transparency
+4. Validate generated personas have all required fields
 
 **Acceptance Criteria**:
-- [ ] Research agent uses WebSearch and WebFetch tools autonomously
-- [ ] Generated personas include source citations
-- [ ] Research results are cached (don't re-search same figure)
-- [ ] Personas include all required fields: worldview, patterns, risk, triggers, settlement
-- [ ] Generated personas are grounded in documented behavior (verifiable sources)
-- [ ] Personas include appropriate risk tolerance characterization (1-10 with justification)
+- [ ] Personas include all required fields: worldview, patterns, risk, triggers, settlement_style
+- [ ] Generated personas are consistent with LLM's knowledge of the figure
+- [ ] Personas include appropriate risk tolerance characterization (1-10)
+- [ ] Generation completes in <10 seconds
 
 ---
 
@@ -817,155 +904,133 @@ async def generate_persona(figure_name: str, use_search: bool = False) -> dict:
 - [ ] Simulated humans occasionally make suboptimal choices (realistic)
 - [ ] Personas are generated fresh for each playtest session
 
-### Milestone 5.2: Playtester Framework (Agentic with Subagents)
+### Milestone 5.2: Playtester Framework (Deterministic Python)
 
 **Deliverable**: `src/brinksmanship/testing/playtester.py` and `scripts/run_playtest.py`
 
-**Design Principle**: The playtester uses **subagents for parallel game execution** and **Bash tool for running Python scripts**. This enables high-throughput testing with deterministic execution.
+**Design Principle**: The playtester is a **pure Python script** with no agentic orchestration. Parallelism is achieved through Python's `multiprocessing` or `asyncio`, not LLM subagents.
 
 **Implementation Tasks**:
-1. Implement `PlaytestRunner` class with subagent orchestration
-2. Implement `scripts/run_playtest.py` for batch execution (pure Python, no LLM)
-3. Agent uses **Bash tool** to run playtest batches
-4. Agent uses **Task tool** to spawn parallel subagents for different pairings
-5. Implement result aggregation from JSON outputs
-6. Implement game log export
-
-**Agentic Orchestration Pattern**:
-```python
-from claude_agent_sdk import query, ClaudeAgentOptions, AgentDefinition
-
-async def run_playtest_suite(scenario_path: str, num_games: int = 100):
-    """Run comprehensive playtest suite using subagents.
-
-    Main agent orchestrates, subagents handle specific test categories.
-    """
-    options = ClaudeAgentOptions(
-        allowed_tools=["Bash", "Read", "Write", "Task"],
-        agents={
-            "deterministic-tester": AgentDefinition(
-                description="Tests deterministic opponent pairings",
-                prompt="Run games between algorithmic opponents and collect stats.",
-                tools=["Bash", "Read"]
-            ),
-            "persona-tester": AgentDefinition(
-                description="Tests historical persona matchups",
-                prompt="Run games between historical personas and verify behavior.",
-                tools=["Bash", "Read", "WebSearch"]  # May need to verify persona accuracy
-            ),
-            "human-sim-tester": AgentDefinition(
-                description="Tests simulated human play patterns",
-                prompt="Run games with simulated humans and check for realistic behavior.",
-                tools=["Bash", "Read"]
-            ),
-        }
-    )
-
-    # Main agent spawns subagents in parallel for different test categories
-    async for message in query(
-        prompt=f"""Run playtest suite for {scenario_path}:
-
-1. Spawn deterministic-tester subagent:
-   Bash: python scripts/run_playtest.py --scenario {scenario_path} \
-         --pairings "Nash:Nash,TitForTat:Opportunist,SecuritySeeker:GrimTrigger" \
-         --games {num_games} --output results/deterministic.json
-
-2. Spawn persona-tester subagent:
-   Bash: python scripts/run_playtest.py --scenario {scenario_path} \
-         --pairings "Bismarck:Khrushchev,Buffett:Icahn,Welch:Dimon" \
-         --games {num_games} --output results/personas.json
-
-3. Spawn human-sim-tester subagent:
-   Bash: python scripts/run_playtest.py --scenario {scenario_path} \
-         --human-sim --games {num_games} --output results/human_sim.json
-
-4. Aggregate all results and produce summary statistics.
-5. Write final report to results/playtest_report.json""",
-        options=options
-    ):
-        yield message
-```
+1. Implement `PlaytestRunner` class (pure Python)
+2. Implement `scripts/run_playtest.py` for batch execution
+3. Implement parallel game execution using `concurrent.futures`
+4. Implement result aggregation from JSON outputs
+5. Implement game log export
 
 **Playtest Script** (`scripts/run_playtest.py`):
-```bash
-# Pure Python, no LLM - deterministic execution
-python scripts/run_playtest.py \
-    --scenario scenarios/cold_war.json \
-    --pairings "Nash:Nash,TitForTat:Opportunist" \
-    --games 100 \
-    --output playtest_results.json \
-    --log-dir logs/
+```python
+#!/usr/bin/env python3
+"""Deterministic playtest runner - no LLM orchestration needed."""
 
-# Output JSON structure:
-# {
-#   "pairings": {"Nash:Nash": {"wins_a": 45, "wins_b": 42, "ties": 13, ...}},
-#   "aggregate": {"avg_turns": 12.3, "settlement_rate": 0.52, ...},
-#   "logs": ["logs/game_001.json", "logs/game_002.json", ...]
-# }
+import argparse
+from concurrent.futures import ProcessPoolExecutor
+
+def run_playtest(scenario_path: str, pairings: list, games: int, output: str):
+    """Run playtest with parallel game execution.
+
+    Uses ProcessPoolExecutor for CPU-bound game simulation.
+    """
+    results = {}
+
+    with ProcessPoolExecutor(max_workers=4) as executor:
+        futures = {}
+        for pairing in pairings:
+            future = executor.submit(run_pairing, scenario_path, pairing, games)
+            futures[pairing] = future
+
+        for pairing, future in futures.items():
+            results[pairing] = future.result()
+
+    # Aggregate and write results
+    aggregate = compute_aggregate_stats(results)
+    write_json(output, {"pairings": results, "aggregate": aggregate})
+
+# CLI usage:
+# python scripts/run_playtest.py \
+#     --scenario scenarios/cold_war.json \
+#     --pairings "Nash:Nash,TitForTat:Opportunist" \
+#     --games 100 \
+#     --output playtest_results.json
+```
+
+**Output JSON structure**:
+```json
+{
+  "pairings": {"Nash:Nash": {"wins_a": 45, "wins_b": 42, "ties": 13, ...}},
+  "aggregate": {"avg_turns": 12.3, "settlement_rate": 0.52, ...},
+  "logs": ["logs/game_001.json", "logs/game_002.json", ...]
+}
 ```
 
 **Acceptance Criteria**:
-- [ ] Agent uses Bash tool to run Python playtest scripts
-- [ ] Agent spawns subagents for parallel test categories
 - [ ] Pure Python scripts handle game execution (deterministic, fast)
+- [ ] Parallel execution via ProcessPoolExecutor (not LLM subagents)
 - [ ] Can run N games with specified opponent pairings via CLI
 - [ ] Aggregates statistics: win rates, average VP, turn counts, ending types
 - [ ] Exports complete game logs for analysis
 - [ ] Generates summary report as structured JSON
+- [ ] 100 games complete in <60 seconds for deterministic opponents
 
-### Milestone 5.3: Mechanics Analysis Agent (Agentic with Tool Execution)
+### Milestone 5.3: Mechanics Analysis (Deterministic Python)
 
-**Deliverable**: `scripts/analyze_mechanics.py` and addition to `prompts.py`
+**Deliverable**: `scripts/analyze_mechanics.py`
 
-**Design Principle**: Mechanics analysis combines **deterministic statistical analysis** (Python) with **LLM interpretation** of results. The agent runs analysis scripts, reads outputs, and interprets patterns.
+**Design Principle**: Mechanics analysis is **deterministic Python** with threshold-based issue detection. No LLM reasoning needed for statistical analysis—the script flags issues when metrics fall outside expected ranges.
 
-**Agentic Analysis Workflow**:
+**Analysis Script** (`scripts/analyze_mechanics.py`):
 ```python
-from brinksmanship.llm import agentic_query
+#!/usr/bin/env python3
+"""Deterministic mechanics analysis - threshold-based issue detection."""
 
-async def analyze_mechanics(playtest_dir: str) -> str:
-    """Analyze playtest results for mechanics issues.
+# Expected ranges (from GAME_MANUAL.md)
+THRESHOLDS = {
+    "dominant_strategy": 0.70,  # Fail if any pairing >70% win rate
+    "variance_min": 10,  # VP std dev should be ≥10
+    "variance_max": 40,  # VP std dev should be ≤40
+    "settlement_rate_min": 0.30,  # At least 30% settlements
+    "settlement_rate_max": 0.70,  # At most 70% settlements
+    "avg_game_length_min": 8,  # Games shouldn't be too short
+    "avg_game_length_max": 16,  # Games shouldn't exceed max turns
+}
 
-    Agent workflow:
-    1. Run statistical analysis scripts via Bash
-    2. Read GAME_MANUAL.md for intended mechanics
-    3. Compare actual vs intended behavior
-    4. Identify issues and recommend fixes
+def analyze_mechanics(playtest_results: dict) -> AnalysisReport:
+    """Analyze playtest results against expected thresholds.
+
+    Returns structured report with issues flagged.
     """
-    return await agentic_query(
-        prompt=f"""Analyze playtest results in {playtest_dir}:
+    report = AnalysisReport()
 
-## Step 1: Run Statistical Analysis
-Bash: python scripts/compute_stats.py {playtest_dir} --output stats.json
+    # Check dominant strategy
+    for pairing, stats in playtest_results["pairings"].items():
+        if stats["win_rate_a"] > THRESHOLDS["dominant_strategy"]:
+            report.add_issue("CRITICAL", f"Dominant strategy: {pairing} A wins {stats['win_rate_a']:.0%}")
+        if stats["win_rate_b"] > THRESHOLDS["dominant_strategy"]:
+            report.add_issue("CRITICAL", f"Dominant strategy: {pairing} B wins {stats['win_rate_b']:.0%}")
 
-## Step 2: Read Intended Mechanics
-Read: GAME_MANUAL.md (focus on variance formula, settlement rules, ending conditions)
+    # Check variance calibration
+    vp_std = playtest_results["aggregate"]["vp_std_dev"]
+    if vp_std < THRESHOLDS["variance_min"]:
+        report.add_issue("MAJOR", f"Variance too low: {vp_std:.1f} (expected ≥{THRESHOLDS['variance_min']})")
+    if vp_std > THRESHOLDS["variance_max"]:
+        report.add_issue("MAJOR", f"Variance too high: {vp_std:.1f} (expected ≤{THRESHOLDS['variance_max']})")
 
-## Step 3: Read Statistical Results
-Read: stats.json
+    # Check settlement rate
+    settlement_rate = playtest_results["aggregate"]["settlement_rate"]
+    if settlement_rate < THRESHOLDS["settlement_rate_min"]:
+        report.add_issue("MINOR", f"Settlement rate low: {settlement_rate:.0%}")
+    if settlement_rate > THRESHOLDS["settlement_rate_max"]:
+        report.add_issue("MINOR", f"Settlement rate high: {settlement_rate:.0%}")
 
-## Step 4: Analyze for Issues
-Check each metric against intended behavior:
-- Dominant strategy: any pairing with >70% win rate?
-- Variance calibration: VP standard deviation in 15-25 range?
-- Settlement rate: between 40-60%?
-- Crisis termination: does uncertain ending prevent backward induction?
+    return report
 
-## Step 5: Produce Report
-Write analysis report with:
-- Executive Summary (1-2 paragraphs)
-- Statistical Tables (from stats.json)
-- Issue List (Critical/Major/Minor severity)
-- Recommended Changes (specific code/parameter changes)
-- Successful Mechanics (what's working)""",
-        allowed_tools=["Bash", "Read", "Write", "Glob"],
-        max_turns=20,
-    )
+# CLI usage:
+# python scripts/analyze_mechanics.py playtest_results.json --output analysis.json
 ```
 
 **Statistical Analysis Script** (`scripts/compute_stats.py`):
 ```python
-# Pure Python statistical analysis - no LLM
+#!/usr/bin/env python3
+"""Pure Python statistical analysis - no LLM needed."""
 # Computes:
 # - Win rates per pairing
 # - VP distributions (mean, std, percentiles)
@@ -973,24 +1038,21 @@ Write analysis report with:
 # - Ending type breakdown
 # - Settlement rate and timing
 # - Cooperation score trajectories
-# Outputs structured JSON for agent to interpret
+# Outputs structured JSON
 ```
 
 **Implementation Tasks**:
-1. Implement `scripts/compute_stats.py` (pure Python, no LLM)
-2. Create `MECHANICS_ANALYSIS_SYSTEM_PROMPT` in `prompts.py`
-3. Agent uses **Bash tool** to run statistical scripts
-4. Agent uses **Read tool** to examine GAME_MANUAL.md and stats output
-5. Agent uses **Write tool** to produce analysis report
-6. LLM interprets statistical patterns (but doesn't compute them)
+1. Implement `scripts/compute_stats.py` (pure Python)
+2. Implement `scripts/analyze_mechanics.py` (threshold-based detection)
+3. Implement `AnalysisReport` dataclass for structured output
+4. Add JSON output with machine-readable issue list
 
 **Acceptance Criteria**:
-- [ ] Agent runs statistical analysis via Bash tool (not LLM math)
-- [ ] Agent reads GAME_MANUAL.md for reference (Read tool)
-- [ ] Analysis compares actual stats against intended metrics
-- [ ] Issue detection uses statistical thresholds (>70% win rate, etc.)
-- [ ] Recommendations are specific: "Change variance factor from X to Y"
-- [ ] Analysis can be run after each batch of playtests
+- [ ] All analysis is pure Python with no LLM calls
+- [ ] Issue detection uses statistical thresholds (configurable)
+- [ ] Output is structured JSON (machine-readable)
+- [ ] Analysis completes in <10 seconds for 100 games
+- [ ] Can be integrated into CI/CD pipeline
 
 ---
 
@@ -1073,7 +1135,7 @@ Write analysis report with:
 - [ ] Application launches and displays main menu
 - [ ] All game state is clearly displayed
 - [ ] Actions show type classification and resource cost
-- [ ] Noisy intelligence is displayed (not exact values)
+- [ ] Intelligence display shows information state with uncertainty bounds (per GAME_MANUAL.md Section 3.6.5)
 - [ ] Settlement negotiation has clear UI
 - [ ] End-game shows results and offers coaching
 - [ ] Application handles all ending conditions gracefully
