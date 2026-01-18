@@ -93,23 +93,49 @@ brinksmanship/
 - [ ] State includes computed properties for variance calculation
 - [ ] Unit tests pass for all state transitions
 
-### Milestone 1.2: Matrix Definitions
+### Milestone 1.2: Matrix Definitions (Constructor Pattern)
 
 **Deliverable**: `src/brinksmanship/models/matrices.py`
 
+**Design Principle**: Scenarios specify game type + parameters only. Constructors guarantee valid matrices by enforcing ordinal constraints. Nash equilibria are guaranteed by the constraints themselves—no runtime computation needed.
+
 **Implementation Tasks**:
 1. Define `MatrixType` enum for all 24 game types
-2. Define `PayoffMatrix` dataclass with payoff values
-3. Implement factory functions for each matrix type
-4. Define `MatrixOutcome` dataclass for resolution results
-5. Implement matrix lookup by enum
+2. Define `MatrixParameters` dataclass with `__post_init__` validation
+3. Define `StateDeltas` dataclass for position/resource/risk changes
+4. Define `PayoffMatrix` dataclass (output of constructors, never serialized)
+5. Implement `MatrixConstructor` protocol with `build(params) -> PayoffMatrix`
+6. Implement concrete constructor for each game type enforcing its ordinal constraints
+7. Define `CONSTRUCTORS: dict[MatrixType, MatrixConstructor]` registry
+
+**Ordinal Constraints (Verified)** — these guarantee Nash equilibrium structure:
+
+| Game Type | Constraint | Guaranteed Nash Equilibrium |
+|-----------|------------|----------------------------|
+| Prisoner's Dilemma | T > R > P > S | Unique: (D,D) |
+| Deadlock | T > P > R > S | Unique: (D,D), Pareto optimal |
+| Harmony | R > T > S > P | Unique: (C,C) |
+| Chicken | T > R > S > P | Two pure: (C,D), (D,C) + mixed |
+| Stag Hunt | R > T > P > S | Two pure: (C,C) payoff-dom, (D,D) risk-dom |
+| Battle of Sexes | Coord > Miscoord, opposite prefs | Two pure + mixed |
+| Pure Coordination | Match > Mismatch | Two pure: (A,A), (B,B) |
+| Matching Pennies | Zero-sum, symmetric | Unique mixed: (0.5, 0.5) |
+
+**Key Insight**: For 2×2 games, ordinal structure determines equilibrium structure. If the constructor enforces the constraint, the equilibrium is guaranteed by construction.
+
+**MatrixParameters Validation**:
+- `scale > 0`
+- `position_weight + resource_weight + risk_weight == 1.0`
+- All weights non-negative
+- Game-type-specific constraints (e.g., `defection_temptation > cooperation_bonus` for PD-family)
 
 **Acceptance Criteria**:
-- [ ] All 24 matrix types from GAME_MANUAL.md are implemented
-- [ ] Each matrix has correct payoff structure (symmetric handling of row/column player)
-- [ ] Matrices support parameterization (scaling by act multiplier)
-- [ ] Matrix outcomes include position_delta, resources_delta, risk_delta
-- [ ] Unit tests verify Nash equilibria for standard matrices
+- [ ] `MatrixParameters.__post_init__` rejects invalid parameter combinations
+- [ ] Each constructor enforces ordinal constraints (cannot produce invalid matrix)
+- [ ] `PayoffMatrix` is never serialized; only `(MatrixType, MatrixParameters)` pairs persist
+- [ ] Unit tests: random valid parameters always produce correct ordinal structure
+- [ ] Unit tests: verify Nash equilibria match expected (computed once at test time)
+- [ ] No runtime Nash equilibrium computation exists in codebase
 
 ### Milestone 1.3: Action Definitions
 
@@ -210,16 +236,19 @@ brinksmanship/
 
 ## Phase 3: Scenario Generation
 
-### Milestone 3.1: JSON Schema Definition
+### Milestone 3.1: JSON Schema Definition (Constructor Pattern)
 
 **Deliverable**: `src/brinksmanship/generation/schemas.py`
 
+**Design Principle**: Scenarios specify `matrix_type` + `matrix_parameters` only. Raw payoffs are never stored. Matrices are constructed at load time, guaranteeing type correctness.
+
 **Implementation Tasks**:
 1. Define JSON schema for complete scenario
-2. Define schema for turn definitions
-3. Define schema for matrix specifications
+2. Define schema for turn definitions with `matrix_type` and `matrix_parameters`
+3. Define schema for `MatrixParameters` with valid ranges
 4. Define schema for narrative templates
 5. Define schema for branch conditions
+6. Implement Pydantic models that construct matrices on load
 
 **Scenario JSON Structure**:
 ```json
@@ -234,13 +263,17 @@ brinksmanship/
       "act": 1,
       "narrative_briefing": "string",
       "matrix_type": "PRISONERS_DILEMMA",
-      "matrix_payoffs": {
-        "CC": {"position_a": 0, "position_b": 0, "risk": -1},
-        "CD": {"position_a": -2, "position_b": 2, "risk": 0},
-        "DC": {"position_a": 2, "position_b": -2, "risk": 0},
-        "DD": {"position_a": -1, "position_b": -1, "risk": 2}
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "cooperation_bonus": 1.0,
+        "defection_temptation": 1.5,
+        "punishment_severity": 0.5,
+        "sucker_penalty": 2.0
       },
-      "action_menu": ["action1", "action2", ...],
+      "action_menu": ["action1", "action2"],
       "outcome_narratives": {
         "CC": "string",
         "CD": "string",
@@ -260,50 +293,105 @@ brinksmanship/
 }
 ```
 
-**Acceptance Criteria**:
-- [ ] Schema validates all required fields
-- [ ] Schema enforces valid ranges (0-10 for state, 0-24 for matrix types)
-- [ ] Schema supports branching structure
-- [ ] Invalid scenarios fail validation with clear error messages
+**What is NOT in the schema**:
+- ~~`matrix_payoffs`~~ — raw payoffs are never stored
+- ~~State deltas~~ — computed from constructor at load time
 
-### Milestone 3.2: Scenario Generator
+**Load-Time Behavior**:
+When a scenario is loaded, for each turn:
+1. Parse `matrix_type` and `matrix_parameters`
+2. Validate parameters via `MatrixParameters.__post_init__`
+3. Call `CONSTRUCTORS[matrix_type].build(params)` to get `PayoffMatrix`
+4. Store constructed matrix in memory (not persisted)
+
+If any parameter validation or construction fails, the scenario load fails with a clear error.
+
+**Acceptance Criteria**:
+- [ ] Schema has no field for raw payoffs
+- [ ] Schema enforces `matrix_parameters` ranges via Pydantic validators
+- [ ] Schema supports branching structure
+- [ ] Loading a scenario automatically constructs matrices
+- [ ] Invalid parameter combinations fail at load time with clear errors
+- [ ] Scenario round-trips: save → load → save produces identical JSON
+
+### Milestone 3.2: Scenario Generator (Constructor Pattern)
 
 **Deliverable**: `src/brinksmanship/generation/scenario_generator.py`
 
+**Sampling Process** (guarantees valid matrices by construction):
+1. **Sample game type**: LLM selects appropriate game type for narrative context
+2. **Sample parameters**: LLM suggests parameters within valid ranges for that type
+3. **Construct matrix**: Engine calls constructor (deterministic, type-safe)
+
+The LLM never specifies raw payoffs—only types and parameters.
+
 **Implementation Tasks**:
 1. Implement `ScenarioGenerator` class using Claude Agent SDK
-2. Load generation prompt from `prompts.py`
-3. Implement scenario generation workflow
-4. Parse LLM output to JSON
-5. Validate generated scenario against schema
+2. Load generation prompts from `prompts.py`
+3. Implement game type sampling (LLM chooses based on narrative/act)
+4. Implement parameter sampling (LLM suggests within valid ranges)
+5. Validate parameters before storing in scenario JSON
+6. Implement act-based parameter scaling (higher stakes in Act III)
+
+**Generation Flow**:
+```
+For each turn:
+  1. LLM generates narrative_briefing
+  2. LLM selects matrix_type from available types for this act
+  3. LLM suggests matrix_parameters (constrained to valid ranges)
+  4. Validate: MatrixParameters.__post_init__ passes
+  5. Validate: Constructor can build matrix (call build() to verify)
+  6. Store (matrix_type, matrix_parameters) in scenario JSON
+```
+
+**Act-Based Constraints**:
+- Act I (turns 1-4): Lower `scale`, coordination/trust games preferred
+- Act II (turns 5-8): Standard `scale`, confrontation games (Chicken, PD)
+- Act III (turns 9+): Higher `scale`, high-stakes games (War of Attrition, Ultimatum)
 
 **Acceptance Criteria**:
 - [ ] Generator uses `claude-agent-sdk` for LLM calls
-- [ ] Prompt is loaded from `prompts.py` (not hardcoded)
-- [ ] Generated scenarios use 8+ distinct matrix types across 12 turns
+- [ ] LLM never outputs raw payoffs, only types and parameters
+- [ ] All generated parameters pass validation before storage
+- [ ] Generated scenarios use 8+ distinct matrix types
 - [ ] Generated scenarios have 10-18 turn maximum (randomized)
-- [ ] Three-act structure is enforced in generation
-- [ ] Generated scenarios pass schema validation
+- [ ] Three-act structure reflected in game type and parameter choices
+- [ ] Generated scenarios load successfully (matrices construct without error)
 
-### Milestone 3.3: Scenario Validator
+### Milestone 3.3: Scenario Validator (Simplified)
 
 **Deliverable**: `src/brinksmanship/generation/validator.py`
 
+**Design Principle**: Matrix correctness is guaranteed by construction. The validator focuses on scenario-level quality, not structural correctness.
+
+**What is NO LONGER validated** (guaranteed by constructors):
+- ~~Payoffs match game type~~ — impossible to fail
+- ~~Nash equilibria exist~~ — guaranteed by ordinal constraints
+- ~~Ordinal constraints hold~~ — enforced by constructor
+- ~~Payoff symmetry for symmetric games~~ — constructor responsibility
+
+**What IS validated**:
+1. **Game type variety**: ≥8 distinct types across scenario
+2. **Act structure compliance**: Turns map to correct acts
+3. **Narrative consistency**: LLM check for thematic coherence
+4. **Balance analysis**: LLM check for dominant meta-strategies
+
 **Implementation Tasks**:
-1. Implement `ScenarioValidator` class using Claude Agent SDK
-2. Load validation prompt from `prompts.py`
-3. Implement balance checking (both players have viable paths)
-4. Implement matrix type distribution check
-5. Implement narrative consistency check
+1. Implement `ScenarioValidator` class
+2. Implement game type distribution check (deterministic, fast)
+3. Implement act structure check (deterministic, fast)
+4. Implement LLM-based narrative consistency check
+5. Implement LLM-based balance analysis
 6. Generate validation report
 
 **Acceptance Criteria**:
-- [ ] Validator checks for dominant strategies (should find none)
-- [ ] Validator checks matrix type variety (≥8 distinct types)
-- [ ] Validator checks payoff ranges are reasonable
-- [ ] Validator checks three-act structure compliance
-- [ ] Validation report includes pass/fail with explanations
-- [ ] Unbalanced scenarios are rejected with specific feedback
+- [ ] Validator does NOT recheck matrix structure (no such code exists)
+- [ ] Validator does NOT compute Nash equilibria
+- [ ] Game type variety check: ≥8 distinct types required
+- [ ] Act structure check: turns 1-4 → Act I, 5-8 → Act II, 9+ → Act III
+- [ ] LLM checks focus on narrative and balance only
+- [ ] Validation is fast for structural checks (< 100ms)
+- [ ] Validation report clearly separates structural vs semantic issues
 
 ---
 
@@ -793,20 +881,48 @@ def generate_scenario(theme: str) -> dict:
 
 ## Testing Strategy
 
-### Unit Tests
+### Unit Tests (Constructor Correctness)
 
-- State model validation
-- Matrix payoff calculations
+These tests prove constructors are correct once; no runtime verification needed thereafter.
+
+**Matrix Constructor Tests**:
+- For each game type, sample 100 random valid parameters
+- Verify constructed matrix satisfies ordinal constraints
+- Verify Nash equilibrium structure matches expected (computed once at test time)
+
+**Parameter Validation Tests**:
+- `MatrixParameters.__post_init__` rejects invalid combinations
+- Each constructor's type-specific validation rejects incompatible params
+- Edge cases: scale=0, negative weights, weights not summing to 1
+
+**State Model Tests**:
+- State serialization/deserialization round-trips
+- Field clamping to valid ranges
+- Computed variance properties
+
+### Unit Tests (Engine)
+
 - Variance formula correctness
 - Ending condition triggers
 - Action classification
+- Cooperation/Stability update rules
 
 ### Integration Tests
 
-- Full turn sequence execution
-- Scenario loading and parsing
+- Scenario loading constructs all matrices without error
+- Full turn sequence execution with constructed matrices
 - Opponent decision-making
 - Settlement negotiation flow
+
+### Validation Taxonomy
+
+| What | When Verified | How |
+|------|---------------|-----|
+| Ordinal constraints | Test time (once) | Unit tests prove constructors correct |
+| Nash equilibrium structure | Test time (once) | Unit tests verify expected equilibria |
+| Parameter ranges | Load time | `MatrixParameters.__post_init__` |
+| Game type variety | Generation/Validation | Count distinct types |
+| Narrative consistency | Generation/Validation | LLM check |
 
 ### Playtest Analysis
 
