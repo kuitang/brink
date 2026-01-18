@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}{{ scenario.name }} - Brinksmanship{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>{{ scenario.name }}</h1>
+    <p class="text-muted">{{ scenario.setting }}</p>
+</div>
+
+<div class="two-column">
+    <div class="box">
+        <div class="box-header">
+            <h3>Overview</h3>
+        </div>
+        <p>{{ scenario.description }}</p>
+
+        <table style="width: 100%; margin-top: 16px;">
+            <tr>
+                <td><strong>Maximum Turns:</strong></td>
+                <td>{{ scenario.max_turns }}</td>
+            </tr>
+            <tr>
+                <td><strong>Setting:</strong></td>
+                <td>{{ scenario.setting }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="box">
+        <div class="box-header">
+            <h3>Play This Scenario</h3>
+        </div>
+        {% if current_user.is_authenticated %}
+        <p>Ready to play? Choose your opponent and begin.</p>
+        <a href="{{ url_for('lobby.new_game') }}?scenario={{ scenario.id }}" class="btn btn-primary">
+            Start Game
+        </a>
+        {% else %}
+        <p>Log in to play this scenario.</p>
+        <a href="{{ url_for('auth.login') }}" class="btn btn-primary">Login</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="box mt-md">
+    <div class="box-header">
+        <h3>Leaderboard</h3>
+    </div>
+    <p class="text-muted">
+        See how other players have performed in this scenario.
+    </p>
+    <a href="{{ url_for('leaderboard.index') }}" class="btn">View Leaderboards</a>
+</div>
+
+<div class="mt-md">
+    <a href="{{ url_for('scenarios.index') }}" class="btn">Back to Scenarios</a>
+</div>
+{% endblock %}

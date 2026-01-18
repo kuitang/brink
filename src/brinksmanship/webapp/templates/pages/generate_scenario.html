@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Generate Scenario - Brinksmanship{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Generate New Scenario</h1>
+    <p class="text-muted">Create a unique scenario using AI generation</p>
+</div>
+
+<div class="box" style="max-width: 600px;">
+    <form method="POST">
+        <div class="form-group">
+            <label>Theme</label>
+            <p class="text-muted" style="margin-bottom: 8px;">
+                Choose a theme or enter a custom prompt below.
+            </p>
+            {% for theme in themes %}
+            <div class="mb-md">
+                <label style="display: flex; align-items: flex-start; font-weight: normal;">
+                    <input type="radio" name="theme" value="{{ theme.id }}"
+                           style="width: auto; margin-right: 8px; margin-top: 4px;">
+                    <span>
+                        <strong>{{ theme.name }}</strong><br>
+                        <span class="text-muted">{{ theme.description }}</span>
+                    </span>
+                </label>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="form-group">
+            <label for="custom_prompt">Custom Prompt (Optional)</label>
+            <textarea id="custom_prompt" name="custom_prompt" rows="4"
+                      placeholder="Describe your scenario idea. For example: 'A trade negotiation between two rising powers in the Pacific, set in the near future...'"></textarea>
+            <p class="text-muted" style="margin-top: 4px;">
+                If provided, this will be used instead of the selected theme.
+            </p>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Generate Scenario</button>
+        <a href="{{ url_for('scenarios.index') }}" class="btn">Cancel</a>
+    </form>
+</div>
+
+<div class="box mt-md" style="max-width: 600px;">
+    <div class="box-header">
+        <h3>How It Works</h3>
+    </div>
+    <ol>
+        <li>Choose a theme or describe your scenario idea</li>
+        <li>AI generates a complete scenario with:
+            <ul>
+                <li>12-16 turns with narrative briefings</li>
+                <li>Varied game-theoretic matrices (Prisoner's Dilemma, Chicken, Stag Hunt, etc.)</li>
+                <li>Branching narratives based on player choices</li>
+                <li>Balanced gameplay validated through simulation</li>
+            </ul>
+        </li>
+        <li>The scenario is saved and available to play immediately</li>
+    </ol>
+</div>
+{% endblock %}

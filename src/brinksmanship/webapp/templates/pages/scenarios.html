@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Scenarios - Brinksmanship{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Scenarios</h1>
+    {% if current_user.is_authenticated %}
+    <a href="{{ url_for('scenarios.generate') }}" class="btn btn-primary">Generate New Scenario</a>
+    {% endif %}
+</div>
+
+{% if scenarios %}
+<div class="box">
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr>
+                <th style="text-align: left; padding: 8px; border-bottom: 2px solid var(--border);">Name</th>
+                <th style="text-align: left; padding: 8px; border-bottom: 2px solid var(--border);">Setting</th>
+                <th style="text-align: right; padding: 8px; border-bottom: 2px solid var(--border);">Max Turns</th>
+                <th style="text-align: center; padding: 8px; border-bottom: 2px solid var(--border);">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for scenario in scenarios %}
+            <tr>
+                <td style="padding: 8px; border-bottom: 1px solid var(--border-light);">
+                    <a href="{{ url_for('scenarios.view', scenario_id=scenario.id) }}">
+                        <strong>{{ scenario.name }}</strong>
+                    </a>
+                </td>
+                <td style="padding: 8px; border-bottom: 1px solid var(--border-light);">
+                    {{ scenario.setting }}
+                </td>
+                <td style="text-align: right; padding: 8px; border-bottom: 1px solid var(--border-light);">
+                    {{ scenario.max_turns }}
+                </td>
+                <td style="text-align: center; padding: 8px; border-bottom: 1px solid var(--border-light);">
+                    {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('lobby.new_game') }}?scenario={{ scenario.id }}" class="btn btn-small">
+                        Play
+                    </a>
+                    {% endif %}
+                    <a href="{{ url_for('scenarios.view', scenario_id=scenario.id) }}" class="btn btn-small">
+                        Details
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="box">
+    <p class="text-muted">No scenarios available yet.</p>
+    {% if current_user.is_authenticated %}
+    <p><a href="{{ url_for('scenarios.generate') }}">Generate your first scenario</a></p>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}
