@@ -1,5 +1,5 @@
 """Route blueprints for the webapp."""
 
-from . import auth, game, lobby
+from . import auth, game, leaderboard, lobby
 
-__all__ = ["auth", "game", "lobby"]
+__all__ = ["auth", "game", "leaderboard", "lobby"]

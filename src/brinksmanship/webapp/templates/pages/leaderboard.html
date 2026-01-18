@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}{{ scenario_name }} vs {{ opponent_type }} - Leaderboard - Brinksmanship{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>{{ scenario_name }}</h1>
+    <p class="text-muted">vs {{ opponent_type }}</p>
+</div>
+
+{% if entries %}
+<div class="box">
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr>
+                <th style="text-align: right; padding: 8px; border-bottom: 2px solid var(--border); width: 50px;">Rank</th>
+                <th style="text-align: left; padding: 8px; border-bottom: 2px solid var(--border);">Player</th>
+                <th style="text-align: right; padding: 8px; border-bottom: 2px solid var(--border);">VP</th>
+                <th style="text-align: right; padding: 8px; border-bottom: 2px solid var(--border);">Turns</th>
+                <th style="text-align: left; padding: 8px; border-bottom: 2px solid var(--border);">Ending</th>
+                <th style="text-align: left; padding: 8px; border-bottom: 2px solid var(--border);">Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for entry in entries %}
+            <tr {% if entry.user_id == current_user_id %}style="background-color: var(--bg-alt); font-weight: bold;"{% endif %}>
+                <td style="text-align: right; padding: 8px; border-bottom: 1px solid var(--border-light);">
+                    {% if entry.rank == 1 %}
+                        <span style="color: gold;">{{ entry.rank }}</span>
+                    {% elif entry.rank == 2 %}
+                        <span style="color: silver;">{{ entry.rank }}</span>
+                    {% elif entry.rank == 3 %}
+                        <span style="color: #cd7f32;">{{ entry.rank }}</span>
+                    {% else %}
+                        {{ entry.rank }}
+                    {% endif %}
+                </td>
+                <td style="padding: 8px; border-bottom: 1px solid var(--border-light);">
+                    {{ entry.username }}
+                    {% if entry.user_id == current_user_id %}
+                        (you)
+                    {% endif %}
+                </td>
+                <td style="text-align: right; padding: 8px; border-bottom: 1px solid var(--border-light);">
+                    {{ entry.vp }}
+                </td>
+                <td style="text-align: right; padding: 8px; border-bottom: 1px solid var(--border-light);">
+                    {{ entry.turns }}
+                </td>
+                <td style="padding: 8px; border-bottom: 1px solid var(--border-light);">
+                    {{ entry.ending_type | replace('_', ' ') | title }}
+                </td>
+                <td style="padding: 8px; border-bottom: 1px solid var(--border-light);">
+                    {% if entry.finished_at %}
+                        {{ entry.finished_at.strftime('%Y-%m-%d') }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="box">
+    <p class="text-muted">No games completed for this scenario/opponent pair yet.</p>
+</div>
+{% endif %}
+
+<div class="mt-md">
+    <a href="{{ url_for('leaderboard.index') }}" class="btn">All Leaderboards</a>
+    <a href="{{ url_for('lobby.new_game') }}" class="btn btn-primary">Play This Scenario</a>
+</div>
+{% endblock %}
