@@ -1062,13 +1062,16 @@ def run_playtest(scenario_path: str, pairings: list, games: int, output: str):
 ```
 
 **Acceptance Criteria**:
-- [x] Pure Python scripts handle game execution (deterministic, fast)
-- [x] Parallel execution via ProcessPoolExecutor (not LLM subagents)
-- [x] Can run N games with specified opponent pairings via CLI
-- [x] Aggregates statistics: win rates, average VP, turn counts, ending types
-- [x] Exports complete game logs for analysis
-- [x] Generates summary report as structured JSON
-- [x] 100 games complete in <60 seconds for deterministic opponents
+- [x] Pure Python game simulation with simplified state (SimpleGameState, SimplePlayerState) - TESTED
+- [x] 7 built-in strategies (TitForTat, AlwaysDefect, AlwaysCooperate, Opportunist, Nash, GrimTrigger, Random) - TESTED
+- [x] PlaytestRunner with run_pairing(), run_playtest(), run_all_pairings() - TESTED
+- [x] Parallel execution via ProcessPoolExecutor - TESTED
+- [x] Can run N games with specified opponent pairings - TESTED
+- [x] Aggregates statistics: win rates, average VP, turn counts, ending types - TESTED
+- [x] PairingStats and PlaytestResults dataclasses with to_dict/to_json - TESTED
+- [x] run_playtest.py CLI with argparse (--pairings, --games, --output, --workers, --seed) - IMPLEMENTED
+- [ ] Full integration with game engine (uses simplified simulation, not full GameState) - AWAITS game engine integration
+- [ ] Scenario loading from JSON files - AWAITS scenario system
 
 ### Milestone 5.3: Mechanics Analysis (Deterministic Python)
 
@@ -1147,11 +1150,16 @@ def analyze_mechanics(playtest_results: dict) -> AnalysisReport:
 4. Add JSON output with machine-readable issue list
 
 **Acceptance Criteria**:
-- [ ] All analysis is pure Python with no LLM calls
-- [ ] Issue detection uses statistical thresholds (configurable)
-- [ ] Output is structured JSON (machine-readable)
-- [ ] Analysis completes in <10 seconds for 100 games
-- [ ] Can be integrated into CI/CD pipeline
+- [x] All analysis is pure Python with no LLM calls - TESTED
+- [x] Issue detection uses statistical thresholds (DEFAULT_THRESHOLDS configurable) - TESTED
+- [x] check_dominant_strategy (>60% win rate) - TESTED
+- [x] check_variance_calibration (VP std dev 10-40) - TESTED
+- [x] check_settlement_rate (30-70%) - TESTED
+- [x] check_game_length (8-16 turns) - TESTED
+- [x] AnalysisReport with Issue dataclass and severity levels (CRITICAL, MAJOR, MINOR) - TESTED
+- [x] Output is structured JSON (to_dict, format_text_report) - TESTED
+- [x] load_playtest_results from JSON file - TESTED
+- [ ] Performance benchmark (<10 seconds for 100 games) - NOT BENCHMARKED
 
 ---
 
