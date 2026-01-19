@@ -209,18 +209,32 @@ Screen {
     color: $success;
 }
 
-#history-content {
-    height: 100%;
-}
-
-.history-entry {
+#latest-entry {
+    border: heavy $warning;
+    background: $surface-lighten-1;
+    padding: 1;
     margin-bottom: 1;
-    padding-bottom: 1;
-    border-bottom: dashed $surface-lighten-2;
+    min-height: 4;
 }
 
-.history-entry-latest {
+#latest-entry-header {
+    text-style: bold;
     color: $warning;
+}
+
+#latest-entry-narrative {
+    color: $text;
+    text-style: italic;
+    margin-top: 1;
+}
+
+#older-entries {
+    height: 1fr;
+}
+
+.older-entry {
+    color: $text-muted;
+    margin-bottom: 1;
 }
 
 .history-turn-header {
@@ -239,11 +253,11 @@ Screen {
 
 #briefing-panel {
     width: 100%;
-    min-height: 4;
+    min-height: 6;
     height: auto;
-    max-height: 8;
+    max-height: 14;
     border: solid $primary;
-    padding: 0 1;
+    padding: 1 1;
 }
 
 #state-row {
@@ -733,9 +747,15 @@ class GameScreen(Screen):
 
             # Bottom row: history and actions side by side
             with Horizontal(id="bottom-row"):
-                with VerticalScroll(id="history-panel"):
-                    yield Static("HISTORY", classes="history-title")
-                    yield Static("No turns yet.", id="history-content")
+                with Vertical(id="history-panel"):
+                    yield Static("CRISIS LOG", classes="history-title")
+                    # Latest entry container - prominently styled
+                    with Vertical(id="latest-entry"):
+                        yield Static("Awaiting first action...", id="latest-entry-header")
+                        yield Static("", id="latest-entry-narrative")
+                    # Older entries in scrollable area
+                    with VerticalScroll(id="older-entries"):
+                        yield Static("", id="older-entries-content")
                 with Vertical(id="actions-panel"):
                     yield Static("ACTIONS (1-9 to select)", classes="panel-title")
                     yield OptionList(id="action-list")
@@ -798,7 +818,7 @@ class GameScreen(Screen):
         # Update shared stats only - positions are hidden per game design
         # Players learn outcomes from the history narratives
         self.query_one("#shared-stats", Static).update(
-            f"Risk: {state.risk_level:.1f}  Coop: {state.cooperation_score:.1f}  Stab: {state.stability:.1f}  Turn: {state.turn}"
+            f"Risk Level: {state.risk_level:.1f}/10    Cooperation: {state.cooperation_score:.1f}/10    Stability: {state.stability:.1f}/10    Turn: {state.turn}"
         )
 
         # Update available actions for human's side
@@ -998,18 +1018,45 @@ class GameScreen(Screen):
             action_list.add_option(Option(label, id=str(i)))
 
     def _update_history(self) -> None:
-        """Update the history panel with detailed turn-by-turn history including narratives."""
-        history_content = self.query_one("#history-content", Static)
+        """Update the history panel with detailed turn-by-turn history including narratives.
+
+        Uses separate Textual widgets for the latest entry (prominently styled) and
+        older entries to create a clean visual distinction.
+        """
+        latest_header = self.query_one("#latest-entry-header", Static)
+        latest_narrative = self.query_one("#latest-entry-narrative", Static)
+        older_content = self.query_one("#older-entries-content", Static)
+
         if self.turn_history:
-            # Show all turns with detailed info and narratives, newest at top
-            lines = []
-            for i, entry in enumerate(reversed(self.turn_history)):
-                is_latest = (i == 0)
-                marker = ">>> " if is_latest else "    "
-                lines.append(f"{marker}{entry}")
-            history_content.update("\n".join(lines))
+            # Parse the latest entry
+            latest = self.turn_history[-1]
+            latest_lines = latest.split("\n")
+
+            # First line is the turn summary (e.g., "Turn 1: You (C) vs Opponent (D) → CD")
+            header = latest_lines[0] if latest_lines else "Latest turn"
+            # Remaining lines are the narrative
+            narrative = "\n".join(line.strip() for line in latest_lines[1:] if line.strip())
+
+            latest_header.update(f"★ {header}")
+            latest_narrative.update(narrative if narrative else "")
+
+            # Build older entries (all except the latest)
+            if len(self.turn_history) > 1:
+                older_lines = []
+                for entry in reversed(self.turn_history[:-1]):
+                    entry_lines = entry.split("\n")
+                    older_lines.append(entry_lines[0])  # Turn header
+                    for line in entry_lines[1:]:
+                        if line.strip():
+                            older_lines.append(f"  {line.strip()}")
+                    older_lines.append("")  # Separator
+                older_content.update("\n".join(older_lines))
+            else:
+                older_content.update("")
         else:
-            history_content.update("No turns yet. Press a number key (1-9) to select an action.")
+            latest_header.update("Awaiting first action...")
+            latest_narrative.update("Press a number key (1-9) to select an action.")
+            older_content.update("")
 
     @on(OptionList.OptionSelected, "#action-list")
     def action_selected(self, event: OptionList.OptionSelected) -> None:
@@ -1164,8 +1211,7 @@ class GameScreen(Screen):
             if result.turn_history_entry:
                 self.turn_history.append(result.turn_history_entry)
 
-            if result.narrative:
-                self.notify(result.narrative, timeout=5)
+            # Narrative is already included in turn_history_entry, no need to notify
 
             if result.ending:
                 # Record ending in trace
@@ -1202,8 +1248,8 @@ class GameScreen(Screen):
 
     def action_confirm_quit(self) -> None:
         """Return to main menu (abandons current game)."""
-        # Pop all screens back to main menu
-        while len(self.app.screen_stack) > 1:
+        # Pop all screens back to main menu (keep base Screen + MainMenuScreen)
+        while len(self.app.screen_stack) > 2:
             self.app.pop_screen()
 
 
@@ -1601,8 +1647,8 @@ class EndGameScreen(Screen):
 
     @on(Button.Pressed, "#main-menu-btn")
     def go_to_main_menu(self) -> None:
-        # Pop all screens and show main menu
-        while len(self.app.screen_stack) > 1:
+        # Pop all screens back to main menu (keep base Screen + MainMenuScreen)
+        while len(self.app.screen_stack) > 2:
             self.app.pop_screen()
 
     @on(Button.Pressed, "#quit")
@@ -1711,7 +1757,8 @@ class CoachingScreen(Screen):
         self.app.pop_screen()
 
     def action_main_menu(self) -> None:
-        while len(self.app.screen_stack) > 1:
+        # Pop all screens back to main menu (keep base Screen + MainMenuScreen)
+        while len(self.app.screen_stack) > 2:
             self.app.pop_screen()
 
 
