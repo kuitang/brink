@@ -294,18 +294,63 @@ class GameEngine:
             self._turn_configs["turn_1"] = self._create_default_turn_config(1)
             self._current_turn_key = "turn_1"
 
+    def _parse_matrix_type(self, matrix_type_str: str, turn: int) -> MatrixType:
+        """Parse matrix type string with alias support.
+
+        Raises ValueError if the matrix type is unknown - no fallbacks.
+        """
+        # Normalize the string
+        normalized = matrix_type_str.lower().replace("-", "_").replace(" ", "_")
+
+        # Alias mapping for common variations (documented mappings only)
+        aliases = {
+            "inspection": "inspection_game",
+            "inspect": "inspection_game",
+            "recon": "reconnaissance",
+            "pd": "prisoners_dilemma",
+            "prisoner_dilemma": "prisoners_dilemma",
+            "bos": "battle_of_sexes",
+            "battle": "battle_of_sexes",
+            "stag": "stag_hunt",
+            "coord": "pure_coordination",
+            "coordination": "pure_coordination",
+            "trust": "stag_hunt",  # Trust game maps to Stag Hunt (similar structure)
+            "trust_game": "stag_hunt",
+            "security": "security_dilemma",
+        }
+
+        # Apply alias if exists
+        if normalized in aliases:
+            normalized = aliases[normalized]
+
+        # Try direct enum lookup
+        try:
+            return MatrixType(normalized)
+        except ValueError:
+            pass
+
+        # Try uppercase enum name
+        try:
+            return MatrixType[matrix_type_str.upper().replace("-", "_").replace(" ", "_")]
+        except KeyError:
+            pass
+
+        # No fallbacks - fail with clear error
+        valid_types = [t.value for t in MatrixType]
+        raise ValueError(
+            f"Unknown matrix type '{matrix_type_str}' at turn {turn}. "
+            f"Valid types: {valid_types}. "
+            f"Valid aliases: {list(aliases.keys())}"
+        )
+
     def _parse_turn_config(self, turn_data: dict) -> TurnConfiguration:
         """Parse a single turn configuration from scenario data."""
         turn_num = turn_data.get("turn", 1)
         act = self._get_act_for_turn(turn_num)
 
-        # Parse matrix type
+        # Parse matrix type with alias mapping - no fallbacks, fail on invalid
         matrix_type_str = turn_data.get("matrix_type", "PRISONERS_DILEMMA")
-        try:
-            matrix_type = MatrixType(matrix_type_str.lower())
-        except ValueError:
-            # Try uppercase enum name
-            matrix_type = MatrixType[matrix_type_str.upper()]
+        matrix_type = self._parse_matrix_type(matrix_type_str, turn_num)
 
         # Parse matrix parameters or use defaults
         params_data = turn_data.get("matrix_parameters", {})

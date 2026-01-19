@@ -1264,13 +1264,13 @@ def analyze_mechanics(playtest_results: dict) -> AnalysisReport:
 ```
 
 **Acceptance Criteria**:
-- [ ] Application launches and displays main menu
-- [ ] All game state is clearly displayed
-- [ ] Actions show type classification and resource cost
-- [ ] Intelligence display shows information state with uncertainty bounds (per GAME_MANUAL.md Section 3.6.5)
-- [ ] Settlement negotiation has clear UI
-- [ ] End-game shows results and offers coaching
-- [ ] Application handles all ending conditions gracefully
+- [x] Application launches and displays main menu
+- [x] All game state is clearly displayed
+- [x] Actions show type classification and resource cost
+- [x] Intelligence display shows information state with uncertainty bounds (per GAME_MANUAL.md Section 3.6.5)
+- [x] Settlement negotiation has clear UI
+- [x] End-game shows results and offers coaching
+- [x] Application handles all ending conditions gracefully
 
 ---
 
