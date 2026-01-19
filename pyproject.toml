@@ -68,3 +68,8 @@ warn_unused_ignores = true
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
+
+[dependency-groups]
+dev = [
+    "cairosvg>=2.8.2",
+]

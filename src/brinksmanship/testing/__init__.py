@@ -1,27 +1,28 @@
 """Playtesting framework for Brinksmanship.
 
 This module provides automated playtesting tools for game balance validation.
-All components are pure Python with no LLM orchestration - parallelism is
-achieved through Python's multiprocessing.
+All components use the ACTUAL opponent implementations from
+brinksmanship.opponents.deterministic to ensure simulation matches real gameplay.
 
 Key classes:
-- PlaytestRunner: Orchestrates batch game execution (simplified simulation)
-- EnginePlaytestRunner: Uses real GameEngine with scenario loading
-- PairingStats: Statistics for a single strategy pairing
-- PlaytestResults: Aggregate results from a full playtest run
+- GameRunner: Runs single games using real GameEngine and Opponent instances
+- BatchRunner: Orchestrates parallel batch execution for balance testing
 - HumanSimulator: Simulates human player behavior for playtesting
 
 Usage:
-    from brinksmanship.testing import PlaytestRunner, HumanSimulator
+    from brinksmanship.testing import GameRunner, BatchRunner
+    from brinksmanship.opponents.deterministic import TitForTat, NashCalculator
 
-    # Deterministic playtesting (simplified simulation)
-    runner = PlaytestRunner()
-    results = runner.run_all_pairings(games_per_pairing=100)
+    # Run a single game
+    result = run_game_sync(
+        scenario_id="cuban_missile_crisis",
+        opponent_a=TitForTat(),
+        opponent_b=NashCalculator(),
+    )
 
-    # Engine-based playtesting with scenario
-    from brinksmanship.testing import EnginePlaytestRunner
-    runner = EnginePlaytestRunner("cuban-missile-crisis")
-    results = runner.run_all_pairings(games_per_pairing=100)
+    # Run batch simulations
+    runner = BatchRunner(scenario_id="cuban_missile_crisis")
+    results = runner.run_all_pairings(num_games=100)
 
     # Human simulation
     simulator = HumanSimulator()
@@ -31,33 +32,19 @@ Usage:
 See ENGINEERING_DESIGN.md Milestones 5.1 and 5.2 for specifications.
 """
 
-from .playtester import (
-    # Core classes
-    PlaytestRunner,
-    PairingStats,
-    PlaytestResults,
+from .game_runner import (
+    GameRunner,
     GameResult,
-    # State classes
-    SimpleGameState,
-    SimplePlayerState,
-    # Enums
-    ActionChoice,
-    EndingType,
-    # Strategy type alias
-    Strategy,
-    # Built-in strategies
-    STRATEGIES,
-    tit_for_tat,
-    always_defect,
-    always_cooperate,
-    opportunist,
-    nash_equilibrium,
-    grim_trigger,
-    random_strategy,
-    # Game execution
-    run_game,
-    run_pairing_batch,
-    # Utilities
+    run_game_sync,
+)
+
+from .batch_runner import (
+    BatchRunner,
+    PairingStats,
+    BatchResults,
+    DETERMINISTIC_OPPONENTS,
+    ALL_OPPONENTS,
+    create_opponent,
     print_results_summary,
 )
 
@@ -71,75 +58,23 @@ from .human_simulator import (
     SettlementResponse,
 )
 
-from .engine_playtester import (
-    # Core classes
-    EnginePlaytestRunner,
-    EngineGameResult,
-    EnginePairingStats,
-    EnginePlaytestResults,
-    # Adapter
-    StrategyAdapter,
-    # Strategy type alias
-    EngineStrategy,
-    # Built-in engine strategies
-    ENGINE_STRATEGIES,
-    engine_tit_for_tat,
-    engine_always_cooperate,
-    engine_always_defect,
-    engine_opportunist,
-    engine_nash,
-    engine_random,
-    # Game execution
-    run_engine_game,
-)
-
 __all__ = [
-    # Core classes (simplified playtester)
-    "PlaytestRunner",
-    "PairingStats",
-    "PlaytestResults",
+    # Game Runner (single games)
+    "GameRunner",
     "GameResult",
-    # Engine-integrated playtester
-    "EnginePlaytestRunner",
-    "EngineGameResult",
-    "EnginePairingStats",
-    "EnginePlaytestResults",
-    "StrategyAdapter",
-    "EngineStrategy",
-    "ENGINE_STRATEGIES",
-    "engine_tit_for_tat",
-    "engine_always_cooperate",
-    "engine_always_defect",
-    "engine_opportunist",
-    "engine_nash",
-    "engine_random",
-    "run_engine_game",
+    "run_game_sync",
+    # Batch Runner (parallel simulations)
+    "BatchRunner",
+    "PairingStats",
+    "BatchResults",
+    "DETERMINISTIC_OPPONENTS",
+    "ALL_OPPONENTS",
+    "create_opponent",
+    "print_results_summary",
     # Human Simulator
     "HumanSimulator",
     "HumanPersona",
     "ActionSelection",
     "MistakeCheck",
     "SettlementResponse",
-    # State classes
-    "SimpleGameState",
-    "SimplePlayerState",
-    # Enums
-    "ActionChoice",
-    "EndingType",
-    # Strategy type alias
-    "Strategy",
-    # Built-in strategies
-    "STRATEGIES",
-    "tit_for_tat",
-    "always_defect",
-    "always_cooperate",
-    "opportunist",
-    "nash_equilibrium",
-    "grim_trigger",
-    "random_strategy",
-    # Game execution
-    "run_game",
-    "run_pairing_batch",
-    # Utilities
-    "print_results_summary",
 ]

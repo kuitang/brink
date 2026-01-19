@@ -91,3 +91,4 @@ src/brinksmanship/webapp/templates/generated/
 
 # Playtest results (local data)
 playtest_results/
+traces/
