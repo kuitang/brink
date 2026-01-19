@@ -34,6 +34,22 @@ except ImportError:
     Scenario = None
     load_scenario = None
 
+# Import matrix building - for scenario-specific simulation
+try:
+    from brinksmanship.models.matrices import (
+        MatrixType,
+        MatrixParameters,
+        PayoffMatrix,
+        build_matrix,
+    )
+    MATRICES_AVAILABLE = True
+except ImportError:
+    MATRICES_AVAILABLE = False
+    MatrixType = None
+    MatrixParameters = None
+    PayoffMatrix = None
+    build_matrix = None
+
 
 # =============================================================================
 # Validation Thresholds (from ENGINEERING_DESIGN.md)
@@ -864,6 +880,227 @@ SIM_STRATEGIES = {
 }
 
 
+# =============================================================================
+# Scenario-Specific Simulation (uses actual matrix types and parameters)
+# =============================================================================
+
+
+def _get_scenario_turn(
+    scenario: dict, turn_id: str, turn_number: int
+) -> dict | None:
+    """Get a turn from either main turns array or branches dict."""
+    # Check main turns array
+    for turn in scenario.get("turns", []):
+        if turn.get("turn") == turn_number:
+            return turn
+
+    # Check branches dict
+    branches = scenario.get("branches", {})
+    if turn_id in branches:
+        return branches[turn_id]
+
+    # Fallback: look for turn_N in branches
+    fallback_id = f"turn_{turn_number}"
+    if fallback_id in branches:
+        return branches[fallback_id]
+
+    return None
+
+
+def _build_turn_matrix(turn_data: dict) -> PayoffMatrix | None:
+    """Build a PayoffMatrix from turn's matrix_type and matrix_parameters."""
+    if not MATRICES_AVAILABLE:
+        return None
+
+    matrix_type_str = turn_data.get("matrix_type", "")
+    params_dict = turn_data.get("matrix_parameters", {})
+
+    # Parse matrix type
+    type_str = str(matrix_type_str).upper().replace("MATRIXTYPE.", "")
+    try:
+        matrix_type = MatrixType[type_str]
+    except (KeyError, ValueError):
+        return None
+
+    # Build parameters
+    params = MatrixParameters(**params_dict)
+
+    # Build and return the matrix
+    return build_matrix(matrix_type, params)
+
+
+def _apply_matrix_outcome(
+    state: SimGameState,
+    action_a: SimAction,
+    action_b: SimAction,
+    matrix: PayoffMatrix | None,
+) -> str:
+    """Apply outcome using actual matrix payoffs. Returns outcome code (CC/CD/DC/DD)."""
+    # Get outcome code
+    if action_a == SimAction.COOPERATE and action_b == SimAction.COOPERATE:
+        outcome_code = "CC"
+        outcome = matrix.cc if matrix else None
+    elif action_a == SimAction.COOPERATE and action_b == SimAction.DEFECT:
+        outcome_code = "CD"
+        outcome = matrix.cd if matrix else None
+    elif action_a == SimAction.DEFECT and action_b == SimAction.COOPERATE:
+        outcome_code = "DC"
+        outcome = matrix.dc if matrix else None
+    else:
+        outcome_code = "DD"
+        outcome = matrix.dd if matrix else None
+
+    multiplier = state.get_act_multiplier()
+    noise = random.uniform(0.95, 1.05)
+
+    if outcome is not None:
+        # Use actual matrix deltas
+        deltas = outcome.deltas
+        state.player_a.position += deltas.pos_a * multiplier * noise
+        state.player_b.position += deltas.pos_b * multiplier * noise
+        # res_cost is subtracted (it's a cost, not a delta)
+        state.player_a.resources -= deltas.res_cost_a * multiplier * noise
+        state.player_b.resources -= deltas.res_cost_b * multiplier * noise
+        state.risk += deltas.risk_delta * multiplier * noise
+        # Cooperation score based on outcome
+        if outcome_code == "CC":
+            state.cooperation_score += 1.0
+        elif outcome_code == "DD":
+            state.cooperation_score -= 1.0
+    else:
+        # Fallback to generic payoffs if matrix unavailable
+        if outcome_code == "CC":
+            state.player_a.position += 0.6 * multiplier * noise
+            state.player_b.position += 0.6 * multiplier * noise
+            state.risk -= 0.5 * multiplier * noise
+            state.cooperation_score += 1.0
+        elif outcome_code == "CD":
+            state.player_a.position -= 0.7 * multiplier * noise
+            state.player_b.position += 0.7 * multiplier * noise
+            state.risk += 0.8 * multiplier * noise
+        elif outcome_code == "DC":
+            state.player_a.position += 0.7 * multiplier * noise
+            state.player_b.position -= 0.7 * multiplier * noise
+            state.risk += 0.8 * multiplier * noise
+        else:  # DD
+            state.player_a.position -= 0.5 * multiplier * noise
+            state.player_b.position -= 0.5 * multiplier * noise
+            state.player_a.resources -= 0.5 * multiplier * noise
+            state.player_b.resources -= 0.5 * multiplier * noise
+            state.risk += 2.0 * multiplier * noise
+            state.cooperation_score -= 1.0
+
+    # Update stability based on action switches
+    switches = 0
+    if len(state.history_a) >= 1 and state.history_a[-1] != action_a:
+        switches += 1
+    if len(state.history_b) >= 1 and state.history_b[-1] != action_b:
+        switches += 1
+
+    state.stability = state.stability * 0.8 + 1.0
+    if switches == 0:
+        state.stability += 1.5
+    elif switches == 1:
+        state.stability -= 3.5
+    else:
+        state.stability -= 5.5
+
+    state.clamp()
+    return outcome_code
+
+
+def _run_scenario_sim_game(
+    scenario: dict, strategy_a_name: str, strategy_b_name: str
+) -> SimGameResult:
+    """Run a single simulated game using the actual scenario's turns and matrices."""
+    strategy_a = SIM_STRATEGIES[strategy_a_name]
+    strategy_b = SIM_STRATEGIES[strategy_b_name]
+    max_turns = scenario.get("max_turns", 14)
+
+    state = SimGameState(max_turns=max_turns)
+
+    current_turn_id = "turn_1"
+    turn_number = 1
+    ending = None
+
+    while True:
+        # Check for ending conditions
+        ending = _check_sim_ending(state)
+        if ending:
+            break
+
+        # Get current turn data
+        turn_data = _get_scenario_turn(scenario, current_turn_id, turn_number)
+        if turn_data is None:
+            # No more turns defined, end game
+            ending = SimEndingType.MAX_TURNS
+            break
+
+        # Build the matrix for this turn
+        matrix = _build_turn_matrix(turn_data)
+
+        # Get actions from strategies
+        action_a = strategy_a(state, state.history_a, state.history_b, "A")
+        action_b = strategy_b(state, state.history_b, state.history_a, "B")
+
+        # Apply outcome using actual matrix
+        outcome_code = _apply_matrix_outcome(state, action_a, action_b, matrix)
+
+        # Record history
+        state.history_a.append(action_a)
+        state.history_b.append(action_b)
+        state.turn += 1
+        turn_number += 1
+
+        # Follow branching based on outcome
+        branches = turn_data.get("branches", {})
+        next_turn_id = branches.get(outcome_code)
+
+        if next_turn_id is None:
+            # Use default_next
+            next_turn_id = turn_data.get("default_next", f"turn_{turn_number}")
+
+        current_turn_id = next_turn_id
+
+        # Check for ending after turn
+        ending = _check_sim_ending(state)
+        if ending:
+            break
+
+    # Determine winner and VP
+    vp_a, vp_b = _calculate_final_vp(state)
+
+    if ending == SimEndingType.MUTUAL_DESTRUCTION:
+        winner = "mutual_destruction"
+        vp_a, vp_b = 20.0, 20.0
+    elif ending in (SimEndingType.POSITION_LOSS_A, SimEndingType.RESOURCE_LOSS_A):
+        winner = "B"
+        vp_a, vp_b = 10.0, 90.0
+    elif ending in (SimEndingType.POSITION_LOSS_B, SimEndingType.RESOURCE_LOSS_B):
+        winner = "A"
+        vp_a, vp_b = 90.0, 10.0
+    else:
+        if vp_a > vp_b + 1:
+            winner = "A"
+        elif vp_b > vp_a + 1:
+            winner = "B"
+        else:
+            winner = "tie"
+
+    return SimGameResult(
+        winner=winner,
+        ending_type=ending,
+        turns_played=state.turn - 1,
+        final_pos_a=state.player_a.position,
+        final_pos_b=state.player_b.position,
+        final_res_a=state.player_a.resources,
+        final_res_b=state.player_b.resources,
+        final_risk=state.risk,
+        vp_a=vp_a,
+        vp_b=vp_b,
+    )
+
+
 def _run_sim_game(strategy_a_name: str, strategy_b_name: str) -> SimGameResult:
     """Run a single simulated game."""
     strategy_a = SIM_STRATEGIES[strategy_a_name]
@@ -929,12 +1166,11 @@ def run_balance_simulation(
 ) -> BalanceSimulationResults:
     """Run balance simulation to detect dominant strategies.
 
-    This runs simplified game simulations using various strategies.
-    The scenario parameter is currently unused but reserved for
-    future scenario-specific simulation.
+    Uses the ACTUAL scenario's matrix types and parameters to detect if any
+    deterministic strategy dominates in THIS SPECIFIC scenario.
 
     Args:
-        scenario: Scenario object or dict (currently unused, for future use)
+        scenario: Scenario object or dict (REQUIRED for accurate simulation)
         games: Number of games per strategy pairing
         seed: Random seed for reproducibility
 
@@ -943,6 +1179,17 @@ def run_balance_simulation(
     """
     if seed is not None:
         random.seed(seed)
+
+    # Convert Scenario object to dict if needed
+    scenario_dict: dict | None = None
+    if scenario is not None:
+        if Scenario is not None and isinstance(scenario, Scenario):
+            scenario_dict = scenario.model_dump()
+        elif isinstance(scenario, dict):
+            scenario_dict = scenario
+
+    # Check if we can use scenario-specific simulation
+    use_scenario_sim = scenario_dict is not None and MATRICES_AVAILABLE
 
     results = BalanceSimulationResults()
     strategy_names = list(SIM_STRATEGIES.keys())
@@ -972,7 +1219,11 @@ def run_balance_simulation(
             wins_b = 0
 
             for _ in range(games):
-                result = _run_sim_game(name_a, name_b)
+                # Use scenario-specific simulation if available
+                if use_scenario_sim:
+                    result = _run_scenario_sim_game(scenario_dict, name_a, name_b)
+                else:
+                    result = _run_sim_game(name_a, name_b)
                 total_games += 1
                 total_turns += result.turns_played
 
