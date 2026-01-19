@@ -1,17 +1,16 @@
 """Tests for brinksmanship.testing.playtester module.
 
 Tests cover:
-- SimplePlayerState and SimpleGameState dataclasses
-- ActionChoice enum
 - apply_outcome() function (game mechanics)
 - check_crisis_termination() and check_ending() functions
 - final_resolution() function
 - Built-in strategies (TitForTat, AlwaysDefect, etc.)
 - run_game() function
 - PlaytestRunner class
-- PairingStats and PlaytestResults dataclasses
+- PairingStats dataclass
 
-These tests are self-contained and do not require external dependencies.
+Note: Trivial enum tests (TestActionChoice), player state clamp tests, and
+game state default value tests were removed. See test_removal_log.md for details.
 """
 
 import random
@@ -50,131 +49,6 @@ from brinksmanship.testing.playtester import (
     # Runner
     PlaytestRunner,
 )
-
-
-# =============================================================================
-# ActionChoice Enum Tests
-# =============================================================================
-
-
-class TestActionChoice:
-    """Tests for ActionChoice enum."""
-
-    def test_cooperate_value(self):
-        """Test COOPERATE has correct value."""
-        assert ActionChoice.COOPERATE.value == "C"
-
-    def test_defect_value(self):
-        """Test DEFECT has correct value."""
-        assert ActionChoice.DEFECT.value == "D"
-
-    def test_enum_has_two_members(self):
-        """Test ActionChoice has exactly two members."""
-        members = list(ActionChoice)
-        assert len(members) == 2
-
-
-# =============================================================================
-# SimplePlayerState Tests
-# =============================================================================
-
-
-class TestSimplePlayerState:
-    """Tests for SimplePlayerState dataclass."""
-
-    def test_default_values(self):
-        """Test default player state values."""
-        player = SimplePlayerState()
-        assert player.position == 5.0
-        assert player.resources == 5.0
-        assert player.previous_type is None
-
-    def test_clamp_position_max(self):
-        """Test position clamped to max 10."""
-        player = SimplePlayerState(position=15.0)
-        player.clamp()
-        assert player.position == 10.0
-
-    def test_clamp_position_min(self):
-        """Test position clamped to min 0."""
-        player = SimplePlayerState(position=-5.0)
-        player.clamp()
-        assert player.position == 0.0
-
-    def test_clamp_resources_max(self):
-        """Test resources clamped to max 10."""
-        player = SimplePlayerState(resources=15.0)
-        player.clamp()
-        assert player.resources == 10.0
-
-    def test_clamp_resources_min(self):
-        """Test resources clamped to min 0."""
-        player = SimplePlayerState(resources=-5.0)
-        player.clamp()
-        assert player.resources == 0.0
-
-
-# =============================================================================
-# SimpleGameState Tests
-# =============================================================================
-
-
-class TestSimpleGameState:
-    """Tests for SimpleGameState dataclass."""
-
-    def test_default_values(self):
-        """Test default game state values."""
-        state = SimpleGameState()
-        assert state.cooperation_score == 5.0
-        assert state.stability == 5.0
-        assert state.risk_level == 2.0
-        assert state.turn == 1
-        assert state.max_turns == 14
-        assert len(state.history_a) == 0
-        assert len(state.history_b) == 0
-
-    def test_player_defaults(self):
-        """Test default player states."""
-        state = SimpleGameState()
-        assert state.player_a.position == 5.0
-        assert state.player_b.position == 5.0
-
-    def test_get_act_multiplier_act_i(self):
-        """Test Act I multiplier (turns 1-4)."""
-        state = SimpleGameState()
-        for turn in [1, 2, 3, 4]:
-            state.turn = turn
-            assert state.get_act_multiplier() == 0.7, f"Failed for turn {turn}"
-
-    def test_get_act_multiplier_act_ii(self):
-        """Test Act II multiplier (turns 5-8)."""
-        state = SimpleGameState()
-        for turn in [5, 6, 7, 8]:
-            state.turn = turn
-            assert state.get_act_multiplier() == 1.0, f"Failed for turn {turn}"
-
-    def test_get_act_multiplier_act_iii(self):
-        """Test Act III multiplier (turns 9+)."""
-        state = SimpleGameState()
-        for turn in [9, 10, 11, 14]:
-            state.turn = turn
-            assert state.get_act_multiplier() == 1.3, f"Failed for turn {turn}"
-
-    def test_clamp(self):
-        """Test clamp clamps all values."""
-        state = SimpleGameState()
-        state.cooperation_score = 15.0
-        state.stability = -5.0
-        state.risk_level = 20.0
-        state.clamp()
-        assert state.cooperation_score == 10.0
-        assert state.stability == 1.0  # Min stability is 1
-        assert state.risk_level == 10.0
-
-
-# =============================================================================
-# apply_outcome Tests
-# =============================================================================
 
 
 class TestApplyOutcome:

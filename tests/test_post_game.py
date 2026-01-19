@@ -1,15 +1,14 @@
 """Tests for brinksmanship.coaching.post_game module.
 
 Tests cover:
-- CriticalDecision dataclass
-- CoachingReport dataclass
-- Helper functions (_get_act_for_turn, _get_outcome_description, etc.)
 - format_turn_history function
 - PostGameCoach.run_bayesian_inference method
-- PostGameCoach parsing methods (_extract_section, _parse_critical_decisions, etc.)
+- PostGameCoach parsing methods
 
-These tests are self-contained and do not require LLM calls.
-LLM-dependent functionality (analyze_game) is tested via integration tests.
+Note: Trivial dataclass tests (TestCriticalDecision, TestCoachingReport) and
+helper function tests (_get_act_for_turn, _get_outcome_description, _format_matrix_type,
+_format_ending_type) were removed as they test simple string formatting.
+See test_removal_log.md for details.
 """
 
 import pytest
@@ -19,172 +18,12 @@ from brinksmanship.coaching.post_game import (
     CoachingReport,
     CriticalDecision,
     PostGameCoach,
-    _get_act_for_turn,
-    _get_outcome_description,
-    _format_matrix_type,
-    _format_ending_type,
     format_turn_history,
 )
 from brinksmanship.engine.game_engine import EndingType, TurnRecord, TurnPhase
 from brinksmanship.models.actions import Action, ActionType, ActionCategory
 from brinksmanship.models.matrices import MatrixType
 from brinksmanship.models.state import ActionResult, GameState
-
-
-# =============================================================================
-# CriticalDecision Dataclass Tests
-# =============================================================================
-
-
-class TestCriticalDecision:
-    """Tests for CriticalDecision dataclass."""
-
-    def test_create_critical_decision(self):
-        """Test creating a CriticalDecision."""
-        decision = CriticalDecision(
-            turn=5,
-            player_action="Escalate",
-            opponent_action="Cooperate",
-            analysis="This was a turning point.",
-            alternative="Could have cooperated to build trust.",
-        )
-        assert decision.turn == 5
-        assert decision.player_action == "Escalate"
-        assert decision.opponent_action == "Cooperate"
-        assert "turning point" in decision.analysis
-        assert "cooperated" in decision.alternative
-
-
-# =============================================================================
-# CoachingReport Dataclass Tests
-# =============================================================================
-
-
-class TestCoachingReport:
-    """Tests for CoachingReport dataclass."""
-
-    def test_create_coaching_report(self):
-        """Test creating a CoachingReport with all fields."""
-        report = CoachingReport(
-            overall_assessment="Good game overall.",
-            critical_decisions=[
-                CriticalDecision(
-                    turn=3,
-                    player_action="Defect",
-                    opponent_action="Cooperate",
-                    analysis="Key moment.",
-                    alternative="Could have cooperated.",
-                )
-            ],
-            opponent_analysis="Opponent followed TFT pattern.",
-            strategic_lessons="Use Schelling focal points.",
-            recommendations=["Be more patient", "Watch for patterns"],
-            bayesian_inference_trace="Turn 1: ...",
-            inferred_opponent_type=OpponentType.TIT_FOR_TAT,
-            inferred_type_probability=0.75,
-            raw_analysis="Full LLM response here.",
-        )
-        assert report.overall_assessment == "Good game overall."
-        assert len(report.critical_decisions) == 1
-        assert report.inferred_opponent_type == OpponentType.TIT_FOR_TAT
-        assert report.inferred_type_probability == 0.75
-        assert len(report.recommendations) == 2
-
-
-# =============================================================================
-# Helper Function Tests
-# =============================================================================
-
-
-class TestGetActForTurn:
-    """Tests for _get_act_for_turn helper function."""
-
-    def test_act_1_turns_1_to_4(self):
-        """Test turns 1-4 are Act I."""
-        for turn in range(1, 5):
-            assert _get_act_for_turn(turn) == 1
-
-    def test_act_2_turns_5_to_8(self):
-        """Test turns 5-8 are Act II."""
-        for turn in range(5, 9):
-            assert _get_act_for_turn(turn) == 2
-
-    def test_act_3_turns_9_and_beyond(self):
-        """Test turns 9+ are Act III."""
-        for turn in [9, 10, 12, 15, 20]:
-            assert _get_act_for_turn(turn) == 3
-
-
-class TestGetOutcomeDescription:
-    """Tests for _get_outcome_description helper function."""
-
-    def test_cc_outcome(self):
-        """Test CC outcome description."""
-        desc = _get_outcome_description("CC")
-        assert "cooperation" in desc.lower()
-
-    def test_dd_outcome(self):
-        """Test DD outcome description."""
-        desc = _get_outcome_description("DD")
-        assert "competition" in desc.lower()
-
-    def test_cd_outcome(self):
-        """Test CD outcome description."""
-        desc = _get_outcome_description("CD")
-        assert "cooperated" in desc.lower() or "loses" in desc.lower()
-
-    def test_dc_outcome(self):
-        """Test DC outcome description."""
-        desc = _get_outcome_description("DC")
-        assert "competed" in desc.lower() or "loses" in desc.lower()
-
-    def test_unknown_outcome(self):
-        """Test unknown outcome returns default."""
-        desc = _get_outcome_description("UNKNOWN_CODE")
-        assert "Unknown" in desc
-
-
-class TestFormatMatrixType:
-    """Tests for _format_matrix_type helper function."""
-
-    def test_prisoners_dilemma(self):
-        """Test Prisoner's Dilemma formatting."""
-        name = _format_matrix_type(MatrixType.PRISONERS_DILEMMA)
-        assert "Prisoner" in name
-
-    def test_chicken(self):
-        """Test Chicken formatting."""
-        name = _format_matrix_type(MatrixType.CHICKEN)
-        assert "Chicken" in name
-
-    def test_stag_hunt(self):
-        """Test Stag Hunt formatting."""
-        name = _format_matrix_type(MatrixType.STAG_HUNT)
-        assert "Stag" in name
-
-
-class TestFormatEndingType:
-    """Tests for _format_ending_type helper function."""
-
-    def test_mutual_destruction(self):
-        """Test Mutual Destruction formatting."""
-        name = _format_ending_type(EndingType.MUTUAL_DESTRUCTION)
-        assert "Mutual Destruction" in name or "Risk" in name
-
-    def test_settlement(self):
-        """Test Settlement formatting."""
-        name = _format_ending_type(EndingType.SETTLEMENT)
-        assert "Settlement" in name
-
-    def test_natural_ending(self):
-        """Test Natural Ending formatting."""
-        name = _format_ending_type(EndingType.NATURAL_ENDING)
-        assert "Natural" in name or "max" in name.lower()
-
-
-# =============================================================================
-# Format Turn History Tests
-# =============================================================================
 
 
 class TestFormatTurnHistory:

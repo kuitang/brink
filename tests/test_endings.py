@@ -1,13 +1,15 @@
 """Tests for the game endings module.
 
 Tests verify all game ending conditions as specified in GAME_MANUAL.md:
-1. EndingType enum membership
-2. Mutual destruction (Risk = 10)
-3. Position loss (Position = 0)
-4. Resource loss (Resources = 0)
-5. Crisis termination probability calculation
-6. Max turns ending
-7. check_all_endings priority order
+1. Mutual destruction (Risk = 10)
+2. Position loss (Position = 0)
+3. Resource loss (Resources = 0)
+4. Crisis termination probability calculation
+5. Max turns ending
+6. check_all_endings priority order
+
+Note: TestEndingType and TestGameEnding were removed as trivial enum/dataclass tests.
+See test_removal_log.md for details.
 """
 
 import pytest
@@ -24,68 +26,6 @@ from brinksmanship.engine.endings import (
     get_crisis_termination_probability,
 )
 from brinksmanship.models.state import GameState, PlayerState
-
-
-class TestEndingType:
-    """Tests for EndingType enum."""
-
-    def test_all_ending_types_defined(self):
-        """All expected ending types exist in the enum."""
-        expected_types = [
-            "MUTUAL_DESTRUCTION",
-            "POSITION_LOSS_A",
-            "POSITION_LOSS_B",
-            "RESOURCE_LOSS_A",
-            "RESOURCE_LOSS_B",
-            "CRISIS_TERMINATION",
-            "MAX_TURNS",
-            "SETTLEMENT",
-        ]
-        for type_name in expected_types:
-            assert hasattr(EndingType, type_name), f"EndingType.{type_name} not found"
-
-    def test_enum_membership(self):
-        """EndingType values are proper enum members."""
-        assert isinstance(EndingType.MUTUAL_DESTRUCTION, EndingType)
-        assert isinstance(EndingType.POSITION_LOSS_A, EndingType)
-        assert isinstance(EndingType.POSITION_LOSS_B, EndingType)
-        assert isinstance(EndingType.RESOURCE_LOSS_A, EndingType)
-        assert isinstance(EndingType.RESOURCE_LOSS_B, EndingType)
-        assert isinstance(EndingType.CRISIS_TERMINATION, EndingType)
-        assert isinstance(EndingType.MAX_TURNS, EndingType)
-        assert isinstance(EndingType.SETTLEMENT, EndingType)
-
-    def test_enum_count(self):
-        """Verify total number of ending types."""
-        assert len(EndingType) == 8
-
-
-class TestGameEnding:
-    """Tests for GameEnding dataclass."""
-
-    def test_game_ending_creation(self):
-        """GameEnding can be created with all required fields."""
-        ending = GameEnding(
-            ending_type=EndingType.MUTUAL_DESTRUCTION,
-            vp_a=20.0,
-            vp_b=20.0,
-            description="Test description",
-        )
-        assert ending.ending_type == EndingType.MUTUAL_DESTRUCTION
-        assert ending.vp_a == 20.0
-        assert ending.vp_b == 20.0
-        assert ending.description == "Test description"
-
-    def test_game_ending_frozen(self):
-        """GameEnding is immutable (frozen dataclass)."""
-        ending = GameEnding(
-            ending_type=EndingType.MUTUAL_DESTRUCTION,
-            vp_a=20.0,
-            vp_b=20.0,
-            description="Test",
-        )
-        with pytest.raises(AttributeError):
-            ending.vp_a = 50.0
 
 
 class TestMutualDestruction:
