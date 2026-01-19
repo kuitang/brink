@@ -36,5 +36,24 @@ Estimated tokens: ~10,000 tokens (44KB, 6600 words - worth the context cost for 
 
 ## Webapp
 
+### Launching the Webapp
+
+```bash
+# Install webapp dependencies
+uv sync --extra webapp
+
+# Generate the game manual HTML (required before first run, and after GAME_MANUAL.md changes)
+uv run python scripts/generate_manual.py
+
+# Start the webapp (listens on 0.0.0.0:5000)
+uv run brinksmanship-web
+```
+
+The webapp listens on `0.0.0.0:5000` by default for network accessibility.
+
+### Generated Files
+
+The game manual page (`/manual`) is generated from `GAME_MANUAL.md`. The generated HTML is stored in `src/brinksmanship/webapp/templates/generated/` (gitignored). Regenerate after any changes to `GAME_MANUAL.md`.
+
 ### htmx
 **CRITICAL**: Always use the latest version of htmx. Check https://htmx.org for the current version before downloading or referencing. Do NOT use outdated CDN links or old versions from examples.
