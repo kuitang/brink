@@ -723,5 +723,28 @@ uv sync --extra webapp
 
 ---
 
-*Document Version: 1.0*
+## Implementation Status
+
+**All milestones W1-W8 are COMPLETE.**
+
+| Milestone | Status | Notes |
+|-----------|--------|-------|
+| W1: Project Setup | Complete | Flask app factory, CSS foundation |
+| W2: Core Pages & Routing | Complete | Auth routes, base templates |
+| W3: Game Interface (htmx) | Complete | Mock engine, game routes, htmx integration |
+| W4: Database & Persistence | Complete | SQLAlchemy models, scenario repository |
+| W5: Lobby & Game Setup | Complete | Lobby routes, leaderboards |
+| W6: Scenario Management UI | Complete | Scenario list, generation |
+| W7: Persona Selection | Complete | All opponent types, custom persona |
+| W8: Real Engine Integration | Complete | `USE_MOCK_ENGINE=False` by default |
+
+### Additional Features
+
+- **Game Manual Page** (`/manual`): Generated from `GAME_MANUAL.md` using the `markdown` library. Run `uv run python scripts/generate_manual.py` to regenerate. Served with sidebar TOC and site styling.
+
+- **Hidden Turn Count**: `max_turns` is not disclosed to players per game design (uncertain endpoints). Only current turn number is shown.
+
+---
+
+*Document Version: 1.1*
 *Last Updated: January 2026*
