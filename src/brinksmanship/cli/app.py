@@ -65,6 +65,7 @@ from brinksmanship.opponents.base import (
     list_opponent_types,
 )
 from brinksmanship.storage import get_scenario_repository
+from brinksmanship.cli.trace import TraceLogger
 
 if TYPE_CHECKING:
     from brinksmanship.coaching.post_game import CoachingReport
@@ -97,6 +98,11 @@ class ActionExecutionResult:
     narrative: Optional[str] = None
     ending: Optional[GameEnding] = None
     error: Optional[str] = None
+    # For trace logging
+    human_action: Optional[Action] = None
+    opponent_action: Optional[Action] = None
+    turn_result: Optional[TurnResult] = None
+    state_after: Optional[GameState] = None
 
 
 @dataclass
@@ -613,6 +619,14 @@ class GameScreen(Screen):
         self.opponent: Optional[Opponent] = None
         self.available_actions: list[Action] = []
         self.turn_history: list[str] = []
+        self._last_checked_turn: int = 0  # Track which turn we checked for opponent settlement
+        self._pending_opponent_proposal: Optional[SettlementProposal] = None
+        # Initialize trace logger
+        self.trace_logger = TraceLogger(
+            scenario_id=scenario_id,
+            opponent_type=opponent_type,
+            human_player=self.human_player,
+        )
 
     def compose(self) -> ComposeResult:
         yield Header()
@@ -722,6 +736,116 @@ class GameScreen(Screen):
         # Update history
         self._update_history()
 
+        # Check if opponent wants to propose settlement (only once per turn)
+        if state.turn > self._last_checked_turn and state.turn > 4 and state.stability > 2:
+            self._last_checked_turn = state.turn
+            self._check_opponent_settlement()
+
+    @work(thread=True)
+    def _check_opponent_settlement(self) -> None:
+        """Check if opponent wants to propose settlement (runs in worker thread)."""
+        if not self.game or not self.opponent:
+            return
+
+        state = self.game.get_current_state()
+
+        # Ask opponent if they want to propose settlement
+        proposal = run_opponent_method(self.opponent.propose_settlement, state)
+
+        if proposal is not None:
+            # Opponent wants to propose - show response modal on main thread
+            self.app.call_from_thread(self._show_opponent_settlement_proposal, proposal)
+
+    def _show_opponent_settlement_proposal(self, proposal: SettlementProposal) -> None:
+        """Show the opponent's settlement proposal to the human."""
+        self._pending_opponent_proposal = proposal
+
+        def handle_response(action: str, counter: Optional[SettlementProposal]) -> None:
+            if action == "counter":
+                # Human countered - now opponent decides on the counter
+                self._handle_human_counter(counter)
+            elif action == "reject":
+                # Human rejected - Risk +1, continue turn
+                self.notify("You rejected the settlement. Risk +1", severity="warning")
+                # TODO: Actually apply Risk +1 to game state
+                self._pending_opponent_proposal = None
+
+        self.app.push_screen(SettlementResponseModal(
+            self.game,
+            proposal,
+            human_is_player_a=self.human_is_player_a,
+            is_final_offer=False,
+            on_response=handle_response,
+        ))
+
+    @work(thread=True)
+    def _handle_human_counter(self, counter: SettlementProposal) -> None:
+        """Handle human's counter-proposal to opponent's settlement."""
+        if not self.game or not self.opponent:
+            return
+
+        state = self.game.get_current_state()
+
+        # Opponent evaluates human's counter-proposal
+        response = run_opponent_method(
+            self.opponent.evaluate_settlement, counter, state, False
+        )
+
+        self.app.call_from_thread(self._process_counter_response, response, counter)
+
+    def _process_counter_response(
+        self, response: SettlementResponse, counter: SettlementProposal
+    ) -> None:
+        """Process opponent's response to human's counter-proposal."""
+        state = self.game.get_current_state()
+
+        if response.action == "accept":
+            # Opponent accepts human's counter
+            if self.human_is_player_a:
+                vp_a = counter.offered_vp
+                vp_b = 100 - counter.offered_vp
+            else:
+                vp_b = counter.offered_vp
+                vp_a = 100 - counter.offered_vp
+
+            ending = GameEnding(
+                ending_type=EndingType.SETTLEMENT,
+                vp_a=float(vp_a),
+                vp_b=float(vp_b),
+                turn=state.turn,
+                description=f"Settlement accepted. Player A: {vp_a} VP, Player B: {vp_b} VP",
+            )
+            self.game.ending = ending
+            self.app.push_screen(EndGameScreen(ending, self.game, self.opponent_type))
+
+        elif response.action == "counter":
+            # Opponent makes final offer
+            final_offer = SettlementProposal(
+                offered_vp=response.counter_vp,
+                argument=response.counter_argument,
+            )
+            self.notify("Opponent makes a FINAL OFFER", timeout=3)
+
+            def handle_final(action: str, _: Optional[SettlementProposal]) -> None:
+                if action == "reject":
+                    self.notify("Final offer rejected. Risk +1", severity="warning")
+                # Accept is handled in the modal itself
+
+            self.app.push_screen(SettlementResponseModal(
+                self.game,
+                final_offer,
+                human_is_player_a=self.human_is_player_a,
+                is_final_offer=True,
+                on_response=handle_final,
+            ))
+        else:
+            # Opponent rejects - settlement fails
+            self.notify(
+                f"Opponent rejects your counter: {response.rejection_reason or 'No reason'}. Risk +1",
+                severity="warning"
+            )
+            self._pending_opponent_proposal = None
+
     def _update_intel_display(self, info: InformationState, current_turn: int) -> None:
         """Update intelligence display with uncertainty bounds."""
         pos_display = self.query_one("#intel-position", Static)
@@ -776,17 +900,32 @@ class GameScreen(Screen):
     }
 
     def _update_action_list(self) -> None:
-        """Update the action list display with narrative descriptions and mechanics hints."""
+        """Update the action list display with narrative descriptions and mechanics hints.
+
+        Multiple actions of each type (C/D) offer strategic variety:
+        - Different resource costs
+        - Different risk/position impacts
+        - Different narrative effects
+        """
         action_list = self.query_one("#action-list", OptionList)
         action_list.clear_options()
 
-        for i, action in enumerate(self.available_actions):
-            is_coop = action.action_type == ActionType.COOPERATIVE
-            hint = self._COOP_HINTS.get(action.category, "Builds trust") if is_coop else "Risk +, position?"
-            icon = "\u2764" if is_coop else "\u2694"  # heart or sword
-            cost_str = f" | {action.resource_cost:.1f}R" if action.resource_cost > 0 else ""
+        # Group actions by type for clarity
+        coop_actions = [(i, a) for i, a in enumerate(self.available_actions) if a.action_type == ActionType.COOPERATIVE]
+        comp_actions = [(i, a) for i, a in enumerate(self.available_actions) if a.action_type == ActionType.COMPETITIVE]
 
-            label = f"[{i+1}] {icon} {action.name}\n     {hint}{cost_str}"
+        # Add competitive actions first (more impactful)
+        for i, action in comp_actions:
+            hint = f"COMPETITIVE - Risk ↑, may gain position"
+            cost_str = f" | Cost: {action.resource_cost:.1f}R" if action.resource_cost > 0 else ""
+            label = f"[{i+1}] ⚔ {action.name}\n     {hint}{cost_str}"
+            action_list.add_option(Option(label, id=str(i)))
+
+        # Add cooperative actions
+        for i, action in coop_actions:
+            hint = self._COOP_HINTS.get(action.category, "COOPERATIVE - Builds trust, reduces risk")
+            cost_str = f" | Cost: {action.resource_cost:.1f}R" if action.resource_cost > 0 else ""
+            label = f"[{i+1}] ❤ {action.name}\n     {hint}{cost_str}"
             action_list.add_option(Option(label, id=str(i)))
 
     def _update_history(self) -> None:
@@ -865,6 +1004,10 @@ class GameScreen(Screen):
     def _execute_action_worker(self, human_action: Action) -> None:
         """Execute action in worker thread (handles async opponent methods)."""
         state = self.game.get_current_state()
+
+        # Record state before turn for trace
+        self.trace_logger.start_turn(state)
+
         opponent_actions = self.game.get_available_actions(self.opponent_player)
 
         # Get opponent's action - this may call asyncio.run() internally
@@ -890,6 +1033,9 @@ class GameScreen(Screen):
         else:
             result = self.game.submit_actions(opponent_action, human_action)
 
+        # Get state after turn for trace
+        state_after = self.game.get_current_state()
+
         # Build result for main thread
         exec_result = ActionExecutionResult(success=result.success)
         if result.success:
@@ -903,6 +1049,11 @@ class GameScreen(Screen):
                 )
             exec_result.narrative = result.narrative
             exec_result.ending = result.ending
+            # Add trace data
+            exec_result.human_action = human_action
+            exec_result.opponent_action = opponent_action
+            exec_result.turn_result = result
+            exec_result.state_after = state_after
         else:
             exec_result.error = result.error
 
@@ -916,6 +1067,16 @@ class GameScreen(Screen):
             self.app.pop_screen()
 
         if result.success:
+            # Record turn in trace
+            if result.human_action and result.opponent_action and result.turn_result and result.state_after:
+                self.trace_logger.record_turn(
+                    human_action=result.human_action,
+                    opponent_action=result.opponent_action,
+                    result=result.turn_result,
+                    state_after=result.state_after,
+                    human_is_player_a=self.human_is_player_a,
+                )
+
             if result.turn_history_entry:
                 self.turn_history.append(result.turn_history_entry)
 
@@ -923,6 +1084,16 @@ class GameScreen(Screen):
                 self.notify(result.narrative, timeout=5)
 
             if result.ending:
+                # Record ending in trace
+                self.trace_logger.record_ending(
+                    ending_type=result.ending.ending_type.value,
+                    vp_a=result.ending.vp_a,
+                    vp_b=result.ending.vp_b,
+                    description=result.ending.description,
+                )
+                # Show trace summary
+                trace_summary = self.trace_logger.get_summary()
+                self.notify(f"Trace saved: {self.trace_logger._output_file}", timeout=10)
                 self.app.push_screen(EndGameScreen(result.ending, self.game, self.opponent_type))
                 return
 
@@ -1087,6 +1258,151 @@ class SettlementProposalModal(Screen):
 
     def action_cancel(self) -> None:
         self.app.pop_screen()
+
+
+class SettlementResponseModal(Screen):
+    """Modal screen for responding to opponent's settlement proposal."""
+
+    BINDINGS = [
+        Binding("escape", "reject", "Reject"),
+    ]
+
+    def __init__(
+        self,
+        game: GameEngine,
+        proposal: SettlementProposal,
+        human_is_player_a: bool = True,
+        is_final_offer: bool = False,
+        on_response: callable = None,
+    ) -> None:
+        super().__init__()
+        self.game = game
+        self.proposal = proposal
+        self.human_is_player_a = human_is_player_a
+        self.is_final_offer = is_final_offer
+        self.on_response = on_response  # Callback for response
+        self._suggested_vp: int = 50
+
+    def compose(self) -> ComposeResult:
+        state = self.game.get_current_state()
+
+        # Calculate what VP the human would get
+        their_vp = self.proposal.offered_vp
+        your_vp = 100 - their_vp
+
+        # Calculate human's suggested counter VP
+        if self.human_is_player_a:
+            my_position = state.position_a
+            opp_position = state.position_b
+        else:
+            my_position = state.position_b
+            opp_position = state.position_a
+
+        pos_diff = my_position - opp_position
+        coop_bonus = int((state.cooperation_score - 5) * 2)
+        suggested = int(50 + (pos_diff * 5) + coop_bonus)
+        suggested = max(20, min(80, suggested))
+        self._suggested_vp = suggested
+        min_vp = max(20, suggested - 10)
+        max_vp = min(80, suggested + 10)
+
+        title = "OPPONENT'S FINAL OFFER" if self.is_final_offer else "OPPONENT PROPOSES SETTLEMENT"
+
+        with Container(id="settlement-modal"):
+            with Vertical(classes="modal-container"):
+                yield Static(title, classes="modal-title")
+                yield Rule()
+                yield Static(f"Opponent offers: {their_vp} VP for them, {your_vp} VP for you")
+                yield Rule()
+                yield Static("Their argument:", classes="input-label")
+                yield Static(self.proposal.argument or "(No argument provided)")
+                yield Rule()
+
+                if self.is_final_offer:
+                    yield Static("This is a FINAL OFFER. You can only Accept or Reject.")
+                    with Horizontal(classes="button-row"):
+                        yield Button("Accept", id="accept", variant="success")
+                        yield Button("Reject", id="reject", variant="error")
+                else:
+                    yield Static(f"Your suggested counter: {suggested} VP (range: {min_vp}-{max_vp})")
+                    yield Static("Counter VP (for yourself):", classes="input-label")
+                    yield Input(value=str(suggested), id="counter-vp-input", type="integer")
+                    yield Static("Counter argument:", classes="input-label")
+                    yield TextArea(id="counter-argument-input")
+                    with Horizontal(classes="button-row"):
+                        yield Button("Accept", id="accept", variant="success")
+                        yield Button("Counter", id="counter", variant="primary")
+                        yield Button("Reject", id="reject", variant="error")
+
+    @on(Button.Pressed, "#accept")
+    def accept_proposal(self) -> None:
+        """Accept the opponent's proposal."""
+        state = self.game.get_current_state()
+        their_vp = self.proposal.offered_vp
+        your_vp = 100 - their_vp
+
+        if self.human_is_player_a:
+            vp_a = your_vp
+            vp_b = their_vp
+        else:
+            vp_a = their_vp
+            vp_b = your_vp
+
+        ending = GameEnding(
+            ending_type=EndingType.SETTLEMENT,
+            vp_a=float(vp_a),
+            vp_b=float(vp_b),
+            turn=state.turn,
+            description=f"Settlement accepted. Player A: {vp_a} VP, Player B: {vp_b} VP",
+        )
+        self.game.ending = ending
+        self.app.pop_screen()  # Remove modal
+        self.app.push_screen(EndGameScreen(ending, self.game, ""))
+
+    @on(Button.Pressed, "#counter")
+    def counter_proposal(self) -> None:
+        """Submit a counter-proposal."""
+        counter_vp_input = self.query_one("#counter-vp-input", Input)
+        counter_arg_input = self.query_one("#counter-argument-input", TextArea)
+
+        try:
+            counter_vp = int(counter_vp_input.value)
+        except ValueError:
+            self.notify("Invalid VP value", severity="error")
+            return
+
+        # Validate range
+        min_vp = max(20, self._suggested_vp - 10)
+        max_vp = min(80, self._suggested_vp + 10)
+
+        if not (min_vp <= counter_vp <= max_vp):
+            self.notify(f"VP must be between {min_vp} and {max_vp}", severity="error")
+            return
+
+        counter_argument = counter_arg_input.text[:500]
+
+        # Create counter-proposal
+        counter = SettlementProposal(offered_vp=counter_vp, argument=counter_argument)
+
+        if self.on_response:
+            self.app.pop_screen()
+            self.on_response("counter", counter)
+        else:
+            self.notify("Counter-proposal submitted", timeout=3)
+            self.app.pop_screen()
+
+    @on(Button.Pressed, "#reject")
+    def reject_proposal(self) -> None:
+        """Reject the proposal."""
+        if self.on_response:
+            self.app.pop_screen()
+            self.on_response("reject", None)
+        else:
+            self.notify("Settlement rejected. Risk +1", severity="warning")
+            self.app.pop_screen()
+
+    def action_reject(self) -> None:
+        self.reject_proposal()
 
 
 class EndGameScreen(Screen):

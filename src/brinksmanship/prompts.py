@@ -35,6 +35,29 @@ The game uses a three-act structure:
 - Act II (turns 5-8): Confrontation and testing. Standard stakes (1.0x multiplier).
 - Act III (turns 9+): Resolution and high stakes. Higher stakes (1.3x multiplier).
 
+CRITICAL NARRATIVE SCALING - Mutual Destruction & Catastrophe:
+The game has ~25% mutual destruction rate when both players repeatedly defect. Your narratives
+for DD outcomes and "mutual destruction" endings MUST match the theme's stakes:
+
+| Theme         | Mutual Destruction Looks Like                                           |
+|---------------|-------------------------------------------------------------------------|
+| crisis        | Nuclear war, military annihilation, global catastrophe                  |
+| corporate     | Both companies bankrupt, hostile takeover destroys acquirer too,        |
+|               | regulatory shutdown of entire industry, SEC investigation ruins all     |
+| palace        | Dynasty collapses, civil war kills everyone, foreign invasion,          |
+|               | plague/famine from misrule, all factions purged                         |
+| espionage     | Both networks compromised, agents on both sides executed,               |
+|               | operations exposed causing international incident                       |
+| legal/trial   | Mistrial with double jeopardy, jury nullification, contempt chaos,      |
+|               | case becomes career-ending scandal for all parties                      |
+| rivals        | Market collapse harms both, regulatory intervention destroys industry,  |
+|               | price war bankrupts all players                                         |
+| allies        | Alliance collapses leaving both vulnerable to external threat,          |
+|               | mutual betrayal invites common enemy to destroy both                    |
+
+Your DD outcome narratives and settlement_failed_narrative should reflect these theme-appropriate
+catastrophes. The "game over from high risk" condition must feel believable for the setting.
+
 CRITICAL: You output matrix_type and matrix_parameters, NEVER raw payoff values.
 The engine constructs valid matrices from your parameters automatically.
 
@@ -68,6 +91,56 @@ Variety Constraints:
 - High risk (>=7): Favor Chicken (confrontation) or Stag Hunt (de-escalation)
 - High cooperation (>=7): Favor trust-based games (Stag Hunt, Harmony)
 - Low cooperation (<=3): Favor confrontational games (Chicken, Deadlock)
+
+BRANCHING NARRATIVE STRUCTURE:
+Scenarios MUST use branching paths based on outcomes (CC, CD, DC, DD) to create narrative diversity.
+This prevents the "disjointed" feeling of linear scenarios where turns don't connect.
+
+How Branching Works:
+1. Each turn can branch to DIFFERENT turn variants based on the outcome
+2. Turn variants are stored in the scenario's "branches" dict with IDs like "turn_3_diplomatic"
+3. A turn's "branches" field maps outcomes to variant IDs: {"CC": "turn_3_diplomatic", "DD": "turn_3_tense"}
+4. The engine follows the branch matching the actual outcome
+
+Branching Guidelines:
+- Create 2-4 variants per critical turn (turns 2-3, 5-6, 8-9 are often pivotal)
+- CC typically leads to diplomatic/cooperative variants
+- DD leads to tense/confrontational variants
+- CD and DC often share a variant (mixed outcome)
+- Use variant IDs like: turn_3_diplomatic, turn_3_tense, turn_4_breakthrough, turn_4_crisis
+
+MERGING PATHS to Avoid Combinatorial Explosion:
+- Paths MUST eventually merge back to shared turns (within 2-3 turns of diverging)
+- Merge at key junctures: mid Act I (turn 4-5), end of Act II (turn 7-8), mid Act III (turn 10-11)
+- Each branch point can sustain 2-3 turns of divergence before merging
+- Example: turn_3_diplomatic → turn_4_breakthrough → merge at turn_5 (shared)
+- Final 2-3 turns: branch to different ENDINGS based on accumulated state (these don't merge)
+
+Example Branch Structure for a 12-turn scenario:
+  Turn 1 (linear) → Turn 2 (branches based on outcome)
+
+  Divergence 1 (Turns 2-4):
+    Turn 2 branches: CC/CD → turn_3_diplomatic, DC/DD → turn_3_tense
+    turn_3_diplomatic → turn_4_breakthrough (still diplomatic path)
+    turn_3_tense → turn_4_crisis (still tense path)
+    Both turn_4 variants merge → Turn 5 (shared)
+
+  Divergence 2 (Turns 6-8):
+    Turn 6 branches again based on outcome
+    turn_7_progress vs turn_7_escalation
+    Both merge → Turn 8 (shared)
+
+  Ending Branch (Turns 10-12):
+    Turn 10 branches to DIFFERENT ENDINGS:
+    High cooperation path → turn_11_peace → turn_12_resolution
+    Low cooperation path → turn_11_cold → turn_12_standoff
+    High risk path → turn_11_crisis → turn_12_apocalypse
+    (These do NOT merge - they're terminal paths)
+
+Ending Variants:
+- Create at least 2-3 ending variants in Act III based on cooperation/risk trajectory
+- Examples: turn_12_peace, turn_12_cold_war, turn_12_apocalypse
+- Endings should reflect the overall path taken, not just the final choice
 """
 
 SCENARIO_GENERATION_USER_PROMPT_TEMPLATE = """Generate a complete scenario for Brinksmanship with the following parameters:
@@ -88,17 +161,37 @@ For each turn, provide:
 4. matrix_type (one of the 14 available types, appropriate for act and theme)
 5. matrix_parameters (valid parameters for the chosen type - see constraints below)
 6. actions (4-6 TurnAction objects with action_id, action_type="cooperative"|"competitive", narrative_description, resource_cost=0.0)
-7. outcome_narratives (CC, CD, DC, DD descriptions)
+7. outcome_narratives (CC, CD, DC, DD descriptions - DD MUST reflect theme-appropriate catastrophe!)
 8. branches (OPTIONAL: which turn to follow based on outcome - use null for linear progression)
 9. default_next (REQUIRED: next turn for linear progression, use "turn_N" format where N is the turn number)
 10. settlement_available (ONLY true for turns 5+ in Act II/III, MUST be false for turns 1-4 in Act I)
 11. settlement_failed_narrative (text for when negotiation fails)
 
 CRITICAL BRANCH RULES:
-- For LINEAR progression (most common): Set all branches to null and use default_next: "turn_N"
-- Valid turn targets: "turn_1", "turn_2", ..., "turn_{num_turns}" (use exactly this format)
-- Branch targets MUST match these exact IDs - no variations like "turn_2_cooperative"
-- Example for turn 5: default_next: "turn_6", branches: {{"CC": null, "CD": null, "DC": null, "DD": null}}
+Scenarios MUST use branching to create narrative diversity. Follow these rules:
+
+1. MAIN TURNS (in "turns" array): Linear progression turns 1-{num_turns} that form the backbone
+   - Use branches field to route outcomes to variant turns
+   - Use default_next as fallback when branch is null
+
+2. VARIANT TURNS (in "branches" dict at scenario level): Alternative versions of critical turns
+   - IDs like "turn_3_diplomatic", "turn_3_tense", "turn_5_breakthrough"
+   - Store in scenario's top-level "branches" object (not inside individual turns)
+   - Variants merge back to main turns via their default_next
+
+3. BRANCHING PATTERN (three divergence zones):
+   - Zone 1 (Turns 2-4): Turn 2 branches → turn_3 variants → turn_4 variants → merge at Turn 5
+   - Zone 2 (Turns 6-8): Turn 6 branches → turn_7 variants → merge at Turn 8
+   - Zone 3 (Turns 10+): Branch to different ENDINGS (no merge, terminal paths)
+
+4. MERGING: All variant paths MUST merge within 2-3 turns to prevent explosion
+   - Example: turn_3_diplomatic → turn_4_breakthrough → merge at turn_5 (shared)
+   - Example: turn_3_tense → turn_4_crisis → merge at turn_5 (shared)
+   - This allows meaningful divergence before narratives reconverge
+
+Example branching for Turn 2:
+  In turns array: {{"turn": 2, ..., "branches": {{"CC": "turn_3_diplomatic", "CD": "turn_3_diplomatic", "DC": "turn_3_tense", "DD": "turn_3_tense"}}, "default_next": "turn_3"}}
+  In scenario branches dict: {{"turn_3_diplomatic": {{...variant turn...}}, "turn_3_tense": {{...variant turn...}}}}
 
 Matrix Parameters Constraints by Type:
 
@@ -155,37 +248,82 @@ Output your response as valid JSON with this structure:
     {{
       "turn": 1,
       "act": 1,
-      "narrative_briefing": "...",
+      "narrative_briefing": "Opening situation...",
       "matrix_type": "STAG_HUNT",
-      "matrix_parameters": {{
-        "stag_payoff": 2.0,
-        "hare_temptation": 1.5,
-        "hare_safe": 1.0,
-        "stag_fail": 0.0,
-        "scale": 1.0
-      }},
+      "matrix_parameters": {{ "stag_payoff": 2.0, "hare_temptation": 1.5, "hare_safe": 1.0, "stag_fail": 0.0 }},
       "actions": [
-        {{"action_id": "action_slug", "action_type": "cooperative", "narrative_description": "What this action represents", "resource_cost": 0.0}},
-        ...
+        {{"action_id": "reach_out", "action_type": "cooperative", "narrative_description": "Extend an olive branch", "resource_cost": 0.0}},
+        {{"action_id": "stand_firm", "action_type": "competitive", "narrative_description": "Hold your ground", "resource_cost": 0.0}}
       ],
-      "outcome_narratives": {{
-        "CC": "Both cooperated narrative...",
-        "CD": "A cooperated, B defected narrative...",
-        "DC": "A defected, B cooperated narrative...",
-        "DD": "Both defected narrative..."
-      }},
-      "branches": {{
-        "CC": null,
-        "CD": null,
-        "DC": null,
-        "DD": null
-      }},
+      "outcome_narratives": {{ "CC": "...", "CD": "...", "DC": "...", "DD": "..." }},
+      "branches": {{ "CC": null, "CD": null, "DC": null, "DD": null }},
       "default_next": "turn_2",
       "settlement_available": false
     }},
-    ...
+    {{
+      "turn": 2,
+      "act": 1,
+      "narrative_briefing": "The situation develops...",
+      "matrix_type": "PRISONERS_DILEMMA",
+      "matrix_parameters": {{ "temptation": 1.5, "reward": 1.0, "punishment": 0.3, "sucker": 0.0 }},
+      "actions": [...],
+      "outcome_narratives": {{ "CC": "...", "CD": "...", "DC": "...", "DD": "..." }},
+      "branches": {{
+        "CC": "turn_3_diplomatic",
+        "CD": "turn_3_diplomatic",
+        "DC": "turn_3_tense",
+        "DD": "turn_3_tense"
+      }},
+      "default_next": "turn_3",
+      "settlement_available": false
+    }},
+    {{
+      "turn": 3,
+      "act": 1,
+      "narrative_briefing": "Default turn 3 (fallback if no branch matched)...",
+      "...": "rest of turn definition..."
+    }}
   ],
-  "branches": {{}}
+  "branches": {{
+    "turn_3_diplomatic": {{
+      "turn": 3,
+      "act": 1,
+      "narrative_briefing": "After the cooperative exchange, tensions have eased...",
+      "matrix_type": "STAG_HUNT",
+      "matrix_parameters": {{ "stag_payoff": 2.0, "hare_temptation": 1.5, "hare_safe": 1.0, "stag_fail": 0.0 }},
+      "actions": [...],
+      "outcome_narratives": {{ "CC": "...", "CD": "...", "DC": "...", "DD": "..." }},
+      "branches": {{ "CC": null, "CD": null, "DC": null, "DD": null }},
+      "default_next": "turn_4",
+      "settlement_available": false
+    }},
+    "turn_3_tense": {{
+      "turn": 3,
+      "act": 1,
+      "narrative_briefing": "The confrontation has escalated. Neither side is backing down...",
+      "matrix_type": "CHICKEN",
+      "matrix_parameters": {{ "temptation": 1.5, "reward": 1.0, "swerve_payoff": 0.5, "crash_payoff": -1.0 }},
+      "actions": [...],
+      "outcome_narratives": {{ "CC": "...", "CD": "...", "DC": "...", "DD": "..." }},
+      "branches": {{ "CC": null, "CD": null, "DC": null, "DD": null }},
+      "default_next": "turn_4",
+      "settlement_available": false
+    }},
+    "turn_12_peace": {{
+      "turn": 12,
+      "act": 3,
+      "narrative_briefing": "After sustained cooperation, a lasting peace is within reach...",
+      "matrix_type": "HARMONY",
+      "...": "ending variant for cooperative path"
+    }},
+    "turn_12_apocalypse": {{
+      "turn": 12,
+      "act": 3,
+      "narrative_briefing": "All diplomatic options are exhausted. The final confrontation begins...",
+      "matrix_type": "CHICKEN",
+      "...": "ending variant for destructive path"
+    }}
+  }}
 }}
 """
 
@@ -229,6 +367,13 @@ Based on the current state, generate this turn's content:
 
 5. Write outcome_narratives for CC, CD, DC, DD outcomes
 
+6. Define branches for narrative divergence:
+   - At critical turns (2-3, 5-6, 9), branch based on CC/DD outcomes
+   - CC typically leads to diplomatic variants
+   - DD leads to tense/confrontational variants
+   - CD and DC often share a middle variant
+   - Use IDs like "turn_N_diplomatic", "turn_N_tense"
+
 Matrix Type Selection Guidelines for Current State:
 - Risk >= 7: Favor Chicken (brinkmanship) or Stag Hunt (de-escalation opportunity)
 - Cooperation >= 7: Favor Stag Hunt, Harmony, or coordination games
@@ -244,8 +389,13 @@ Output as JSON:
   "matrix_parameters": {{ ... }},
   "action_menu": [ ... ],
   "outcome_narratives": {{ "CC": "...", "CD": "...", "DC": "...", "DD": "..." }},
-  "branches": {{ ... }},
-  "default_next": "...",
+  "branches": {{
+    "CC": "turn_{{next}}_diplomatic",
+    "CD": null,
+    "DC": null,
+    "DD": "turn_{{next}}_tense"
+  }},
+  "default_next": "turn_{{next}}",
   "settlement_available": {settlement_available}
 }}
 """
