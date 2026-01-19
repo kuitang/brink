@@ -201,25 +201,30 @@ def test_multi_round_settlement_negotiation(self):
 
 ---
 
-## Estimated Impact
+## Actual Impact (Final Results)
 
-| Category | Before | After | Reduction |
-|----------|--------|-------|-----------|
-| test_variance.py | 772 lines | ~350 lines | 55% |
-| test_endings.py | 767 lines | ~400 lines | 48% |
-| test_state_deltas.py | 1029 lines | ~600 lines | 42% |
-| test_storage.py | 818 lines | ~550 lines | 33% |
-| test_human_simulator.py | 607 lines | ~200 lines | 67% |
-| test_human_simulator_integration.py | 630 lines | ~300 lines | 52% |
-| test_post_game.py | 598 lines | ~350 lines | 41% |
-| test_analyze_mechanics.py | 710 lines | ~500 lines | 30% |
-| test_playtester.py | 812 lines | ~550 lines | 32% |
-| test_state.py | ~1143 lines | ~700 lines | 39% |
-| test_matrices.py | ~1358 lines | ~750 lines | 45% |
-| test_actions.py | ~1142 lines | ~650 lines | 43% |
-| **Total** | ~10,386 lines | ~5,900 lines | **43%** |
+| File | Before | After | Reduction |
+|------|--------|-------|-----------|
+| test_variance.py | 772 | 457 | 41% |
+| test_endings.py | 767 | 707 | 8% |
+| test_state_deltas.py | 1029 | 850 | 17% |
+| test_storage.py | 818 | 315 | 62% |
+| test_human_simulator.py | 607 | 71 | 88% |
+| test_post_game.py | 598 | 436 | 27% |
+| test_analyze_mechanics.py | 710 | 549 | 23% |
+| test_playtester.py | 812 | 685 | 16% |
+| test_state.py | 1143 | 603 | 47% |
+| test_matrices.py | 1358 | 948 | 30% |
+| test_actions.py | 1142 | 573 | 50% |
+| test_resolution.py | 1200 | 1088 | 9% |
+| test_game_engine.py | 1200 | 884 | 26% |
+| test_bayesian_inference.py | 600 | 434 | 28% |
+| test_mechanics_benchmark.py | 300 | 207 | 31% |
 
-Note: Actual reduction may vary based on exact cuts made.
+**Summary:**
+- Lines removed: ~4,200 lines across two commits
+- Tests remaining: 660 (all passing)
+- Test volume reduction: ~32% overall
 
 ---
 
