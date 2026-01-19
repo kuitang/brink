@@ -23,6 +23,15 @@ See GAME_MANUAL.md for authoritative game mechanics.
 
 SCENARIO_GENERATION_SYSTEM_PROMPT = """You are a game designer creating scenarios for Brinksmanship, a game-theoretic strategy simulation.
 
+CRITICAL FIRST STEP: Before generating any scenario, read the GAME_MANUAL.md file at /home/kuitang/git/brink/GAME_MANUAL.md
+This document contains the AUTHORITATIVE game rules for:
+- All 14 matrix types and their parameters
+- Information game mechanics (INSPECTION_GAME, RECONNAISSANCE)
+- State delta formulas
+- Act structure and scaling
+- Settlement mechanics
+You MUST reference this file to ensure scenarios conform to game rules.
+
 Your role is to generate compelling narratives that map onto classic 2x2 game theory structures. Each scenario should:
 
 1. Create genuine strategic dilemmas with no "correct" answer
@@ -92,6 +101,17 @@ Variety Constraints:
 - High cooperation (>=7): Favor trust-based games (Stag Hunt, Harmony)
 - Low cooperation (<=3): Favor confrontational games (Chicken, Deadlock)
 
+INTELLIGENCE GAMES REQUIREMENT (CRITICAL):
+Information is a game, not a passive observation. Scenarios MUST include intelligence games:
+- INSPECTION_GAME: Arms verification, compliance monitoring, resource intelligence (learn opponent Resources)
+- RECONNAISSANCE: Surveillance, probing, position intelligence (learn opponent Position)
+
+Minimum requirements:
+- At least 2 intelligence game turns per scenario (INSPECTION_GAME or RECONNAISSANCE)
+- At least 1 intelligence game in Act I or early Act II (information gathering phase)
+- At least 1 intelligence game in Act II (testing/verification phase)
+- Intelligence games are about information acquisition under strategic uncertainty, NOT guaranteed outcomes
+
 BRANCHING NARRATIVE STRUCTURE:
 Scenarios MUST use branching paths based on outcomes (CC, CD, DC, DD) to create narrative diversity.
 This prevents the "disjointed" feeling of linear scenarios where turns don't connect.
@@ -106,8 +126,10 @@ Branching Guidelines:
 - Create 2-4 variants per critical turn (turns 2-3, 5-6, 8-9 are often pivotal)
 - CC typically leads to diplomatic/cooperative variants
 - DD leads to tense/confrontational variants
-- CD and DC often share a variant (mixed outcome)
+- CD and DC: Use `null` to fall through to default_next (the main turn sequence)
+  IMPORTANT: Do NOT create "standard" variants. Use null for standard progression.
 - Use variant IDs like: turn_3_diplomatic, turn_3_tense, turn_4_breakthrough, turn_4_crisis
+- ONLY reference branch IDs that exist in the scenario's "branches" dict or main turns
 
 MERGING PATHS to Avoid Combinatorial Explosion:
 - Paths MUST eventually merge back to shared turns (within 2-3 turns of diverging)
@@ -190,8 +212,9 @@ Scenarios MUST use branching to create narrative diversity. Follow these rules:
    - This allows meaningful divergence before narratives reconverge
 
 Example branching for Turn 2:
-  In turns array: {{"turn": 2, ..., "branches": {{"CC": "turn_3_diplomatic", "CD": "turn_3_diplomatic", "DC": "turn_3_tense", "DD": "turn_3_tense"}}, "default_next": "turn_3"}}
+  In turns array: {{"turn": 2, ..., "branches": {{"CC": "turn_3_diplomatic", "CD": null, "DC": null, "DD": "turn_3_tense"}}, "default_next": "turn_3"}}
   In scenario branches dict: {{"turn_3_diplomatic": {{...variant turn...}}, "turn_3_tense": {{...variant turn...}}}}
+  NOTE: CD and DC use null, which means they fall through to default_next ("turn_3" - the main sequence turn)
 
 Matrix Parameters Constraints by Type:
 

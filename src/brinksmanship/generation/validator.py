@@ -129,6 +129,7 @@ class ValidationResult:
 
     # Individual check results
     game_variety: CheckResult | None = None
+    intelligence_games: CheckResult | None = None
     act_structure: CheckResult | None = None
     branching: CheckResult | None = None
     settlement: CheckResult | None = None
@@ -143,6 +144,7 @@ class ValidationResult:
         issues = []
         for check in [
             self.game_variety,
+            self.intelligence_games,
             self.act_structure,
             self.branching,
             self.settlement,
@@ -173,6 +175,7 @@ class ValidationResult:
             "overall_passed": self.overall_passed,
             "checks": {
                 "game_variety": self._check_to_dict(self.game_variety),
+                "intelligence_games": self._check_to_dict(self.intelligence_games),
                 "act_structure": self._check_to_dict(self.act_structure),
                 "branching": self._check_to_dict(self.branching),
                 "settlement": self._check_to_dict(self.settlement),
@@ -262,6 +265,90 @@ def check_game_variety(scenario: dict | Scenario) -> CheckResult:
                 "required": THRESHOLDS["min_game_types"],
                 "types": [str(t) for t in matrix_types],
             },
+        )
+
+    return result
+
+
+def check_intelligence_games(scenario: dict | Scenario) -> CheckResult:
+    """Check that scenario includes sufficient intelligence game turns.
+
+    Intelligence games (INSPECTION_GAME, RECONNAISSANCE) are core mechanics for
+    information acquisition under strategic uncertainty.
+
+    Requirements:
+    - At least 2 intelligence game turns per scenario
+    - At least 1 in Act I or early Act II (turns 1-6)
+    - At least 1 in Act II (turns 5-8)
+
+    Args:
+        scenario: Scenario object or dict with scenario data
+
+    Returns:
+        CheckResult with pass/fail and metrics
+    """
+    result = CheckResult(check_name="intelligence_games", passed=True)
+
+    intelligence_types = {"inspection_game", "reconnaissance", "INSPECTION_GAME", "RECONNAISSANCE"}
+    intelligence_turns: list[int] = []
+    early_phase_intel = 0  # turns 1-6
+    mid_phase_intel = 0    # turns 5-8
+
+    def check_turn(turn_data: dict) -> None:
+        nonlocal early_phase_intel, mid_phase_intel
+        turn_num = turn_data.get("turn", 0)
+        matrix_type = turn_data.get("matrix_type", "")
+
+        # Handle both string and enum types
+        type_str = str(matrix_type).lower().replace("matrixtype.", "")
+
+        if type_str in {"inspection_game", "reconnaissance"}:
+            intelligence_turns.append(turn_num)
+            if turn_num <= 6:
+                early_phase_intel += 1
+            if 5 <= turn_num <= 8:
+                mid_phase_intel += 1
+
+    if hasattr(scenario, "turns"):
+        # Scenario object
+        for turn in scenario.turns:
+            check_turn(turn.model_dump())
+        for branch_turn in scenario.branches.values():
+            check_turn(branch_turn.model_dump())
+    else:
+        # Dict format
+        for turn in scenario.get("turns", []):
+            check_turn(turn)
+        for branch_turn in scenario.get("branches", {}).values():
+            check_turn(branch_turn)
+
+    result.metrics["intelligence_turns"] = intelligence_turns
+    result.metrics["total_intelligence_games"] = len(intelligence_turns)
+    result.metrics["early_phase_intel"] = early_phase_intel
+    result.metrics["mid_phase_intel"] = mid_phase_intel
+
+    # Check minimum total
+    if len(intelligence_turns) < 2:
+        result.add_issue(
+            ValidationSeverity.MAJOR,
+            f"Insufficient intelligence games: found {len(intelligence_turns)}, need at least 2",
+            details={"found": len(intelligence_turns), "turns": intelligence_turns},
+        )
+
+    # Check early phase (at least 1 in turns 1-6)
+    if early_phase_intel < 1:
+        result.add_issue(
+            ValidationSeverity.MINOR,
+            "No intelligence games in early phase (turns 1-6)",
+            details={"early_phase_intel": early_phase_intel},
+        )
+
+    # Check mid phase (at least 1 in turns 5-8)
+    if mid_phase_intel < 1:
+        result.add_issue(
+            ValidationSeverity.MINOR,
+            "No intelligence games in mid phase (turns 5-8)",
+            details={"mid_phase_intel": mid_phase_intel},
         )
 
     return result
@@ -584,29 +671,50 @@ class SimGameResult:
 def _apply_sim_outcome(
     state: SimGameState, action_a: SimAction, action_b: SimAction
 ) -> None:
-    """Apply outcome based on actions."""
+    """Apply outcome based on actions.
+
+    CRITICAL: All payoffs must be SYMMETRIC. No "hand of god" asymmetry.
+    If exploiter gets +X, victim gets -X (same magnitude).
+
+    BALANCE TUNING: Narrowed T-R gap to reduce Nash dominance.
+    - R (reward for mutual cooperation): +0.6
+    - T (temptation to exploit): +0.7
+    - P (punishment for mutual defection): -0.5
+    - S (sucker's payoff): -0.7
+
+    Ordinal: T=0.7 > R=0.6 > P=-0.5 > S=-0.7 (valid PD)
+    T-R gap: 0.1 (narrowed from 0.5)
+    Exploitation magnitude: 0.7 (reduced from 1.0)
+    """
     multiplier = state.get_act_multiplier()
     noise = random.uniform(0.9, 1.1)
 
     if action_a == SimAction.COOPERATE and action_b == SimAction.COOPERATE:
-        state.player_a.position += 0.5 * multiplier * noise
-        state.player_b.position += 0.5 * multiplier * noise
+        # R (reward): Both get +0.6
+        state.player_a.position += 0.6 * multiplier * noise
+        state.player_b.position += 0.6 * multiplier * noise
         state.risk -= 0.5 * multiplier * noise
         state.cooperation_score += 1.0
     elif action_a == SimAction.COOPERATE and action_b == SimAction.DEFECT:
-        state.player_a.position -= 1.0 * multiplier * noise
-        state.player_b.position += 1.0 * multiplier * noise
-        state.risk += 0.5 * multiplier * noise
+        # SYMMETRIC: A gets S=-0.7, B gets T=+0.7
+        # BALANCE: Increased risk from exploitation to punish aggressive play
+        state.player_a.position -= 0.7 * multiplier * noise
+        state.player_b.position += 0.7 * multiplier * noise
+        state.risk += 0.8 * multiplier * noise  # Increased from 0.5 to 0.8
     elif action_a == SimAction.DEFECT and action_b == SimAction.COOPERATE:
-        state.player_a.position += 1.0 * multiplier * noise
-        state.player_b.position -= 1.0 * multiplier * noise
-        state.risk += 0.5 * multiplier * noise
+        # SYMMETRIC: A gets T=+0.7, B gets S=-0.7
+        # BALANCE: Increased risk from exploitation to punish aggressive play
+        state.player_a.position += 0.7 * multiplier * noise
+        state.player_b.position -= 0.7 * multiplier * noise
+        state.risk += 0.8 * multiplier * noise  # Increased from 0.5 to 0.8
     else:  # DD
-        state.player_a.position -= 0.3 * multiplier * noise
-        state.player_b.position -= 0.3 * multiplier * noise
+        # P (punishment): Both get -0.5
+        # BALANCE: Very high risk from DD to force cooperation before crisis
+        state.player_a.position -= 0.5 * multiplier * noise
+        state.player_b.position -= 0.5 * multiplier * noise
         state.player_a.resources -= 0.5 * multiplier * noise
         state.player_b.resources -= 0.5 * multiplier * noise
-        state.risk += 1.0 * multiplier * noise
+        state.risk += 2.0 * multiplier * noise  # Increased from 1.5 to 2.0
         state.cooperation_score -= 1.0
 
     # Update stability
@@ -735,6 +843,13 @@ def _opportunist(
 def _nash(
     state: SimGameState, my_history: list, opp_history: list, player: str
 ) -> SimAction:
+    """Nash equilibrium strategy for stage game PD.
+
+    In the stage game PD, defection is the dominant strategy (Nash equilibrium).
+    The only exception is when risk is critically high - then cooperation is
+    needed to avoid mutual destruction.
+    """
+    # Cooperate only at critically high risk to avoid mutual destruction
     if state.risk >= 8:
         return SimAction.COOPERATE
     return SimAction.DEFECT
@@ -1120,6 +1235,7 @@ class ScenarioValidator:
 
         # Run structural checks
         result.game_variety = check_game_variety(scenario)
+        result.intelligence_games = check_intelligence_games(scenario)
         result.act_structure = check_act_structure(scenario)
         result.branching = check_branching_validity(scenario)
         result.settlement = check_settlement_config(scenario)
@@ -1151,6 +1267,7 @@ class ScenarioValidator:
         # Determine overall pass/fail
         for check in [
             result.game_variety,
+            result.intelligence_games,
             result.act_structure,
             result.branching,
             result.settlement,

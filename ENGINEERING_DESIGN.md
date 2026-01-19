@@ -1633,11 +1633,41 @@ python scripts/generate_scenario_library.py --parallel 3
 ```
 
 **Acceptance Criteria**:
-- [ ] Generates all 10 scenarios to `scenarios/` directory
-- [ ] Each scenario passes validation before completion
-- [ ] Reports progress and which scenarios passed/failed
-- [ ] `--skip-valid` skips scenarios that already exist and pass validation
-- [ ] Parallel mode speeds up generation
+- [x] Generates all 10 scenarios to `scenarios/` directory
+- [x] Each scenario passes validation before completion
+- [x] Reports progress and which scenarios passed/failed
+- [x] `--skip-valid` skips scenarios that already exist and pass validation
+- [ ] Parallel mode speeds up generation (not implemented - sequential is fast enough)
+
+### Phase 9 Implementation Notes (Completed 2026-01-19)
+
+**Generated Scenarios**:
+| # | Scenario | Turns | Branches | Intel Games | Games Simulated |
+|---|----------|-------|----------|-------------|-----------------|
+| 1 | Cuban Missile Crisis | 14 | 12 | 2 | 450 |
+| 2 | Berlin Blockade | 14 | 12 | 2 | 450 |
+| 3 | Taiwan Strait Crisis | 14 | 12 | 3 | 450 |
+| 4 | Silicon Valley Tech Wars | 14 | 15 | 2 | 450 |
+| 5 | OPEC Oil Politics | 14 | 13 | 2 | 450 |
+| 6 | Brexit Negotiations | 14 | 14 | 2 | 450 |
+| 7 | NATO Burden Sharing | 14 | 10 | 2 | 450 |
+| 8 | Cold War Espionage | 14 | 16 | 4 | 450 |
+| 9 | Byzantine Succession | 14 | 8 | 2 | 450 |
+| 10 | Medici Banking Dynasty | 14 | 12 | 2 | 450 |
+
+**Key Implementation Details**:
+- All scenarios passed validation on iteration 1 (100% first-try success rate)
+- Each scenario includes 8-16 branch variants for narrative diversity
+- Intelligence games (INSPECTION_GAME, RECONNAISSANCE) in every scenario
+- Balance simulation uses 5 strategies (TitForTat, AlwaysDefect, AlwaysCooperate, Opportunist, Nash)
+- No dominant strategy detected (all strategies <60% win rate)
+- Total generation time: ~40 minutes for all 10 scenarios
+
+**Validation Pipeline**:
+1. LLM generates scenario with branching narrative structure
+2. Deterministic checks: game variety (8+ types), act structure, branch validity, settlements, intelligence games
+3. Balance simulation: 450 games (30 per pairing × 15 strategy combinations)
+4. If failed: Feed back errors to LLM for iterative refinement (max 3-5 iterations)
 
 ---
 

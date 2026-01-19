@@ -106,7 +106,11 @@ async def generate_json(
     # When using structured output (schema provided), Claude uses a StructuredOutput tool
     # Per docs, use higher max_turns (examples use 250) to allow agent to complete
     # The structured_output field will be populated in ResultMessage when done
-    options_kwargs: dict[str, Any] = {"max_turns": 10 if schema is not None else 1}
+    # Enable Read tool so LLM can read GAME_MANUAL.md for authoritative game rules
+    options_kwargs: dict[str, Any] = {
+        "max_turns": 10 if schema is not None else 3,  # 3 turns allows reading GAME_MANUAL then generating
+        "allowed_tools": ["Read"],  # Enable file reading for GAME_MANUAL.md
+    }
     if system_prompt is not None:
         options_kwargs["system_prompt"] = system_prompt
     if schema is not None:
