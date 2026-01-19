@@ -22,9 +22,13 @@ from brinksmanship.opponents.base import (
     SettlementResponse,
 )
 from brinksmanship.prompts import (
+    GENERATED_PERSONA_ACTION_PROMPT,
+    GENERATED_PERSONA_SETTLEMENT_PROMPT,
     HISTORICAL_PERSONA_SYSTEM_PROMPT,
     PERSONA_EVALUATION_PROMPT,
     PERSONA_GENERATION_PROMPT,
+    PERSONA_RESEARCH_PROMPT,
+    PERSONA_RESEARCH_SYSTEM_PROMPT,
     SETTLEMENT_EVALUATION_SYSTEM_PROMPT,
     format_settlement_evaluation_prompt,
 )
@@ -247,22 +251,11 @@ class PersonaGenerator:
         Returns:
             Research context text synthesized from web search results.
         """
-        research_prompt = (
-            f"Research {figure_name}: find documented strategic decisions, "
-            f"negotiation tactics, characteristic quotes about strategy, "
-            f"and any available primary sources like emails, memos, or letters. "
-            f"Focus on patterns that would be useful for creating a game AI persona."
-        )
+        research_prompt = PERSONA_RESEARCH_PROMPT.format(figure_name=figure_name)
 
         research = await agentic_query(
             prompt=research_prompt,
-            system_prompt=(
-                "You are researching a historical figure to extract strategic "
-                "behavior patterns. Focus on documented decisions, quotes, and "
-                "negotiation tactics that reveal their strategic worldview. "
-                "Synthesize findings into a coherent profile suitable for "
-                "creating a game AI persona."
-            ),
+            system_prompt=PERSONA_RESEARCH_SYSTEM_PROMPT,
             allowed_tools=["WebSearch", "WebFetch"],
             max_turns=5,
         )
@@ -426,33 +419,21 @@ class GeneratedPersona(Opponent):
         # Format action list
         action_list = self._format_action_list(available_actions)
 
-        # Build prompt
-        prompt = f"""Current Game State:
-- Turn: {state.turn}
-- Risk Level: {state.risk_level:.1f}/10
-- Cooperation Score: {state.cooperation_score:.1f}/10
-- Stability: {state.stability:.1f}/10
-- Your Position: {my_position:.1f}/10
-- Your Resources: {my_resources:.1f}/10
-- Opponent Position estimate: {opp_position_est:.1f} (+/-{opp_uncertainty:.1f})
-
-Your previous action type: {self._format_action_type(my_last_type)}
-Opponent's previous action type: {self._format_action_type(opp_last_type)}
-
-Available Actions:
-{action_list}
-
-As {self.persona_definition.figure_name}, select ONE action. Consider:
-1. What does your worldview suggest about this situation?
-2. Which action aligns with your strategic patterns?
-3. What would you historically have done in similar situations?
-
-Output JSON:
-{{
-    "reasoning": "Brief explanation as this persona (1-2 sentences)",
-    "selected_action": "Exact action name from the list"
-}}
-"""
+        # Build prompt using centralized prompt from prompts.py
+        prompt = GENERATED_PERSONA_ACTION_PROMPT.format(
+            turn=state.turn,
+            risk_level=f"{state.risk_level:.1f}",
+            cooperation_score=f"{state.cooperation_score:.1f}",
+            stability=f"{state.stability:.1f}",
+            my_position=f"{my_position:.1f}",
+            my_resources=f"{my_resources:.1f}",
+            opp_position_est=f"{opp_position_est:.1f}",
+            opp_uncertainty=f"{opp_uncertainty:.1f}",
+            my_last_type=self._format_action_type(my_last_type),
+            opp_last_type=self._format_action_type(opp_last_type),
+            action_list=action_list,
+            figure_name=self.persona_definition.figure_name,
+        )
 
         system_prompt = f"""{HISTORICAL_PERSONA_SYSTEM_PROMPT}
 
@@ -566,33 +547,20 @@ Output JSON:
         min_vp = max(20, fair_vp - 10)
         max_vp = min(80, fair_vp + 10)
 
-        prompt = f"""You are {self.persona_definition.figure_name}.
-
-{self._persona_prompt}
-
-CURRENT SITUATION:
-- Turn: {state.turn} (game ends around turn 12-16, exact end unknown)
-- Your Position: {my_position:.1f}/10
-- Your Resources: {my_resources:.1f}/10
-- Opponent Position estimate: {opp_position_est:.1f} (+/-{opp_uncertainty:.1f})
-- Risk Level: {state.risk_level:.1f}/10
-- Cooperation Score: {state.cooperation_score:.1f}/10
-
-SETTLEMENT CONTEXT:
-- If you propose, you offer a VP split (your share: {min_vp}-{max_vp} is valid range)
-- Failed settlement increases Risk by 1
-- Settlement locks in a guaranteed outcome vs uncertain continued play
-
-Should you propose settlement now? Consider your strategic patterns.
-
-Output JSON:
-{{
-    "propose": true or false,
-    "reasoning": "Brief explanation (1-2 sentences)",
-    "offered_vp": number (only if propose is true, your VP share),
-    "argument": "Settlement argument (max 500 chars, only if propose is true)"
-}}
-"""
+        # Build prompt using centralized prompt from prompts.py
+        prompt = GENERATED_PERSONA_SETTLEMENT_PROMPT.format(
+            figure_name=self.persona_definition.figure_name,
+            persona_prompt=self._persona_prompt,
+            turn=state.turn,
+            my_position=f"{my_position:.1f}",
+            my_resources=f"{my_resources:.1f}",
+            opp_position_est=f"{opp_position_est:.1f}",
+            opp_uncertainty=f"{opp_uncertainty:.1f}",
+            risk_level=f"{state.risk_level:.1f}",
+            cooperation_score=f"{state.cooperation_score:.1f}",
+            min_vp=min_vp,
+            max_vp=max_vp,
+        )
 
         response = asyncio.run(
             generate_json(

@@ -27,9 +27,11 @@ from brinksmanship.opponents.base import (
 from brinksmanship.prompts import (
     HUMAN_ACTION_SELECTION_PROMPT,
     HUMAN_PERSONA_GENERATION_PROMPT,
+    HUMAN_PERSONA_GENERATION_SYSTEM_PROMPT,
     HUMAN_SETTLEMENT_EVALUATION_PROMPT,
     HUMAN_SIMULATOR_SYSTEM_PROMPT,
     MISTAKE_CHECK_PROMPT,
+    MISTAKE_CHECK_SYSTEM_PROMPT,
 )
 
 
@@ -226,7 +228,7 @@ class HumanSimulator(Opponent):
         """
         result = await generate_json(
             prompt=HUMAN_PERSONA_GENERATION_PROMPT,
-            system_prompt="Generate a diverse, coherent human player persona. Output valid JSON only.",
+            system_prompt=HUMAN_PERSONA_GENERATION_SYSTEM_PROMPT,
         )
 
         self.persona = HumanPersona.model_validate(result)
@@ -496,7 +498,7 @@ class HumanSimulator(Opponent):
 
         result = await generate_json(
             prompt=mistake_prompt,
-            system_prompt="Determine if and how this persona would make a mistake. Output valid JSON.",
+            system_prompt=MISTAKE_CHECK_SYSTEM_PROMPT,
         )
 
         mistake = MistakeCheck.model_validate(result)

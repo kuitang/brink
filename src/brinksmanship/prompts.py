@@ -673,6 +673,8 @@ Turn-by-Turn History:
 Player was: {player_role}
 Opponent was: {opponent_type}
 
+{bayesian_summary}
+
 Provide analysis covering:
 
 1. OVERALL ASSESSMENT
@@ -686,7 +688,9 @@ Provide analysis covering:
 3. OPPONENT ANALYSIS
    - What pattern did the opponent follow?
    - Was the player reading them correctly?
-   - Bayesian inference: What should the player have believed about opponent type?
+   - Use the Bayesian inference result above as a reference point for what
+     the player should have inferred about opponent type based on observations
+   - Discuss whether the player adapted correctly as evidence accumulated
 
 4. STRATEGIC LESSONS
    - What game theory concepts apply to this game?
@@ -1548,6 +1552,178 @@ Output:
 
 
 # =============================================================================
+# SCENARIO VALIDATION USER PROMPT (ALIAS)
+# =============================================================================
+
+# Alias for NARRATIVE_CONSISTENCY_PROMPT per ENGINEERING_DESIGN.md Milestone 8.2
+SCENARIO_VALIDATION_USER_PROMPT_TEMPLATE = NARRATIVE_CONSISTENCY_PROMPT
+
+
+# =============================================================================
+# PERSONA RESEARCH PROMPTS
+# =============================================================================
+
+PERSONA_RESEARCH_SYSTEM_PROMPT = """You are researching a historical figure to extract strategic behavior patterns.
+
+Focus on:
+- Documented strategic decisions and their outcomes
+- Characteristic quotes about strategy, negotiation, or conflict
+- Negotiation tactics that reveal their strategic worldview
+- Primary sources like emails, memos, letters, or depositions when available
+
+Synthesize findings into a coherent profile suitable for creating a game AI persona.
+The goal is actionable patterns that can guide decision-making in a strategic game."""
+
+
+PERSONA_RESEARCH_PROMPT = """Research {figure_name}: find documented strategic decisions, negotiation tactics, characteristic quotes about strategy, and any available primary sources like emails, memos, or letters.
+
+Focus on patterns that would be useful for creating a game AI persona:
+1. How did they approach strategic dilemmas?
+2. What were their negotiation tactics?
+3. How did they handle risk and uncertainty?
+4. What characteristic quotes reveal their worldview?
+5. Are there documented cases (lawsuits, depositions, internal memos) that reveal their actual behavior?
+
+Synthesize your findings into strategic behavior patterns."""
+
+
+# =============================================================================
+# PERSONA ACTION SELECTION PROMPTS
+# =============================================================================
+
+PERSONA_ACTION_SELECTION_PROMPT = """You are {persona_name} in a strategic crisis game.
+
+{persona_description}
+
+CURRENT SITUATION:
+- Turn: {turn} (game ends around turn 12-16, exact end unknown)
+- Your Position: {my_position}/10 (power/advantage)
+- Your Resources: {my_resources}/10
+- Opponent Position estimate: {opp_position_est} (uncertainty: +/-{opp_uncertainty})
+- Risk Level: {risk_level}/10 (10 = mutual destruction)
+- Cooperation Score: {coop_score}/10 (relationship trajectory)
+- Your last action type: {my_last_type}
+- Opponent's last action type: {opp_last_type}
+
+AVAILABLE ACTIONS:
+{action_list}
+
+As {persona_name}, select ONE action. Consider:
+1. What does your worldview suggest about this situation?
+2. Which action aligns with your strategic patterns?
+3. What would you historically have done in similar situations?
+
+Output JSON:
+{{
+    "reasoning": "Brief explanation as this persona (1-2 sentences)",
+    "selected_action": "Exact action name from the list"
+}}"""
+
+
+PERSONA_SETTLEMENT_PROPOSAL_PROMPT = """You are {persona_name} in a strategic crisis game.
+
+{persona_description}
+
+CURRENT SITUATION:
+- Turn: {turn} (game ends around turn 12-16, exact end unknown)
+- Your Position: {my_position}/10 (power/advantage)
+- Your Resources: {my_resources}/10
+- Opponent Position estimate: {opp_position_est} (uncertainty: +/-{opp_uncertainty})
+- Risk Level: {risk_level}/10 (10 = mutual destruction)
+- Cooperation Score: {coop_score}/10 (relationship trajectory)
+- Stability: {stability}/10 (behavioral predictability)
+
+SETTLEMENT CONTEXT:
+- Settlement is available (turn > 4 and stability > 2)
+- If you propose, you offer a VP split (your share: {min_vp}-{max_vp} is valid range)
+- Failed settlement increases Risk by 1
+- Settlement locks in a guaranteed outcome vs uncertain continued play
+
+As {persona_name}, decide whether to propose settlement this turn.
+Consider your historical patterns:
+- Did you prefer negotiated solutions or decisive action?
+- At what point would you consider the situation ripe for settlement?
+- What terms would you consider acceptable?
+
+Output JSON:
+{{
+    "propose": true or false,
+    "reasoning": "Brief explanation as this persona (1-2 sentences)",
+    "offered_vp": number (only if propose is true, your VP share),
+    "argument": "Settlement argument (max 500 chars, only if propose is true)"
+}}"""
+
+
+# =============================================================================
+# GENERATED PERSONA PROMPTS (for dynamically generated personas)
+# =============================================================================
+
+GENERATED_PERSONA_ACTION_PROMPT = """Current Game State:
+- Turn: {turn}
+- Risk Level: {risk_level}/10
+- Cooperation Score: {cooperation_score}/10
+- Stability: {stability}/10
+- Your Position: {my_position}/10
+- Your Resources: {my_resources}/10
+- Opponent Position estimate: {opp_position_est} (+/-{opp_uncertainty})
+
+Your previous action type: {my_last_type}
+Opponent's previous action type: {opp_last_type}
+
+Available Actions:
+{action_list}
+
+As {figure_name}, select ONE action. Consider:
+1. What does your worldview suggest about this situation?
+2. Which action aligns with your strategic patterns?
+3. What would you historically have done in similar situations?
+
+Output JSON:
+{{
+    "reasoning": "Brief explanation as this persona (1-2 sentences)",
+    "selected_action": "Exact action name from the list"
+}}"""
+
+
+GENERATED_PERSONA_SETTLEMENT_PROMPT = """You are {figure_name}.
+
+{persona_prompt}
+
+CURRENT SITUATION:
+- Turn: {turn} (game ends around turn 12-16, exact end unknown)
+- Your Position: {my_position}/10
+- Your Resources: {my_resources}/10
+- Opponent Position estimate: {opp_position_est} (+/-{opp_uncertainty})
+- Risk Level: {risk_level}/10
+- Cooperation Score: {cooperation_score}/10
+
+SETTLEMENT CONTEXT:
+- If you propose, you offer a VP split (your share: {min_vp}-{max_vp} is valid range)
+- Failed settlement increases Risk by 1
+- Settlement locks in a guaranteed outcome vs uncertain continued play
+
+Should you propose settlement now? Consider your strategic patterns.
+
+Output JSON:
+{{
+    "propose": true or false,
+    "reasoning": "Brief explanation (1-2 sentences)",
+    "offered_vp": number (only if propose is true, your VP share),
+    "argument": "Settlement argument (max 500 chars, only if propose is true)"
+}}"""
+
+
+# =============================================================================
+# HUMAN SIMULATOR SYSTEM PROMPTS (short prompts for internal use)
+# =============================================================================
+
+HUMAN_PERSONA_GENERATION_SYSTEM_PROMPT = """Generate a diverse, coherent human player persona for the Brinksmanship game. Output valid JSON only."""
+
+
+MISTAKE_CHECK_SYSTEM_PROMPT = """Determine if and how this persona would make a mistake given their traits and the current situation. Output valid JSON."""
+
+
+# =============================================================================
 # HELPER FUNCTIONS
 # =============================================================================
 
@@ -1811,6 +1987,7 @@ def format_coaching_prompt(
     turn_history: str,
     player_role: str,
     opponent_type: str,
+    bayesian_summary: str = "",
 ) -> str:
     """Format the post-game coaching analysis prompt.
 
@@ -1824,6 +2001,7 @@ def format_coaching_prompt(
         turn_history: Formatted string of turn-by-turn events
         player_role: Description of the player's role
         opponent_type: Type/name of opponent
+        bayesian_summary: Summary of Bayesian inference results for opponent type
 
     Returns:
         Formatted prompt string ready for LLM
@@ -1838,6 +2016,7 @@ def format_coaching_prompt(
         turn_history=turn_history,
         player_role=player_role,
         opponent_type=opponent_type,
+        bayesian_summary=bayesian_summary,
     )
 
 

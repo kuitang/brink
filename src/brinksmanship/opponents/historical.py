@@ -21,9 +21,11 @@ from brinksmanship.opponents.base import (
 )
 from brinksmanship.prompts import (
     HISTORICAL_PERSONA_SYSTEM_PROMPT,
+    PERSONA_ACTION_SELECTION_PROMPT,
     PERSONA_BISMARCK,
     PERSONA_KHRUSHCHEV,
     PERSONA_NIXON,
+    PERSONA_SETTLEMENT_PROPOSAL_PROMPT,
     SETTLEMENT_EVALUATION_PROMPT,
     SETTLEMENT_EVALUATION_SYSTEM_PROMPT,
     format_settlement_evaluation_prompt,
@@ -75,71 +77,6 @@ PERSONA_DISPLAY_NAMES: dict[str, str] = {
     "cixi": "Empress Dowager Cixi",
     "livia": "Livia Drusilla",
 }
-
-
-# Action selection prompt template
-PERSONA_ACTION_SELECTION_PROMPT = """You are {persona_name} in a strategic crisis game.
-
-{persona_description}
-
-CURRENT SITUATION:
-- Turn: {turn} (game ends around turn 12-16, exact end unknown)
-- Your Position: {my_position}/10 (power/advantage)
-- Your Resources: {my_resources}/10
-- Opponent Position estimate: {opp_position_est} (uncertainty: +/-{opp_uncertainty})
-- Risk Level: {risk_level}/10 (10 = mutual destruction)
-- Cooperation Score: {coop_score}/10 (relationship trajectory)
-- Your last action type: {my_last_type}
-- Opponent's last action type: {opp_last_type}
-
-AVAILABLE ACTIONS:
-{action_list}
-
-As {persona_name}, select ONE action. Consider:
-1. What does your worldview suggest about this situation?
-2. Which action aligns with your strategic patterns?
-3. What would you historically have done in similar situations?
-
-Output JSON:
-{{
-    "reasoning": "Brief explanation as this persona (1-2 sentences)",
-    "selected_action": "Exact action name from the list"
-}}"""
-
-
-# Settlement proposal prompt template
-PERSONA_SETTLEMENT_PROPOSAL_PROMPT = """You are {persona_name} in a strategic crisis game.
-
-{persona_description}
-
-CURRENT SITUATION:
-- Turn: {turn} (game ends around turn 12-16, exact end unknown)
-- Your Position: {my_position}/10 (power/advantage)
-- Your Resources: {my_resources}/10
-- Opponent Position estimate: {opp_position_est} (uncertainty: +/-{opp_uncertainty})
-- Risk Level: {risk_level}/10 (10 = mutual destruction)
-- Cooperation Score: {coop_score}/10 (relationship trajectory)
-- Stability: {stability}/10 (behavioral predictability)
-
-SETTLEMENT CONTEXT:
-- Settlement is available (turn > 4 and stability > 2)
-- If you propose, you offer a VP split (your share: {min_vp}-{max_vp} is valid range)
-- Failed settlement increases Risk by 1
-- Settlement locks in a guaranteed outcome vs uncertain continued play
-
-As {persona_name}, decide whether to propose settlement this turn.
-Consider your historical patterns:
-- Did you prefer negotiated solutions or decisive action?
-- At what point would you consider the situation ripe for settlement?
-- What terms would you consider acceptable?
-
-Output JSON:
-{{
-    "propose": true or false,
-    "reasoning": "Brief explanation as this persona (1-2 sentences)",
-    "offered_vp": number (only if propose is true, your VP share),
-    "argument": "Settlement argument (max 500 chars, only if propose is true)"
-}}"""
 
 
 def _get_persona_description(persona_name: str) -> str:
