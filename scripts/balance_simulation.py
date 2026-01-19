@@ -26,6 +26,10 @@ from typing import Callable, Optional
 from collections import defaultdict
 import statistics
 
+# Import actual game parameters from the application
+from brinksmanship.engine.state_deltas import get_scaled_delta_for_outcome
+from brinksmanship.models.matrices import MatrixType
+
 
 class Action(Enum):
     COOPERATE = "C"
@@ -79,50 +83,37 @@ class GameState:
             return 1.3  # Act III
 
 
-# State delta rules for Prisoner's Dilemma outcomes
-# CC: both cooperate
-# CD: a cooperates, b defects
-# DC: a defects, b cooperates
-# DD: both defect
+# State delta rules now imported from the application's state_deltas module
+# This ensures simulation matches actual game behavior
 
-def apply_outcome(state: GameState, action_a: Action, action_b: Action, add_noise: bool = True):
-    """Apply outcome based on actions and state delta rules.
+def apply_outcome(state: GameState, action_a: Action, action_b: Action):
+    """Apply outcome based on actions using actual game delta templates.
+
+    Uses the application's state_deltas module to ensure simulation
+    matches real game behavior. Deltas are applied deterministically
+    (no noise) to match the real game's apply_action_result().
 
     Args:
         state: Current game state
         action_a: Action from player A
         action_b: Action from player B
-        add_noise: If True, add small random variance to outcomes
     """
-    multiplier = state.get_act_multiplier()
+    # Map actions to outcome code (CC, CD, DC, DD)
+    outcome = action_a.value + action_b.value
 
-    # Small random variance (+/- 10%) to make games less deterministic
-    noise_factor = 1.0
-    if add_noise:
-        noise_factor = random.uniform(0.9, 1.1)
+    # Get actual deltas from application (includes act scaling)
+    delta = get_scaled_delta_for_outcome(
+        MatrixType.PRISONERS_DILEMMA,
+        outcome,
+        state.turn
+    )
 
-    if action_a == Action.COOPERATE and action_b == Action.COOPERATE:
-        # CC: pos_a +0.5, pos_b +0.5, risk -0.5
-        state.player_a.position += 0.5 * multiplier * noise_factor
-        state.player_b.position += 0.5 * multiplier * noise_factor
-        state.risk -= 0.5 * multiplier * noise_factor
-    elif action_a == Action.COOPERATE and action_b == Action.DEFECT:
-        # CD: pos_a -1.0, pos_b +1.0, risk +0.5
-        state.player_a.position -= 1.0 * multiplier * noise_factor
-        state.player_b.position += 1.0 * multiplier * noise_factor
-        state.risk += 0.5 * multiplier * noise_factor
-    elif action_a == Action.DEFECT and action_b == Action.COOPERATE:
-        # DC: pos_a +1.0, pos_b -1.0, risk +0.5
-        state.player_a.position += 1.0 * multiplier * noise_factor
-        state.player_b.position -= 1.0 * multiplier * noise_factor
-        state.risk += 0.5 * multiplier * noise_factor
-    else:  # DD
-        # DD: pos_a -0.3, pos_b -0.3, resource_cost each 0.5, risk +1.0
-        state.player_a.position -= 0.3 * multiplier * noise_factor
-        state.player_b.position -= 0.3 * multiplier * noise_factor
-        state.player_a.resources -= 0.5 * multiplier * noise_factor
-        state.player_b.resources -= 0.5 * multiplier * noise_factor
-        state.risk += 1.0 * multiplier * noise_factor
+    # Apply deltas deterministically (matches real game behavior)
+    state.player_a.position += delta.pos_a
+    state.player_b.position += delta.pos_b
+    state.player_a.resources -= delta.res_cost_a
+    state.player_b.resources -= delta.res_cost_b
+    state.risk += delta.risk_delta
 
     state.clamp()
 
@@ -339,6 +330,10 @@ class PairingStats:
     mutual_destructions: int = 0
     crisis_terminations: int = 0
     eliminations: int = 0  # Position or resource = 0
+    position_loss_a: int = 0
+    position_loss_b: int = 0
+    resource_loss_a: int = 0
+    resource_loss_b: int = 0
     total_games: int = 0
     total_turns: int = 0
     position_spreads: list = field(default_factory=list)
@@ -361,9 +356,18 @@ class PairingStats:
             self.mutual_destructions += 1
         elif result.ending_type == EndingType.CRISIS_TERMINATION:
             self.crisis_terminations += 1
-        elif result.ending_type in [EndingType.POSITION_LOSS_A, EndingType.POSITION_LOSS_B,
-                                     EndingType.RESOURCE_LOSS_A, EndingType.RESOURCE_LOSS_B]:
+        elif result.ending_type == EndingType.POSITION_LOSS_A:
             self.eliminations += 1
+            self.position_loss_a += 1
+        elif result.ending_type == EndingType.POSITION_LOSS_B:
+            self.eliminations += 1
+            self.position_loss_b += 1
+        elif result.ending_type == EndingType.RESOURCE_LOSS_A:
+            self.eliminations += 1
+            self.resource_loss_a += 1
+        elif result.ending_type == EndingType.RESOURCE_LOSS_B:
+            self.eliminations += 1
+            self.resource_loss_b += 1
 
         # Record position spread
         self.position_spreads.append(abs(result.final_pos_a - result.final_pos_b))
@@ -549,6 +553,32 @@ def print_summary_table(results: dict, num_games: int):
     print(f"Games ending in mutual destruction: {total_mutual} ({total_mutual/total_games*100:.1f}%)")
     print(f"Games ending in crisis termination: {total_crisis} ({total_crisis/total_games*100:.1f}%)")
     print(f"Games ending at max turns: {total_max_turns} ({total_max_turns/total_games*100:.1f}%)")
+
+    # Breakdown elimination types
+    position_elims = sum(1 for s in results.values() for _ in range(sum(1 for r in [s] if hasattr(s, 'position_eliminations'))))
+    print("\n" + "=" * 100)
+    print("ELIMINATION BREAKDOWN")
+    print("=" * 100)
+
+    # Count each elimination type
+    pos_loss_a = 0
+    pos_loss_b = 0
+    res_loss_a = 0
+    res_loss_b = 0
+    for pairing, stats in results.items():
+        pos_loss_a += stats.position_loss_a
+        pos_loss_b += stats.position_loss_b
+        res_loss_a += stats.resource_loss_a
+        res_loss_b += stats.resource_loss_b
+
+    total_pos_elim = pos_loss_a + pos_loss_b
+    total_res_elim = res_loss_a + res_loss_b
+    print(f"\nPosition eliminations (pos=0): {total_pos_elim} ({total_pos_elim/total_games*100:.1f}%)")
+    print(f"  - Player A eliminated: {pos_loss_a}")
+    print(f"  - Player B eliminated: {pos_loss_b}")
+    print(f"\nResource eliminations (res=0): {total_res_elim} ({total_res_elim/total_games*100:.1f}%)")
+    print(f"  - Player A eliminated: {res_loss_a}")
+    print(f"  - Player B eliminated: {res_loss_b}")
 
 
 def main():

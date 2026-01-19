@@ -336,16 +336,16 @@ Both name a number 2-100; lower number wins, plus bonus. Higher number gets lowe
 
 | Variable | Type | Range | Initial | Description |
 |----------|------|-------|---------|-------------|
-| Position_A | Per player | 0–10 | 5 | Player A's relative power/advantage |
-| Position_B | Per player | 0–10 | 5 | Player B's relative power/advantage |
-| Resources_A | Per player | 0–10 | 5 | Player A's reserves (political capital, treasury) |
-| Resources_B | Per player | 0–10 | 5 | Player B's reserves |
+| Position_A | Per player (HIDDEN) | 0–10 | 5 | Player A's relative power/advantage |
+| Position_B | Per player (HIDDEN) | 0–10 | 5 | Player B's relative power/advantage |
 | Cooperation_Score | **Shared** | 0–10 | 5 | Overall relationship trajectory |
 | Stability | **Shared** | 1–10 | 5 | Predictability of both players' behavior |
 | Risk_Level | **Shared** | 0–10 | 2 | Position on escalation ladder |
 | Turn | Shared | 1–N | 1 | Current turn (N is uncertain, range 12–16) |
 | Previous_Type_A | Per player | C/D | None | Player A's last action classification |
 | Previous_Type_B | Per player | C/D | None | Player B's last action classification |
+
+**Note on Hidden State**: Positions are tracked internally but NOT displayed to players. Players learn about relative advantage through narrative outcomes and payoff results, not raw numbers. This creates genuine strategic uncertainty - you must infer your standing from how situations resolve.
 
 ### 3.2 Action Classification
 
@@ -380,8 +380,7 @@ TURN SEQUENCE
    - If both proposed settlement: compare offers, negotiate
    - If one proposed settlement: other player accepts or rejects
    - Otherwise: resolve using hidden matrix game
-     → Position changes based on matrix payoffs
-     → Resource costs deducted
+     → Position changes based on matrix payoffs (HIDDEN from players)
      → Risk Level changes based on escalation dynamics
 
 4. STATE UPDATE
@@ -398,7 +397,6 @@ TURN SEQUENCE
 5. CHECK DETERMINISTIC ENDINGS
    - If Risk = 10: Mutual Destruction → END
    - If either Position = 0: That player loses → END
-   - If either Resources = 0: That player loses → END
 
 6. CHECK CRISIS TERMINATION (Turn ≥ 10 only)
    - If Risk > 7: Roll for Crisis Termination
@@ -415,67 +413,38 @@ TURN SEQUENCE
 
 ### 3.4 Information and Intelligence
 
-**Core Principle**: You never passively observe opponent state. Information is a strategic resource acquired through information games, and it decays over time.
+**Core Principle**: Positions are HIDDEN from all players. You learn about your standing through narrative outcomes and payoff results, not raw numbers. This creates genuine strategic uncertainty.
 
 **What You Always Know (Perfect Information)**:
-- Your own Position (exact)
-- Your own Resources (exact)
 - Current Risk Level
 - Current Cooperation Score
 - Current Stability
 - Turn number
 - History of your own actions
-- History of observable outcomes (your own state changes)
+- History of observable outcomes (narrative descriptions)
+- What action your opponent took each turn (cooperate/compete)
 
 **What You Never Know Directly**:
-- Opponent's exact Position (must acquire through information games)
-- Opponent's exact Resources (must acquire through information games)
+- Your own exact Position (tracked internally, affects outcomes)
+- Opponent's exact Position
 - Opponent's "type" (if playing vs. LLM)
 - Exact payoff values in current matrix
 - How many turns remain
 
-**Information State Model**:
+**How You Learn Your Standing**:
 
-Each player maintains an `InformationState` about their opponent:
-
-```
-InformationState:
-  position_bounds: [0.0, 10.0]     # Hard bounds, always valid
-  resources_bounds: [0.0, 10.0]    # Hard bounds, always valid
-  known_position: Optional[float]  # From last successful recon
-  known_position_turn: Optional[int]
-  known_resources: Optional[float] # From last successful inspection
-  known_resources_turn: Optional[int]
-```
-
-**Information Decay**:
-
-Information becomes stale as opponent's state changes each turn:
-```
-uncertainty = min(turns_since_known × 0.8, 5.0)
-estimate_range = [known_value - uncertainty, known_value + uncertainty]
-```
-
-After ~6 turns, information is nearly useless (uncertainty = 5.0, which is half the scale).
-
-**Information Acquisition Methods**:
-
-1. **Reconnaissance Game** (learn opponent's Position)
-2. **Inspection Game** (learn opponent's Resources)
-3. **Costly Signaling** (reveal bounds on your own Position)
-4. **Inference from Outcomes** (learn opponent's action, not state)
-5. **Inference from Settlement Proposals** (cheap talk, may be unreliable)
-
-See Section 3.6 for detailed information game mechanics.
+1. **Narrative Outcomes**: Each turn's resolution includes narrative text describing the outcome
+2. **Outcome Patterns**: If you cooperate and opponent defects, you're likely losing position
+3. **Settlement Suggestions**: The system suggests VP ranges based on internal state
+4. **Inference from History**: Track wins/losses over turns to estimate relative position
 
 ### 3.5 State Deltas (How Outcomes Affect State)
 
-Each turn's matrix outcome produces **State Deltas**—changes to Position, Resources, and Risk:
+Each turn's matrix outcome produces **State Deltas**—changes to Position and Risk:
 
 | Delta Type | Range | Description |
 |------------|-------|-------------|
 | Position (each player) | -1.5 to +1.5 | Relative advantage change |
-| Resource Cost (each) | 0 to 1.0 | Resources expended |
 | Risk | -1.0 to +2.0 | Shared escalation level |
 
 **Act Scaling**: Deltas are multiplied by act factor:
@@ -485,38 +454,47 @@ Each turn's matrix outcome produces **State Deltas**—changes to Position, Reso
 
 **Example State Deltas for Prisoner's Dilemma**:
 
-| Outcome | Pos_A | Pos_B | Res Cost | Risk |
-|---------|-------|-------|----------|------|
-| CC (mutual cooperation) | +0.5 | +0.5 | 0 | -0.5 |
-| CD (A exploited) | -1.0 | +1.0 | 0 | +0.5 |
-| DC (B exploited) | +1.0 | -1.0 | 0 | +0.5 |
-| DD (mutual defection) | -0.3 | -0.3 | 0.5 each | +1.0 |
+| Outcome | Pos_A | Pos_B | Risk | Strategic Logic |
+|---------|-------|-------|------|-----------------|
+| CC (mutual cooperation) | 0 | 0 | -0.5 | No position change, but danger decreases |
+| CD (A exploited) | -0.7 | +0.7 | +0.8 | Zero-sum: B gains what A loses |
+| DC (B exploited) | +0.7 | -0.7 | +0.8 | Zero-sum: A gains what B loses |
+| DD (mutual defection) | 0 | 0 | +2.0 | No position change, but danger spikes |
 
 **Example State Deltas for Chicken**:
 
-| Outcome | Pos_A | Pos_B | Res Cost | Risk |
-|---------|-------|-------|----------|------|
-| Dove-Dove | +0.3 | +0.3 | 0 | -0.5 |
-| Dove-Hawk | -0.5 | +1.0 | 0 | +0.5 |
-| Hawk-Dove | +1.0 | -0.5 | 0 | +0.5 |
-| Hawk-Hawk (crash) | -1.5 | -1.5 | 1.0 each | +2.0 |
+| Outcome | Pos_A | Pos_B | Risk | Strategic Logic |
+|---------|-------|-------|------|-----------------|
+| Dove-Dove | 0 | 0 | -0.55 | No position change, risk decreases |
+| Dove-Hawk | -0.5 | +0.5 | +0.55 | Zero-sum: Hawk exploits Dove |
+| Hawk-Dove | +0.5 | -0.5 | +0.55 | Zero-sum: Hawk exploits Dove |
+| Hawk-Hawk (crash) | 0 | 0 | +2.0 | No position change, catastrophic risk |
 
-**Balance Constraints**:
-- Position changes are near-zero-sum: |Δpos_a + Δpos_b| ≤ 0.5
-- Resources never increase from outcomes (only decrease or stay same)
-- Mutual cooperation reduces Risk; mutual defection increases it
+**STRICTLY ZERO-SUM POSITIONS**:
+
+Position is a fixed-sum resource representing relative advantage:
+- **Only exploitation (CD/DC) changes position**: exploiter gains what victim loses
+- **Symmetric outcomes (CC/DD) don't change position**: no advantage shifts
+- **The incentive to cooperate** comes from RISK reduction, not position gain
+- **The punishment for defection** is RISK increase, not position loss
+
+**Why this design works**:
+1. The "pie" (100 VP) is fixed - cooperation doesn't create more pie
+2. Cooperation's value is reducing the chance of destroying the pie (risk)
+3. If you're losing position, you must fight back (retaliate), not just keep cooperating
+4. Since position IS strictly zero-sum, knowing your own position DOES reveal opponent's position - which is why both positions are hidden
 
 ### 3.6 Information Game Mechanics
 
-Information games allow players to acquire intelligence about their opponent's state. Playing an information game consumes your action for that turn—you cannot play both an information game AND a regular strategic game in the same turn.
+Information games allow players to acquire intelligence about their opponent's position. Playing an information game consumes your action for that turn—you cannot play both an information game AND a regular strategic game in the same turn.
+
+**Key Design Note**: Since BOTH players' positions are hidden, learning opponent's position is valuable but still doesn't tell you your own position. If you learn opponent has Position 6, they might have gained it (total > 10) or you might have lost it (total < 10).
 
 #### 3.6.1 Reconnaissance Game (Position Intelligence)
 
 **Purpose**: Learn opponent's exact Position.
 
 **Initiation**: Either player may choose "Initiate Reconnaissance" as their action. If chosen, BOTH players enter the Reconnaissance game that turn instead of the regular strategic game.
-
-**Cost**: The initiating player pays 0.5 Resources.
 
 **Matrix Structure** (Matching Pennies variant):
 
@@ -540,80 +518,37 @@ Information games allow players to acquire intelligence about their opponent's s
 - 25% chance you learn their Position
 - 25% chance they learn your Position
 - 12.5% chance of escalation (Risk +0.5)
-- Cost: 0.5 Resources (initiator only)
 
-#### 3.6.2 Inspection Game (Resource Intelligence)
+#### 3.6.2 Inference from Outcomes
 
-**Purpose**: Learn opponent's exact Resources.
+After each turn, you observe the narrative outcome. You can infer:
 
-**Initiation**: Either player may choose "Initiate Inspection" as their action.
+| What You Know | What You Can Infer |
+|---------------|-------------------|
+| You cooperated, narrative describes exploitation | Opponent likely defected |
+| You defected, narrative describes mutual harm | Opponent likely defected |
+| Risk increased significantly | Both likely defected |
+| Risk decreased | Both likely cooperated |
 
-**Cost**: Initiating player pays 0.3 Resources.
+**Limitation**: This reveals what opponent DID, not what their exact Position is.
 
-**Matrix Structure**:
-
-|  | Opponent: Comply | Opponent: Cheat |
-|--|-----------------|-----------------|
-| **You: Inspect** | Verified | Caught |
-| **You: Trust** | Nothing | Exploited |
-
-**Outcomes**:
-
-| Outcome | Your Info Gain | Opponent Effect | Other Effects |
-|---------|---------------|-----------------|---------------|
-| Inspect + Comply (Verified) | Learn opponent's exact Resources | — | — |
-| Inspect + Cheat (Caught) | Learn opponent's exact Resources | Opponent Risk +1, Position -0.5 | — |
-| Trust + Comply (Nothing) | None | — | — |
-| Trust + Cheat (Exploited) | None | Opponent Position +0.5 | — |
-
-**Nash Equilibrium**: Mixed strategy; inspection probability depends on cost-benefit ratio.
-
-#### 3.6.3 Costly Signaling (Voluntary Disclosure)
-
-**Purpose**: Credibly reveal information about your own Position.
-
-**Mechanism**: You may UNILATERALLY choose to signal alongside your regular action (no turn cost). You pay a resource cost that depends on your true Position:
-
-| Your Position | Signal Cost |
-|---------------|-------------|
-| ≥ 7 (Strong) | 0.3 Resources |
-| 4–6 (Medium) | 0.7 Resources |
-| ≤ 3 (Weak) | 1.2 Resources |
-
-**What Opponent Learns**:
-- If you signal successfully: Opponent learns "Your Position ≥ 4"
-- Bayesian inference: Given you signaled, P(Position ≥ 7) is elevated
-
-**Design Insight**: Only strong players can profitably signal because the cost is prohibitive for weak players. This is the "burning money" mechanism from Spence signaling theory.
-
-#### 3.6.4 Inference from Outcomes
-
-After each turn, you observe your own state changes. You can infer opponent's likely ACTION (not state):
-
-| Your Action | Your Position Change | Likely Opponent Action |
-|-------------|---------------------|----------------------|
-| Cooperate | -1.0 | Defect |
-| Cooperate | +0.5 | Cooperate |
-| Defect | +1.0 | Cooperate |
-| Defect | -0.3, Resources -0.5 | Defect |
-
-**Limitation**: This reveals what opponent DID, not what their Position/Resources ARE.
-
-#### 3.6.5 Information Display
+#### 3.6.3 Information Display
 
 What players see each turn:
 
 ```
-YOUR STATUS (exact)           INTELLIGENCE ON OPPONENT
-Position: 6.0                 Position: UNKNOWN
-Resources: 4.2                  Last recon: Turn 3, value was 5.2
-                                Uncertainty: ±2.4 (4 turns stale)
-                                Estimate: 2.8 – 7.6
+CRISIS STATUS
+Risk: 4.2/10  Cooperation: 6/10  Stability: 7/10  Turn: 5
 
-                              Resources: UNKNOWN
-                                No inspection data
-                                Estimate: 0.0 – 10.0
+HISTORY (visible outcomes)
+Turn 4: You cooperated — Opponent cooperated
+        "Both sides showed restraint, tensions ease slightly."
+
+Turn 3: You cooperated — Opponent competed
+        "Your gesture was met with aggression."
 ```
+
+Players do NOT see raw Position numbers. They must infer relative standing from the pattern of outcomes and narratives.
 
 ---
 
@@ -836,7 +771,6 @@ Failed settlement proposals reveal information to your opponent:
 |---------|--------|
 | Risk = 10 | Mutual Destruction: both receive 20 VP |
 | Position = 0 | That player loses: 10 VP. Opponent: 90 VP |
-| Resources = 0 | That player loses: 15 VP. Opponent: 85 VP |
 
 ### 4.6 Crisis Termination (Probabilistic)
 
@@ -1050,9 +984,7 @@ Your goal: Maximize your Victory Points (VP). VP are determined at game end by y
 
 ### The State Variables
 
-**Your Position (0–10)**: Your relative power and advantage. Higher is better. If it reaches 0, you lose.
-
-**Your Resources (0–10)**: Your reserves—political capital, treasury, military reserves. Some actions cost Resources. If it reaches 0, you lose.
+**Position (HIDDEN, 0–10)**: Your relative power and advantage. Higher is better. If it reaches 0, you lose. **You cannot see your own or opponent's exact Position** — you must infer your standing from outcome narratives and action patterns.
 
 **Risk Level (shared, 0–10)**: How dangerous the situation is. Higher Risk means higher stakes and higher chance of sudden crisis termination. If it reaches 10, both players suffer Mutual Destruction.
 
@@ -1087,7 +1019,7 @@ Starting Turn 10, if Risk > 7, there's a chance each turn that the situation spi
 - Risk 10: Automatic Mutual Destruction
 
 **Elimination**:
-If your Position or Resources hit 0, you lose immediately.
+If your Position hits 0, you lose immediately.
 
 **Natural End**:
 The game has a maximum length between 12 and 16 turns. You don't know exactly when.

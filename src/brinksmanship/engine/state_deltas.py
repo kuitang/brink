@@ -129,33 +129,39 @@ def _outcome_bounds(
 # Based on GAME_MANUAL.md Section 3.5 examples and game theory principles.
 
 # Prisoner's Dilemma (T > R > P > S)
-# - CC: Mutual cooperation - both gain moderately, risk decreases
-# - CD/DC: Exploitation - exploiter gains, victim loses, risk increases
-# - DD: Mutual defection - both lose moderately, high resource cost, high risk
+# STRICTLY ZERO-SUM POSITION: Only exploitation changes position.
+# - CC: Mutual cooperation - NO position change, risk decreases (incentive to cooperate)
+# - CD/DC: Exploitation - exploiter gains what victim loses (zero-sum)
+# - DD: Mutual defection - NO position change, risk spikes (standoff)
 #
-# BALANCE TUNING: Reduced exploitation advantage (T-R gap narrowed from 0.35 to 0.10)
-# and increased DD penalty (P more negative) to make cooperation more attractive.
-# This prevents Nash from easily dominating by exploiting early advantages.
+# The strategic logic:
+# - Cooperate = safe from escalation but vulnerable to exploitation
+# - Defect = safe from exploitation but increases mutual risk
+# - The temptation payoff comes from exploiting a cooperator
+# - The punishment for mutual defection is RISK, not position loss
 #
-# Ordinal check: T=0.65 > R=0.55 > P=-0.5 > S=-0.6 (verified)
+# Ordinal (for position): T=0.7 > R=0 > P=0 > S=-0.7
+# This means T > R but R = P (not strictly valid PD for position alone)
+# However, when considering RISK, the ordinal makes sense:
+# - CC: pos=0, risk=-0.5 (good)
+# - DD: pos=0, risk=+2.0 (bad)
+# So R > P when you factor in risk consequences.
 PD_DELTA_TEMPLATE = StateDeltaTemplate(
     matrix_type=MatrixType.PRISONERS_DILEMMA,
     cc=_outcome_bounds(
-        pos_a=(0.4, 0.7), pos_b=(0.4, 0.7), risk=(-1.0, -0.3)
-    ),  # R: Mutual gain (midpoint 0.55)
+        pos_a=(0.0, 0.0), pos_b=(0.0, 0.0), risk=(-0.6, -0.4)
+    ),  # R: No position change, risk -0.5 (cooperation reduces danger)
     cd=_outcome_bounds(
-        pos_a=(-0.8, -0.4), pos_b=(0.5, 0.8), risk=(0.3, 1.0)
-    ),  # S/T: A exploited (victim -0.6, exploiter 0.65)
+        pos_a=(-0.8, -0.6), pos_b=(0.6, 0.8), risk=(0.6, 1.0)
+    ),  # ZERO-SUM: A=-0.7, B=+0.7, risk +0.8 (exploitation punished by risk)
     dc=_outcome_bounds(
-        pos_a=(0.5, 0.8), pos_b=(-0.8, -0.4), risk=(0.3, 1.0)
-    ),  # T/S: B exploited (exploiter 0.65, victim -0.6)
+        pos_a=(0.6, 0.8), pos_b=(-0.8, -0.6), risk=(0.6, 1.0)
+    ),  # ZERO-SUM: A=+0.7, B=-0.7, risk +0.8 (exploitation punished by risk)
     dd=_outcome_bounds(
-        pos_a=(-0.7, -0.3),
-        pos_b=(-0.7, -0.3),
-        res_a=(0.4, 0.7),
-        res_b=(0.4, 0.7),
-        risk=(0.8, 1.5),
-    ),  # P: Mutual harm (midpoint -0.5, increased from -0.35)
+        pos_a=(0.0, 0.0),
+        pos_b=(0.0, 0.0),
+        risk=(1.8, 2.2),
+    ),  # P: No position change, risk +2.0 (standoff - very dangerous)
 )
 
 # Deadlock (T > P > R > S)
@@ -200,30 +206,31 @@ HARMONY_DELTA_TEMPLATE = StateDeltaTemplate(
 )
 
 # Chicken (T > R > S > P)
-# - Dove-Dove: Both back down, modest gains, risk decreases
-# - Hawk-Dove: Hawk wins, Dove loses but survives
-# - Hawk-Hawk: CRASH - catastrophic for both, maximum risk
+# STRICTLY ZERO-SUM POSITION: Only exploitation changes position.
+# - Dove-Dove: Both back down, NO position change, risk decreases significantly
+# - Hawk-Dove: Hawk wins, Dove loses (zero-sum position change)
+# - Hawk-Hawk: CRASH - NO position change but MASSIVE risk spike
 #
-# BALANCE TUNING: Reduced hawk advantage (0.5-0.9 instead of 0.7-1.2)
-# and increased dove-dove reward to make mutual de-escalation more attractive.
+# The strategic logic:
+# - Swerving is "safe" but vulnerable to hawks
+# - Going straight risks catastrophic crash if opponent doesn't swerve
+# - The incentive to swerve comes from RISK consequences, not position
 CHICKEN_DELTA_TEMPLATE = StateDeltaTemplate(
     matrix_type=MatrixType.CHICKEN,
     cc=_outcome_bounds(
-        pos_a=(0.3, 0.6), pos_b=(0.3, 0.6), risk=(-0.8, -0.3)
-    ),  # Both swerve (increased reward from 0.2-0.5)
+        pos_a=(0.0, 0.0), pos_b=(0.0, 0.0), risk=(-0.8, -0.3)
+    ),  # Both swerve: No position change, risk decreases
     cd=_outcome_bounds(
-        pos_a=(-0.6, -0.2), pos_b=(0.5, 0.9), risk=(0.3, 0.8)
-    ),  # Row swerves (reduced hawk advantage from 0.7-1.2)
+        pos_a=(-0.6, -0.4), pos_b=(0.4, 0.6), risk=(0.3, 0.8)
+    ),  # Row swerves: ZERO-SUM A=-0.5, B=+0.5
     dc=_outcome_bounds(
-        pos_a=(0.5, 0.9), pos_b=(-0.6, -0.2), risk=(0.3, 0.8)
-    ),  # Col swerves (reduced hawk advantage from 0.7-1.2)
+        pos_a=(0.4, 0.6), pos_b=(-0.6, -0.4), risk=(0.3, 0.8)
+    ),  # Col swerves: ZERO-SUM A=+0.5, B=-0.5
     dd=_outcome_bounds(
-        pos_a=(-1.5, -1.0),
-        pos_b=(-1.5, -1.0),
-        res_a=(0.7, 1.0),
-        res_b=(0.7, 1.0),
-        risk=(1.5, 2.0),
-    ),  # CRASH (unchanged - already severe)
+        pos_a=(0.0, 0.0),
+        pos_b=(0.0, 0.0),
+        risk=(1.8, 2.2),
+    ),  # CRASH: No position change, risk +2.0 (catastrophic)
 )
 
 # Volunteer's Dilemma (F > W > D)
@@ -410,27 +417,27 @@ RECONNAISSANCE_DELTA_TEMPLATE = StateDeltaTemplate(
     ),  # Exposed
 )
 
-# Security Dilemma (Same as PD but with defensive interpretation)
-# BALANCE TUNING: Same adjustments as PD to prevent Nash dominance
-# Ordinal check: T=0.65 > R=0.55 > P=-0.5 > S=-0.6 (verified)
+# Security Dilemma (Same structure as PD with defensive interpretation)
+# STRICTLY ZERO-SUM POSITION: Same as PD template
+# - CC (mutual disarm): No position change, risk decreases
+# - CD/DC (arms race): exploiter gains what victim loses
+# - DD (arms race): No position change, risk spikes (dangerous standoff)
 SECURITY_DILEMMA_DELTA_TEMPLATE = StateDeltaTemplate(
     matrix_type=MatrixType.SECURITY_DILEMMA,
     cc=_outcome_bounds(
-        pos_a=(0.4, 0.7), pos_b=(0.4, 0.7), risk=(-1.0, -0.3)
-    ),  # R: Mutual disarm (midpoint 0.55)
+        pos_a=(0.0, 0.0), pos_b=(0.0, 0.0), risk=(-0.6, -0.4)
+    ),  # R: Mutual disarm, no position change, risk -0.5
     cd=_outcome_bounds(
-        pos_a=(-0.8, -0.4), pos_b=(0.5, 0.8), risk=(0.3, 1.0)
-    ),  # S/T: A vulnerable (victim -0.6, exploiter 0.65)
+        pos_a=(-0.8, -0.6), pos_b=(0.6, 0.8), risk=(0.6, 1.0)
+    ),  # ZERO-SUM: A=-0.7, B=+0.7, risk +0.8
     dc=_outcome_bounds(
-        pos_a=(0.5, 0.8), pos_b=(-0.8, -0.4), risk=(0.3, 1.0)
-    ),  # T/S: B vulnerable (exploiter 0.65, victim -0.6)
+        pos_a=(0.6, 0.8), pos_b=(-0.8, -0.6), risk=(0.6, 1.0)
+    ),  # ZERO-SUM: A=+0.7, B=-0.7, risk +0.8
     dd=_outcome_bounds(
-        pos_a=(-0.7, -0.3),
-        pos_b=(-0.7, -0.3),
-        res_a=(0.4, 0.7),
-        res_b=(0.4, 0.7),
-        risk=(0.5, 1.2),
-    ),  # P: Arms race (midpoint -0.5)
+        pos_a=(0.0, 0.0),
+        pos_b=(0.0, 0.0),
+        risk=(1.8, 2.2),
+    ),  # P: Arms race standoff, no position change, risk +2.0
 )
 
 
@@ -703,7 +710,13 @@ def _get_player_delta_value(
 
 
 def validate_pd_ordinal_consistency(template: StateDeltaTemplate) -> tuple[bool, list[str]]:
-    """Validate Prisoner's Dilemma ordinal constraint: T > R > P > S.
+    """Validate Prisoner's Dilemma ordinal constraint: T > R >= P > S.
+
+    With strictly zero-sum positions, CC and DD both have pos=0.
+    The constraint becomes T > R >= P > S where R = P = 0.
+    The R vs P distinction comes from RISK, not position:
+    - R (CC): risk decreases
+    - P (DD): risk increases dramatically
 
     For row player A:
     - T = DC (defect against cooperator): pos_a from dc
@@ -722,8 +735,8 @@ def validate_pd_ordinal_consistency(template: StateDeltaTemplate) -> tuple[bool,
 
     if not (t > r):
         errors.append(f"T > R violated: T={t:.2f}, R={r:.2f}")
-    if not (r > p):
-        errors.append(f"R > P violated: R={r:.2f}, P={p:.2f}")
+    if not (r >= p):  # Changed from > to >= since R=P=0 in zero-sum model
+        errors.append(f"R >= P violated: R={r:.2f}, P={p:.2f}")
     if not (p > s):
         errors.append(f"P > S violated: P={p:.2f}, S={s:.2f}")
 
@@ -731,7 +744,13 @@ def validate_pd_ordinal_consistency(template: StateDeltaTemplate) -> tuple[bool,
 
 
 def validate_chicken_ordinal_consistency(template: StateDeltaTemplate) -> tuple[bool, list[str]]:
-    """Validate Chicken ordinal constraint: T > R > S > P.
+    """Validate Chicken ordinal constraint: T > R >= S > P.
+
+    With strictly zero-sum positions, CC and DD both have pos=0.
+    The constraint becomes T > R >= S > P where R = P = 0.
+    The key distinction is:
+    - R (CC): both swerve, risk decreases (good)
+    - P (DD): crash, risk spikes (catastrophic)
 
     For row player A:
     - T = DC (hawk vs dove): pos_a from dc
@@ -748,8 +767,8 @@ def validate_chicken_ordinal_consistency(template: StateDeltaTemplate) -> tuple[
 
     if not (t > r):
         errors.append(f"T > R violated: T={t:.2f}, R={r:.2f}")
-    if not (r > s):
-        errors.append(f"R > S violated: R={r:.2f}, S={s:.2f}")
+    if not (r >= s):  # Changed from > to >= for zero-sum model
+        errors.append(f"R >= S violated: R={r:.2f}, S={s:.2f}")
     if not (s > p):
         errors.append(f"S > P violated: S={s:.2f}, P={p:.2f}")
 
