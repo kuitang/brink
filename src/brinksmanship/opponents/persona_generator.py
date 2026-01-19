@@ -7,7 +7,6 @@ in documented historical behavior.
 See ENGINEERING_DESIGN.md Milestone 4.4 for specification.
 """
 
-import asyncio
 import json
 import logging
 from dataclasses import dataclass
@@ -22,6 +21,7 @@ from brinksmanship.opponents.base import (
     SettlementResponse,
 )
 from brinksmanship.prompts import (
+    ACTION_SELECTION_SCHEMA,
     GENERATED_PERSONA_ACTION_PROMPT,
     GENERATED_PERSONA_SETTLEMENT_PROMPT,
     HISTORICAL_PERSONA_SYSTEM_PROMPT,
@@ -29,7 +29,9 @@ from brinksmanship.prompts import (
     PERSONA_GENERATION_PROMPT,
     PERSONA_RESEARCH_PROMPT,
     PERSONA_RESEARCH_SYSTEM_PROMPT,
+    SETTLEMENT_EVALUATION_SCHEMA,
     SETTLEMENT_EVALUATION_SYSTEM_PROMPT,
+    SETTLEMENT_PROPOSAL_SCHEMA,
     format_settlement_evaluation_prompt,
 )
 
@@ -407,7 +409,7 @@ class GeneratedPersona(Opponent):
 
         return info_state.get_position_estimate(state.turn)
 
-    def choose_action(
+    async def choose_action(
         self, state: GameState, available_actions: list[Action]
     ) -> Action:
         """Choose an action using LLM with generated persona prompt."""
@@ -440,9 +442,11 @@ class GeneratedPersona(Opponent):
 {self._persona_prompt}
 """
 
-        # Run async LLM call
-        response = asyncio.run(
-            generate_json(prompt=prompt, system_prompt=system_prompt)
+        # Run LLM with structured output
+        response = await generate_json(
+            prompt=prompt,
+            system_prompt=system_prompt,
+            schema=ACTION_SELECTION_SCHEMA,
         )
 
         # Find matching action
@@ -472,7 +476,7 @@ class GeneratedPersona(Opponent):
         self.action_history.append((selected_action, state))
         return selected_action
 
-    def evaluate_settlement(
+    async def evaluate_settlement(
         self,
         proposal: SettlementProposal,
         state: GameState,
@@ -499,11 +503,10 @@ class GeneratedPersona(Opponent):
             persona_description=self._persona_prompt,
         )
 
-        response = asyncio.run(
-            generate_json(
-                prompt=prompt,
-                system_prompt=SETTLEMENT_EVALUATION_SYSTEM_PROMPT,
-            )
+        response = await generate_json(
+            prompt=prompt,
+            system_prompt=SETTLEMENT_EVALUATION_SYSTEM_PROMPT,
+            schema=SETTLEMENT_EVALUATION_SCHEMA,
         )
 
         action = response.get("action", "").upper()
@@ -535,7 +538,7 @@ class GeneratedPersona(Opponent):
                 rejection_reason=reason,
             )
 
-    def propose_settlement(self, state: GameState) -> SettlementProposal | None:
+    async def propose_settlement(self, state: GameState) -> SettlementProposal | None:
         """Decide whether to propose settlement."""
         if state.turn <= 4 or state.stability <= 2:
             return None
@@ -562,11 +565,10 @@ class GeneratedPersona(Opponent):
             max_vp=max_vp,
         )
 
-        response = asyncio.run(
-            generate_json(
-                prompt=prompt,
-                system_prompt=HISTORICAL_PERSONA_SYSTEM_PROMPT,
-            )
+        response = await generate_json(
+            prompt=prompt,
+            system_prompt=HISTORICAL_PERSONA_SYSTEM_PROMPT,
+            schema=SETTLEMENT_PROPOSAL_SCHEMA,
         )
 
         if not response.get("propose", False):

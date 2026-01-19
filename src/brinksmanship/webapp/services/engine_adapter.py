@@ -5,8 +5,21 @@ Game state is stored in the database, and engines are created
 on-demand from the scenario and synced with stored state.
 """
 
+import asyncio
+import inspect
 import random
 from typing import Any, Optional
+
+
+def _run_opponent_method(method, *args, **kwargs):
+    """Run an opponent method, handling both sync and async implementations.
+
+    Since Flask is sync, we use asyncio.run() for async methods.
+    This must be called from a non-async context (standard Flask request handler).
+    """
+    if inspect.iscoroutinefunction(method):
+        return asyncio.run(method(*args, **kwargs))
+    return method(*args, **kwargs)
 
 from brinksmanship.engine import GameEngine, create_game
 from brinksmanship.models.actions import Action, ActionCategory, ActionType, get_action_by_name
@@ -35,8 +48,17 @@ class RealGameEngine:
         user_id: int,
         game_id: Optional[str] = None,
         custom_persona: Optional[str] = None,
+        player_is_a: bool = True,
     ) -> dict[str, Any]:
         """Create a new game with initial state.
+
+        Args:
+            scenario_id: ID of the scenario to play
+            opponent_type: Type of opponent AI
+            user_id: User ID
+            game_id: Optional custom game ID
+            custom_persona: Custom persona description (if opponent_type is "custom")
+            player_is_a: Whether the human player is Player A (default True)
 
         Returns:
             Game state dict to be stored in database
@@ -49,18 +71,31 @@ class RealGameEngine:
         scenario = self._scenario_repo.get_scenario(scenario_id)
         scenario_name = scenario.get("name", scenario_id) if scenario else scenario_id
 
+        # Get positions/resources based on which side the player is
+        if player_is_a:
+            player_position = engine.state.position_a
+            player_resources = engine.state.resources_a
+            opponent_position = engine.state.position_b
+            opponent_resources = engine.state.resources_b
+        else:
+            player_position = engine.state.position_b
+            player_resources = engine.state.resources_b
+            opponent_position = engine.state.position_a
+            opponent_resources = engine.state.resources_a
+
         return {
             "game_id": game_id,
             "scenario_id": scenario_id,
             "scenario_name": scenario_name,
             "opponent_type": opponent_type,
             "custom_persona": custom_persona,
+            "player_is_a": player_is_a,  # Track which side the player is
             "turn": engine.state.turn,
             "max_turns": engine.state.max_turns,
-            "position_player": engine.state.position_a,
-            "position_opponent": engine.state.position_b,
-            "resources_player": engine.state.resources_a,
-            "resources_opponent": engine.state.resources_b,
+            "position_player": player_position,
+            "position_opponent": opponent_position,
+            "resources_player": player_resources,
+            "resources_opponent": opponent_resources,
             "risk_level": engine.state.risk_level,
             "cooperation_score": int(engine.state.cooperation_score),
             "stability": int(engine.state.stability),
@@ -70,7 +105,7 @@ class RealGameEngine:
         }
 
     def get_scenarios(self) -> list[dict[str, Any]]:
-        """Get available scenarios."""
+        """Get available scenarios with role information."""
         scenarios = self._scenario_repo.list_scenarios()
         return [
             {
@@ -79,6 +114,11 @@ class RealGameEngine:
                 "setting": s.get("setting", ""),
                 "max_turns": s.get("max_turns", 14),
                 "description": s.get("description", ""),
+                # Role information for side selection
+                "player_a_name": s.get("player_a_name", "Player A"),
+                "player_a_role": s.get("player_a_role", "Side A"),
+                "player_b_name": s.get("player_b_name", "Player B"),
+                "player_b_role": s.get("player_b_role", "Side B"),
             }
             for s in scenarios
         ]
@@ -149,7 +189,8 @@ class RealGameEngine:
         Creates engine from scenario and syncs to stored state.
         """
         engine = self._create_engine_from_state(state)
-        actions = engine.get_available_actions("A")
+        player_side = "A" if state.get("player_is_a", True) else "B"
+        actions = engine.get_available_actions(player_side)
         return [self._format_action(a) for a in actions]
 
     def submit_action(self, state: dict[str, Any], action_id: str) -> dict[str, Any]:
@@ -161,18 +202,29 @@ class RealGameEngine:
         engine = self._create_engine_from_state(state)
         opponent = self._create_opponent(state)
 
+        # Determine which side is which
+        player_is_a = state.get("player_is_a", True)
+        player_side = "A" if player_is_a else "B"
+        opponent_side = "B" if player_is_a else "A"
+
         # Find player's action
-        player_actions = engine.get_available_actions("A")
+        player_actions = engine.get_available_actions(player_side)
         player_action = self._match_action(action_id, player_actions)
         if not player_action:
             raise ValueError(f"Invalid action: {action_id}")
 
-        # Get opponent's choice
-        opponent_actions = engine.get_available_actions("B")
-        opponent_action = opponent.choose_action(engine.state, opponent_actions)
+        # Get opponent's choice (async method, run in sync context)
+        opponent_actions = engine.get_available_actions(opponent_side)
+        opponent_action = _run_opponent_method(
+            opponent.choose_action, engine.state, opponent_actions
+        )
 
-        # Submit actions
-        result = engine.submit_actions(player_action, opponent_action)
+        # Submit actions in correct order (action_a, action_b)
+        if player_is_a:
+            result = engine.submit_actions(player_action, opponent_action)
+        else:
+            result = engine.submit_actions(opponent_action, player_action)
+
         if result.action_result:
             opponent.receive_result(result.action_result)
 
@@ -180,6 +232,18 @@ class RealGameEngine:
         gs = engine.state
         player_symbol = "C" if player_action.action_type == ActionType.COOPERATIVE else "D"
         opponent_symbol = "C" if opponent_action.action_type == ActionType.COOPERATIVE else "D"
+
+        # Get positions/resources based on which side the player is
+        if player_is_a:
+            player_position = gs.position_a
+            player_resources = gs.resources_a
+            opponent_position = gs.position_b
+            opponent_resources = gs.resources_b
+        else:
+            player_position = gs.position_b
+            player_resources = gs.resources_b
+            opponent_position = gs.position_a
+            opponent_resources = gs.resources_a
 
         # Maintain history in state dict
         history = list(state.get("history", []))
@@ -195,12 +259,13 @@ class RealGameEngine:
             "scenario_name": state.get("scenario_name"),
             "opponent_type": state.get("opponent_type"),
             "custom_persona": state.get("custom_persona"),
+            "player_is_a": player_is_a,
             "turn": gs.turn,
             "max_turns": gs.max_turns,
-            "position_player": gs.position_a,
-            "position_opponent": gs.position_b,
-            "resources_player": gs.resources_a,
-            "resources_opponent": gs.resources_b,
+            "position_player": player_position,
+            "position_opponent": opponent_position,
+            "resources_player": player_resources,
+            "resources_opponent": opponent_resources,
             "risk_level": gs.risk_level,
             "cooperation_score": int(gs.cooperation_score),
             "stability": int(gs.stability),
@@ -218,8 +283,13 @@ class RealGameEngine:
 
         if result.ending:
             new_state["ending_type"] = result.ending.ending_type.value
-            new_state["vp_player"] = int(result.ending.vp_a)
-            new_state["vp_opponent"] = int(result.ending.vp_b)
+            # VPs are relative to player A and B, need to map correctly
+            if player_is_a:
+                new_state["vp_player"] = int(result.ending.vp_a)
+                new_state["vp_opponent"] = int(result.ending.vp_b)
+            else:
+                new_state["vp_player"] = int(result.ending.vp_b)
+                new_state["vp_opponent"] = int(result.ending.vp_a)
 
         return new_state
 
@@ -247,13 +317,37 @@ class RealGameEngine:
         return engine
 
     def _create_opponent(self, state: dict[str, Any]) -> Opponent:
-        """Create opponent instance from state."""
+        """Create opponent instance from state with role information."""
         opponent_type = state.get("opponent_type", "tit_for_tat")
         custom_persona = state.get("custom_persona")
+        player_is_a = state.get("player_is_a", True)
 
         if opponent_type == "custom" and custom_persona:
             return create_opponent_from_persona(custom_persona)
-        return get_opponent_by_type(opponent_type)
+
+        # Get scenario role information for the opponent's side
+        scenario_id = state.get("scenario_id")
+        role_name = None
+        role_description = None
+
+        if scenario_id:
+            scenario = self._scenario_repo.get_scenario(scenario_id)
+            if scenario:
+                if player_is_a:
+                    # Player is A, opponent is B
+                    role_name = scenario.get("player_b_role")
+                    role_description = scenario.get("player_b_description")
+                else:
+                    # Player is B, opponent is A
+                    role_name = scenario.get("player_a_role")
+                    role_description = scenario.get("player_a_description")
+
+        return get_opponent_by_type(
+            opponent_type,
+            is_player_a=not player_is_a,  # Opponent is opposite of player
+            role_name=role_name,
+            role_description=role_description,
+        )
 
     def _match_action(self, action_id: str, available: list[Action]) -> Optional[Action]:
         """Find action matching the ID."""

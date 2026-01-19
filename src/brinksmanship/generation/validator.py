@@ -360,11 +360,13 @@ def check_branching_validity(scenario: dict | Scenario) -> CheckResult:
         for turn in scenario.turns:
             for outcome in ["CC", "CD", "DC", "DD"]:
                 target = getattr(turn.branches, outcome)
-                if target not in valid_ids:
+                # None means "use default_next" - not an error
+                if target is not None and target not in valid_ids:
                     missing_targets.append(
                         {"source": f"turn_{turn.turn}", "outcome": outcome, "target": target}
                     )
-            if turn.default_next not in valid_ids:
+            # None is valid for last turn (no next turn) or when all branches are specified
+            if turn.default_next is not None and turn.default_next not in valid_ids:
                 missing_default_next.append(
                     {"source": f"turn_{turn.turn}", "default_next": turn.default_next}
                 )
@@ -372,11 +374,13 @@ def check_branching_validity(scenario: dict | Scenario) -> CheckResult:
         for branch_id, branch_turn in scenario.branches.items():
             for outcome in ["CC", "CD", "DC", "DD"]:
                 target = getattr(branch_turn.branches, outcome)
-                if target not in valid_ids:
+                # None means "use default_next" - not an error
+                if target is not None and target not in valid_ids:
                     missing_targets.append(
                         {"source": branch_id, "outcome": outcome, "target": target}
                     )
-            if branch_turn.default_next not in valid_ids:
+            # None is valid for terminal branches
+            if branch_turn.default_next is not None and branch_turn.default_next not in valid_ids:
                 missing_default_next.append(
                     {"source": branch_id, "default_next": branch_turn.default_next}
                 )
@@ -397,11 +401,8 @@ def check_branching_validity(scenario: dict | Scenario) -> CheckResult:
                         {"source": turn_id, "outcome": outcome, "target": target}
                     )
             default_next = turn.get("default_next")
-            if not default_next:
-                missing_default_next.append(
-                    {"source": turn_id, "default_next": "MISSING"}
-                )
-            elif default_next not in valid_ids:
+            # None is valid for last turn (no next turn) or when all branches are specified
+            if default_next is not None and default_next not in valid_ids:
                 missing_default_next.append(
                     {"source": turn_id, "default_next": default_next}
                 )
@@ -415,11 +416,8 @@ def check_branching_validity(scenario: dict | Scenario) -> CheckResult:
                         {"source": branch_id, "outcome": outcome, "target": target}
                     )
             default_next = branch_turn.get("default_next")
-            if not default_next:
-                missing_default_next.append(
-                    {"source": branch_id, "default_next": "MISSING"}
-                )
-            elif default_next not in valid_ids:
+            # None is valid for terminal branches
+            if default_next is not None and default_next not in valid_ids:
                 missing_default_next.append(
                     {"source": branch_id, "default_next": default_next}
                 )

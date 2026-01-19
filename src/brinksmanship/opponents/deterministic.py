@@ -23,6 +23,7 @@ from brinksmanship.opponents.base import (
 )
 from brinksmanship.prompts import (
     SETTLEMENT_EVALUATION_PROMPT,
+    SETTLEMENT_EVALUATION_SCHEMA,
     SETTLEMENT_EVALUATION_SYSTEM_PROMPT,
 )
 
@@ -108,6 +109,16 @@ class DeterministicOpponent(Opponent):
         # Fallback to any action
         return random.choice(available_actions)
 
+    async def choose_action(
+        self, state: GameState, available_actions: list[Action]
+    ) -> Action:
+        """Choose action - must be overridden by subclasses.
+
+        This is async for interface consistency, even though deterministic
+        opponents don't need async (they don't call LLMs for action selection).
+        """
+        raise NotImplementedError("Subclasses must implement choose_action")
+
     async def evaluate_settlement(
         self,
         proposal: SettlementProposal,
@@ -147,10 +158,11 @@ class DeterministicOpponent(Opponent):
             persona_description=self.settlement_persona,
         )
 
-        # Call LLM for settlement evaluation
+        # Call LLM with structured output
         response = await generate_json(
             prompt=prompt,
             system_prompt=SETTLEMENT_EVALUATION_SYSTEM_PROMPT,
+            schema=SETTLEMENT_EVALUATION_SCHEMA,
         )
 
         # Parse response
@@ -175,11 +187,14 @@ class DeterministicOpponent(Opponent):
             rejection_reason=response.get("rejection_reason", "Offer rejected."),
         )
 
-    def propose_settlement(self, state: GameState) -> SettlementProposal | None:
+    async def propose_settlement(self, state: GameState) -> SettlementProposal | None:
         """Optionally propose settlement based on strategy.
 
         Default implementation proposes settlement when in a favorable position
         and risk is elevated. Subclasses may override.
+
+        This is async for interface consistency, even though deterministic
+        opponents don't need async for this decision.
 
         Args:
             state: Current game state
@@ -215,7 +230,7 @@ class NashCalculator(DeterministicOpponent):
         """Initialize NashCalculator opponent."""
         super().__init__(name="Nash Calculator")
 
-    def choose_action(
+    async def choose_action(
         self, state: GameState, available_actions: list[Action]
     ) -> Action:
         """Choose action based on Nash equilibrium reasoning.
@@ -261,7 +276,7 @@ class NashCalculator(DeterministicOpponent):
                     available_actions, ActionType.COOPERATIVE
                 )
 
-    def propose_settlement(self, state: GameState) -> SettlementProposal | None:
+    async def propose_settlement(self, state: GameState) -> SettlementProposal | None:
         """Propose settlement when position advantage is clear.
 
         Nash reasoning: lock in gains when ahead.
@@ -312,7 +327,7 @@ class SecuritySeeker(DeterministicOpponent):
         """Initialize SecuritySeeker opponent."""
         super().__init__(name="Security Seeker")
 
-    def choose_action(
+    async def choose_action(
         self, state: GameState, available_actions: list[Action]
     ) -> Action:
         """Choose action based on spiral model reasoning.
@@ -354,7 +369,7 @@ class SecuritySeeker(DeterministicOpponent):
                 available_actions, ActionType.COOPERATIVE
             )
 
-    def propose_settlement(self, state: GameState) -> SettlementProposal | None:
+    async def propose_settlement(self, state: GameState) -> SettlementProposal | None:
         """Propose settlement when risk is elevated.
 
         Security seekers value stability - propose when dangerous.
@@ -403,7 +418,7 @@ class Opportunist(DeterministicOpponent):
         """Initialize Opportunist opponent."""
         super().__init__(name="Opportunist")
 
-    def choose_action(
+    async def choose_action(
         self, state: GameState, available_actions: list[Action]
     ) -> Action:
         """Choose action based on deterrence model reasoning.
@@ -451,7 +466,7 @@ class Opportunist(DeterministicOpponent):
                     available_actions, ActionType.COOPERATIVE
                 )
 
-    def propose_settlement(self, state: GameState) -> SettlementProposal | None:
+    async def propose_settlement(self, state: GameState) -> SettlementProposal | None:
         """Propose settlement only when clearly dominant.
 
         Opportunists only settle to lock in clear victories.
@@ -503,7 +518,7 @@ class Erratic(DeterministicOpponent):
         """Initialize Erratic opponent."""
         super().__init__(name="Erratic")
 
-    def choose_action(
+    async def choose_action(
         self, state: GameState, available_actions: list[Action]
     ) -> Action:
         """Choose action randomly with competitive bias.
@@ -527,7 +542,7 @@ class Erratic(DeterministicOpponent):
                 available_actions, ActionType.COMPETITIVE
             )
 
-    def propose_settlement(self, state: GameState) -> SettlementProposal | None:
+    async def propose_settlement(self, state: GameState) -> SettlementProposal | None:
         """Randomly propose settlement.
 
         Erratic behavior includes random settlement proposals.
@@ -577,7 +592,7 @@ class TitForTat(DeterministicOpponent):
         """Initialize TitForTat opponent."""
         super().__init__(name="Tit for Tat")
 
-    def choose_action(
+    async def choose_action(
         self, state: GameState, available_actions: list[Action]
     ) -> Action:
         """Choose action using Tit-for-Tat strategy.
@@ -610,7 +625,7 @@ class TitForTat(DeterministicOpponent):
                 available_actions, ActionType.COMPETITIVE
             )
 
-    def propose_settlement(self, state: GameState) -> SettlementProposal | None:
+    async def propose_settlement(self, state: GameState) -> SettlementProposal | None:
         """Propose settlement when cooperation has been established.
 
         Tit-for-Tat values mutual cooperation - propose when it's working.
@@ -675,7 +690,7 @@ class GrimTrigger(DeterministicOpponent):
         if opponent_action == ActionType.COMPETITIVE:
             self._triggered = True
 
-    def choose_action(
+    async def choose_action(
         self, state: GameState, available_actions: list[Action]
     ) -> Action:
         """Choose action using Grim Trigger strategy.
@@ -727,7 +742,7 @@ class GrimTrigger(DeterministicOpponent):
         # If not triggered, use normal LLM evaluation
         return await super().evaluate_settlement(proposal, state, is_final_offer)
 
-    def propose_settlement(self, state: GameState) -> SettlementProposal | None:
+    async def propose_settlement(self, state: GameState) -> SettlementProposal | None:
         """Propose settlement only if trust is intact.
 
         GrimTrigger proposes when cooperation is working well.

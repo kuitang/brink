@@ -2144,5 +2144,74 @@ Note: Milestone 1.4 (Storage Repository) is foundational infrastructure used by 
 
 ---
 
-*Document Version: 1.1*
+## Appendix A: Async Architecture for Opponent Interface
+
+### Decision: All Opponent Methods are Async
+
+All methods in the `Opponent` interface that may involve LLM calls are declared as `async`:
+- `async def choose_action(state, available_actions) -> Action`
+- `async def evaluate_settlement(proposal, state, is_final_offer) -> SettlementResponse`
+- `async def propose_settlement(state) -> SettlementProposal | None`
+
+### Rationale
+
+1. **LLM calls are fundamentally async**: The Claude Agent SDK uses async iterators for streaming responses. Making opponent methods async aligns with the underlying I/O-bound nature of LLM calls.
+
+2. **Consistency over convenience**: Even deterministic opponents (which don't call LLMs for action selection) use async methods. This ensures a uniform interface where callers don't need to check whether a method is sync or async.
+
+3. **Future-proofing**: Any opponent method might gain LLM functionality in the future. Starting async prevents breaking changes.
+
+### Caller Patterns
+
+**CLI (Textual)**: Uses `@work(thread=True)` decorated workers with a helper function:
+```python
+def run_opponent_method(method, *args, **kwargs):
+    """Run opponent method, handling both sync and async implementations."""
+    if inspect.iscoroutinefunction(method):
+        return asyncio.run(method(*args, **kwargs))
+    return method(*args, **kwargs)
+```
+
+The CLI calls this from worker threads, which avoids blocking the Textual event loop. Example:
+```python
+@work(thread=True)
+def _execute_action_worker(self, player_action):
+    opponent_action = run_opponent_method(
+        self.opponent.choose_action, state, opponent_actions
+    )
+    # ... rest of action execution
+    self.app.call_from_thread(self._handle_action_result, result)
+```
+
+**Webapp (Flask)**: Uses `asyncio.run()` in sync Flask request handlers:
+```python
+def _run_opponent_method(method, *args, **kwargs):
+    if inspect.iscoroutinefunction(method):
+        return asyncio.run(method(*args, **kwargs))
+    return method(*args, **kwargs)
+```
+
+Since Flask runs in a sync context (no active event loop), `asyncio.run()` works safely.
+
+### Why Not Just Use sync + `asyncio.run()` Internally?
+
+We originally tried wrapping async LLM calls with `asyncio.run()` inside opponent methods. This failed because:
+1. Textual runs an async event loop, and `asyncio.run()` cannot be called from within an existing event loop
+2. The error "asyncio.run() cannot be called from a running event loop" is fatal
+
+Moving the `asyncio.run()` call to the caller (in a separate thread for CLI, or in the sync Flask context for webapp) solves this.
+
+### Future Enhancement: Parallel Opponent Thinking
+
+The async architecture enables a future optimization: starting the LLM opponent's "thinking" while the human player is still deciding their action. This would:
+1. Reduce perceived latency when the human submits their action
+2. Create a more responsive feel for LLM-based opponents
+
+Implementation would involve:
+- Starting `opponent.choose_action()` as a background task when the action menu is displayed
+- Awaiting the result (or timing out) when the human submits their action
+
+---
+
+*Document Version: 1.2*
 *Last Updated: January 2026*

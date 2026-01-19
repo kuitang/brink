@@ -11,14 +11,42 @@
     <form method="POST" id="new-game-form">
         <div class="form-group">
             <label for="scenario_id">Scenario</label>
-            <select id="scenario_id" name="scenario_id" required>
+            <select id="scenario_id" name="scenario_id" required onchange="updateSideOptions()">
                 <option value="">-- Select a Scenario --</option>
                 {% for scenario in scenarios %}
-                <option value="{{ scenario.id }}">
+                <option value="{{ scenario.id }}"
+                        data-player-a-name="{{ scenario.player_a_name }}"
+                        data-player-a-role="{{ scenario.player_a_role }}"
+                        data-player-b-name="{{ scenario.player_b_name }}"
+                        data-player-b-role="{{ scenario.player_b_role }}">
                     {{ scenario.name }} ({{ scenario.setting }})
                 </option>
                 {% endfor %}
             </select>
+        </div>
+
+        <div class="form-group" id="side-selection" style="display: none;">
+            <label>Choose Your Side</label>
+            <div class="mb-md">
+                <label style="display: flex; align-items: flex-start; font-weight: normal;">
+                    <input type="radio" name="player_side" value="a" checked
+                           style="width: auto; margin-right: 8px; margin-top: 4px;">
+                    <span id="side-a-label">
+                        <strong>Player A</strong><br>
+                        <span class="text-muted">Side A</span>
+                    </span>
+                </label>
+            </div>
+            <div class="mb-md">
+                <label style="display: flex; align-items: flex-start; font-weight: normal;">
+                    <input type="radio" name="player_side" value="b"
+                           style="width: auto; margin-right: 8px; margin-top: 4px;">
+                    <span id="side-b-label">
+                        <strong>Player B</strong><br>
+                        <span class="text-muted">Side B</span>
+                    </span>
+                </label>
+            </div>
         </div>
 
         <div class="form-group">
@@ -151,6 +179,31 @@ function toggleCustomPersona(value) {
         customInput.style.display = 'none';
         textarea.required = false;
     }
+}
+
+function updateSideOptions() {
+    const select = document.getElementById('scenario_id');
+    const sideSelection = document.getElementById('side-selection');
+    const selectedOption = select.options[select.selectedIndex];
+
+    if (!selectedOption.value) {
+        sideSelection.style.display = 'none';
+        return;
+    }
+
+    // Get role data from the selected option
+    const playerAName = selectedOption.dataset.playerAName || 'Player A';
+    const playerARole = selectedOption.dataset.playerARole || 'Side A';
+    const playerBName = selectedOption.dataset.playerBName || 'Player B';
+    const playerBRole = selectedOption.dataset.playerBRole || 'Side B';
+
+    // Update labels
+    document.getElementById('side-a-label').innerHTML =
+        '<strong>' + playerAName + ' (' + playerARole + ')</strong>';
+    document.getElementById('side-b-label').innerHTML =
+        '<strong>' + playerBName + ' (' + playerBRole + ')</strong>';
+
+    sideSelection.style.display = 'block';
 }
 </script>
 {% endblock %}

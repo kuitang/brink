@@ -98,10 +98,21 @@ class TestRealLLMOpponentChooseAction:
 
     @pytest.mark.slow
     @pytest.mark.llm_integration
-    def test_historical_persona_choose_action_bismarck(self, cuban_missile_game):
+    def test_historical_persona_choose_action_bismarck(self, cuban_missile_game, scenario_repo):
         """Test Bismarck persona choosing an action (requires LLM)."""
         game = cuban_missile_game
-        opponent = get_opponent_by_type("bismarck")
+
+        # Get scenario role information for Player B (the opponent)
+        scenario = scenario_repo.get_scenario("cuban-missile-crisis")
+        role_name = scenario.get("player_b_role", "Premier Khrushchev")
+        role_description = scenario.get("player_b_description", "You are the Soviet leader.")
+
+        opponent = get_opponent_by_type(
+            "bismarck",
+            is_player_a=False,
+            role_name=role_name,
+            role_description=role_description,
+        )
 
         state = game.get_current_state()
         actions = game.get_available_actions("B")
@@ -156,10 +167,21 @@ class TestRealLLMFullGameFlow:
 
     @pytest.mark.slow
     @pytest.mark.llm_integration
-    def test_play_3_turns_with_khrushchev(self, cuban_missile_game):
+    def test_play_3_turns_with_khrushchev(self, cuban_missile_game, scenario_repo):
         """Play 3 turns with Khrushchev opponent (real LLM calls)."""
         game = cuban_missile_game
-        opponent = get_opponent_by_type("khrushchev")
+
+        # Get scenario role information
+        scenario = scenario_repo.get_scenario("cuban-missile-crisis")
+        role_name = scenario.get("player_b_role", "Premier Khrushchev")
+        role_description = scenario.get("player_b_description", "You are the Soviet leader.")
+
+        opponent = get_opponent_by_type(
+            "khrushchev",
+            is_player_a=False,
+            role_name=role_name,
+            role_description=role_description,
+        )
 
         for turn in range(3):
             state = game.get_current_state()

@@ -287,12 +287,60 @@ OptionList {
     height: auto;
     max-height: 12;
 }
+
+#loading-modal {
+    align: center middle;
+}
+
+.loading-container {
+    width: 40;
+    height: 7;
+    border: solid $warning;
+    background: $surface;
+    padding: 1 2;
+}
+
+.loading-text {
+    text-align: center;
+    color: $warning;
+}
+
+.loading-spinner {
+    text-align: center;
+    color: $primary;
+}
 """
 
 
 # =============================================================================
 # Screens
 # =============================================================================
+
+
+class LoadingModal(Screen):
+    """Simple modal showing a loading/thinking indicator."""
+
+    def __init__(self, message: str = "Opponent is thinking...") -> None:
+        super().__init__()
+        self.message = message
+        self._spinner_frames = ["|", "/", "-", "\\"]
+        self._frame_index = 0
+
+    def compose(self) -> ComposeResult:
+        with Container(id="loading-modal"):
+            with Vertical(classes="loading-container"):
+                yield Static(self.message, classes="loading-text")
+                yield Static("|", id="spinner", classes="loading-spinner")
+
+    def on_mount(self) -> None:
+        """Start spinner animation."""
+        self.set_interval(0.1, self._update_spinner)
+
+    def _update_spinner(self) -> None:
+        """Animate the spinner."""
+        self._frame_index = (self._frame_index + 1) % len(self._spinner_frames)
+        spinner = self.query_one("#spinner", Static)
+        spinner.update(self._spinner_frames[self._frame_index])
 
 
 class MainMenuScreen(Screen):
@@ -419,7 +467,83 @@ class OpponentSelectScreen(Screen):
         if event.option.disabled:
             return
         opponent_type = str(event.option.id)
-        self.app.push_screen(GameScreen(self.scenario_id, opponent_type))
+        self.app.push_screen(SideSelectScreen(self.scenario_id, opponent_type))
+
+    @on(Button.Pressed, "#back")
+    def go_back(self) -> None:
+        self.app.pop_screen()
+
+    def action_go_back(self) -> None:
+        self.app.pop_screen()
+
+
+class SideSelectScreen(Screen):
+    """Screen for selecting which side (Player A or B) to play."""
+
+    BINDINGS = [
+        Binding("escape", "go_back", "Back"),
+    ]
+
+    def __init__(self, scenario_id: str, opponent_type: str) -> None:
+        super().__init__()
+        self.scenario_id = scenario_id
+        self.opponent_type = opponent_type
+        self.scenario: dict | None = None
+
+    def compose(self) -> ComposeResult:
+        yield Header()
+        with Container(id="main-menu"):
+            with Vertical(classes="menu-container"):
+                yield Static("CHOOSE YOUR SIDE", classes="menu-title")
+                yield Rule()
+                yield Static("", id="side-description")
+                yield Rule()
+                yield OptionList(id="side-list")
+                yield Rule()
+                yield Button("Back", id="back", variant="default")
+        yield Footer()
+
+    def on_mount(self) -> None:
+        """Load scenario roles when screen mounts."""
+        repo = get_scenario_repository()
+        self.scenario = repo.get_scenario(self.scenario_id)
+
+        option_list = self.query_one("#side-list", OptionList)
+        description = self.query_one("#side-description", Static)
+
+        if self.scenario:
+            # Get role information
+            player_a_name = self.scenario.get("player_a_name", "Player A")
+            player_a_role = self.scenario.get("player_a_role", "Side A")
+            player_b_name = self.scenario.get("player_b_name", "Player B")
+            player_b_role = self.scenario.get("player_b_role", "Side B")
+
+            description.update(
+                f"Scenario: {self.scenario.get('name', self.scenario_id)}\n\n"
+                f"Choose which side you want to play:"
+            )
+
+            option_list.add_option(Option(
+                f"{player_a_name} ({player_a_role})",
+                id="player_a"
+            ))
+            option_list.add_option(Option(
+                f"{player_b_name} ({player_b_role})",
+                id="player_b"
+            ))
+        else:
+            description.update("Choose your side:")
+            option_list.add_option(Option("Player A", id="player_a"))
+            option_list.add_option(Option("Player B", id="player_b"))
+
+    @on(OptionList.OptionSelected)
+    def side_selected(self, event: OptionList.OptionSelected) -> None:
+        human_is_player_a = str(event.option.id) == "player_a"
+        self.app.push_screen(GameScreen(
+            self.scenario_id,
+            self.opponent_type,
+            human_is_player_a=human_is_player_a,
+        ))
 
     @on(Button.Pressed, "#back")
     def go_back(self) -> None:
@@ -446,10 +570,18 @@ class GameScreen(Screen):
         Binding("9", "select_action_9", "Action 9", show=False),
     ]
 
-    def __init__(self, scenario_id: str, opponent_type: str) -> None:
+    def __init__(
+        self,
+        scenario_id: str,
+        opponent_type: str,
+        human_is_player_a: bool = True,
+    ) -> None:
         super().__init__()
         self.scenario_id = scenario_id
         self.opponent_type = opponent_type
+        self.human_is_player_a = human_is_player_a
+        self.human_player = "A" if human_is_player_a else "B"
+        self.opponent_player = "B" if human_is_player_a else "A"
         self.game: Optional[GameEngine] = None
         self.opponent: Optional[Opponent] = None
         self.available_actions: list[Action] = []
@@ -494,17 +626,23 @@ class GameScreen(Screen):
         self.game = create_game(self.scenario_id, repo)
 
         # Get scenario information for opponent role context
-        # The opponent plays as Player B, so we need player_b_role and player_b_description
+        # The opponent plays the opposite side of the human
         scenario = repo.get_scenario(self.scenario_id)
         role_name = None
         role_description = None
         if scenario:
-            role_name = scenario.get("player_b_role")
-            role_description = scenario.get("player_b_description")
+            if self.human_is_player_a:
+                # Human is A, opponent is B
+                role_name = scenario.get("player_b_role")
+                role_description = scenario.get("player_b_description")
+            else:
+                # Human is B, opponent is A
+                role_name = scenario.get("player_a_role")
+                role_description = scenario.get("player_a_description")
 
         self.opponent = get_opponent_by_type(
             self.opponent_type,
-            is_player_a=False,  # Opponent is always Player B in CLI
+            is_player_a=not self.human_is_player_a,  # Opponent is opposite of human
             role_name=role_name,
             role_description=role_description,
         )
@@ -533,16 +671,23 @@ class GameScreen(Screen):
         else:
             briefing_text.update("The situation develops...")
 
-        # Update your status (exact values - you are player A)
-        self.query_one("#your-position", Static).update(f"Position: {state.position_a:.1f}")
-        self.query_one("#your-resources", Static).update(f"Resources: {state.resources_a:.1f}")
+        # Update your status (exact values for the human's side)
+        if self.human_is_player_a:
+            my_position = state.position_a
+            my_resources = state.resources_a
+        else:
+            my_position = state.position_b
+            my_resources = state.resources_b
+
+        self.query_one("#your-position", Static).update(f"Position: {my_position:.1f}")
+        self.query_one("#your-resources", Static).update(f"Resources: {my_resources:.1f}")
 
         # Update intelligence on opponent (with uncertainty)
-        info_state = self.game.get_information_state("A")
+        info_state = self.game.get_information_state(self.human_player)
         self._update_intel_display(info_state, state.turn)
 
-        # Update available actions
-        self.available_actions = self.game.get_available_actions("A")
+        # Update available actions for human's side
+        self.available_actions = self.game.get_available_actions(self.human_player)
         self._update_action_list()
 
         # Update history
@@ -676,23 +821,29 @@ class GameScreen(Screen):
             self.app.push_screen(SettlementProposalModal(self.game, self.opponent))
             return
 
+        # Show loading modal while opponent thinks
+        self.app.push_screen(LoadingModal("Opponent is thinking..."))
+
         # Run the action execution in a worker thread to avoid blocking the event loop
         # This is necessary because opponent.choose_action may use asyncio.run() internally
         self._execute_action_worker(player_action)
 
     @work(thread=True)
-    def _execute_action_worker(self, player_action: Action) -> None:
+    def _execute_action_worker(self, human_action: Action) -> None:
         """Execute action in worker thread (handles async opponent methods)."""
         state = self.game.get_current_state()
-        opponent_actions = self.game.get_available_actions("B")
+        opponent_actions = self.game.get_available_actions(self.opponent_player)
 
         # Get opponent's action - this may call asyncio.run() internally
         opponent_action = run_opponent_method(
             self.opponent.choose_action, state, opponent_actions
         )
 
-        # Submit actions
-        result = self.game.submit_actions(player_action, opponent_action)
+        # Submit actions in correct order (action_a, action_b)
+        if self.human_is_player_a:
+            result = self.game.submit_actions(human_action, opponent_action)
+        else:
+            result = self.game.submit_actions(opponent_action, human_action)
 
         # Build result for main thread
         exec_result = ActionExecutionResult(success=result.success)
@@ -709,6 +860,10 @@ class GameScreen(Screen):
 
     def _handle_action_result(self, result: ActionExecutionResult) -> None:
         """Handle action result on main thread."""
+        # Dismiss the loading modal
+        if isinstance(self.app.screen, LoadingModal):
+            self.app.pop_screen()
+
         if result.success:
             if result.turn_history_entry:
                 self.turn_history.append(result.turn_history_entry)
@@ -727,10 +882,14 @@ class GameScreen(Screen):
     def action_propose_settlement(self) -> None:
         """Open settlement proposal modal."""
         if self.game and self.opponent:
-            # Check if settlement is available
-            menu = self.game.get_action_menu("A")
+            # Check if settlement is available for human's side
+            menu = self.game.get_action_menu(self.human_player)
             if menu.can_propose_settlement:
-                self.app.push_screen(SettlementProposalModal(self.game, self.opponent))
+                self.app.push_screen(SettlementProposalModal(
+                    self.game,
+                    self.opponent,
+                    human_is_player_a=self.human_is_player_a,
+                ))
             else:
                 self.notify("Settlement not available (requires Turn > 4 and Stability > 2)", severity="warning")
 
@@ -748,19 +907,30 @@ class SettlementProposalModal(Screen):
         Binding("escape", "cancel", "Cancel"),
     ]
 
-    def __init__(self, game: GameEngine, opponent: Opponent) -> None:
+    def __init__(
+        self,
+        game: GameEngine,
+        opponent: Opponent,
+        human_is_player_a: bool = True,
+    ) -> None:
         super().__init__()
         self.game = game
         self.opponent = opponent
+        self.human_is_player_a = human_is_player_a
         self._suggested_vp: int = 50
 
     def compose(self) -> ComposeResult:
         state = self.game.get_current_state()
 
-        # Calculate suggested VP based on position
+        # Calculate suggested VP based on human's position
+        if self.human_is_player_a:
+            my_position = state.position_a
+        else:
+            my_position = state.position_b
+
         total_pos = state.position_a + state.position_b
         if total_pos > 0:
-            suggested = int((state.position_a / total_pos) * 100)
+            suggested = int((my_position / total_pos) * 100)
         else:
             suggested = 50
 

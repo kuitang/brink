@@ -318,7 +318,7 @@ class HumanSimulator(Opponent):
         b_code = "C" if action_b == ActionType.COOPERATIVE else "D"
         self._turn_history.append(f"Turn {turn}: {a_code}{b_code}")
 
-    def choose_action(
+    async def choose_action(
         self,
         state: GameState,
         available_actions: list[Action],
@@ -328,8 +328,7 @@ class HumanSimulator(Opponent):
         Makes a decision as the simulated human persona, potentially including
         realistic mistakes based on sophistication and emotional state.
 
-        This implements the Opponent interface. Uses asyncio.run() internally
-        to call async LLM functions.
+        This implements the Opponent interface.
 
         Args:
             state: Current game state
@@ -341,8 +340,7 @@ class HumanSimulator(Opponent):
         Raises:
             ValueError: If no persona has been set
         """
-        import asyncio
-        return asyncio.run(self._choose_action_async(state, available_actions))
+        return await self._choose_action_async(state, available_actions)
 
     async def _choose_action_async(
         self,
@@ -614,7 +612,7 @@ class HumanSimulator(Opponent):
         else:
             return random.choice(available_actions)
 
-    def evaluate_settlement(
+    async def evaluate_settlement(
         self,
         proposal: BaseSettlementProposal,
         state: GameState,
@@ -622,8 +620,7 @@ class HumanSimulator(Opponent):
     ) -> BaseSettlementResponse:
         """Evaluate a settlement proposal as this persona.
 
-        Implements the Opponent interface. Uses asyncio.run() internally
-        to call async LLM functions.
+        Implements the Opponent interface.
 
         Args:
             proposal: The settlement proposal to evaluate
@@ -636,8 +633,7 @@ class HumanSimulator(Opponent):
         Raises:
             ValueError: If no persona has been set
         """
-        import asyncio
-        return asyncio.run(self._evaluate_settlement_async(proposal, state, is_final_offer))
+        return await self._evaluate_settlement_async(proposal, state, is_final_offer)
 
     async def _evaluate_settlement_async(
         self,
@@ -718,7 +714,7 @@ class HumanSimulator(Opponent):
             rejection_reason=internal_response.rejection_reason,
         )
 
-    def propose_settlement(self, state: GameState) -> BaseSettlementProposal | None:
+    async def propose_settlement(self, state: GameState) -> BaseSettlementProposal | None:
         """Decide whether to propose settlement and what offer to make.
 
         Implements the Opponent interface.

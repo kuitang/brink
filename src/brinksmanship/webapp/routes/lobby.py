@@ -46,6 +46,8 @@ def new_game():
         scenario_id = request.form.get("scenario_id", "")
         opponent_type = request.form.get("opponent_type", "")
         custom_persona = request.form.get("custom_persona", "").strip() or None
+        player_side = request.form.get("player_side", "a")  # Default to Player A
+        player_is_a = player_side.lower() == "a"
 
         if not scenario_id or not opponent_type:
             flash("Please select a scenario and opponent.", "error")
@@ -59,6 +61,7 @@ def new_game():
             user_id=current_user.id,
             game_id=game_id,
             custom_persona=custom_persona,
+            player_is_a=player_is_a,
         )
 
         # Persist game record

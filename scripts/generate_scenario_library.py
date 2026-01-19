@@ -242,7 +242,13 @@ async def generate_single_scenario(
     max_iterations: int,
     games_per_test: int,
 ) -> tuple[bool, str]:
-    """Generate and validate a single scenario.
+    """Generate and validate a single scenario with agentic error feedback.
+
+    This function:
+    1. Generates a scenario using LLM
+    2. Runs DETERMINISTIC checks first (fast fail on structural issues)
+    3. Only runs balance simulation if deterministic checks pass
+    4. Feeds back errors to LLM for retry with context
 
     Args:
         spec: Scenario specification
@@ -260,15 +266,22 @@ async def generate_single_scenario(
     generator = ScenarioGenerator()
     validator = ScenarioValidator(simulation_games=games_per_test)
 
+    previous_errors: list[str] = []
+    reasoning_traces: list[dict] = []
+
     for iteration in range(max_iterations):
         try:
-            # Generate scenario
+            # Generate scenario with previous error feedback
             logger.info(f"[{spec.number}] Iteration {iteration+1}: Calling LLM...")
+            if previous_errors:
+                logger.info(f"[{spec.number}] Feeding back {len(previous_errors)} errors from previous attempt")
+
             scenario = await generator.generate_scenario(
                 theme=spec.theme,
                 setting=spec.prompt,
                 additional_context=f"Title: {spec.title}",
                 num_turns=14,
+                previous_errors=previous_errors if previous_errors else None,
             )
 
             # Update title if needed
@@ -282,32 +295,145 @@ async def generate_single_scenario(
                 f"{len(scenario.get_all_matrix_types())} types"
             )
 
-            # Validate
-            logger.info(f"[{spec.number}] Running validation with {games_per_test} games per pairing...")
-            result = validator.validate(scenario=scenario, run_simulation=True)
+            # STEP 1: Run DETERMINISTIC checks first (fast fail)
+            logger.info(f"[{spec.number}] Running deterministic checks...")
+            deterministic_result = validator.validate(
+                scenario=scenario,
+                run_simulation=False,  # Skip simulation for now
+                check_narrative=False,
+            )
+
+            # Collect deterministic errors
+            deterministic_errors = []
+            for issue in deterministic_result.get_critical_issues() + deterministic_result.get_major_issues():
+                deterministic_errors.append(issue.message)
+
+            if deterministic_errors:
+                logger.warning(
+                    f"[{spec.number}] Deterministic checks failed ({len(deterministic_errors)} issues)"
+                )
+                for err in deterministic_errors[:5]:
+                    logger.warning(f"[{spec.number}]   - {err}")
+
+                # Save trace with deterministic failure
+                save_validation_trace(spec, iteration + 1, deterministic_result, scenario)
+
+                # Store reasoning trace
+                reasoning_traces.append({
+                    "iteration": iteration + 1,
+                    "phase": "deterministic",
+                    "passed": False,
+                    "errors": deterministic_errors,
+                    "action": "retry with error feedback",
+                })
+
+                # Feed back errors for next iteration
+                previous_errors = deterministic_errors
+                continue  # Skip simulation, retry immediately
+
+            logger.info(f"[{spec.number}] Deterministic checks PASSED")
+
+            # STEP 2: Run simulation checks (only if deterministic passed)
+            logger.info(f"[{spec.number}] Running balance simulation ({games_per_test} games per pairing)...")
+            full_result = validator.validate(
+                scenario=scenario,
+                run_simulation=True,
+                check_narrative=False,
+            )
 
             # Save trace for every iteration
-            save_validation_trace(spec, iteration + 1, result, scenario)
+            save_validation_trace(spec, iteration + 1, full_result, scenario)
 
-            if result.overall_passed:
+            if full_result.overall_passed:
                 # Save scenario
                 save_scenario(scenario, str(output_path))
                 logger.info(f"[{spec.number}] PASSED: Saved to {output_path}")
+
+                # Save reasoning trace
+                reasoning_traces.append({
+                    "iteration": iteration + 1,
+                    "phase": "simulation",
+                    "passed": True,
+                    "action": "saved scenario",
+                })
+                _save_reasoning_trace(spec, reasoning_traces)
+
                 return True, f"Success: {spec.title}"
 
-            # Log failures
-            issues = result.get_critical_issues() + result.get_major_issues()
-            issue_summary = "; ".join(i.message[:50] for i in issues[:3])
+            # Collect simulation errors
+            simulation_errors = []
+            for issue in full_result.get_critical_issues() + full_result.get_major_issues():
+                simulation_errors.append(issue.message)
+
             logger.warning(
-                f"[{spec.number}] Iteration {iteration+1} failed: {issue_summary}"
+                f"[{spec.number}] Simulation checks failed ({len(simulation_errors)} issues)"
             )
+            for err in simulation_errors[:3]:
+                logger.warning(f"[{spec.number}]   - {err}")
+
+            # Store reasoning trace
+            reasoning_traces.append({
+                "iteration": iteration + 1,
+                "phase": "simulation",
+                "passed": False,
+                "errors": simulation_errors,
+                "action": "retry with error feedback",
+            })
+
+            # Feed back errors for next iteration
+            previous_errors = simulation_errors
 
         except Exception as e:
             logger.error(f"[{spec.number}] Error in iteration {iteration+1}: {e}")
             import traceback
             logger.error(traceback.format_exc())
 
+            # Store error in reasoning trace
+            reasoning_traces.append({
+                "iteration": iteration + 1,
+                "phase": "generation",
+                "passed": False,
+                "errors": [str(e)],
+                "action": "retry after exception",
+            })
+
+            previous_errors = [f"Generation error: {str(e)}"]
+
+    # Save final reasoning trace even on failure
+    _save_reasoning_trace(spec, reasoning_traces)
+
     return False, f"Failed after {max_iterations} iterations: {spec.title}"
+
+
+def _save_reasoning_trace(spec: ScenarioSpec, traces: list[dict]) -> Path:
+    """Save the full reasoning trace for a scenario generation.
+
+    Args:
+        spec: Scenario specification
+        traces: List of reasoning trace entries
+
+    Returns:
+        Path to saved trace file
+    """
+    trace_dir = LOG_DIR / "reasoning"
+    trace_dir.mkdir(exist_ok=True)
+
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    trace_file = trace_dir / f"{spec.number:02d}_{spec.filename.replace('.json', '')}_reasoning_{timestamp}.json"
+
+    trace_data = {
+        "scenario_number": spec.number,
+        "scenario_title": spec.title,
+        "total_iterations": len(traces),
+        "final_status": traces[-1]["passed"] if traces else False,
+        "traces": traces,
+    }
+
+    with open(trace_file, "w") as f:
+        json.dump(trace_data, f, indent=2)
+
+    logger.info(f"[{spec.number}] Reasoning trace saved: {trace_file}")
+    return trace_file
 
 
 async def check_existing_scenario(

@@ -313,6 +313,7 @@ class ScenarioGenerator:
         player_b_role: str = "Player B",
         additional_context: str = "",
         num_turns: int | None = None,
+        previous_errors: list[str] | None = None,
     ) -> Scenario:
         """Generate a complete scenario using LLM.
 
@@ -324,6 +325,7 @@ class ScenarioGenerator:
             player_b_role: Description of Player B's role
             additional_context: Any additional context for generation
             num_turns: Target number of turns (12-16, randomized if not specified)
+            previous_errors: List of validation errors from previous attempt to fix
 
         Returns:
             A validated Scenario object with all matrices constructable.
@@ -333,6 +335,17 @@ class ScenarioGenerator:
             random.randint(12, 16) if num_turns is None else max(12, min(16, num_turns))
         )
 
+        # Add error feedback to additional context if provided
+        error_context = additional_context
+        if previous_errors:
+            error_feedback = (
+                "\n\nPREVIOUS ATTEMPT FAILED VALIDATION. Fix these issues:\n"
+                + "\n".join(f"- {error}" for error in previous_errors)
+                + "\n\nEnsure all branch targets exist, default_next points to valid turns, "
+                "and matrix parameters are balanced."
+            )
+            error_context = additional_context + error_feedback
+
         # Format the generation prompt
         user_prompt = format_scenario_generation_prompt(
             theme=theme,
@@ -340,7 +353,7 @@ class ScenarioGenerator:
             time_period=time_period,
             player_a_role=player_a_role,
             player_b_role=player_b_role,
-            additional_context=additional_context,
+            additional_context=error_context,
             num_turns=num_turns,
         )
 
