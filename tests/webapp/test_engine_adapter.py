@@ -123,7 +123,7 @@ def test_submit_action_updates_state(real_engine, test_scenario_file):
 
     assert new_state["turn"] >= 1  # Turn should advance or stay same if game ended
     assert new_state["last_action_player"] is not None
-    assert new_state["last_action_opponent"] in ["cooperate", "defect"]
+    assert new_state["last_action_opponent"] in ["C", "D"]
     assert len(new_state["history"]) == 1
 
 

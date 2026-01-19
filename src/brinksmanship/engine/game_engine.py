@@ -167,6 +167,47 @@ class TurnResult:
 
 
 @dataclass
+class ScenarioAction:
+    """A scenario-defined action with narrative context.
+
+    This represents an action defined in the scenario with a context-specific
+    description that makes sense for the current turn's situation.
+
+    Attributes:
+        action_id: Base action identifier (e.g., 'escalate', 'hold')
+        narrative_description: Context-specific description for this turn
+        action_type: Whether the action is cooperative or competitive
+        resource_cost: Cost to take this action
+    """
+
+    action_id: str
+    narrative_description: str
+    action_type: ActionType
+    resource_cost: float = 0.0
+
+    def to_action(self) -> Action:
+        """Convert to an Action object for the game engine."""
+        # Determine category based on action_id
+        category = ActionCategory.STANDARD
+        if self.action_id in ("reconnaissance", "recon"):
+            category = ActionCategory.RECONNAISSANCE
+        elif self.action_id == "inspection":
+            category = ActionCategory.INSPECTION
+        elif self.action_id in ("settlement", "propose_settlement"):
+            category = ActionCategory.SETTLEMENT
+        elif self.action_id in ("signal", "signal_strength", "costly_signaling"):
+            category = ActionCategory.COSTLY_SIGNALING
+
+        return Action(
+            name=self.narrative_description,  # Use narrative as display name
+            action_type=self.action_type,
+            resource_cost=self.resource_cost,
+            description=self.narrative_description,
+            category=category,
+        )
+
+
+@dataclass
 class TurnConfiguration:
     """Configuration for the current turn from the scenario.
 
@@ -176,7 +217,7 @@ class TurnConfiguration:
         narrative_briefing: Scenario narrative for this turn
         matrix_type: Game type to use for resolution
         matrix_params: Parameters for matrix construction
-        action_menu_override: Optional override for available actions
+        scenario_actions: List of scenario-defined actions with narrative descriptions
         outcome_narratives: Narrative text for each outcome (CC, CD, DC, DD)
         branches: Next turn mappings based on outcome
         default_next: Default next turn if settlement fails or special action
@@ -189,12 +230,16 @@ class TurnConfiguration:
     narrative_briefing: str
     matrix_type: MatrixType
     matrix_params: MatrixParameters
-    action_menu_override: Optional[list[str]] = None
+    scenario_actions: list[ScenarioAction] = field(default_factory=list)
     outcome_narratives: Optional[dict[str, str]] = None
     branches: Optional[dict[str, str]] = None
     default_next: Optional[str] = None
     settlement_available: bool = True
     settlement_failed_narrative: str = "Negotiations failed. The crisis continues."
+
+    def has_scenario_actions(self) -> bool:
+        """Check if this turn has scenario-defined actions."""
+        return len(self.scenario_actions) > 0
 
 
 class GameEngine:
@@ -359,13 +404,31 @@ class GameEngine:
         else:
             matrix_params = get_default_params_for_type(matrix_type)
 
+        # Parse scenario-defined actions (new format with narrative descriptions)
+        scenario_actions: list[ScenarioAction] = []
+        actions_data = turn_data.get("actions", [])
+        for action_data in actions_data:
+            # Parse action_type string to enum
+            action_type_str = action_data.get("action_type", "cooperative")
+            if isinstance(action_type_str, str):
+                action_type = ActionType(action_type_str.lower())
+            else:
+                action_type = action_type_str
+
+            scenario_actions.append(ScenarioAction(
+                action_id=action_data.get("action_id", "hold"),
+                narrative_description=action_data.get("narrative_description", ""),
+                action_type=action_type,
+                resource_cost=float(action_data.get("resource_cost", 0.0)),
+            ))
+
         return TurnConfiguration(
             turn=turn_num,
             act=act,
             narrative_briefing=turn_data.get("narrative_briefing", ""),
             matrix_type=matrix_type,
             matrix_params=matrix_params,
-            action_menu_override=turn_data.get("action_menu"),
+            scenario_actions=scenario_actions,
             outcome_narratives=turn_data.get("outcome_narratives"),
             branches=turn_data.get("branches"),
             default_next=turn_data.get("default_next"),
@@ -469,6 +532,9 @@ class GameEngine:
     def get_available_actions(self, player: Literal["A", "B"]) -> list[Action]:
         """Get available actions for a player.
 
+        If the scenario defines actions for this turn with narrative descriptions,
+        those are returned. Otherwise, generic actions based on Risk Level are used.
+
         Args:
             player: "A" or "B"
 
@@ -484,7 +550,16 @@ class GameEngine:
 
         config = self._get_current_config()
 
-        # Get base action menu
+        # If scenario defines actions for this turn, use them
+        if config.has_scenario_actions():
+            actions = []
+            for sa in config.scenario_actions:
+                # Filter out actions the player can't afford
+                if sa.resource_cost <= resources:
+                    actions.append(sa.to_action())
+            return actions
+
+        # Otherwise, fall back to generic action menu based on Risk Level
         menu = get_action_menu(
             risk_level=int(self.state.risk_level),
             turn=self.state.turn,
@@ -521,6 +596,27 @@ class GameEngine:
 
         config = self._get_current_config()
 
+        # If scenario defines actions, convert them to an ActionMenu
+        if config.has_scenario_actions():
+            standard_actions = []
+            special_actions = []
+            for sa in config.scenario_actions:
+                if sa.resource_cost <= resources:
+                    action = sa.to_action()
+                    if action.is_special():
+                        special_actions.append(action)
+                    else:
+                        standard_actions.append(action)
+
+            return ActionMenu(
+                standard_actions=standard_actions,
+                special_actions=special_actions,
+                risk_level=int(self.state.risk_level),
+                turn=self.state.turn,
+                can_propose_settlement=config.settlement_available,
+            )
+
+        # Fall back to generic action menu
         menu = get_action_menu(
             risk_level=int(self.state.risk_level),
             turn=self.state.turn,

@@ -1,10 +1,8 @@
-"""Game service - abstraction over mock/real engine."""
+"""Game service - wraps real game engine for webapp use."""
 
-from typing import Any, Protocol, Union
+from typing import Any, Protocol
 
-from flask import current_app
-
-from .mock_engine import MockGameEngine
+from .engine_adapter import RealGameEngine
 
 
 class GameEngineProtocol(Protocol):
@@ -28,31 +26,17 @@ class GameEngineProtocol(Protocol):
     def submit_action(self, state: dict[str, Any], action_id: str) -> dict[str, Any]: ...
 
 
-_mock_engine: MockGameEngine | None = None
-_real_engine: Any = None
+_engine: RealGameEngine | None = None
 
 
 def get_game_service() -> GameEngineProtocol:
-    """Get the game service (mock or real based on config).
+    """Get the game service (real engine).
 
-    Uses USE_MOCK_ENGINE config to determine which engine to use.
-    Default is True (mock engine) for development.
+    Returns the singleton RealGameEngine instance that wraps the
+    actual game engine with scenario-specific narrative actions.
     """
-    global _mock_engine, _real_engine
+    global _engine
 
-    use_mock = True
-    try:
-        use_mock = current_app.config.get("USE_MOCK_ENGINE", True)
-    except RuntimeError:
-        # Outside of application context
-        pass
-
-    if use_mock:
-        if _mock_engine is None:
-            _mock_engine = MockGameEngine()
-        return _mock_engine
-    else:
-        if _real_engine is None:
-            from .engine_adapter import RealGameEngine
-            _real_engine = RealGameEngine()
-        return _real_engine
+    if _engine is None:
+        _engine = RealGameEngine()
+    return _engine

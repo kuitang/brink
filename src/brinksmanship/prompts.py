@@ -87,7 +87,7 @@ For each turn, provide:
 3. narrative_briefing (compelling situation description, 2-4 sentences)
 4. matrix_type (one of the 14 available types, appropriate for act and theme)
 5. matrix_parameters (valid parameters for the chosen type - see constraints below)
-6. action_menu (4-6 narrative action options, each classified as COOPERATIVE or COMPETITIVE)
+6. actions (4-6 TurnAction objects with action_id, action_type=COOPERATIVE|COMPETITIVE, narrative_description, resource_cost=0.0)
 7. outcome_narratives (CC, CD, DC, DD descriptions)
 8. branches (which turn/branch to follow based on outcome)
 9. default_next (branch for failed settlement or skipped turn)
@@ -158,8 +158,8 @@ Output your response as valid JSON with this structure:
         "stag_fail": 0.0,
         "scale": 1.0
       }},
-      "action_menu": [
-        {{"name": "Action Name", "type": "COOPERATIVE", "description": "..."}},
+      "actions": [
+        {{"action_id": "action_slug", "action_type": "COOPERATIVE", "narrative_description": "What this action represents", "resource_cost": 0.0}},
         ...
       ],
       "outcome_narratives": {{

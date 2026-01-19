@@ -12,9 +12,8 @@ def test_scenarios_index_shows_scenarios(client):
     """Test scenarios index shows available scenarios."""
     response = client.get("/scenarios/")
     assert response.status_code == 200
-    # Mock engine has these scenarios
+    # Should show at least the Cuban Missile Crisis scenario
     assert b"Cuban Missile Crisis" in response.data
-    assert b"Hostile Takeover" in response.data
 
 
 def test_scenario_detail_renders(client):

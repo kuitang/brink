@@ -422,6 +422,20 @@ textarea:focus {
     white-space: nowrap;
 }
 
+.action-content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    text-align: left;
+}
+
+.action-mechanics {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: normal;
+    margin-top: 2px;
+}
+
 /* ===== HISTORY ===== */
 .history {
     font-family: var(--font-mono);

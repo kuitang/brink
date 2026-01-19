@@ -1,18 +1,29 @@
 {# Action selection menu with htmx #}
-<form hx-post="{{ url_for('game.submit_action', game_id=game_id) }}"
+<form id="action-form" hx-post="{{ url_for('game.submit_action', game_id=game_id) }}"
       hx-target="#game-board"
       hx-swap="innerHTML"
       hx-indicator="#thinking">
 
     <div class="hide-on-request">
+        <h3>Choose Your Action <span class="text-muted">(or press 1-{{ actions|length }})</span></h3>
         <div class="action-menu">
             {% for action in actions %}
             <button type="submit" name="action_id" value="{{ action.id }}"
-                    class="action-btn {{ action.type }}">
-                <span class="action-name">{{ action.name }}</span>
-                {% if action.cost > 0 %}
-                <span class="action-cost">Cost: {{ action.cost }} resources</span>
-                {% endif %}
+                    class="action-btn {{ action.type }}"
+                    data-action-index="{{ loop.index }}"
+                    title="{{ action.description }}">
+                <span class="action-key">{{ loop.index }}</span>
+                <span class="action-type-indicator {{ action.type }}">
+                    {% if action.type == 'cooperative' %}
+                    &#x1F54A;
+                    {% else %}
+                    &#x2694;
+                    {% endif %}
+                </span>
+                <div class="action-content">
+                    <span class="action-name">{{ action.name }}</span>
+                    <span class="action-mechanics">{{ action.mechanics_hint }}{% if action.cost > 0 %} &middot; {{ action.cost }} resources{% endif %}</span>
+                </div>
             </button>
             {% endfor %}
         </div>
@@ -22,3 +33,21 @@
         {% include "components/opponent_thinking.html" %}
     </div>
 </form>
+
+<script>
+// Keyboard shortcuts for actions (1-9)
+document.addEventListener('keydown', function(e) {
+    // Ignore if typing in an input field
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+    // Check for number keys 1-9
+    const key = parseInt(e.key);
+    if (key >= 1 && key <= 9) {
+        const btn = document.querySelector(`[data-action-index="${key}"]`);
+        if (btn) {
+            e.preventDefault();
+            btn.click();
+        }
+    }
+});
+</script>

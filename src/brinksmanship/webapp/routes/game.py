@@ -53,8 +53,15 @@ def submit_action(game_id: str):
     state = game_record.state
     new_state = game_service.submit_action(state, action_id)
 
+    # Record turn in history
+    game_record.add_turn(
+        new_state["new_turn_number"],
+        new_state["new_turn_player"],
+        new_state["new_turn_opponent"]
+    )
+
     # Update record
-    game_record.state = new_state
+    game_record.update_from_state(new_state)
     game_record.updated_at = datetime.utcnow()
 
     # Check for game over

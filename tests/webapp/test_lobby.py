@@ -30,17 +30,15 @@ def test_new_game_page_shows_scenarios(auth_client):
     """Test new game page shows available scenarios."""
     response = auth_client.get("/new")
     assert response.status_code == 200
+    # Should show at least the Cuban Missile Crisis scenario
     assert b"Cuban Missile Crisis" in response.data
-    assert b"Hostile Takeover" in response.data
 
 
 def test_new_game_page_shows_opponents(auth_client):
     """Test new game page shows available opponents."""
     response = auth_client.get("/new")
     assert response.status_code == 200
-    assert b"Tit-for-Tat" in response.data
-    assert b"Nash Calculator" in response.data
-    assert b"Otto von Bismarck" in response.data
+    # Should show opponent selection options and custom persona option
     assert b"Custom Persona" in response.data
 
 

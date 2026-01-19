@@ -21,9 +21,6 @@ class Config:
     SCENARIOS_PATH = PROJECT_ROOT / "scenarios"
     SCENARIO_STORAGE = "file"  # 'file' or 'sqlite'
 
-    # Game engine
-    USE_MOCK_ENGINE = False  # Real engine is ready; set True for fast UI dev
-
     # LLM
     LLM_TIMEOUT = 60  # seconds to wait for persona responses
 
@@ -33,11 +30,4 @@ class TestConfig(Config):
 
     TESTING = True
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
-    USE_MOCK_ENGINE = True
     WTF_CSRF_ENABLED = False
-
-
-class RealEngineTestConfig(TestConfig):
-    """Testing configuration with real game engine."""
-
-    USE_MOCK_ENGINE = False

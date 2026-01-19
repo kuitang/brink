@@ -454,7 +454,7 @@ class GameScreen(Screen):
         repo = get_scenario_repository()
         self.game = create_game(self.scenario_id, repo)
         self.opponent = get_opponent_by_type(self.opponent_type)
-        self.call_from_thread(self.update_display)
+        self.app.call_from_thread(self.update_display)
 
     def update_display(self) -> None:
         """Update all display elements."""
@@ -539,28 +539,26 @@ class GameScreen(Screen):
             res_display.update("Resources: UNKNOWN (no inspection data)")
             res_display.add_class("intel-unknown")
 
+    # Mechanics hints for cooperative actions by category
+    _COOP_HINTS = {
+        ActionCategory.SETTLEMENT: "Negotiate end",
+        ActionCategory.RECONNAISSANCE: "Learn position",
+        ActionCategory.INSPECTION: "Learn resources",
+        ActionCategory.COSTLY_SIGNALING: "Signal strength",
+    }
+
     def _update_action_list(self) -> None:
-        """Update the action list display."""
+        """Update the action list display with narrative descriptions and mechanics hints."""
         action_list = self.query_one("#action-list", OptionList)
         action_list.clear_options()
 
         for i, action in enumerate(self.available_actions):
-            type_label = "C" if action.action_type == ActionType.COOPERATIVE else "D"
-            cost_str = f" ({action.resource_cost:.1f} res)" if action.resource_cost > 0 else ""
+            is_coop = action.action_type == ActionType.COOPERATIVE
+            hint = self._COOP_HINTS.get(action.category, "Builds trust") if is_coop else "Risk +, position?"
+            icon = "\u2764" if is_coop else "\u2694"  # heart or sword
+            cost_str = f" | {action.resource_cost:.1f}R" if action.resource_cost > 0 else ""
 
-            # Special action indicator
-            if action.category == ActionCategory.SETTLEMENT:
-                special = " [SETTLEMENT]"
-            elif action.category == ActionCategory.RECONNAISSANCE:
-                special = " [RECON]"
-            elif action.category == ActionCategory.INSPECTION:
-                special = " [INSPECT]"
-            elif action.category == ActionCategory.COSTLY_SIGNALING:
-                special = " [SIGNAL]"
-            else:
-                special = ""
-
-            label = f"[{i+1}] {action.name} ({type_label}){cost_str}{special}"
+            label = f"[{i+1}] {icon} {action.name}\n     {hint}{cost_str}"
             action_list.add_option(Option(label, id=str(i)))
 
     def _update_history(self) -> None:
@@ -880,7 +878,7 @@ class CoachingScreen(Screen):
     def load_coaching(self) -> None:
         """Load coaching analysis asynchronously."""
         content = self._generate_coaching_content()
-        self.call_from_thread(self._update_coaching_display, content)
+        self.app.call_from_thread(self._update_coaching_display, content)
 
     def _generate_coaching_content(self) -> str:
         """Generate coaching content from game history."""

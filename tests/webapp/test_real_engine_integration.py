@@ -5,7 +5,7 @@ import os
 import pytest
 
 from brinksmanship.webapp import create_app
-from brinksmanship.webapp.config import RealEngineTestConfig
+from brinksmanship.webapp.config import TestConfig
 from brinksmanship.webapp.extensions import db
 from brinksmanship.webapp.models import User
 
@@ -52,7 +52,7 @@ def test_scenario_file():
 @pytest.fixture
 def real_engine_app(test_scenario_file):
     """Create test application with real engine."""
-    app = create_app(RealEngineTestConfig)
+    app = create_app(TestConfig)
     with app.app_context():
         db.create_all()
         yield app

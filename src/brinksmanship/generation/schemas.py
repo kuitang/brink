@@ -14,6 +14,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from brinksmanship.models.actions import ActionType
 from brinksmanship.models.matrices import (
     CONSTRUCTORS,
     MatrixParameters,
@@ -65,6 +66,54 @@ class BranchTargets(BaseModel):
         return getattr(self, outcome_code)
 
 
+class TurnAction(BaseModel):
+    """A context-specific action available on a particular turn.
+
+    Each turn in a scenario defines its own action menu with narrative descriptions
+    that make sense in the context of that turn's situation. This replaces the
+    generic action names like "De-escalate" with specific, meaningful choices
+    like "Order naval blockade of Cuba".
+
+    The action_id maps to a base action type (escalate, hold, etc.) which
+    determines the game mechanics (cooperative vs competitive classification).
+    The narrative_description provides the context-specific meaning.
+
+    Example:
+        TurnAction(
+            action_id="escalate",
+            narrative_description="Order naval blockade of Cuba",
+            action_type="competitive"
+        )
+    """
+
+    model_config = ConfigDict(frozen=True)
+
+    action_id: str = Field(
+        description="Base action identifier (e.g., 'escalate', 'hold', 'deescalate', "
+        "'reconnaissance', 'inspection', 'settlement')"
+    )
+    narrative_description: str = Field(
+        min_length=1,
+        max_length=200,
+        description="Context-specific description of this action for this turn"
+    )
+    action_type: ActionType = Field(
+        description="Whether this action is cooperative or competitive"
+    )
+    resource_cost: float = Field(
+        default=0.0,
+        ge=0.0,
+        le=10.0,
+        description="Resource cost to take this action"
+    )
+
+    def to_matrix_choice(self) -> Literal["C", "D"]:
+        """Map action type to matrix game choice."""
+        if self.action_type == ActionType.COOPERATIVE:
+            return "C"
+        return "D"
+
+
 class TurnDefinition(BaseModel):
     """Definition of a single turn in a scenario.
 
@@ -96,12 +145,14 @@ class TurnDefinition(BaseModel):
         description="Parameters for matrix construction",
     )
 
-    # Action menu (optional override of default actions)
-    action_menu: list[str] = Field(
+    # Action menu with context-specific descriptions
+    # When provided, these replace the generic actions with narrative meanings
+    # that make sense in the context of this turn's situation
+    actions: list[TurnAction] = Field(
         default_factory=list,
-        min_length=0,
         max_length=6,
-        description="Available actions this turn (optional override)",
+        description="Available actions this turn with context-specific narrative descriptions. "
+        "If empty, generic actions based on Risk Level will be used."
     )
 
     # Outcome narratives
@@ -233,6 +284,22 @@ class TurnDefinition(BaseModel):
         if branch_target is not None:
             return branch_target
         return self.default_next
+
+    def has_scenario_actions(self) -> bool:
+        """Check if this turn defines scenario-specific actions.
+
+        Returns:
+            True if actions are defined with narrative descriptions.
+        """
+        return len(self.actions) > 0
+
+    def get_scenario_actions(self) -> list[TurnAction]:
+        """Get the scenario-specific actions for this turn.
+
+        Returns:
+            List of TurnAction objects with narrative descriptions.
+        """
+        return list(self.actions)
 
 
 class Scenario(BaseModel):

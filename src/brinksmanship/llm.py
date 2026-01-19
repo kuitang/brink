@@ -9,6 +9,7 @@ The Agent SDK shells out to Claude Code CLI, which means:
 - Full access to Claude's capabilities
 """
 
+import logging
 from collections.abc import AsyncIterator
 from typing import Any
 
@@ -19,6 +20,8 @@ from claude_agent_sdk import (
     TextBlock,
     query,
 )
+
+logger = logging.getLogger(__name__)
 
 
 async def generate_text(
@@ -90,6 +93,14 @@ async def generate_json(
     """
     import json
 
+    # Log the request
+    logger.info("=" * 60)
+    logger.info("LLM REQUEST (generate_json)")
+    logger.info("=" * 60)
+    logger.info(f"System prompt length: {len(system_prompt) if system_prompt else 0} chars")
+    logger.info(f"User prompt length: {len(prompt)} chars")
+    logger.debug(f"User prompt preview: {prompt[:500]}...")
+
     # Build options
     options_kwargs: dict[str, Any] = {"max_turns": 1}
     if system_prompt is not None:
@@ -99,15 +110,22 @@ async def generate_json(
 
     options = ClaudeAgentOptions(**options_kwargs)
 
+    logger.info("Calling Claude Agent SDK...")
     response_text = ""
+    message_count = 0
     async for message in query(prompt=prompt, options=options):
+        message_count += 1
         if isinstance(message, AssistantMessage):
             for block in message.content:
                 if isinstance(block, TextBlock):
                     response_text += block.text
+                    logger.debug(f"Received text block: {len(block.text)} chars")
         elif isinstance(message, ResultMessage):
+            logger.info(f"Received result message: subresult={message.subresult}")
             if message.result:
                 response_text = str(message.result)
+
+    logger.info(f"Received {message_count} messages, total response: {len(response_text)} chars")
 
     # Clean up response (remove markdown code blocks if present)
     text = response_text.strip()
@@ -121,9 +139,18 @@ async def generate_json(
             lines = lines[1:]
         text = "\n".join(lines)
 
+    logger.info("=" * 60)
+    logger.info("LLM RESPONSE")
+    logger.info("=" * 60)
+    logger.debug(f"Response preview: {text[:1000]}...")
+
     try:
-        return json.loads(text)
+        result = json.loads(text)
+        logger.info(f"Successfully parsed JSON with {len(result)} top-level keys")
+        return result
     except json.JSONDecodeError as e:
+        logger.error(f"Failed to parse JSON: {e}")
+        logger.error(f"Raw response: {text[:2000]}")
         raise ValueError(f"Failed to parse JSON response: {e}\nResponse: {text}") from e
 
 

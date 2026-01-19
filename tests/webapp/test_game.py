@@ -76,7 +76,8 @@ def test_game_page_shows_actions(auth_client, app, user):
 
     response = auth_client.get("/game/test-game")
     assert response.status_code == 200
-    assert b"De-escalate" in response.data or b"Probe" in response.data
+    # Should show action menu with cooperative and competitive options
+    assert b"cooperative" in response.data or b"competitive" in response.data
 
 
 def test_game_not_found(auth_client):

@@ -522,6 +522,9 @@ class ScenarioGenerator:
             DD=branches_data.get("DD"),
         )
 
+        # Pass actions directly - Pydantic will validate against TurnAction schema
+        actions_data = turn_data.get("actions", [])
+
         return TurnDefinition(
             turn=turn_num,
             act=act,
@@ -530,7 +533,7 @@ class ScenarioGenerator:
             ),
             matrix_type=matrix_type,
             matrix_parameters=scaled_params,
-            action_menu=turn_data.get("action_menu", []),
+            actions=actions_data,
             outcome_narratives=outcome_narratives,
             branches=branch_targets,
             default_next=turn_data.get("default_next"),
@@ -657,7 +660,7 @@ class ScenarioGenerator:
                         narrative_briefing=old_turn.narrative_briefing,
                         matrix_type=new_type,
                         matrix_parameters=scaled_params,
-                        action_menu=old_turn.action_menu,
+                        actions=old_turn.actions,
                         outcome_narratives=old_turn.outcome_narratives,
                         branches=old_turn.branches,
                         default_next=old_turn.default_next,

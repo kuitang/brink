@@ -468,20 +468,23 @@ class HumanSimulator(Opponent):
         if random.random() > final_prob:
             return chosen_action  # No mistake
 
-        # Determine mistake type based on persona and context
+        # Get player position and opponent's last action
         if is_player_a:
-            position_diff = state.position_a - state.position_b
+            player_position = state.position_a
         else:
-            position_diff = state.position_b - state.position_a
+            player_position = state.position_b
 
-        # Check recent pattern
-        recent_pattern = "mixed"
-        if len(self._turn_history) >= 2:
-            recent = self._turn_history[-2:]
-            if all("CC" in t for t in recent):
-                recent_pattern = "cooperative"
-            elif all("DD" in t for t in recent):
-                recent_pattern = "competitive"
+        # Get opponent's previous action type
+        opponent_previous_type = "unknown"
+        if len(self._turn_history) >= 1:
+            last = self._turn_history[-1]
+            if "C" in last[1]:  # Second character is opponent's action
+                opponent_previous_type = "cooperative"
+            elif "D" in last[1]:
+                opponent_previous_type = "competitive"
+
+        # Format history for prompt
+        history_str = ", ".join(self._turn_history[-3:]) if self._turn_history else "none"
 
         # Use LLM to determine mistake type
         mistake_prompt = MISTAKE_CHECK_PROMPT.format(
@@ -490,10 +493,11 @@ class HumanSimulator(Opponent):
             emotional_state=self.persona.emotional_state,
             personality=self.persona.personality,
             triggers=", ".join(self.persona.triggers),
-            risk_level=state.risk_level,
-            position_diff=position_diff,
             turn=state.turn,
-            recent_pattern=recent_pattern,
+            risk_level=state.risk_level,
+            player_position=player_position,
+            opponent_previous_type=opponent_previous_type,
+            history=history_str,
         )
 
         result = await generate_json(
@@ -686,19 +690,17 @@ class HumanSimulator(Opponent):
             sophistication=self.persona.sophistication,
             emotional_state=self.persona.emotional_state,
             personality=self.persona.personality,
-            backstory=self.persona.backstory,
-            triggers=", ".join(self.persona.triggers),
-            opponent_vp=opponent_vp,
+            decision_style=self.persona.decision_style,
             your_vp=your_vp,
             argument=argument,
-            player_position=player_position,
-            opponent_position_estimate=f"{opp_est:.1f} +/-{opp_unc:.1f}",
-            risk_level=state.risk_level,
+            is_final_offer="Yes" if is_final_offer else "No",
             turn=state.turn,
+            player_position=player_position,
+            opponent_position=f"{opp_est:.1f}",
+            risk_level=state.risk_level,
             cooperation_score=state.cooperation_score,
             fair_vp=fair_vp,
             vp_difference=vp_difference,
-            is_final_offer="Yes" if is_final_offer else "No",
         )
 
         result = await generate_json(
