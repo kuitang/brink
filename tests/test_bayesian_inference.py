@@ -1,13 +1,23 @@
 """Tests for brinksmanship.coaching.bayesian_inference module.
 
 Tests cover:
-- OpponentType enum
-- OpponentTypeDistribution dataclass (initialization, normalization, to_dict)
-- ObservedAction dataclass
-- BayesianInference class (update, likelihoods, inference, trace)
+- OpponentTypeDistribution dataclass (initialization, normalization, get_probability)
+- BayesianInference class (update, likelihoods, inference, trace, reset)
 
 These tests are self-contained and verify the mathematical correctness
 of the Bayesian inference implementation.
+
+Note: Redundant tests removed per test_removal_log.md:
+- TestOpponentType: Removed trivial enum tests (test_all_types_exist, test_enum_has_six_members)
+- TestOpponentTypeDistribution: Removed test_to_dict (trivial accessor)
+- TestObservedAction: Removed entire class (trivial dataclass tests)
+- TestBayesianInference: Removed test_init_with_default_prior (subsumed by test_reset),
+  test_init_with_custom_prior (subsumed by test_reset_with_custom_prior),
+  test_get_most_likely_type (trivial accessor),
+  test_format_inference_trace_empty (trivial edge case)
+- TestLikelihoodComputation: Removed test_random_has_0_5_likelihood (tests constant)
+- TestBayesianMathematics: Removed test_posteriors_sum_to_one (subsumed by
+  test_multiple_updates_posteriors_sum_to_one)
 """
 
 import pytest
@@ -19,33 +29,6 @@ from brinksmanship.coaching.bayesian_inference import (
     OpponentTypeDistribution,
 )
 from brinksmanship.models.actions import ActionType
-
-
-# =============================================================================
-# OpponentType Enum Tests
-# =============================================================================
-
-
-class TestOpponentType:
-    """Tests for OpponentType enum."""
-
-    def test_all_types_exist(self):
-        """Test all expected opponent types exist."""
-        expected_types = {
-            "tit_for_tat",
-            "grim_trigger",
-            "opportunist",
-            "always_cooperate",
-            "always_defect",
-            "random",
-        }
-        actual_types = {t.value for t in OpponentType}
-        assert actual_types == expected_types
-
-    def test_enum_has_six_members(self):
-        """Test OpponentType has exactly six members."""
-        members = list(OpponentType)
-        assert len(members) == 6
 
 
 # =============================================================================
@@ -101,56 +84,6 @@ class TestOpponentTypeDistribution:
         assert dist.get_probability(OpponentType.TIT_FOR_TAT) == dist.tit_for_tat
         assert dist.get_probability(OpponentType.GRIM_TRIGGER) == dist.grim_trigger
 
-    def test_to_dict(self):
-        """Test to_dict returns correct dictionary."""
-        dist = OpponentTypeDistribution()
-        d = dist.to_dict()
-        assert "tit_for_tat" in d
-        assert "grim_trigger" in d
-        assert "opportunist" in d
-        assert "always_cooperate" in d
-        assert "always_defect" in d
-        assert "random" in d
-        assert len(d) == 6
-
-
-# =============================================================================
-# ObservedAction Tests
-# =============================================================================
-
-
-class TestObservedAction:
-    """Tests for ObservedAction dataclass."""
-
-    def test_create_first_turn_observation(self):
-        """Test creating observation for first turn (no previous action)."""
-        obs = ObservedAction(
-            turn=1,
-            opponent_action=ActionType.COOPERATIVE,
-            player_previous_action=None,
-            position_difference=0.0,
-            was_betrayed_before=False,
-        )
-        assert obs.turn == 1
-        assert obs.opponent_action == ActionType.COOPERATIVE
-        assert obs.player_previous_action is None
-        assert obs.was_betrayed_before is False
-
-    def test_create_later_turn_observation(self):
-        """Test creating observation for later turn with context."""
-        obs = ObservedAction(
-            turn=5,
-            opponent_action=ActionType.COMPETITIVE,
-            player_previous_action=ActionType.COOPERATIVE,
-            position_difference=1.5,
-            was_betrayed_before=True,
-        )
-        assert obs.turn == 5
-        assert obs.opponent_action == ActionType.COMPETITIVE
-        assert obs.player_previous_action == ActionType.COOPERATIVE
-        assert obs.position_difference == 1.5
-        assert obs.was_betrayed_before is True
-
 
 # =============================================================================
 # BayesianInference Tests
@@ -159,27 +92,6 @@ class TestObservedAction:
 
 class TestBayesianInference:
     """Tests for BayesianInference class."""
-
-    def test_init_with_default_prior(self):
-        """Test initialization with uniform prior."""
-        inference = BayesianInference()
-        dist = inference.get_distribution()
-        assert abs(dist.tit_for_tat - 1 / 6) < 0.001
-
-    def test_init_with_custom_prior(self):
-        """Test initialization with custom prior."""
-        prior = OpponentTypeDistribution(
-            tit_for_tat=0.5,
-            grim_trigger=0.1,
-            opportunist=0.1,
-            always_cooperate=0.1,
-            always_defect=0.1,
-            random=0.1,
-        )
-        inference = BayesianInference(prior=prior)
-        dist = inference.get_distribution()
-        # After normalization, tit_for_tat should be 0.5
-        assert dist.tit_for_tat == prior.tit_for_tat
 
     def test_update_always_cooperate_pattern(self):
         """Test inference correctly identifies always cooperate pattern."""
@@ -301,19 +213,6 @@ class TestBayesianInference:
         best_type, prob = inference.get_most_likely_type()
         # Should favor grim_trigger or always_defect (both defect after betrayal)
         assert best_type in [OpponentType.GRIM_TRIGGER, OpponentType.ALWAYS_DEFECT]
-
-    def test_get_most_likely_type(self):
-        """Test get_most_likely_type returns tuple of type and probability."""
-        inference = BayesianInference()
-        best_type, prob = inference.get_most_likely_type()
-        assert isinstance(best_type, OpponentType)
-        assert 0.0 <= prob <= 1.0
-
-    def test_format_inference_trace_empty(self):
-        """Test trace format with no observations."""
-        inference = BayesianInference()
-        trace = inference.format_inference_trace()
-        assert "No observations recorded" in trace
 
     def test_format_inference_trace_with_observations(self):
         """Test trace format with observations."""
@@ -477,31 +376,6 @@ class TestLikelihoodComputation:
         likelihoods = inference._compute_likelihoods(obs)
         assert likelihoods[OpponentType.OPPORTUNIST] > 0.7
 
-    def test_random_has_0_5_likelihood(self):
-        """Test Random always has 0.5 likelihood regardless of action."""
-        inference = BayesianInference()
-
-        obs_coop = ObservedAction(
-            turn=1,
-            opponent_action=ActionType.COOPERATIVE,
-            player_previous_action=None,
-            position_difference=0.0,
-            was_betrayed_before=False,
-        )
-        obs_defect = ObservedAction(
-            turn=1,
-            opponent_action=ActionType.COMPETITIVE,
-            player_previous_action=None,
-            position_difference=0.0,
-            was_betrayed_before=False,
-        )
-
-        likelihoods_coop = inference._compute_likelihoods(obs_coop)
-        likelihoods_defect = inference._compute_likelihoods(obs_defect)
-
-        assert likelihoods_coop[OpponentType.RANDOM] == 0.5
-        assert likelihoods_defect[OpponentType.RANDOM] == 0.5
-
 
 # =============================================================================
 # Mathematical Correctness Tests
@@ -510,30 +384,6 @@ class TestLikelihoodComputation:
 
 class TestBayesianMathematics:
     """Tests verifying Bayesian mathematics are correct."""
-
-    def test_posteriors_sum_to_one(self):
-        """Test posteriors always sum to 1 after update."""
-        inference = BayesianInference()
-
-        obs = ObservedAction(
-            turn=1,
-            opponent_action=ActionType.COOPERATIVE,
-            player_previous_action=None,
-            position_difference=0.0,
-            was_betrayed_before=False,
-        )
-        inference.update(obs)
-
-        dist = inference.get_distribution()
-        total = (
-            dist.tit_for_tat
-            + dist.grim_trigger
-            + dist.opportunist
-            + dist.always_cooperate
-            + dist.always_defect
-            + dist.random
-        )
-        assert abs(total - 1.0) < 0.001
 
     def test_multiple_updates_posteriors_sum_to_one(self):
         """Test posteriors sum to 1 after multiple updates."""

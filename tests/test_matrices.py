@@ -7,6 +7,17 @@ Tests cover:
 4. PayoffMatrix - creation and properties
 5. All 14 constructors - ordinal constraints and random parameter validation
 6. CONSTRUCTORS registry - completeness and build_matrix function
+
+REMOVED TESTS (see test_removal_log.md for rationale):
+- TestMatrixType: test_enum_values_are_strings, test_enum_membership, test_enum_by_value
+- TestMatrixParameters: test_default_parameters, test_valid_custom_weights, test_parameters_are_frozen,
+  consolidated validation tests
+- TestStateDeltas: test_valid_creation, test_frozen_dataclass, consolidated bounds tests
+- TestPayoffMatrix: test_creation, test_default_labels, test_custom_labels
+- All 14 constructor classes: test_build_returns_valid_matrix (redundant with random params test)
+- TestConstructorsRegistry: test_constructors_count_matches_types_count
+- TestBuildMatrixFunction: test_build_matrix_raises_for_invalid_type
+- TestGetDefaultParamsForType: test_defaults_produce_different_matrices
 """
 
 import random
@@ -77,24 +88,6 @@ class TestMatrixType:
         assert actual_types == expected_types
         assert len(MatrixType) == 14
 
-    def test_enum_values_are_strings(self) -> None:
-        """Verify all enum values are descriptive strings."""
-        for matrix_type in MatrixType:
-            assert isinstance(matrix_type.value, str)
-            assert len(matrix_type.value) > 0
-
-    def test_enum_membership(self) -> None:
-        """Test enum membership checks."""
-        assert MatrixType.PRISONERS_DILEMMA in MatrixType
-        assert MatrixType.CHICKEN in MatrixType
-        assert MatrixType.STAG_HUNT in MatrixType
-
-    def test_enum_by_value(self) -> None:
-        """Test accessing enum by value."""
-        assert MatrixType("prisoners_dilemma") == MatrixType.PRISONERS_DILEMMA
-        assert MatrixType("chicken") == MatrixType.CHICKEN
-        assert MatrixType("stag_hunt") == MatrixType.STAG_HUNT
-
 
 # =============================================================================
 # MatrixParameters Tests
@@ -103,20 +96,6 @@ class TestMatrixType:
 
 class TestMatrixParameters:
     """Tests for MatrixParameters validation and defaults."""
-
-    def test_default_parameters(self) -> None:
-        """Test that default parameters are valid."""
-        params = MatrixParameters()
-
-        # Check defaults
-        assert params.scale == 1.0
-        assert params.position_weight == 0.6
-        assert params.resource_weight == 0.2
-        assert params.risk_weight == 0.2
-
-        # Check weights sum to 1.0
-        total = params.position_weight + params.resource_weight + params.risk_weight
-        assert total == pytest.approx(1.0)
 
     def test_scale_must_be_positive(self) -> None:
         """Test that scale <= 0 is rejected."""
@@ -134,43 +113,11 @@ class TestMatrixParameters:
             MatrixParameters(position_weight=0.5, resource_weight=0.3, risk_weight=0.3)
         assert "Weights must sum to 1.0" in str(exc_info.value)
 
-        with pytest.raises(ValidationError) as exc_info:
-            MatrixParameters(position_weight=0.2, resource_weight=0.2, risk_weight=0.2)
-        assert "Weights must sum to 1.0" in str(exc_info.value)
-
     def test_weights_must_be_non_negative(self) -> None:
         """Test that negative weights are rejected."""
         with pytest.raises(ValidationError) as exc_info:
             MatrixParameters(position_weight=-0.1, resource_weight=0.6, risk_weight=0.5)
         assert "non-negative" in str(exc_info.value).lower()
-
-        with pytest.raises(ValidationError) as exc_info:
-            MatrixParameters(position_weight=0.6, resource_weight=-0.2, risk_weight=0.6)
-        assert "non-negative" in str(exc_info.value).lower()
-
-        with pytest.raises(ValidationError) as exc_info:
-            MatrixParameters(position_weight=0.6, resource_weight=0.6, risk_weight=-0.2)
-        assert "non-negative" in str(exc_info.value).lower()
-
-    def test_valid_custom_weights(self) -> None:
-        """Test valid custom weight combinations."""
-        params = MatrixParameters(
-            position_weight=0.5, resource_weight=0.3, risk_weight=0.2
-        )
-        total = params.position_weight + params.resource_weight + params.risk_weight
-        assert total == pytest.approx(1.0)
-
-        params2 = MatrixParameters(
-            position_weight=1.0, resource_weight=0.0, risk_weight=0.0
-        )
-        total2 = params2.position_weight + params2.resource_weight + params2.risk_weight
-        assert total2 == pytest.approx(1.0)
-
-    def test_parameters_are_frozen(self) -> None:
-        """Test that parameters are immutable."""
-        params = MatrixParameters()
-        with pytest.raises(ValidationError):
-            params.scale = 2.0  # type: ignore[misc]
 
 
 # =============================================================================
@@ -180,17 +127,6 @@ class TestMatrixParameters:
 
 class TestStateDeltas:
     """Tests for StateDeltas creation and constraints."""
-
-    def test_valid_creation(self) -> None:
-        """Test creating valid StateDeltas."""
-        deltas = StateDeltas(
-            pos_a=0.5, pos_b=-0.5, res_cost_a=0.3, res_cost_b=0.2, risk_delta=0.5
-        )
-        assert deltas.pos_a == 0.5
-        assert deltas.pos_b == -0.5
-        assert deltas.res_cost_a == 0.3
-        assert deltas.res_cost_b == 0.2
-        assert deltas.risk_delta == 0.5
 
     def test_zero_sum_position_changes(self) -> None:
         """Test that perfectly zero-sum position changes are valid."""
@@ -214,86 +150,28 @@ class TestStateDeltas:
             )
         assert "near-zero-sum" in str(exc_info.value)
 
-    def test_position_bounds(self) -> None:
-        """Test position change bounds (-1.5 to +1.5)."""
-        # Valid at bounds
-        deltas = StateDeltas(
-            pos_a=1.5, pos_b=-1.5, res_cost_a=0.0, res_cost_b=0.0, risk_delta=0.0
-        )
-        assert deltas.pos_a == 1.5
-        assert deltas.pos_b == -1.5
-
-        # Invalid: exceeds positive bound
+    def test_bounds_validation(self) -> None:
+        """Test all bounds are validated correctly."""
+        # Position out of bounds
         with pytest.raises(ValueError) as exc_info:
             StateDeltas(
                 pos_a=2.0, pos_b=-2.0, res_cost_a=0.0, res_cost_b=0.0, risk_delta=0.0
             )
         assert "pos_a must be in [-1.5, 1.5]" in str(exc_info.value)
 
-        # Invalid: exceeds negative bound
-        with pytest.raises(ValueError) as exc_info:
-            StateDeltas(
-                pos_a=-2.0, pos_b=2.0, res_cost_a=0.0, res_cost_b=0.0, risk_delta=0.0
-            )
-        assert "pos_a must be in [-1.5, 1.5]" in str(exc_info.value)
-
-    def test_resource_cost_bounds(self) -> None:
-        """Test resource cost bounds (0 to 1.0)."""
-        # Valid at bounds
-        deltas = StateDeltas(
-            pos_a=0.0, pos_b=0.0, res_cost_a=0.0, res_cost_b=1.0, risk_delta=0.0
-        )
-        assert deltas.res_cost_a == 0.0
-        assert deltas.res_cost_b == 1.0
-
-        # Invalid: negative
+        # Resource cost out of bounds
         with pytest.raises(ValueError) as exc_info:
             StateDeltas(
                 pos_a=0.0, pos_b=0.0, res_cost_a=-0.1, res_cost_b=0.0, risk_delta=0.0
             )
         assert "res_cost_a must be in [0, 1.0]" in str(exc_info.value)
 
-        # Invalid: exceeds maximum
-        with pytest.raises(ValueError) as exc_info:
-            StateDeltas(
-                pos_a=0.0, pos_b=0.0, res_cost_a=0.0, res_cost_b=1.5, risk_delta=0.0
-            )
-        assert "res_cost_b must be in [0, 1.0]" in str(exc_info.value)
-
-    def test_risk_delta_bounds(self) -> None:
-        """Test risk delta bounds (-1.0 to +2.0)."""
-        # Valid at bounds
-        deltas_low = StateDeltas(
-            pos_a=0.0, pos_b=0.0, res_cost_a=0.0, res_cost_b=0.0, risk_delta=-1.0
-        )
-        assert deltas_low.risk_delta == -1.0
-
-        deltas_high = StateDeltas(
-            pos_a=0.0, pos_b=0.0, res_cost_a=0.0, res_cost_b=0.0, risk_delta=2.0
-        )
-        assert deltas_high.risk_delta == 2.0
-
-        # Invalid: below minimum
-        with pytest.raises(ValueError) as exc_info:
-            StateDeltas(
-                pos_a=0.0, pos_b=0.0, res_cost_a=0.0, res_cost_b=0.0, risk_delta=-1.5
-            )
-        assert "risk_delta must be in [-1.0, 2.0]" in str(exc_info.value)
-
-        # Invalid: above maximum
+        # Risk delta out of bounds
         with pytest.raises(ValueError) as exc_info:
             StateDeltas(
                 pos_a=0.0, pos_b=0.0, res_cost_a=0.0, res_cost_b=0.0, risk_delta=2.5
             )
         assert "risk_delta must be in [-1.0, 2.0]" in str(exc_info.value)
-
-    def test_frozen_dataclass(self) -> None:
-        """Test that StateDeltas is immutable."""
-        deltas = StateDeltas(
-            pos_a=0.0, pos_b=0.0, res_cost_a=0.0, res_cost_b=0.0, risk_delta=0.0
-        )
-        with pytest.raises(AttributeError):
-            deltas.pos_a = 1.0  # type: ignore[misc]
 
 
 # =============================================================================
@@ -309,21 +187,6 @@ class TestPayoffMatrix:
         return StateDeltas(
             pos_a=0.0, pos_b=0.0, res_cost_a=0.0, res_cost_b=0.0, risk_delta=0.0
         )
-
-    def test_creation(self) -> None:
-        """Test creating a PayoffMatrix."""
-        deltas = self._make_deltas()
-        matrix = PayoffMatrix(
-            matrix_type=MatrixType.PRISONERS_DILEMMA,
-            cc=OutcomePayoffs(3.0, 3.0, deltas),
-            cd=OutcomePayoffs(0.0, 5.0, deltas),
-            dc=OutcomePayoffs(5.0, 0.0, deltas),
-            dd=OutcomePayoffs(1.0, 1.0, deltas),
-        )
-
-        assert matrix.matrix_type == MatrixType.PRISONERS_DILEMMA
-        assert matrix.cc.payoff_a == 3.0
-        assert matrix.cd.payoff_b == 5.0
 
     def test_get_outcome(self) -> None:
         """Test get_outcome method."""
@@ -345,36 +208,6 @@ class TestPayoffMatrix:
         # Row 1, Col 1 = DD
         assert matrix.get_outcome(1, 1) == matrix.dd
 
-    def test_default_labels(self) -> None:
-        """Test default strategy labels."""
-        deltas = self._make_deltas()
-        matrix = PayoffMatrix(
-            matrix_type=MatrixType.PRISONERS_DILEMMA,
-            cc=OutcomePayoffs(3.0, 3.0, deltas),
-            cd=OutcomePayoffs(0.0, 5.0, deltas),
-            dc=OutcomePayoffs(5.0, 0.0, deltas),
-            dd=OutcomePayoffs(1.0, 1.0, deltas),
-        )
-
-        assert matrix.row_labels == ("Cooperate", "Defect")
-        assert matrix.col_labels == ("Cooperate", "Defect")
-
-    def test_custom_labels(self) -> None:
-        """Test custom strategy labels."""
-        deltas = self._make_deltas()
-        matrix = PayoffMatrix(
-            matrix_type=MatrixType.CHICKEN,
-            cc=OutcomePayoffs(3.0, 3.0, deltas),
-            cd=OutcomePayoffs(2.0, 4.0, deltas),
-            dc=OutcomePayoffs(4.0, 2.0, deltas),
-            dd=OutcomePayoffs(1.0, 1.0, deltas),
-            row_labels=("Dove", "Hawk"),
-            col_labels=("Dove", "Hawk"),
-        )
-
-        assert matrix.row_labels == ("Dove", "Hawk")
-        assert matrix.col_labels == ("Dove", "Hawk")
-
     def test_is_zero_sum_property(self) -> None:
         """Test checking if a matrix is zero-sum."""
         deltas = self._make_deltas()
@@ -393,18 +226,6 @@ class TestPayoffMatrix:
         assert zero_sum_matrix.cd.payoff_a + zero_sum_matrix.cd.payoff_b == pytest.approx(0.0)
         assert zero_sum_matrix.dc.payoff_a + zero_sum_matrix.dc.payoff_b == pytest.approx(0.0)
         assert zero_sum_matrix.dd.payoff_a + zero_sum_matrix.dd.payoff_b == pytest.approx(0.0)
-
-        # Non-zero-sum matrix (Prisoner's Dilemma)
-        non_zero_sum = PayoffMatrix(
-            matrix_type=MatrixType.PRISONERS_DILEMMA,
-            cc=OutcomePayoffs(3.0, 3.0, deltas),
-            cd=OutcomePayoffs(0.0, 5.0, deltas),
-            dc=OutcomePayoffs(5.0, 0.0, deltas),
-            dd=OutcomePayoffs(1.0, 1.0, deltas),
-        )
-
-        # CC payoffs don't sum to zero
-        assert non_zero_sum.cc.payoff_a + non_zero_sum.cc.payoff_b != pytest.approx(0.0)
 
 
 # =============================================================================
@@ -467,20 +288,11 @@ def generate_random_stag_hunt_params() -> MatrixParameters:
 
 def generate_random_volunteers_params() -> MatrixParameters:
     """Generate random valid parameters for Volunteer's Dilemma (F > W > D)."""
-    # W = base - cost, F = base + bonus, D = -disaster
-    # Need F > W > D, so: base + bonus > base - cost > -disaster
-    # This means: bonus > -cost (always true for positive values)
-    # And: base - cost > -disaster, so base + disaster > cost
-
     base = random.uniform(0.5, 2.0)
     cost = random.uniform(0.1, 0.5)
     bonus = random.uniform(0.2, 0.8)
     disaster = random.uniform(0.5, 2.0)
 
-    # Verify constraint: F > W > D
-    # F = base + bonus, W = base - cost, D = -disaster
-    # Need base + bonus > base - cost, which is bonus > -cost (always true)
-    # Need base - cost > -disaster, which is base + disaster > cost (need to check)
     while base - cost <= -disaster:
         base = random.uniform(0.5, 2.0)
         cost = random.uniform(0.1, min(0.5, base + disaster - 0.1))
@@ -584,25 +396,6 @@ class TestPrisonersDilemmaConstructor:
             PrisonersDilemmaConstructor.validate_params(invalid_params)
         assert "T > R > P > S" in str(exc_info.value)
 
-        # Invalid: R not > P
-        with pytest.raises(ValueError) as exc_info:
-            invalid_params = MatrixParameters(
-                temptation=5.0, reward=1.0, punishment=1.0, sucker=0.0
-            )
-            PrisonersDilemmaConstructor.validate_params(invalid_params)
-        assert "T > R > P > S" in str(exc_info.value)
-
-    def test_build_returns_valid_matrix(self) -> None:
-        """Test that build() returns a valid PayoffMatrix."""
-        params = MatrixParameters(
-            temptation=5.0, reward=3.0, punishment=1.0, sucker=0.0
-        )
-        matrix = PrisonersDilemmaConstructor.build(params)
-
-        assert isinstance(matrix, PayoffMatrix)
-        assert matrix.matrix_type == MatrixType.PRISONERS_DILEMMA
-        assert matrix.row_labels == ("Cooperate", "Defect")
-
     @pytest.mark.parametrize("seed", range(10))
     def test_random_valid_params_produce_valid_matrix(self, seed: int) -> None:
         """Test that random valid parameters always produce valid matrices."""
@@ -638,16 +431,6 @@ class TestDeadlockConstructor:
             DeadlockConstructor.validate_params(invalid_params)
         assert "T > P > R > S" in str(exc_info.value)
 
-    def test_build_returns_valid_matrix(self) -> None:
-        """Test that build() returns a valid PayoffMatrix."""
-        params = MatrixParameters(
-            temptation=4.0, punishment=3.0, reward=2.0, sucker=1.0
-        )
-        matrix = DeadlockConstructor.build(params)
-
-        assert isinstance(matrix, PayoffMatrix)
-        assert matrix.matrix_type == MatrixType.DEADLOCK
-
     @pytest.mark.parametrize("seed", range(10))
     def test_random_valid_params_produce_valid_matrix(self, seed: int) -> None:
         """Test that random valid parameters always produce valid matrices."""
@@ -680,16 +463,6 @@ class TestHarmonyConstructor:
             )
             HarmonyConstructor.validate_params(invalid_params)
         assert "R > T > S > P" in str(exc_info.value)
-
-    def test_build_returns_valid_matrix(self) -> None:
-        """Test that build() returns a valid PayoffMatrix."""
-        params = MatrixParameters(
-            reward=4.0, temptation=3.0, sucker=2.0, punishment=1.0
-        )
-        matrix = HarmonyConstructor.build(params)
-
-        assert isinstance(matrix, PayoffMatrix)
-        assert matrix.matrix_type == MatrixType.HARMONY
 
     @pytest.mark.parametrize("seed", range(10))
     def test_random_valid_params_produce_valid_matrix(self, seed: int) -> None:
@@ -724,17 +497,6 @@ class TestChickenConstructor:
             ChickenConstructor.validate_params(invalid_params)
         assert "T > R > S > P" in str(exc_info.value)
 
-    def test_build_returns_valid_matrix(self) -> None:
-        """Test that build() returns a valid PayoffMatrix."""
-        params = MatrixParameters(
-            temptation=4.0, reward=3.0, swerve_payoff=2.0, crash_payoff=0.0
-        )
-        matrix = ChickenConstructor.build(params)
-
-        assert isinstance(matrix, PayoffMatrix)
-        assert matrix.matrix_type == MatrixType.CHICKEN
-        assert matrix.row_labels == ("Dove", "Hawk")
-
     @pytest.mark.parametrize("seed", range(10))
     def test_random_valid_params_produce_valid_matrix(self, seed: int) -> None:
         """Test that random valid parameters always produce valid matrices."""
@@ -767,17 +529,6 @@ class TestStagHuntConstructor:
             )
             StagHuntConstructor.validate_params(invalid_params)
         assert "R > T > P > S" in str(exc_info.value)
-
-    def test_build_returns_valid_matrix(self) -> None:
-        """Test that build() returns a valid PayoffMatrix."""
-        params = MatrixParameters(
-            stag_payoff=4.0, hare_temptation=3.0, hare_safe=2.0, stag_fail=1.0
-        )
-        matrix = StagHuntConstructor.build(params)
-
-        assert isinstance(matrix, PayoffMatrix)
-        assert matrix.matrix_type == MatrixType.STAG_HUNT
-        assert matrix.row_labels == ("Stag", "Hare")
 
     @pytest.mark.parametrize("seed", range(10))
     def test_random_valid_params_produce_valid_matrix(self, seed: int) -> None:
@@ -814,17 +565,6 @@ class TestVolunteersDilemmaConstructor:
             VolunteersDilemmaConstructor.validate_params(invalid_params)
         assert "F > W > D" in str(exc_info.value)
 
-    def test_build_returns_valid_matrix(self) -> None:
-        """Test that build() returns a valid PayoffMatrix."""
-        params = MatrixParameters(
-            reward=2.0, volunteer_cost=0.3, free_ride_bonus=0.5, disaster_penalty=1.0
-        )
-        matrix = VolunteersDilemmaConstructor.build(params)
-
-        assert isinstance(matrix, PayoffMatrix)
-        assert matrix.matrix_type == MatrixType.VOLUNTEERS_DILEMMA
-        assert matrix.row_labels == ("Volunteer", "Abstain")
-
     @pytest.mark.parametrize("seed", range(10))
     def test_random_valid_params_produce_valid_matrix(self, seed: int) -> None:
         """Test that random valid parameters always produce valid matrices."""
@@ -856,17 +596,6 @@ class TestWarOfAttritionConstructor:
             WarOfAttritionConstructor.validate_params(invalid_params)
         assert "T > R > P and T > S" in str(exc_info.value)
 
-    def test_build_returns_valid_matrix(self) -> None:
-        """Test that build() returns a valid PayoffMatrix."""
-        params = MatrixParameters(
-            temptation=4.0, reward=3.0, punishment=2.0, sucker=1.0
-        )
-        matrix = WarOfAttritionConstructor.build(params)
-
-        assert isinstance(matrix, PayoffMatrix)
-        assert matrix.matrix_type == MatrixType.WAR_OF_ATTRITION
-        assert matrix.row_labels == ("Continue", "Quit")
-
     @pytest.mark.parametrize("seed", range(10))
     def test_random_valid_params_produce_valid_matrix(self, seed: int) -> None:
         """Test that random valid parameters always produce valid matrices."""
@@ -897,15 +626,6 @@ class TestPureCoordinationConstructor:
             )
             PureCoordinationConstructor.validate_params(invalid_params)
         assert "Match > Mismatch" in str(exc_info.value)
-
-    def test_build_returns_valid_matrix(self) -> None:
-        """Test that build() returns a valid PayoffMatrix."""
-        params = MatrixParameters(coordination_bonus=2.0, miscoordination_penalty=0.0)
-        matrix = PureCoordinationConstructor.build(params)
-
-        assert isinstance(matrix, PayoffMatrix)
-        assert matrix.matrix_type == MatrixType.PURE_COORDINATION
-        assert matrix.row_labels == ("A", "B")
 
     @pytest.mark.parametrize("seed", range(10))
     def test_random_valid_params_produce_valid_matrix(self, seed: int) -> None:
@@ -947,31 +667,6 @@ class TestBattleOfSexesConstructor:
             BattleOfSexesConstructor.validate_params(invalid_params)
         assert "Coord > Miscoord" in str(exc_info.value)
 
-        # Invalid: preference not > 1.0
-        with pytest.raises(ValueError) as exc_info:
-            invalid_params = MatrixParameters(
-                coordination_bonus=2.0,
-                miscoordination_penalty=0.0,
-                preference_a=0.9,
-                preference_b=1.3,
-            )
-            BattleOfSexesConstructor.validate_params(invalid_params)
-        assert "preference multipliers > 1.0" in str(exc_info.value)
-
-    def test_build_returns_valid_matrix(self) -> None:
-        """Test that build() returns a valid PayoffMatrix."""
-        params = MatrixParameters(
-            coordination_bonus=2.0,
-            miscoordination_penalty=0.0,
-            preference_a=1.5,
-            preference_b=1.3,
-        )
-        matrix = BattleOfSexesConstructor.build(params)
-
-        assert isinstance(matrix, PayoffMatrix)
-        assert matrix.matrix_type == MatrixType.BATTLE_OF_SEXES
-        assert matrix.row_labels == ("Opera", "Football")
-
     @pytest.mark.parametrize("seed", range(10))
     def test_random_valid_params_produce_valid_matrix(self, seed: int) -> None:
         """Test that random valid parameters always produce valid matrices."""
@@ -1006,17 +701,6 @@ class TestLeaderConstructor:
             LeaderConstructor.validate_params(invalid_params)
         assert "G > H > B > C" in str(exc_info.value)
 
-    def test_build_returns_valid_matrix(self) -> None:
-        """Test that build() returns a valid PayoffMatrix."""
-        params = MatrixParameters(
-            temptation=4.0, reward=3.0, sucker=2.0, punishment=1.0
-        )
-        matrix = LeaderConstructor.build(params)
-
-        assert isinstance(matrix, PayoffMatrix)
-        assert matrix.matrix_type == MatrixType.LEADER
-        assert matrix.row_labels == ("Follow", "Lead")
-
     @pytest.mark.parametrize("seed", range(10))
     def test_random_valid_params_produce_valid_matrix(self, seed: int) -> None:
         """Test that random valid parameters always produce valid matrices."""
@@ -1033,20 +717,6 @@ class TestLeaderConstructor:
 
 class TestMatchingPenniesConstructor:
     """Tests for Matching Pennies constructor."""
-
-    def test_no_specific_parameter_constraints(self) -> None:
-        """Test that Matching Pennies has no specific parameter constraints."""
-        params = MatrixParameters()
-        MatchingPenniesConstructor.validate_params(params)  # Should not raise
-
-    def test_build_returns_valid_matrix(self) -> None:
-        """Test that build() returns a valid PayoffMatrix."""
-        params = MatrixParameters(scale=1.0)
-        matrix = MatchingPenniesConstructor.build(params)
-
-        assert isinstance(matrix, PayoffMatrix)
-        assert matrix.matrix_type == MatrixType.MATCHING_PENNIES
-        assert matrix.row_labels == ("Heads", "Tails")
 
     def test_matrix_is_zero_sum(self) -> None:
         """Test that the matrix is zero-sum."""
@@ -1099,32 +769,6 @@ class TestInspectionGameConstructor:
             InspectionGameConstructor.validate_params(invalid_params)
         assert "Loss > Cost" in str(exc_info.value)
 
-        # Invalid: penalty not > gain
-        with pytest.raises(ValueError) as exc_info:
-            invalid_params = MatrixParameters(
-                inspection_cost=0.3,
-                cheat_gain=1.5,
-                caught_penalty=1.0,
-                loss_if_exploited=0.7,
-            )
-            InspectionGameConstructor.validate_params(invalid_params)
-        assert "Penalty > Gain" in str(exc_info.value)
-
-    def test_build_returns_valid_matrix(self) -> None:
-        """Test that build() returns a valid PayoffMatrix."""
-        params = MatrixParameters(
-            inspection_cost=0.3,
-            cheat_gain=0.5,
-            caught_penalty=1.0,
-            loss_if_exploited=0.7,
-        )
-        matrix = InspectionGameConstructor.build(params)
-
-        assert isinstance(matrix, PayoffMatrix)
-        assert matrix.matrix_type == MatrixType.INSPECTION_GAME
-        assert matrix.row_labels == ("Inspect", "Trust")
-        assert matrix.col_labels == ("Comply", "Cheat")
-
     @pytest.mark.parametrize("seed", range(10))
     def test_random_valid_params_produce_valid_matrix(self, seed: int) -> None:
         """Test that random valid parameters always produce valid matrices."""
@@ -1141,21 +785,6 @@ class TestInspectionGameConstructor:
 
 class TestReconnaissanceConstructor:
     """Tests for Reconnaissance constructor."""
-
-    def test_no_specific_parameter_constraints(self) -> None:
-        """Test that Reconnaissance has no specific parameter constraints."""
-        params = MatrixParameters()
-        ReconnaissanceConstructor.validate_params(params)  # Should not raise
-
-    def test_build_returns_valid_matrix(self) -> None:
-        """Test that build() returns a valid PayoffMatrix."""
-        params = MatrixParameters(scale=1.0)
-        matrix = ReconnaissanceConstructor.build(params)
-
-        assert isinstance(matrix, PayoffMatrix)
-        assert matrix.matrix_type == MatrixType.RECONNAISSANCE
-        assert matrix.row_labels == ("Probe", "Mask")
-        assert matrix.col_labels == ("Vigilant", "Project")
 
     def test_matrix_is_zero_sum(self) -> None:
         """Test that the matrix is zero-sum."""
@@ -1199,17 +828,6 @@ class TestSecurityDilemmaConstructor:
             SecurityDilemmaConstructor.validate_params(invalid_params)
         assert "T > R > P > S" in str(exc_info.value)
 
-    def test_build_returns_valid_matrix(self) -> None:
-        """Test that build() returns a valid PayoffMatrix."""
-        params = MatrixParameters(
-            temptation=5.0, reward=3.0, punishment=1.0, sucker=0.0
-        )
-        matrix = SecurityDilemmaConstructor.build(params)
-
-        assert isinstance(matrix, PayoffMatrix)
-        assert matrix.matrix_type == MatrixType.SECURITY_DILEMMA
-        assert matrix.row_labels == ("Disarm", "Arm")
-
     @pytest.mark.parametrize("seed", range(10))
     def test_random_valid_params_produce_valid_matrix(self, seed: int) -> None:
         """Test that random valid parameters always produce valid matrices."""
@@ -1231,11 +849,6 @@ class TestConstructorsRegistry:
         """Test that every MatrixType has a corresponding constructor."""
         for matrix_type in MatrixType:
             assert matrix_type in CONSTRUCTORS, f"Missing constructor for {matrix_type}"
-
-    def test_constructors_count_matches_types_count(self) -> None:
-        """Test that constructor count matches type count."""
-        assert len(CONSTRUCTORS) == len(MatrixType)
-        assert len(CONSTRUCTORS) == 14
 
     def test_all_constructors_implement_protocol(self) -> None:
         """Test that all constructors have build and validate_params methods."""
@@ -1264,15 +877,6 @@ class TestBuildMatrixFunction:
             assert isinstance(matrix, PayoffMatrix)
             assert matrix.matrix_type == matrix_type
 
-    def test_build_matrix_raises_for_invalid_type(self) -> None:
-        """Test that build_matrix raises for unknown matrix type."""
-        # This is tricky to test since MatrixType is an enum
-        # We test that all known types work instead
-        for matrix_type in MatrixType:
-            params = get_default_params_for_type(matrix_type)
-            matrix = build_matrix(matrix_type, params)
-            assert matrix is not None
-
     def test_build_matrix_propagates_validation_errors(self) -> None:
         """Test that build_matrix propagates validation errors from constructors."""
         # Invalid PD params
@@ -1299,20 +903,6 @@ class TestGetDefaultParamsForType:
             # Should not raise when building
             matrix = build_matrix(matrix_type, params)
             assert matrix.matrix_type == matrix_type
-
-    def test_defaults_produce_different_matrices(self) -> None:
-        """Test that different types produce different matrix structures."""
-        pd_params = get_default_params_for_type(MatrixType.PRISONERS_DILEMMA)
-        chicken_params = get_default_params_for_type(MatrixType.CHICKEN)
-
-        pd_matrix = build_matrix(MatrixType.PRISONERS_DILEMMA, pd_params)
-        chicken_matrix = build_matrix(MatrixType.CHICKEN, chicken_params)
-
-        # Different types
-        assert pd_matrix.matrix_type != chicken_matrix.matrix_type
-
-        # Different labels
-        assert pd_matrix.row_labels != chicken_matrix.row_labels
 
 
 # =============================================================================

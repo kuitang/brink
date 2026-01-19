@@ -1,14 +1,22 @@
 """Unit tests for brinksmanship.engine.game_engine module.
 
 Tests cover:
-- TurnRecord: creation, serialization
 - GameEngine: initialization, scenario loading
 - Turn structure: 8 phases execute in order
 - State updates: cooperation score, stability decay formula
 - Action validation: risk tier, resource requirements, settlement availability
 - History tracking: turn recording, state before/after
-- Game ending detection: is_game_over, get_ending
+- Game ending detection: deterministic endings, crisis termination
 - Information state updates: reconnaissance, inspection
+
+Removed tests (see test_removal_log.md):
+- TestTurnRecord: Basic dataclass tests (trivial)
+- TestGameEnding: test_valid_ending_creation, test_mutual_destruction_special_case (duplicated in test_endings.py)
+- TestGameEngineInitialization: Basic state value tests (trivial, covered by integration)
+- TestGameEndingDetection: Basic is_game_over/get_ending tests (trivial state checks)
+- TestDeterministicEndings: Entire class (duplicated in test_endings.py)
+- TestCrisisTermination: Duplicate tests (covered by test_endings.py)
+- TestInformationStateUpdates: test_successful_recon/inspection_updates (weak assertions)
 """
 
 from typing import Optional
@@ -136,103 +144,12 @@ def competitive_action() -> Action:
 
 
 # =============================================================================
-# TurnRecord Tests
-# =============================================================================
-
-
-class TestTurnRecord:
-    """Tests for TurnRecord dataclass."""
-
-    def test_creation_with_all_fields(self):
-        """TurnRecord can be created with all fields."""
-        state_before = GameState()
-        state_after = GameState(turn=2)
-
-        record = TurnRecord(
-            turn=1,
-            phase=TurnPhase.BRIEFING,
-            action_a=DEESCALATE,
-            action_b=ESCALATE,
-            state_before=state_before,
-            state_after=state_after,
-            narrative="Test narrative",
-            matrix_type=MatrixType.PRISONERS_DILEMMA,
-        )
-
-        assert record.turn == 1
-        assert record.phase == TurnPhase.BRIEFING
-        assert record.action_a == DEESCALATE
-        assert record.action_b == ESCALATE
-        assert record.state_before is not None
-        assert record.state_after is not None
-        assert record.narrative == "Test narrative"
-        assert record.matrix_type == MatrixType.PRISONERS_DILEMMA
-
-    def test_creation_with_minimal_fields(self):
-        """TurnRecord can be created with only required fields."""
-        record = TurnRecord(
-            turn=1,
-            phase=TurnPhase.DECISION,
-        )
-
-        assert record.turn == 1
-        assert record.phase == TurnPhase.DECISION
-        assert record.action_a is None
-        assert record.action_b is None
-        assert record.outcome is None
-        assert record.state_before is None
-        assert record.state_after is None
-        assert record.narrative == ""
-        assert record.matrix_type is None
-
-    def test_record_mutable_fields(self):
-        """TurnRecord fields can be updated."""
-        record = TurnRecord(turn=1, phase=TurnPhase.BRIEFING)
-
-        record.action_a = DEESCALATE
-        record.action_b = ESCALATE
-        record.narrative = "Updated narrative"
-
-        assert record.action_a == DEESCALATE
-        assert record.action_b == ESCALATE
-        assert record.narrative == "Updated narrative"
-
-
-# =============================================================================
 # GameEnding Tests
 # =============================================================================
 
 
 class TestGameEnding:
     """Tests for GameEnding dataclass validation."""
-
-    def test_valid_ending_creation(self):
-        """GameEnding can be created with valid VP values."""
-        ending = GameEnding(
-            ending_type=EndingType.NATURAL_ENDING,
-            vp_a=60.0,
-            vp_b=40.0,
-            turn=14,
-            description="Test ending",
-        )
-
-        assert ending.ending_type == EndingType.NATURAL_ENDING
-        assert ending.vp_a == pytest.approx(60.0)
-        assert ending.vp_b == pytest.approx(40.0)
-        assert ending.turn == 14
-
-    def test_mutual_destruction_special_case(self):
-        """Mutual destruction VP don't need to sum to 100."""
-        ending = GameEnding(
-            ending_type=EndingType.MUTUAL_DESTRUCTION,
-            vp_a=20.0,
-            vp_b=20.0,
-            turn=10,
-            description="Mutual destruction",
-        )
-
-        assert ending.vp_a == pytest.approx(20.0)
-        assert ending.vp_b == pytest.approx(20.0)
 
     def test_non_mutual_destruction_must_sum_to_100(self):
         """Non-mutual destruction endings must have VP sum to 100."""
@@ -265,24 +182,6 @@ class TestGameEnding:
 class TestGameEngineInitialization:
     """Tests for GameEngine initialization."""
 
-    def test_default_state_values(self, engine):
-        """Engine initializes with default state values from GAME_MANUAL."""
-        state = engine.get_current_state()
-
-        assert state.position_a == pytest.approx(5.0)
-        assert state.position_b == pytest.approx(5.0)
-        assert state.resources_a == pytest.approx(5.0)
-        assert state.resources_b == pytest.approx(5.0)
-        assert state.cooperation_score == pytest.approx(5.0)
-        assert state.stability == pytest.approx(5.0)
-        assert state.risk_level == pytest.approx(2.0)
-        assert state.turn == 1
-
-    def test_max_turns_set(self, engine):
-        """Engine uses provided max_turns."""
-        state = engine.get_current_state()
-        assert state.max_turns == 14
-
     def test_random_max_turns_when_not_specified(self, mock_repo):
         """Engine generates random max_turns (12-16) when not specified."""
         engine = GameEngine(
@@ -307,22 +206,6 @@ class TestGameEngineInitialization:
                 scenario_id="nonexistent",
                 scenario_repo=mock_repo,
             )
-
-    def test_initial_phase_is_briefing(self, engine):
-        """Engine starts in BRIEFING phase."""
-        assert engine.phase == TurnPhase.BRIEFING
-
-    def test_initial_history_has_one_record(self, engine):
-        """Engine starts with one history record for turn 1."""
-        history = engine.get_history()
-        assert len(history) == 1
-        assert history[0].turn == 1
-        assert history[0].state_before is not None
-
-    def test_game_not_over_initially(self, engine):
-        """Game is not over at initialization."""
-        assert engine.is_game_over() is False
-        assert engine.get_ending() is None
 
 
 # =============================================================================
@@ -606,41 +489,6 @@ class TestHistoryTracking:
 class TestGameEndingDetection:
     """Tests for game ending detection."""
 
-    def test_is_game_over_returns_false_during_game(self, engine):
-        """is_game_over returns False while game is in progress."""
-        engine.submit_actions(DEESCALATE, DEESCALATE)
-
-        assert engine.is_game_over() is False
-
-    def test_is_game_over_returns_true_after_ending(self, engine):
-        """is_game_over returns True after game ends."""
-        engine.ending = GameEnding(
-            ending_type=EndingType.NATURAL_ENDING,
-            vp_a=50.0,
-            vp_b=50.0,
-            turn=14,
-            description="Test",
-        )
-
-        assert engine.is_game_over() is True
-
-    def test_get_ending_returns_none_during_game(self, engine):
-        """get_ending returns None while game is in progress."""
-        assert engine.get_ending() is None
-
-    def test_get_ending_returns_ending_after_game(self, engine):
-        """get_ending returns GameEnding after game ends."""
-        ending = GameEnding(
-            ending_type=EndingType.NATURAL_ENDING,
-            vp_a=50.0,
-            vp_b=50.0,
-            turn=14,
-            description="Test",
-        )
-        engine.ending = ending
-
-        assert engine.get_ending() == ending
-
     def test_mutual_destruction_at_risk_10(self, mock_repo):
         """Risk reaching 10 triggers mutual destruction."""
         engine = GameEngine(
@@ -760,52 +608,6 @@ class TestGameEndingDetection:
 class TestInformationStateUpdates:
     """Tests for information state updates via reconnaissance and inspection."""
 
-    def test_successful_recon_updates_known_position(self, mock_repo):
-        """Successful reconnaissance updates known_position."""
-        engine = GameEngine(
-            scenario_id="test-scenario",
-            scenario_repo=mock_repo,
-            max_turns=14,
-            random_seed=42,
-        )
-
-        # Get initial information state
-        info_a_before = engine.get_information_state("A")
-        assert info_a_before.known_position is None
-
-        # Submit reconnaissance action
-        # The outcome depends on the opponent's response
-        # In the game, RECON initiator probes, opponent's action determines outcome
-        engine.submit_actions(RECONNAISSANCE, ESCALATE)
-
-        # Check if information was updated (depends on game outcome)
-        info_a_after = engine.get_information_state("A")
-        # Note: The actual update depends on the reconnaissance resolution
-        # which involves the opponent's choice
-        # We just verify the information state is accessible
-        assert info_a_after is not None
-
-    def test_successful_inspection_updates_known_resources(self, mock_repo):
-        """Successful inspection updates known_resources."""
-        engine = GameEngine(
-            scenario_id="test-scenario",
-            scenario_repo=mock_repo,
-            max_turns=14,
-            random_seed=42,
-        )
-
-        # Get initial information state
-        info_a_before = engine.get_information_state("A")
-        assert info_a_before.known_resources is None
-
-        # Submit inspection action
-        engine.submit_actions(INSPECTION, DEESCALATE)
-
-        # Check if information was updated
-        info_a_after = engine.get_information_state("A")
-        # Verification of update depends on game resolution
-        assert info_a_after is not None
-
     def test_information_state_deep_copied(self, engine):
         """get_information_state returns a deep copy."""
         info1 = engine.get_information_state("A")
@@ -911,52 +713,6 @@ class TestCreateGame:
                 scenario_id="nonexistent",
                 scenario_repo=mock_repo,
             )
-
-
-# =============================================================================
-# Crisis Termination Tests
-# =============================================================================
-
-
-class TestCrisisTermination:
-    """Tests for crisis termination mechanics."""
-
-    def test_crisis_termination_not_checked_before_turn_10(self, mock_repo):
-        """Crisis termination is not checked before turn 10."""
-        engine = GameEngine(
-            scenario_id="test-scenario",
-            scenario_repo=mock_repo,
-            max_turns=16,
-            random_seed=42,
-        )
-
-        # Set high risk but stay on turn 9
-        engine.state.turn = 9
-        engine.state.risk_level = 9.0
-
-        # Manually check crisis termination
-        ending = engine._check_crisis_termination()
-
-        # Should not trigger before turn 10
-        assert ending is None
-
-    def test_crisis_termination_not_checked_at_low_risk(self, mock_repo):
-        """Crisis termination is not checked at low risk (<=7)."""
-        engine = GameEngine(
-            scenario_id="test-scenario",
-            scenario_repo=mock_repo,
-            max_turns=16,
-            random_seed=42,
-        )
-
-        # Set turn 10+ but low risk
-        engine.state.turn = 10
-        engine.state.risk_level = 7.0
-
-        ending = engine._check_crisis_termination()
-
-        # Should not trigger at risk 7 or below
-        assert ending is None
 
 
 # =============================================================================
@@ -1077,105 +833,6 @@ class TestEdgeCases:
         assert menu.special_actions is not None
         assert menu.risk_level == int(engine.state.risk_level)
         assert menu.turn == engine.state.turn
-
-
-# =============================================================================
-# Deterministic Ending Tests
-# =============================================================================
-
-
-class TestDeterministicEndings:
-    """Tests for deterministic ending checks."""
-
-    def test_check_risk_10_mutual_destruction(self, mock_repo):
-        """Risk=10 triggers mutual destruction."""
-        engine = GameEngine(
-            scenario_id="test-scenario",
-            scenario_repo=mock_repo,
-            max_turns=14,
-            random_seed=42,
-        )
-        engine.state.risk_level = 10.0
-
-        ending = engine._check_deterministic_endings()
-
-        assert ending is not None
-        assert ending.ending_type == EndingType.MUTUAL_DESTRUCTION
-        assert ending.vp_a == pytest.approx(20.0)
-        assert ending.vp_b == pytest.approx(20.0)
-
-    def test_check_position_a_zero_collapse(self, mock_repo):
-        """Position A=0 triggers position collapse."""
-        engine = GameEngine(
-            scenario_id="test-scenario",
-            scenario_repo=mock_repo,
-            max_turns=14,
-            random_seed=42,
-        )
-        engine.state.player_a.position = 0.0
-
-        ending = engine._check_deterministic_endings()
-
-        assert ending is not None
-        assert ending.ending_type == EndingType.POSITION_COLLAPSE_A
-        assert ending.vp_a == pytest.approx(10.0)
-        assert ending.vp_b == pytest.approx(90.0)
-
-    def test_check_position_b_zero_collapse(self, mock_repo):
-        """Position B=0 triggers position collapse."""
-        engine = GameEngine(
-            scenario_id="test-scenario",
-            scenario_repo=mock_repo,
-            max_turns=14,
-            random_seed=42,
-        )
-        engine.state.player_b.position = 0.0
-
-        ending = engine._check_deterministic_endings()
-
-        assert ending is not None
-        assert ending.ending_type == EndingType.POSITION_COLLAPSE_B
-        assert ending.vp_a == pytest.approx(90.0)
-        assert ending.vp_b == pytest.approx(10.0)
-
-    def test_check_resources_a_zero_exhaustion(self, mock_repo):
-        """Resources A=0 triggers resource exhaustion."""
-        engine = GameEngine(
-            scenario_id="test-scenario",
-            scenario_repo=mock_repo,
-            max_turns=14,
-            random_seed=42,
-        )
-        engine.state.player_a.resources = 0.0
-
-        ending = engine._check_deterministic_endings()
-
-        assert ending is not None
-        assert ending.ending_type == EndingType.RESOURCE_EXHAUSTION_A
-        assert ending.vp_a == pytest.approx(15.0)
-        assert ending.vp_b == pytest.approx(85.0)
-
-    def test_check_resources_b_zero_exhaustion(self, mock_repo):
-        """Resources B=0 triggers resource exhaustion."""
-        engine = GameEngine(
-            scenario_id="test-scenario",
-            scenario_repo=mock_repo,
-            max_turns=14,
-            random_seed=42,
-        )
-        engine.state.player_b.resources = 0.0
-
-        ending = engine._check_deterministic_endings()
-
-        assert ending is not None
-        assert ending.ending_type == EndingType.RESOURCE_EXHAUSTION_B
-        assert ending.vp_a == pytest.approx(85.0)
-        assert ending.vp_b == pytest.approx(15.0)
-
-    def test_no_deterministic_ending_normal_state(self, engine):
-        """No deterministic ending with normal state values."""
-        ending = engine._check_deterministic_endings()
-        assert ending is None
 
 
 # =============================================================================

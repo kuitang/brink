@@ -6,11 +6,17 @@ From ENGINEERING_DESIGN.md Milestone 5.3:
 - Performance benchmark (<10 seconds for 100 games) - NOT BENCHMARKED
 
 This module implements that benchmark.
+
+Note: Redundant tests removed per test_removal_log.md:
+- test_analysis_completes_under_10_seconds: Subsumed by stricter test_analysis_completes_under_1_second
+- test_compute_summary_performance: Subsumed by test_full_pipeline_under_10_seconds
+- test_text_report_generation_performance: Subsumed by test_full_pipeline_under_10_seconds
+- test_results_serialization_performance: Subsumed by test_full_pipeline_under_10_seconds
+- test_load_from_file_performance: Too narrow, not critical
 """
 
-import json
-import time
 import tempfile
+import time
 from pathlib import Path
 
 import pytest
@@ -72,24 +78,12 @@ def sample_playtest_results_dict(sample_playtest_results_100_games):
 class TestMechanicsAnalysisBenchmark:
     """Benchmark tests for mechanics analysis performance."""
 
-    def test_analysis_completes_under_10_seconds(self, sample_playtest_results_dict):
-        """Test that analysis of 100 games completes in under 10 seconds.
-
-        This is the primary benchmark from ENGINEERING_DESIGN.md Milestone 5.3.
-        """
-        start_time = time.time()
-
-        report = analyze_mechanics(sample_playtest_results_dict)
-
-        elapsed = time.time() - start_time
-
-        assert elapsed < 10.0, f"Analysis took {elapsed:.2f}s, expected < 10s"
-        print(f"\nAnalysis completed in {elapsed:.4f} seconds")
-
     def test_analysis_completes_under_1_second(self, sample_playtest_results_dict):
         """Test that analysis is actually fast (< 1 second for 100 games).
 
         Since this is pure Python with no LLM calls, it should be very fast.
+        This is the primary benchmark - stricter than the 10-second requirement
+        from ENGINEERING_DESIGN.md Milestone 5.3.
         """
         start_time = time.time()
 
@@ -99,34 +93,6 @@ class TestMechanicsAnalysisBenchmark:
 
         assert elapsed < 1.0, f"Analysis took {elapsed:.2f}s, expected < 1s"
         print(f"\nAnalysis completed in {elapsed:.4f} seconds (well under requirement)")
-
-    def test_compute_summary_performance(self, sample_playtest_results_dict):
-        """Test performance of summary computation."""
-        start_time = time.time()
-
-        for _ in range(100):
-            summary = compute_summary_from_results(sample_playtest_results_dict)
-
-        elapsed = time.time() - start_time
-
-        # 100 summaries should take < 1 second
-        assert elapsed < 1.0, f"100 summaries took {elapsed:.2f}s"
-        print(f"\n100 summary computations in {elapsed:.4f} seconds")
-
-    def test_text_report_generation_performance(self, sample_playtest_results_dict):
-        """Test performance of text report generation."""
-        report = analyze_mechanics(sample_playtest_results_dict)
-
-        start_time = time.time()
-
-        for _ in range(100):
-            text = format_text_report(report)
-
-        elapsed = time.time() - start_time
-
-        # 100 text reports should take < 1 second
-        assert elapsed < 1.0, f"100 text reports took {elapsed:.2f}s"
-        print(f"\n100 text report generations in {elapsed:.4f} seconds")
 
 
 class TestPlaytestGenerationBenchmark:
@@ -154,42 +120,6 @@ class TestPlaytestGenerationBenchmark:
         assert results.aggregate["total_games"] == 100
 
 
-class TestJSONSerializationBenchmark:
-    """Benchmark tests for JSON serialization."""
-
-    def test_results_serialization_performance(self, sample_playtest_results_100_games):
-        """Test JSON serialization performance."""
-        start_time = time.time()
-
-        for _ in range(100):
-            json_str = sample_playtest_results_100_games.to_json()
-
-        elapsed = time.time() - start_time
-
-        assert elapsed < 1.0, f"100 serializations took {elapsed:.2f}s"
-        print(f"\n100 JSON serializations in {elapsed:.4f} seconds")
-
-    def test_load_from_file_performance(self, sample_playtest_results_100_games):
-        """Test loading results from file performance."""
-        # Write to temp file
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
-            f.write(sample_playtest_results_100_games.to_json())
-            temp_path = Path(f.name)
-
-        try:
-            start_time = time.time()
-
-            for _ in range(100):
-                data = load_playtest_results(temp_path)
-
-            elapsed = time.time() - start_time
-
-            assert elapsed < 1.0, f"100 file loads took {elapsed:.2f}s"
-            print(f"\n100 file loads in {elapsed:.4f} seconds")
-        finally:
-            temp_path.unlink()
-
-
 # =============================================================================
 # Combined Benchmark
 # =============================================================================
@@ -202,6 +132,8 @@ class TestFullPipelineBenchmark:
         """Test the entire pipeline: generate results + analyze.
 
         This tests the complete flow a user would experience.
+        Subsumes individual component benchmarks (summary computation,
+        text report generation, serialization).
         """
         total_start = time.time()
 

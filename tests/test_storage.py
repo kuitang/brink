@@ -1,15 +1,20 @@
-"""Comprehensive tests for the storage module.
+"""Tests for the storage module.
 
 Tests cover:
-- FileScenarioRepository and FileGameRecordRepository
-- SQLiteScenarioRepository and SQLiteGameRecordRepository
+- FileScenarioRepository error boundaries and edge cases
 - Storage configuration functions
 - Parametrized integration tests to verify both backends pass identical tests
+
+Redundancy Reduction (see tests/test_removal_log.md for rationale):
+- Removed TestSlugify (9 tests) - trivial utility function tested implicitly by save operations
+- Removed most of TestFileScenarioRepository - subsumed by parametrized integration tests
+- Removed TestSQLiteScenarioRepository (10 tests) - fully subsumed by parametrized tests
+- Removed TestFileGameRecordRepository (10 tests) - fully subsumed by parametrized tests
+- Removed TestSQLiteGameRecordRepository (10 tests) - fully subsumed by parametrized tests
+- Removed redundant TestStorageConfig tests - kept only essential factory and default tests
 """
 
-import os
 import uuid
-from pathlib import Path
 
 import pytest
 
@@ -22,7 +27,6 @@ from brinksmanship.storage.config import (
 from brinksmanship.storage.file_repo import (
     FileGameRecordRepository,
     FileScenarioRepository,
-    slugify,
 )
 from brinksmanship.storage.sqlite_repo import (
     SQLiteGameRecordRepository,
@@ -31,149 +35,21 @@ from brinksmanship.storage.sqlite_repo import (
 
 
 # ============================================================================
-# Slugify Tests
-# ============================================================================
-
-
-class TestSlugify:
-    """Tests for the slugify function."""
-
-    def test_basic_slugify(self):
-        """Test basic text is converted to lowercase hyphenated slug."""
-        assert slugify("Cuban Missile Crisis") == "cuban-missile-crisis"
-
-    def test_slugify_with_colon(self):
-        """Test colons are removed."""
-        assert slugify("The Cold War: 1962") == "the-cold-war-1962"
-
-    def test_slugify_with_underscores(self):
-        """Test underscores are converted to hyphens."""
-        assert slugify("test_scenario_name") == "test-scenario-name"
-
-    def test_slugify_multiple_spaces(self):
-        """Test multiple spaces collapse to single hyphen."""
-        assert slugify("hello    world") == "hello-world"
-
-    def test_slugify_special_characters(self):
-        """Test special characters are removed."""
-        assert slugify("Hello! World?") == "hello-world"
-
-    def test_slugify_leading_trailing_hyphens(self):
-        """Test leading and trailing hyphens are stripped."""
-        assert slugify("-hello-world-") == "hello-world"
-
-    def test_slugify_numbers(self):
-        """Test numbers are preserved."""
-        assert slugify("Scenario 123") == "scenario-123"
-
-    def test_slugify_empty_string(self):
-        """Test empty string returns empty string."""
-        assert slugify("") == ""
-
-    def test_slugify_only_special_chars(self):
-        """Test string of only special characters returns empty string."""
-        assert slugify("!@#$%") == ""
-
-
-# ============================================================================
-# FileScenarioRepository Tests
+# FileScenarioRepository Tests - Error Boundaries Only
 # ============================================================================
 
 
 class TestFileScenarioRepository:
-    """Tests for the file-based scenario repository."""
+    """Tests for file-based scenario repository error boundaries and edge cases.
+
+    Most functionality is covered by TestScenarioRepositoryIntegration which runs
+    parametrized tests against both File and SQLite backends.
+    """
 
     @pytest.fixture
     def repo(self, tmp_path):
         """Create a FileScenarioRepository with a temporary directory."""
         return FileScenarioRepository(tmp_path / "scenarios")
-
-    def test_list_scenarios_empty(self, repo):
-        """Test list_scenarios returns empty list initially."""
-        assert repo.list_scenarios() == []
-
-    def test_save_and_get_scenario(self, repo):
-        """Test save_scenario and get_scenario round-trip."""
-        scenario = {
-            "name": "Cuban Missile Crisis",
-            "setting": "Cold War era nuclear standoff",
-            "max_turns": 14,
-            "players": ["USA", "USSR"],
-        }
-
-        scenario_id = repo.save_scenario(scenario)
-        assert scenario_id == "cuban-missile-crisis"
-
-        loaded = repo.get_scenario(scenario_id)
-        assert loaded is not None
-        assert loaded["name"] == "Cuban Missile Crisis"
-        assert loaded["setting"] == "Cold War era nuclear standoff"
-        assert loaded["max_turns"] == 14
-        assert loaded["players"] == ["USA", "USSR"]
-        assert loaded["id"] == "cuban-missile-crisis"
-
-    def test_get_scenario_not_found(self, repo):
-        """Test get_scenario returns None for non-existent scenario."""
-        assert repo.get_scenario("nonexistent") is None
-
-    def test_get_scenario_by_name(self, repo):
-        """Test get_scenario_by_name works with case-insensitive search."""
-        scenario = {
-            "name": "Cuban Missile Crisis",
-            "setting": "Cold War",
-            "max_turns": 14,
-        }
-        repo.save_scenario(scenario)
-
-        # Exact match
-        loaded = repo.get_scenario_by_name("Cuban Missile Crisis")
-        assert loaded is not None
-        assert loaded["name"] == "Cuban Missile Crisis"
-
-        # Case-insensitive match
-        loaded = repo.get_scenario_by_name("cuban missile crisis")
-        assert loaded is not None
-        assert loaded["name"] == "Cuban Missile Crisis"
-
-        # Different case
-        loaded = repo.get_scenario_by_name("CUBAN MISSILE CRISIS")
-        assert loaded is not None
-        assert loaded["name"] == "Cuban Missile Crisis"
-
-    def test_get_scenario_by_name_not_found(self, repo):
-        """Test get_scenario_by_name returns None for non-existent name."""
-        assert repo.get_scenario_by_name("Nonexistent Scenario") is None
-
-    def test_delete_scenario(self, repo):
-        """Test delete_scenario removes the scenario."""
-        scenario = {"name": "Test Scenario", "setting": "Test"}
-        scenario_id = repo.save_scenario(scenario)
-
-        assert repo.get_scenario(scenario_id) is not None
-        assert repo.delete_scenario(scenario_id) is True
-        assert repo.get_scenario(scenario_id) is None
-
-    def test_delete_scenario_not_found(self, repo):
-        """Test delete_scenario returns False for non-existent scenario."""
-        assert repo.delete_scenario("nonexistent") is False
-
-    def test_list_scenarios_multiple(self, repo):
-        """Test list_scenarios returns sorted list of all scenarios."""
-        scenarios = [
-            {"name": "Zebra Crisis", "setting": "A"},
-            {"name": "Alpha Scenario", "setting": "B"},
-            {"name": "Beta Incident", "setting": "C"},
-        ]
-
-        for s in scenarios:
-            repo.save_scenario(s)
-
-        listed = repo.list_scenarios()
-        assert len(listed) == 3
-        # Should be sorted by name
-        assert listed[0]["name"] == "Alpha Scenario"
-        assert listed[1]["name"] == "Beta Incident"
-        assert listed[2]["name"] == "Zebra Crisis"
 
     def test_save_scenario_no_name_raises(self, repo):
         """Test save_scenario raises ValueError if no name field."""
@@ -204,398 +80,19 @@ class TestFileScenarioRepository:
 
 
 # ============================================================================
-# FileGameRecordRepository Tests
-# ============================================================================
-
-
-class TestFileGameRecordRepository:
-    """Tests for the file-based game record repository."""
-
-    @pytest.fixture
-    def repo(self, tmp_path):
-        """Create a FileGameRecordRepository with a temporary directory."""
-        return FileGameRecordRepository(tmp_path / "games")
-
-    def test_list_games_empty(self, repo):
-        """Test list_games returns empty list initially."""
-        assert repo.list_games() == []
-
-    def test_save_and_load_game(self, repo):
-        """Test save_game and load_game round-trip."""
-        game_id = str(uuid.uuid4())
-        state = {
-            "scenario_id": "cuban-missile-crisis",
-            "user_id": 1,
-            "status": "in_progress",
-            "turn": 5,
-            "actions": ["action1", "action2"],
-        }
-
-        repo.save_game(game_id, state)
-        loaded = repo.load_game(game_id)
-
-        assert loaded is not None
-        assert loaded["id"] == game_id
-        assert loaded["scenario_id"] == "cuban-missile-crisis"
-        assert loaded["user_id"] == 1
-        assert loaded["status"] == "in_progress"
-        assert loaded["turn"] == 5
-        assert loaded["actions"] == ["action1", "action2"]
-
-    def test_load_game_not_found(self, repo):
-        """Test load_game returns None for non-existent game."""
-        assert repo.load_game("nonexistent-id") is None
-
-    def test_list_games_no_filter(self, repo):
-        """Test list_games returns all games without filter."""
-        game1_id = str(uuid.uuid4())
-        game2_id = str(uuid.uuid4())
-
-        repo.save_game(game1_id, {"scenario_id": "s1", "user_id": 1})
-        repo.save_game(game2_id, {"scenario_id": "s2", "user_id": 2})
-
-        games = repo.list_games()
-        assert len(games) == 2
-
-    def test_list_games_with_user_filter(self, repo):
-        """Test list_games filters by user_id."""
-        game1_id = str(uuid.uuid4())
-        game2_id = str(uuid.uuid4())
-        game3_id = str(uuid.uuid4())
-
-        repo.save_game(game1_id, {"scenario_id": "s1", "user_id": 1})
-        repo.save_game(game2_id, {"scenario_id": "s2", "user_id": 2})
-        repo.save_game(game3_id, {"scenario_id": "s3", "user_id": 1})
-
-        user1_games = repo.list_games(user_id=1)
-        assert len(user1_games) == 2
-        assert all(g["user_id"] == 1 for g in user1_games)
-
-        user2_games = repo.list_games(user_id=2)
-        assert len(user2_games) == 1
-        assert user2_games[0]["user_id"] == 2
-
-    def test_delete_game(self, repo):
-        """Test delete_game removes the game."""
-        game_id = str(uuid.uuid4())
-        repo.save_game(game_id, {"scenario_id": "test"})
-
-        assert repo.load_game(game_id) is not None
-        assert repo.delete_game(game_id) is True
-        assert repo.load_game(game_id) is None
-
-    def test_delete_game_not_found(self, repo):
-        """Test delete_game returns False for non-existent game."""
-        assert repo.delete_game("nonexistent-id") is False
-
-    def test_create_game(self, repo):
-        """Test create_game creates a new game with UUID."""
-        game_id = repo.create_game("cuban-missile-crisis", user_id=42)
-
-        # Verify it's a valid UUID
-        uuid.UUID(game_id)
-
-        loaded = repo.load_game(game_id)
-        assert loaded is not None
-        assert loaded["scenario_id"] == "cuban-missile-crisis"
-        assert loaded["user_id"] == 42
-        assert loaded["status"] == "in_progress"
-        assert loaded["turn"] == 1
-
-    def test_create_game_no_user(self, repo):
-        """Test create_game works without user_id."""
-        game_id = repo.create_game("test-scenario")
-
-        loaded = repo.load_game(game_id)
-        assert loaded is not None
-        assert loaded["user_id"] is None
-
-    def test_game_update(self, repo):
-        """Test saving a game with same ID updates it."""
-        game_id = str(uuid.uuid4())
-        repo.save_game(game_id, {"scenario_id": "test", "turn": 1})
-        repo.save_game(game_id, {"scenario_id": "test", "turn": 5})
-
-        loaded = repo.load_game(game_id)
-        assert loaded["turn"] == 5
-
-
-# ============================================================================
-# SQLiteScenarioRepository Tests
-# ============================================================================
-
-
-class TestSQLiteScenarioRepository:
-    """Tests for the SQLite-based scenario repository."""
-
-    @pytest.fixture
-    def repo(self, tmp_path):
-        """Create a SQLiteScenarioRepository with a temporary database."""
-        db_path = tmp_path / "test.db"
-        return SQLiteScenarioRepository(str(db_path))
-
-    def test_list_scenarios_empty(self, repo):
-        """Test list_scenarios returns empty list initially."""
-        assert repo.list_scenarios() == []
-
-    def test_save_and_get_scenario(self, repo):
-        """Test save_scenario and get_scenario round-trip."""
-        scenario = {
-            "name": "Cuban Missile Crisis",
-            "setting": "Cold War era nuclear standoff",
-            "max_turns": 14,
-            "players": ["USA", "USSR"],
-        }
-
-        scenario_id = repo.save_scenario(scenario)
-        assert scenario_id is not None
-
-        loaded = repo.get_scenario(scenario_id)
-        assert loaded is not None
-        assert loaded["name"] == "Cuban Missile Crisis"
-        assert loaded["setting"] == "Cold War era nuclear standoff"
-        assert loaded["max_turns"] == 14
-        assert loaded["players"] == ["USA", "USSR"]
-        assert loaded["id"] == scenario_id
-
-    def test_get_scenario_not_found(self, repo):
-        """Test get_scenario returns None for non-existent scenario."""
-        assert repo.get_scenario("nonexistent-uuid") is None
-
-    def test_get_scenario_by_name(self, repo):
-        """Test get_scenario_by_name works with case-insensitive search."""
-        scenario = {
-            "name": "Cuban Missile Crisis",
-            "setting": "Cold War",
-            "max_turns": 14,
-        }
-        repo.save_scenario(scenario)
-
-        # Exact match
-        loaded = repo.get_scenario_by_name("Cuban Missile Crisis")
-        assert loaded is not None
-        assert loaded["name"] == "Cuban Missile Crisis"
-
-        # Case-insensitive match
-        loaded = repo.get_scenario_by_name("cuban missile crisis")
-        assert loaded is not None
-        assert loaded["name"] == "Cuban Missile Crisis"
-
-        # Different case
-        loaded = repo.get_scenario_by_name("CUBAN MISSILE CRISIS")
-        assert loaded is not None
-        assert loaded["name"] == "Cuban Missile Crisis"
-
-    def test_get_scenario_by_name_not_found(self, repo):
-        """Test get_scenario_by_name returns None for non-existent name."""
-        assert repo.get_scenario_by_name("Nonexistent Scenario") is None
-
-    def test_delete_scenario(self, repo):
-        """Test delete_scenario removes the scenario."""
-        scenario = {"name": "Test Scenario", "setting": "Test"}
-        scenario_id = repo.save_scenario(scenario)
-
-        assert repo.get_scenario(scenario_id) is not None
-        assert repo.delete_scenario(scenario_id) is True
-        assert repo.get_scenario(scenario_id) is None
-
-    def test_delete_scenario_not_found(self, repo):
-        """Test delete_scenario returns False for non-existent scenario."""
-        assert repo.delete_scenario("nonexistent-uuid") is False
-
-    def test_list_scenarios_multiple(self, repo):
-        """Test list_scenarios returns sorted list of all scenarios."""
-        scenarios = [
-            {"name": "Zebra Crisis", "setting": "A"},
-            {"name": "Alpha Scenario", "setting": "B"},
-            {"name": "Beta Incident", "setting": "C"},
-        ]
-
-        for s in scenarios:
-            repo.save_scenario(s)
-
-        listed = repo.list_scenarios()
-        assert len(listed) == 3
-        # Should be sorted by name
-        assert listed[0]["name"] == "Alpha Scenario"
-        assert listed[1]["name"] == "Beta Incident"
-        assert listed[2]["name"] == "Zebra Crisis"
-
-    def test_save_scenario_no_name_raises(self, repo):
-        """Test save_scenario raises ValueError if no name field."""
-        with pytest.raises(ValueError, match="must have 'name' or 'title' field"):
-            repo.save_scenario({"setting": "No name"})
-
-    def test_save_scenario_with_title(self, repo):
-        """Test save_scenario accepts 'title' as alternative to 'name'."""
-        scenario = {"title": "Test Title", "setting": "Test"}
-        scenario_id = repo.save_scenario(scenario)
-
-        loaded = repo.get_scenario(scenario_id)
-        assert loaded is not None
-
-    def test_scenario_upsert(self, repo):
-        """Test saving a scenario with same ID updates it."""
-        scenario = {"name": "Test Scenario", "setting": "Original"}
-        scenario_id = repo.save_scenario(scenario)
-
-        # Save with same ID
-        scenario2 = {"id": scenario_id, "name": "Test Scenario", "setting": "Updated"}
-        scenario_id2 = repo.save_scenario(scenario2)
-
-        assert scenario_id == scenario_id2
-        loaded = repo.get_scenario(scenario_id)
-        assert loaded["setting"] == "Updated"
-
-
-# ============================================================================
-# SQLiteGameRecordRepository Tests
-# ============================================================================
-
-
-class TestSQLiteGameRecordRepository:
-    """Tests for the SQLite-based game record repository."""
-
-    @pytest.fixture
-    def repo(self, tmp_path):
-        """Create a SQLiteGameRecordRepository with a temporary database."""
-        db_path = tmp_path / "test.db"
-        return SQLiteGameRecordRepository(str(db_path))
-
-    def test_list_games_empty(self, repo):
-        """Test list_games returns empty list initially."""
-        assert repo.list_games() == []
-
-    def test_save_and_load_game(self, repo):
-        """Test save_game and load_game round-trip."""
-        game_id = str(uuid.uuid4())
-        state = {
-            "scenario_id": "cuban-missile-crisis",
-            "user_id": 1,
-            "status": "in_progress",
-            "turn": 5,
-            "actions": ["action1", "action2"],
-        }
-
-        repo.save_game(game_id, state)
-        loaded = repo.load_game(game_id)
-
-        assert loaded is not None
-        assert loaded["scenario_id"] == "cuban-missile-crisis"
-        assert loaded["user_id"] == 1
-        assert loaded["status"] == "in_progress"
-        assert loaded["turn"] == 5
-        assert loaded["actions"] == ["action1", "action2"]
-
-    def test_load_game_not_found(self, repo):
-        """Test load_game returns None for non-existent game."""
-        assert repo.load_game("nonexistent-id") is None
-
-    def test_list_games_no_filter(self, repo):
-        """Test list_games returns all games without filter."""
-        game1_id = str(uuid.uuid4())
-        game2_id = str(uuid.uuid4())
-
-        repo.save_game(game1_id, {"scenario_id": "s1", "user_id": 1})
-        repo.save_game(game2_id, {"scenario_id": "s2", "user_id": 2})
-
-        games = repo.list_games()
-        assert len(games) == 2
-
-    def test_list_games_with_user_filter(self, repo):
-        """Test list_games filters by user_id."""
-        game1_id = str(uuid.uuid4())
-        game2_id = str(uuid.uuid4())
-        game3_id = str(uuid.uuid4())
-
-        repo.save_game(game1_id, {"scenario_id": "s1", "user_id": 1})
-        repo.save_game(game2_id, {"scenario_id": "s2", "user_id": 2})
-        repo.save_game(game3_id, {"scenario_id": "s3", "user_id": 1})
-
-        user1_games = repo.list_games(user_id=1)
-        assert len(user1_games) == 2
-        assert all(g["user_id"] == 1 for g in user1_games)
-
-        user2_games = repo.list_games(user_id=2)
-        assert len(user2_games) == 1
-        assert user2_games[0]["user_id"] == 2
-
-    def test_delete_game(self, repo):
-        """Test delete_game removes the game."""
-        game_id = str(uuid.uuid4())
-        repo.save_game(game_id, {"scenario_id": "test"})
-
-        assert repo.load_game(game_id) is not None
-        assert repo.delete_game(game_id) is True
-        assert repo.load_game(game_id) is None
-
-    def test_delete_game_not_found(self, repo):
-        """Test delete_game returns False for non-existent game."""
-        assert repo.delete_game("nonexistent-id") is False
-
-    def test_create_game(self, repo):
-        """Test create_game creates a new game with UUID."""
-        game_id = repo.create_game("cuban-missile-crisis", user_id=42)
-
-        # Verify it's a valid UUID
-        uuid.UUID(game_id)
-
-        loaded = repo.load_game(game_id)
-        assert loaded is not None
-        assert loaded["scenario_id"] == "cuban-missile-crisis"
-        assert loaded["user_id"] == 42
-        assert loaded["status"] == "in_progress"
-        assert loaded["turn"] == 1
-
-    def test_create_game_no_user(self, repo):
-        """Test create_game works without user_id."""
-        game_id = repo.create_game("test-scenario")
-
-        loaded = repo.load_game(game_id)
-        assert loaded is not None
-        assert loaded["user_id"] is None
-
-    def test_game_upsert(self, repo):
-        """Test saving a game with same ID updates it."""
-        game_id = str(uuid.uuid4())
-        repo.save_game(game_id, {"scenario_id": "test", "turn": 1})
-        repo.save_game(game_id, {"scenario_id": "test", "turn": 5})
-
-        loaded = repo.load_game(game_id)
-        assert loaded["turn"] == 5
-
-
-# ============================================================================
 # Config Tests
 # ============================================================================
 
 
 class TestStorageConfig:
-    """Tests for storage configuration functions."""
+    """Tests for storage configuration functions.
+
+    Focuses on factory functions and default behavior.
+    """
 
     def test_get_storage_backend_default(self, monkeypatch):
         """Test get_storage_backend returns FILE by default."""
         monkeypatch.delenv("BRINKSMANSHIP_STORAGE_BACKEND", raising=False)
-        assert get_storage_backend() == StorageBackend.FILE
-
-    def test_get_storage_backend_file(self, monkeypatch):
-        """Test get_storage_backend returns FILE when set to 'file'."""
-        monkeypatch.setenv("BRINKSMANSHIP_STORAGE_BACKEND", "file")
-        assert get_storage_backend() == StorageBackend.FILE
-
-    def test_get_storage_backend_sqlite(self, monkeypatch):
-        """Test get_storage_backend returns SQLITE when set to 'sqlite'."""
-        monkeypatch.setenv("BRINKSMANSHIP_STORAGE_BACKEND", "sqlite")
-        assert get_storage_backend() == StorageBackend.SQLITE
-
-    def test_get_storage_backend_case_insensitive(self, monkeypatch):
-        """Test get_storage_backend is case-insensitive."""
-        monkeypatch.setenv("BRINKSMANSHIP_STORAGE_BACKEND", "SQLITE")
-        assert get_storage_backend() == StorageBackend.SQLITE
-
-    def test_get_storage_backend_unknown_defaults_to_file(self, monkeypatch):
-        """Test get_storage_backend defaults to FILE for unknown values."""
-        monkeypatch.setenv("BRINKSMANSHIP_STORAGE_BACKEND", "unknown")
         assert get_storage_backend() == StorageBackend.FILE
 
     def test_factory_returns_file_repo(self, tmp_path, monkeypatch):

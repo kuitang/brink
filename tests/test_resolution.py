@@ -1,14 +1,21 @@
 """Comprehensive unit tests for resolution.py.
 
 Tests cover:
-1. MatrixChoice enum - C and D values defined
-2. Reconnaissance game - all four outcome combinations
-3. Inspection game - all four outcome combinations
-4. Settlement constraints - min/max/suggested VP calculation
-5. Matrix game resolution - outcome lookup and state deltas
-6. Settlement proposal/response - validation and structure
-7. Act multiplier scaling
-8. Full turn resolution functions
+1. Reconnaissance game - all four outcome combinations
+2. Inspection game - all four outcome combinations
+3. Settlement constraints - min/max/suggested VP calculation
+4. Matrix game resolution - outcome lookup and state deltas
+5. Settlement proposal/response - validation and structure
+6. Act multiplier scaling
+7. Full turn resolution functions
+
+Removed tests (see test_removal_log.md):
+- TestMatrixChoice: Basic enum tests (trivial, covered by usage)
+- TestReconnaissanceChoices: Enum value tests (trivial)
+- TestInspectionChoices: Enum value tests (trivial)
+- TestSettlementResponse.test_settlement_action_enum: Enum value test (trivial)
+- TestReconnaissanceGame.test_reconnaissance_result_is_frozen: Frozen check (low value)
+- TestInspectionGame.test_inspection_result_is_frozen: Frozen check (low value)
 """
 
 import pytest
@@ -52,47 +59,6 @@ from brinksmanship.models.matrices import (
     get_default_params_for_type,
 )
 from brinksmanship.models.state import GameState, PlayerState
-
-
-# =============================================================================
-# MatrixChoice Enum Tests
-# =============================================================================
-
-
-class TestMatrixChoice:
-    """Tests for MatrixChoice enum."""
-
-    def test_c_and_d_values_defined(self) -> None:
-        """Verify C and D values are defined correctly."""
-        assert MatrixChoice.C.value == "C"
-        assert MatrixChoice.D.value == "D"
-
-    def test_enum_has_exactly_two_values(self) -> None:
-        """Verify enum has exactly two values: C and D."""
-        assert len(MatrixChoice) == 2
-        assert MatrixChoice.C in MatrixChoice
-        assert MatrixChoice.D in MatrixChoice
-
-    def test_from_action_cooperative(self) -> None:
-        """Test that cooperative actions map to C."""
-        cooperative_action = Action(
-            name="Test Cooperate",
-            action_type=ActionType.COOPERATIVE,
-        )
-        assert MatrixChoice.from_action(cooperative_action) == MatrixChoice.C
-
-    def test_from_action_competitive(self) -> None:
-        """Test that competitive actions map to D."""
-        competitive_action = Action(
-            name="Test Defect",
-            action_type=ActionType.COMPETITIVE,
-        )
-        assert MatrixChoice.from_action(competitive_action) == MatrixChoice.D
-
-    def test_string_enum(self) -> None:
-        """Test that MatrixChoice inherits from str."""
-        assert isinstance(MatrixChoice.C, str)
-        assert isinstance(MatrixChoice.D, str)
 
 
 # =============================================================================
@@ -175,32 +141,6 @@ class TestReconnaissanceGame:
         assert result.player_detected is False
         assert len(result.narrative) > 0
 
-    def test_reconnaissance_result_is_frozen(self, game_state: GameState) -> None:
-        """Test that ReconnaissanceResult is immutable."""
-        result = resolve_reconnaissance(
-            game_state,
-            player_choice=ReconnaissanceChoice.PROBE,
-            opponent_choice=ReconnaissanceOpponentChoice.VIGILANT,
-        )
-        with pytest.raises(AttributeError):
-            result.outcome = "success"  # type: ignore[misc]
-
-
-class TestReconnaissanceChoices:
-    """Tests for Reconnaissance choice enums."""
-
-    def test_player_choices(self) -> None:
-        """Test ReconnaissanceChoice enum values."""
-        assert ReconnaissanceChoice.PROBE.value == "probe"
-        assert ReconnaissanceChoice.MASK.value == "mask"
-        assert len(ReconnaissanceChoice) == 2
-
-    def test_opponent_choices(self) -> None:
-        """Test ReconnaissanceOpponentChoice enum values."""
-        assert ReconnaissanceOpponentChoice.VIGILANT.value == "vigilant"
-        assert ReconnaissanceOpponentChoice.PROJECT.value == "project"
-        assert len(ReconnaissanceOpponentChoice) == 2
-
 
 # =============================================================================
 # Inspection Game Tests (GAME_MANUAL.md Section 3.6.2)
@@ -281,32 +221,6 @@ class TestInspectionGame:
         assert result.opponent_position_delta == 0.5
         assert result.player_position_delta == 0.0
         assert len(result.narrative) > 0
-
-    def test_inspection_result_is_frozen(self, game_state: GameState) -> None:
-        """Test that InspectionResult is immutable."""
-        result = resolve_inspection(
-            game_state,
-            player_choice=InspectionChoice.INSPECT,
-            opponent_choice=InspectionOpponentChoice.COMPLY,
-        )
-        with pytest.raises(AttributeError):
-            result.outcome = "caught"  # type: ignore[misc]
-
-
-class TestInspectionChoices:
-    """Tests for Inspection choice enums."""
-
-    def test_player_choices(self) -> None:
-        """Test InspectionChoice enum values."""
-        assert InspectionChoice.INSPECT.value == "inspect"
-        assert InspectionChoice.TRUST.value == "trust"
-        assert len(InspectionChoice) == 2
-
-    def test_opponent_choices(self) -> None:
-        """Test InspectionOpponentChoice enum values."""
-        assert InspectionOpponentChoice.COMPLY.value == "comply"
-        assert InspectionOpponentChoice.CHEAT.value == "cheat"
-        assert len(InspectionOpponentChoice) == 2
 
 
 # =============================================================================
@@ -570,12 +484,6 @@ class TestSettlementResponse:
         )
         assert response.action == SettlementAction.REJECT
         assert response.rejection_reason == "Your offer is unacceptable."
-
-    def test_settlement_action_enum(self) -> None:
-        """Test SettlementAction enum values."""
-        assert SettlementAction.ACCEPT.value == "accept"
-        assert SettlementAction.COUNTER.value == "counter"
-        assert SettlementAction.REJECT.value == "reject"
 
 
 # =============================================================================

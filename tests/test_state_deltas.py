@@ -1,30 +1,31 @@
 """Comprehensive unit tests for state_deltas.py.
 
 Tests cover:
-1. StateDeltaOutcome dataclass - creation, validation, bounds
-2. Global bounds enforcement (position, resource cost, risk)
-3. Near-zero-sum constraint for position changes
-4. DELTA_TEMPLATES - coverage for all 14 MatrixTypes
-5. Act scaling (Act I, II, III multipliers)
-6. get_delta_for_outcome function
-7. Ordinal consistency validation for key game types
+1. StateDeltaOutcome dataclass - validation
+2. Near-zero-sum constraint for position changes
+3. DELTA_TEMPLATES - coverage for all 14 MatrixTypes
+4. Act scaling (Act I, II, III) - actual behavior tests
+5. get_delta_for_outcome function
+6. Ordinal consistency validation for key game types
+
+Removed tests (see test_removal_log.md):
+- TestStateDeltaOutcome: test_creation_with_all_fields, test_frozen_dataclass, test_creation_at_boundary_values (trivial dataclass tests)
+- TestGlobalBoundsEnforcement: Entire class (trivial constant checks, covered by validation tests)
+- TestOutcomeBounds: test_creation (trivial dataclass test)
+- TestNearZeroSumConstraint: test_validate_delta_full_catches_non_zero_sum (subsumed by integration)
+- TestActScaling: test_act_multiplier_values, test_get_act_for_turn, test_get_act_multiplier (duplicated in test_variance.py and test_resolution.py)
 """
 
 import pytest
 
 from brinksmanship.models.matrices import MatrixType
 from brinksmanship.engine.state_deltas import (
-    ACT_MULTIPLIERS,
     DELTA_TEMPLATES,
-    GLOBAL_BOUNDS,
-    MAX_POSITION_SUM_DEVIATION,
     OutcomeBounds,
     OutcomeDeltaBounds,
     StateDeltaOutcome,
     StateDeltaTemplate,
     apply_act_scaling,
-    get_act_for_turn,
-    get_act_multiplier,
     get_delta_for_outcome,
     get_scaled_delta_for_outcome,
     validate_all_templates,
@@ -47,66 +48,6 @@ from brinksmanship.engine.state_deltas import (
 
 class TestStateDeltaOutcome:
     """Tests for StateDeltaOutcome dataclass creation and properties."""
-
-    def test_creation_with_all_fields(self) -> None:
-        """Test creating StateDeltaOutcome with all fields."""
-        delta = StateDeltaOutcome(
-            pos_a=0.5,
-            pos_b=-0.5,
-            res_cost_a=0.3,
-            res_cost_b=0.2,
-            risk_delta=0.5,
-        )
-
-        assert delta.pos_a == 0.5
-        assert delta.pos_b == -0.5
-        assert delta.res_cost_a == 0.3
-        assert delta.res_cost_b == 0.2
-        assert delta.risk_delta == 0.5
-
-    def test_creation_at_boundary_values(self) -> None:
-        """Test creation at boundary values."""
-        # Maximum position changes
-        delta_max_pos = StateDeltaOutcome(
-            pos_a=1.5,
-            pos_b=-1.5,
-            res_cost_a=0.0,
-            res_cost_b=0.0,
-            risk_delta=0.0,
-        )
-        assert delta_max_pos.pos_a == 1.5
-        assert delta_max_pos.pos_b == -1.5
-
-        # Maximum resource cost
-        delta_max_res = StateDeltaOutcome(
-            pos_a=0.0,
-            pos_b=0.0,
-            res_cost_a=1.0,
-            res_cost_b=1.0,
-            risk_delta=0.0,
-        )
-        assert delta_max_res.res_cost_a == 1.0
-        assert delta_max_res.res_cost_b == 1.0
-
-        # Maximum risk delta
-        delta_max_risk = StateDeltaOutcome(
-            pos_a=0.0,
-            pos_b=0.0,
-            res_cost_a=0.0,
-            res_cost_b=0.0,
-            risk_delta=2.0,
-        )
-        assert delta_max_risk.risk_delta == 2.0
-
-        # Minimum risk delta
-        delta_min_risk = StateDeltaOutcome(
-            pos_a=0.0,
-            pos_b=0.0,
-            res_cost_a=0.0,
-            res_cost_b=0.0,
-            risk_delta=-1.0,
-        )
-        assert delta_min_risk.risk_delta == -1.0
 
     def test_validation_passes_for_valid_deltas(self) -> None:
         """Test that validate_delta_outcome passes for valid deltas."""
@@ -222,76 +163,6 @@ class TestStateDeltaOutcome:
         assert is_valid is False
         assert any("risk_delta" in e for e in errors)
 
-    def test_frozen_dataclass(self) -> None:
-        """Test that StateDeltaOutcome is immutable."""
-        delta = StateDeltaOutcome(
-            pos_a=0.5,
-            pos_b=-0.5,
-            res_cost_a=0.0,
-            res_cost_b=0.0,
-            risk_delta=0.0,
-        )
-        with pytest.raises(AttributeError):
-            delta.pos_a = 1.0  # type: ignore[misc]
-
-
-# =============================================================================
-# Global Bounds Enforcement Tests
-# =============================================================================
-
-
-class TestGlobalBoundsEnforcement:
-    """Tests for global bounds defined in GLOBAL_BOUNDS."""
-
-    def test_global_bounds_values(self) -> None:
-        """Test that GLOBAL_BOUNDS has correct values per GAME_MANUAL.md."""
-        assert GLOBAL_BOUNDS["position"] == (-1.5, 1.5)
-        assert GLOBAL_BOUNDS["resource_cost"] == (0.0, 1.0)
-        assert GLOBAL_BOUNDS["risk"] == (-1.0, 2.0)
-
-    def test_max_position_sum_deviation(self) -> None:
-        """Test MAX_POSITION_SUM_DEVIATION is 0.5."""
-        assert MAX_POSITION_SUM_DEVIATION == 0.5
-
-    def test_position_change_in_valid_range(self) -> None:
-        """Test position change validation in [-1.5, 1.5] range."""
-        pos_min, pos_max = GLOBAL_BOUNDS["position"]
-
-        # At minimum
-        delta_min = StateDeltaOutcome(
-            pos_a=pos_min, pos_b=-pos_min, res_cost_a=0.0, res_cost_b=0.0, risk_delta=0.0
-        )
-        assert validate_delta_outcome(delta_min) is True
-
-        # At maximum
-        delta_max = StateDeltaOutcome(
-            pos_a=pos_max, pos_b=-pos_max, res_cost_a=0.0, res_cost_b=0.0, risk_delta=0.0
-        )
-        assert validate_delta_outcome(delta_max) is True
-
-    def test_resource_cost_in_valid_range(self) -> None:
-        """Test resource cost validation in [0.0, 1.0] range."""
-        res_min, res_max = GLOBAL_BOUNDS["resource_cost"]
-
-        delta = StateDeltaOutcome(
-            pos_a=0.0, pos_b=0.0, res_cost_a=res_min, res_cost_b=res_max, risk_delta=0.0
-        )
-        assert validate_delta_outcome(delta) is True
-
-    def test_risk_delta_in_valid_range(self) -> None:
-        """Test risk delta validation in [-1.0, 2.0] range."""
-        risk_min, risk_max = GLOBAL_BOUNDS["risk"]
-
-        delta_min = StateDeltaOutcome(
-            pos_a=0.0, pos_b=0.0, res_cost_a=0.0, res_cost_b=0.0, risk_delta=risk_min
-        )
-        assert validate_delta_outcome(delta_min) is True
-
-        delta_max = StateDeltaOutcome(
-            pos_a=0.0, pos_b=0.0, res_cost_a=0.0, res_cost_b=0.0, risk_delta=risk_max
-        )
-        assert validate_delta_outcome(delta_max) is True
-
 
 # =============================================================================
 # Near-Zero-Sum Constraint Tests
@@ -333,15 +204,6 @@ class TestNearZeroSumConstraint:
         )
         assert validate_near_zero_sum(delta) is False
         assert abs(delta.pos_a + delta.pos_b) > 0.5
-
-    def test_validate_delta_full_catches_non_zero_sum(self) -> None:
-        """Test that validate_delta_full catches non-zero-sum violations."""
-        delta = StateDeltaOutcome(
-            pos_a=1.0, pos_b=1.0, res_cost_a=0.0, res_cost_b=0.0, risk_delta=0.0
-        )
-        is_valid, errors = validate_delta_full(delta)
-        assert is_valid is False
-        assert any("near-zero-sum" in e for e in errors)
 
 
 # =============================================================================
@@ -458,12 +320,6 @@ class TestDeltaTemplates:
 class TestOutcomeBounds:
     """Tests for OutcomeBounds helper class."""
 
-    def test_creation(self) -> None:
-        """Test creating OutcomeBounds."""
-        bounds = OutcomeBounds(min_val=0.0, max_val=1.0)
-        assert bounds.min_val == 0.0
-        assert bounds.max_val == 1.0
-
     def test_midpoint(self) -> None:
         """Test midpoint calculation."""
         bounds = OutcomeBounds(min_val=0.0, max_val=1.0)
@@ -498,41 +354,6 @@ class TestOutcomeBounds:
 
 class TestActScaling:
     """Tests for act-based scaling of deltas."""
-
-    def test_act_multiplier_values(self) -> None:
-        """Test ACT_MULTIPLIERS has correct values."""
-        assert ACT_MULTIPLIERS[1] == 0.7
-        assert ACT_MULTIPLIERS[2] == 1.0
-        assert ACT_MULTIPLIERS[3] == 1.3
-
-    def test_get_act_for_turn(self) -> None:
-        """Test get_act_for_turn returns correct act."""
-        # Act I: turns 1-4
-        assert get_act_for_turn(1) == 1
-        assert get_act_for_turn(2) == 1
-        assert get_act_for_turn(3) == 1
-        assert get_act_for_turn(4) == 1
-
-        # Act II: turns 5-8
-        assert get_act_for_turn(5) == 2
-        assert get_act_for_turn(6) == 2
-        assert get_act_for_turn(7) == 2
-        assert get_act_for_turn(8) == 2
-
-        # Act III: turns 9+
-        assert get_act_for_turn(9) == 3
-        assert get_act_for_turn(10) == 3
-        assert get_act_for_turn(12) == 3
-        assert get_act_for_turn(16) == 3
-
-    def test_get_act_multiplier(self) -> None:
-        """Test get_act_multiplier returns correct multiplier."""
-        assert get_act_multiplier(1) == 0.7
-        assert get_act_multiplier(4) == 0.7
-        assert get_act_multiplier(5) == 1.0
-        assert get_act_multiplier(8) == 1.0
-        assert get_act_multiplier(9) == 1.3
-        assert get_act_multiplier(12) == 1.3
 
     def test_act_i_scales_down(self) -> None:
         """Test Act I (0.7) scales values down correctly."""
