@@ -440,6 +440,8 @@ TURN SEQUENCE
 
 ### 3.5 State Deltas (How Outcomes Affect State)
 
+**Authoritative Source**: `src/brinksmanship/engine/state_deltas.py` contains the definitive delta templates for all matrix types. The examples below are illustrative; see the source code for exact parameters.
+
 Each turn's matrix outcome produces **State Deltas**—changes to Position and Risk:
 
 | Delta Type | Range | Description |
@@ -484,13 +486,28 @@ Position is a fixed-sum resource representing relative advantage:
 3. If you're losing position, you must fight back (retaliate), not just keep cooperating
 4. Since position IS strictly zero-sum, knowing your own position DOES reveal opponent's position - which is why both positions are hidden
 
-### 3.6 Information Game Mechanics
+### 3.6 Intelligence Game Mechanics
 
-Information games allow players to acquire intelligence about their opponent's position. Playing an information game consumes your action for that turn—you cannot play both an information game AND a regular strategic game in the same turn.
+Intelligence games are special strategic interactions focused on information, signaling, and trust. Unlike regular matrix games that primarily affect Position and Risk, intelligence games can also reveal or conceal hidden information about players' positions.
 
-**Key Design Note**: Since BOTH players' positions are hidden, learning opponent's position is valuable but still doesn't tell you your own position. If you learn opponent has Position 6, they might have gained it (total > 10) or you might have lost it (total < 10).
+**Key Design Principles**:
+1. **Not all scenarios use all intelligence games**: Scenario generators select games that fit the narrative context
+2. **Intelligence games are zero-sum for position**: Like all games, position changes sum to zero
+3. **Information effects are the differentiator**: Learning opponent's position, exposing your own, or signaling credibility
+4. **Risk changes reflect the stakes**: Mutual cooperation reduces risk, mutual aggression increases it
 
-#### 3.6.1 Reconnaissance Game (Position Intelligence)
+**Four Intelligence Game Types**:
+
+| Game | Structure | Key Tension | Information Effect |
+|------|-----------|-------------|-------------------|
+| Reconnaissance | Matching Pennies | Probe vs. mask | Learn/reveal positions |
+| Diplomatic Standoff | Chicken | Commitment vs. backing down | Mutual exposure on crash |
+| Back-Channel Exchange | Stag Hunt | Trust-based sharing | Mutual or asymmetric reveal |
+| Verification Dilemma | Prisoner's Dilemma | Verify vs. trust | Verify reveals opponent |
+
+**Authoritative Parameters**: See `src/brinksmanship/engine/state_deltas.py` for exact delta values.
+
+#### 3.6.1 Reconnaissance Game (Matching Pennies)
 
 **Purpose**: Learn opponent's exact Position.
 
@@ -519,7 +536,91 @@ Information games allow players to acquire intelligence about their opponent's p
 - 25% chance they learn your Position
 - 12.5% chance of escalation (Risk +0.5)
 
-#### 3.6.2 Inference from Outcomes
+#### 3.6.2 Diplomatic Standoff (Chicken)
+
+**Purpose**: Force opponent to reveal their position through escalation pressure. Neither side wants to back down, but neither wants to crash.
+
+**Narrative Context**: Both sides have made implicit claims about their resolve. Neither wants to back down, but mutual aggression risks catastrophic exposure.
+
+**Matrix Structure**:
+
+|  | Opponent: Back Down | Opponent: Stand Firm |
+|--|---------------------|----------------------|
+| **You: Back Down** | Stalemate | You yield |
+| **You: Stand Firm** | They yield | Mutual exposure |
+
+**Outcomes**:
+
+| Outcome | Position Effect | Risk Effect | Information Effect |
+|---------|----------------|-------------|-------------------|
+| Both Back Down | 0 / 0 | -0.35 | None |
+| You Back Down, They Stand | -0.5 / +0.5 | +0.55 | None |
+| You Stand, They Back Down | +0.5 / -0.5 | +0.55 | None |
+| Both Stand Firm | 0 / 0 | +2.0 | **Both learn both positions** |
+
+**Nash Equilibrium**: Two pure equilibria (one yields) plus one mixed equilibrium.
+
+**Strategic Logic**: Standing firm wins if the opponent backs down, but mutual aggression is catastrophic. The "crash" outcome reveals true positions at severe risk cost. Classic anti-coordination: one must yield, but who?
+
+**Best Fit Scenarios**: Cuban Missile Crisis, Berlin Blockade, NATO Burden Sharing, Brexit Negotiations
+
+#### 3.6.3 Back-Channel Exchange (Stag Hunt)
+
+**Purpose**: Enable mutual intelligence sharing to reduce crisis risk, but requires trust.
+
+**Narrative Context**: Both sides could benefit from honest dialogue about their true positions. Sharing creates mutual understanding; withholding protects against exploitation.
+
+**Matrix Structure**:
+
+|  | Opponent: Share | Opponent: Withhold |
+|--|-----------------|---------------------|
+| **You: Share** | Mutual clarity | You're exposed |
+| **You: Withhold** | They're exposed | Fog persists |
+
+**Outcomes**:
+
+| Outcome | Position Effect | Risk Effect | Information Effect |
+|---------|----------------|-------------|-------------------|
+| Both Share | 0 / 0 | -0.65 | **Both learn both positions** |
+| You Share, They Withhold | -0.5 / +0.5 | +0.35 | They learn your position |
+| You Withhold, They Share | +0.5 / -0.5 | +0.35 | You learn their position |
+| Both Withhold | 0 / 0 | 0 | None |
+
+**Nash Equilibrium**: Two pure equilibria—(Share, Share) is payoff-dominant, (Withhold, Withhold) is risk-dominant.
+
+**Strategic Logic**: Mutual sharing is Pareto-optimal (best combined outcome with biggest risk reduction), but sharing unilaterally is exploitable. Trust enables the better equilibrium.
+
+**Best Fit Scenarios**: Cold War Espionage, NATO Burden Sharing, Medici Banking Dynasty, Cuban Missile Crisis back-channels
+
+#### 3.6.4 Verification Dilemma (Prisoner's Dilemma)
+
+**Purpose**: Decide whether to verify opponent's signals or extend trust, balancing inspection costs against exploitation risk.
+
+**Narrative Context**: Both sides have made commitments or signals. Each could trust the other's word or invest in verification. Mutual trust is efficient but vulnerable; mutual verification is safe but costly.
+
+**Matrix Structure**:
+
+|  | Opponent: Trust | Opponent: Verify |
+|--|-----------------|------------------|
+| **You: Trust** | Mutual trust | You're checked |
+| **You: Verify** | You check them | Mutual suspicion |
+
+**Outcomes**:
+
+| Outcome | Position Effect | Risk Effect | Information Effect |
+|---------|----------------|-------------|-------------------|
+| Both Trust | 0 / 0 | -0.5 | None |
+| You Trust, They Verify | -0.4 / +0.4 | +0.5 | They learn your position |
+| You Verify, They Trust | +0.4 / -0.4 | +0.5 | You learn their position |
+| Both Verify | 0 / 0 | +1.2 | **Both learn both positions** |
+
+**Nash Equilibrium**: (Verify, Verify) is dominant but (Trust, Trust) is Pareto-optimal.
+
+**Strategic Logic**: Verification is individually rational—if they trust, you gain intelligence; if they verify, at least you're not the only one exposed. But mutual verification is worse than mutual trust due to risk spike.
+
+**Best Fit Scenarios**: OPEC Oil Politics (quota verification), Cold War Espionage (spy swaps), Arms control agreements
+
+#### 3.6.5 Inference from Outcomes
 
 After each turn, you observe the narrative outcome. You can infer:
 
