@@ -23,6 +23,7 @@ def _run_opponent_method(method, *args, **kwargs):
 
 from brinksmanship.engine import GameEngine, create_game
 from brinksmanship.models.actions import Action, ActionCategory, ActionType, get_action_by_name
+from brinksmanship.opponents.base import SettlementProposal, SettlementResponse
 from brinksmanship.opponents import Opponent, get_opponent_by_type, list_opponent_types as _list_opponent_types
 from brinksmanship.opponents.historical import PERSONA_DISPLAY_NAMES
 from brinksmanship.opponents.persona_generator import create_opponent_from_persona
@@ -245,12 +246,13 @@ class RealGameEngine:
             opponent_position = gs.position_a
             opponent_resources = gs.resources_a
 
-        # Maintain history in state dict
+        # Maintain history in state dict (with narrative for display)
         history = list(state.get("history", []))
         history.append({
             "turn": state.get("turn", 1),
             "player": player_symbol,
             "opponent": opponent_symbol,
+            "narrative": result.narrative,
         })
 
         new_state = {
@@ -274,10 +276,23 @@ class RealGameEngine:
             "last_outcome": result.narrative,
             "briefing": engine.get_briefing(),
             "history": history,
-            # Turn info for GameRecord.add_turn()
+            # Turn info for GameRecord.add_turn() with full trace data
             "new_turn_player": player_symbol,
             "new_turn_opponent": opponent_symbol,
             "new_turn_number": state.get("turn", 1),
+            "new_turn_player_action_name": player_action.name,
+            "new_turn_opponent_action_name": opponent_action.name,
+            "new_turn_outcome_code": result.action_result.outcome_code if result.action_result else None,
+            "new_turn_narrative": result.narrative,
+            "new_turn_state_after": {
+                "position_player": player_position,
+                "position_opponent": opponent_position,
+                "resources_player": player_resources,
+                "resources_opponent": opponent_resources,
+                "risk_level": gs.risk_level,
+                "cooperation_score": int(gs.cooperation_score),
+                "stability": int(gs.stability),
+            },
             "is_finished": result.ending is not None,
         }
 
@@ -408,4 +423,119 @@ class RealGameEngine:
             "cost": a.resource_cost,
             "description": a.description,
             "mechanics_hint": mechanics_hint,
+        }
+
+    def can_propose_settlement(self, state: dict[str, Any]) -> bool:
+        """Check if player can propose settlement.
+
+        Settlement requires Turn > 4 and Stability > 2.
+        """
+        turn = state.get("turn", 1)
+        stability = state.get("stability", 5)
+        is_finished = state.get("is_finished", False)
+        return turn > 4 and stability > 2 and not is_finished
+
+    def get_suggested_settlement_vp(self, state: dict[str, Any]) -> int:
+        """Get suggested VP for player based on current position.
+
+        VP should roughly correspond to position (0-10 scale -> 0-100 VP).
+        """
+        player_pos = state.get("position_player", 5.0)
+        opponent_pos = state.get("position_opponent", 5.0)
+
+        # Calculate based on relative position
+        total_pos = player_pos + opponent_pos
+        if total_pos == 0:
+            return 50
+
+        player_share = player_pos / total_pos
+        suggested = int(player_share * 100)
+
+        # Clamp to reasonable range (20-80)
+        return max(20, min(80, suggested))
+
+    def evaluate_settlement(
+        self,
+        state: dict[str, Any],
+        offered_vp: int,
+        argument: str = "",
+    ) -> dict[str, Any]:
+        """Evaluate player's settlement proposal and get opponent response.
+
+        Returns dict with:
+            - action: "accept", "reject", or "counter"
+            - counter_vp: VP if counter
+            - counter_argument: argument if counter
+            - rejection_reason: reason if rejected
+        """
+        opponent = self._create_opponent(state)
+        engine = self._create_engine_from_state(state)
+
+        proposal = SettlementProposal(offered_vp=offered_vp, argument=argument)
+
+        # Get opponent response
+        response = _run_opponent_method(
+            opponent.evaluate_settlement, proposal, engine.state, False
+        )
+
+        return {
+            "action": response.action,
+            "counter_vp": response.counter_vp,
+            "counter_argument": response.counter_argument,
+            "rejection_reason": response.rejection_reason,
+        }
+
+    def check_opponent_settlement(self, state: dict[str, Any]) -> Optional[dict[str, Any]]:
+        """Check if opponent wants to propose settlement.
+
+        Returns proposal dict if opponent proposes, None otherwise.
+        """
+        if not self.can_propose_settlement(state):
+            return None
+
+        opponent = self._create_opponent(state)
+        engine = self._create_engine_from_state(state)
+
+        proposal = _run_opponent_method(opponent.propose_settlement, engine.state)
+
+        if proposal is None:
+            return None
+
+        return {
+            "offered_vp": proposal.offered_vp,
+            "argument": proposal.argument or "",
+        }
+
+    def finalize_settlement(
+        self,
+        state: dict[str, Any],
+        player_vp: int,
+    ) -> dict[str, Any]:
+        """Finalize settlement and return new state with ending.
+
+        Args:
+            state: Current game state
+            player_vp: VP for the player (opponent gets 100 - player_vp)
+
+        Returns:
+            Updated state dict with ending info
+        """
+        opponent_vp = 100 - player_vp
+        player_is_a = state.get("player_is_a", True)
+
+        if player_is_a:
+            vp_a = player_vp
+            vp_b = opponent_vp
+        else:
+            vp_a = opponent_vp
+            vp_b = player_vp
+
+        return {
+            **state,
+            "is_finished": True,
+            "ending_type": "settlement",
+            "vp_player": player_vp,
+            "vp_opponent": opponent_vp,
+            "vp_a": vp_a,
+            "vp_b": vp_b,
         }

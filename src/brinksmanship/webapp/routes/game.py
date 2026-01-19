@@ -53,11 +53,16 @@ def submit_action(game_id: str):
     state = game_record.state
     new_state = game_service.submit_action(state, action_id)
 
-    # Record turn in history
+    # Record turn in history with full trace data
     game_record.add_turn(
-        new_state["new_turn_number"],
-        new_state["new_turn_player"],
-        new_state["new_turn_opponent"]
+        turn=new_state["new_turn_number"],
+        player=new_state["new_turn_player"],
+        opponent=new_state["new_turn_opponent"],
+        player_action_name=new_state.get("new_turn_player_action_name"),
+        opponent_action_name=new_state.get("new_turn_opponent_action_name"),
+        outcome_code=new_state.get("new_turn_outcome_code"),
+        narrative=new_state.get("new_turn_narrative"),
+        state_after=new_state.get("new_turn_state_after"),
     )
 
     # Update record
@@ -106,3 +111,229 @@ def game_over(game_id: str):
         game=game_record,
         state=game_record.state,
     )
+
+
+@bp.route("/<game_id>/trace")
+@login_required
+def get_trace(game_id: str):
+    """Get full game trace as JSON."""
+    from flask import jsonify
+
+    game_record = GameRecord.query.filter_by(
+        game_id=game_id, user_id=current_user.id
+    ).first_or_404()
+
+    return jsonify(game_record.get_trace())
+
+
+# Settlement routes
+
+@bp.route("/<game_id>/settlement")
+@login_required
+def settlement_panel(game_id: str):
+    """Get settlement panel HTML."""
+    game_record = GameRecord.query.filter_by(
+        game_id=game_id, user_id=current_user.id
+    ).first_or_404()
+
+    if game_record.is_finished:
+        return "", 204  # No content if game is over
+
+    game_service = get_game_service()
+    state = game_record.state
+
+    can_settle = game_service.can_propose_settlement(state)
+    suggested_vp = game_service.get_suggested_settlement_vp(state) if can_settle else 50
+
+    # Check if opponent wants to propose
+    opponent_proposal = game_service.check_opponent_settlement(state) if can_settle else None
+
+    return render_template(
+        "components/settlement_panel.html",
+        game_id=game_id,
+        state=state,
+        can_settle=can_settle,
+        suggested_vp=suggested_vp,
+        opponent_proposal=opponent_proposal,
+    )
+
+
+@bp.route("/<game_id>/settlement/propose", methods=["POST"])
+@login_required
+def propose_settlement(game_id: str):
+    """Player proposes settlement."""
+    game_record = GameRecord.query.filter_by(
+        game_id=game_id, user_id=current_user.id
+    ).first_or_404()
+
+    if game_record.is_finished:
+        return redirect(url_for("game.game_over", game_id=game_id))
+
+    game_service = get_game_service()
+    state = game_record.state
+
+    if not game_service.can_propose_settlement(state):
+        return render_template(
+            "components/settlement_response.html",
+            game_id=game_id,
+            error="Settlement not available (requires Turn > 4 and Stability > 2)",
+        )
+
+    # Get proposal from form
+    try:
+        offered_vp = int(request.form.get("offered_vp", 50))
+    except ValueError:
+        offered_vp = 50
+
+    argument = request.form.get("argument", "")[:500]
+
+    # Clamp VP to valid range
+    offered_vp = max(20, min(80, offered_vp))
+
+    # Evaluate with opponent
+    response = game_service.evaluate_settlement(state, offered_vp, argument)
+
+    # Record the settlement attempt
+    game_record.add_settlement_attempt(
+        turn=state.get("turn", 1),
+        proposer="player",
+        offered_vp=offered_vp,
+        argument=argument,
+        response_action=response["action"],
+        counter_vp=response.get("counter_vp"),
+        counter_argument=response.get("counter_argument"),
+        rejection_reason=response.get("rejection_reason"),
+    )
+    db.session.commit()
+
+    if response["action"] == "accept":
+        # Settlement accepted - end game
+        player_vp = offered_vp
+        new_state = game_service.finalize_settlement(state, player_vp)
+
+        game_record.update_from_state(new_state)
+        game_record.is_finished = True
+        game_record.final_vp_player = player_vp
+        game_record.final_vp_opponent = 100 - player_vp
+        game_record.finished_at = datetime.utcnow()
+        db.session.commit()
+
+        # Return redirect via htmx
+        response_html = render_template(
+            "components/settlement_response.html",
+            game_id=game_id,
+            accepted=True,
+            player_vp=player_vp,
+        )
+        resp = response_html
+        return resp, 200, {"HX-Redirect": url_for("game.game_over", game_id=game_id)}
+
+    return render_template(
+        "components/settlement_response.html",
+        game_id=game_id,
+        response=response,
+        offered_vp=offered_vp,
+    )
+
+
+@bp.route("/<game_id>/settlement/respond", methods=["POST"])
+@login_required
+def respond_to_settlement(game_id: str):
+    """Player responds to opponent's settlement proposal."""
+    game_record = GameRecord.query.filter_by(
+        game_id=game_id, user_id=current_user.id
+    ).first_or_404()
+
+    if game_record.is_finished:
+        return redirect(url_for("game.game_over", game_id=game_id))
+
+    game_service = get_game_service()
+    state = game_record.state
+
+    action = request.form.get("action", "reject")
+    opponent_vp = int(request.form.get("opponent_vp", 50))
+    opponent_argument = request.form.get("opponent_argument", "")
+
+    if action == "accept":
+        # Player accepts opponent's offer
+        player_vp = 100 - opponent_vp
+
+        # Record settlement attempt
+        game_record.add_settlement_attempt(
+            turn=state.get("turn", 1),
+            proposer="opponent",
+            offered_vp=opponent_vp,
+            argument=opponent_argument,
+            response_action="accept",
+        )
+
+        new_state = game_service.finalize_settlement(state, player_vp)
+        game_record.update_from_state(new_state)
+        game_record.is_finished = True
+        game_record.final_vp_player = player_vp
+        game_record.final_vp_opponent = opponent_vp
+        game_record.finished_at = datetime.utcnow()
+        db.session.commit()
+
+        return "", 200, {"HX-Redirect": url_for("game.game_over", game_id=game_id)}
+
+    elif action == "counter":
+        # Player counters
+        try:
+            counter_vp = int(request.form.get("counter_vp", 50))
+        except ValueError:
+            counter_vp = 50
+
+        counter_argument = request.form.get("counter_argument", "")[:500]
+
+        # Record opponent's proposal and player's counter
+        game_record.add_settlement_attempt(
+            turn=state.get("turn", 1),
+            proposer="opponent",
+            offered_vp=opponent_vp,
+            argument=opponent_argument,
+            response_action="counter",
+            counter_vp=counter_vp,
+            counter_argument=counter_argument,
+        )
+        db.session.commit()
+
+        # Evaluate counter with opponent (as final offer)
+        response = game_service.evaluate_settlement(state, counter_vp, counter_argument)
+
+        if response["action"] == "accept":
+            player_vp = counter_vp
+            new_state = game_service.finalize_settlement(state, player_vp)
+            game_record.update_from_state(new_state)
+            game_record.is_finished = True
+            game_record.final_vp_player = player_vp
+            game_record.final_vp_opponent = 100 - player_vp
+            game_record.finished_at = datetime.utcnow()
+            db.session.commit()
+
+            return "", 200, {"HX-Redirect": url_for("game.game_over", game_id=game_id)}
+
+        return render_template(
+            "components/settlement_response.html",
+            game_id=game_id,
+            response=response,
+            offered_vp=counter_vp,
+            is_counter_response=True,
+        )
+
+    else:
+        # Player rejects
+        game_record.add_settlement_attempt(
+            turn=state.get("turn", 1),
+            proposer="opponent",
+            offered_vp=opponent_vp,
+            argument=opponent_argument,
+            response_action="reject",
+        )
+        db.session.commit()
+
+        return render_template(
+            "components/settlement_response.html",
+            game_id=game_id,
+            rejected=True,
+        )

@@ -1,0 +1,139 @@
+{# Settlement response - shows opponent's response to player's proposal #}
+
+{% if error %}
+<div class="chat-message error">
+    <div class="message-content">{{ error }}</div>
+</div>
+
+{% elif accepted %}
+<div class="chat-message success">
+    <div class="message-header">Settlement Accepted!</div>
+    <div class="message-content">
+        <p>The opponent has accepted your terms.</p>
+        <p class="final-score">Final Score: You <strong>{{ player_vp }} VP</strong> - Opponent <strong>{{ 100 - player_vp }} VP</strong></p>
+        <p class="text-muted">Redirecting to results...</p>
+    </div>
+</div>
+
+{% elif rejected %}
+<div class="chat-message opponent">
+    <div class="message-header">Settlement Rejected</div>
+    <div class="message-content">
+        <p>Negotiations have failed. Risk +1.</p>
+        <p class="text-muted">The crisis continues...</p>
+    </div>
+</div>
+<div class="settlement-actions">
+    <button type="button" class="btn btn-secondary" onclick="closeSettlementPanel()">
+        Return to Game
+    </button>
+</div>
+
+{% elif response %}
+{# Show opponent's response #}
+<div class="chat-message player">
+    <div class="message-header">Your proposal:</div>
+    <div class="message-content">
+        <span class="vp-offer">You: <strong>{{ offered_vp }} VP</strong> / Them: <strong>{{ 100 - offered_vp }} VP</strong></span>
+    </div>
+</div>
+
+{% if response.action == "counter" %}
+<div class="chat-message opponent">
+    <div class="message-header">Opponent counters:</div>
+    <div class="message-content">
+        <div class="proposal-terms">
+            <span class="vp-offer">They want <strong>{{ response.counter_vp }} VP</strong></span>
+            <span class="vp-you">You get <strong>{{ 100 - response.counter_vp }} VP</strong></span>
+        </div>
+        {% if response.counter_argument %}
+        <div class="proposal-argument">"{{ response.counter_argument }}"</div>
+        {% endif %}
+    </div>
+</div>
+
+{% if is_counter_response %}
+{# This was a counter to our counter - final offer, no more negotiation #}
+<div class="chat-message system">
+    <div class="message-content">
+        <p><strong>Final offer.</strong> Accept or reject - no further counters allowed.</p>
+    </div>
+</div>
+{% endif %}
+
+<form class="settlement-response-form"
+      hx-post="{{ url_for('game.respond_to_settlement', game_id=game_id) }}"
+      hx-target="#settlement-chat-area"
+      hx-swap="innerHTML">
+    <input type="hidden" name="opponent_vp" value="{{ response.counter_vp }}">
+    <input type="hidden" name="opponent_argument" value="{{ response.counter_argument or '' }}">
+
+    <div class="response-options">
+        <button type="submit" name="action" value="accept" class="btn btn-success">
+            Accept (You: {{ 100 - response.counter_vp }} VP)
+        </button>
+        {% if not is_counter_response %}
+        <button type="button" class="btn btn-primary" onclick="showCounterForm()">
+            Counter Again
+        </button>
+        {% endif %}
+        <button type="submit" name="action" value="reject" class="btn btn-danger">
+            Reject (Risk +1)
+        </button>
+    </div>
+
+    {% if not is_counter_response %}
+    <div class="counter-form" id="counter-form" style="display: none;">
+        <div class="form-group">
+            <label>Your counter (VP for you):</label>
+            <input type="range" name="counter_vp" id="counter-vp-slider"
+                   min="20" max="80" value="{{ (offered_vp + (100 - response.counter_vp)) // 2 }}"
+                   oninput="updateCounterDisplay(this.value)">
+            <div class="vp-display">
+                <span>You: <strong id="counter-your-vp">{{ (offered_vp + (100 - response.counter_vp)) // 2 }}</strong> VP</span>
+                <span>Them: <strong id="counter-their-vp">{{ 100 - (offered_vp + (100 - response.counter_vp)) // 2 }}</strong> VP</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Argument (optional):</label>
+            <textarea name="counter_argument" rows="2" maxlength="500"
+                      placeholder="Make your case..."></textarea>
+        </div>
+        <button type="submit" name="action" value="counter" class="btn btn-primary">
+            Submit Counter
+        </button>
+    </div>
+    {% endif %}
+</form>
+
+{% elif response.action == "reject" %}
+<div class="chat-message opponent">
+    <div class="message-header">Opponent rejects:</div>
+    <div class="message-content">
+        {% if response.rejection_reason %}
+        <div class="rejection-reason">"{{ response.rejection_reason }}"</div>
+        {% else %}
+        <p>Your proposal was rejected.</p>
+        {% endif %}
+        <p class="text-muted">Risk +1. Negotiations have failed.</p>
+    </div>
+</div>
+<div class="settlement-actions">
+    <button type="button" class="btn btn-secondary" onclick="closeSettlementPanel()">
+        Return to Game
+    </button>
+</div>
+{% endif %}
+
+{% endif %}
+
+<script>
+function updateCounterDisplay(value) {
+    document.getElementById('counter-your-vp').textContent = value;
+    document.getElementById('counter-their-vp').textContent = 100 - value;
+}
+
+function showCounterForm() {
+    document.getElementById('counter-form').style.display = 'block';
+}
+</script>

@@ -11,4 +11,35 @@
 <div id="game-board">
     {% include "components/game_board.html" %}
 </div>
+
+{# Settlement modal overlay #}
+<div id="settlement-modal" class="modal-overlay" style="display: none;">
+    <div id="settlement-content"></div>
+</div>
+
+<script>
+function openSettlementPanel() {
+    var modal = document.getElementById('settlement-modal');
+    var content = document.getElementById('settlement-content');
+    modal.style.display = 'flex';
+
+    // Load settlement panel via htmx
+    htmx.ajax('GET', '{{ url_for("game.settlement_panel", game_id=game_id) }}', {
+        target: '#settlement-content',
+        swap: 'innerHTML'
+    });
+}
+
+function closeSettlementPanel() {
+    var modal = document.getElementById('settlement-modal');
+    modal.style.display = 'none';
+}
+
+// Close modal when clicking outside
+document.getElementById('settlement-modal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeSettlementPanel();
+    }
+});
+</script>
 {% endblock %}

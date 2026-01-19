@@ -26,6 +26,19 @@ class GameEngineProtocol(Protocol):
 
     def submit_action(self, state: dict[str, Any], action_id: str) -> dict[str, Any]: ...
 
+    # Settlement methods
+    def can_propose_settlement(self, state: dict[str, Any]) -> bool: ...
+
+    def get_suggested_settlement_vp(self, state: dict[str, Any]) -> int: ...
+
+    def evaluate_settlement(
+        self, state: dict[str, Any], offered_vp: int, argument: str = ""
+    ) -> dict[str, Any]: ...
+
+    def check_opponent_settlement(self, state: dict[str, Any]) -> dict[str, Any] | None: ...
+
+    def finalize_settlement(self, state: dict[str, Any], player_vp: int) -> dict[str, Any]: ...
+
 
 _engine: RealGameEngine | None = None
 

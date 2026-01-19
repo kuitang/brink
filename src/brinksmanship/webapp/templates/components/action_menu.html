@@ -2,10 +2,20 @@
 <form id="action-form" hx-post="{{ url_for('game.submit_action', game_id=game_id) }}"
       hx-target="#game-board"
       hx-swap="innerHTML"
-      hx-indicator="#thinking">
+      hx-indicator="#thinking"
+      hx-disabled-elt="button[type='submit']">
 
     <div class="hide-on-request">
-        <h3>Choose Your Action <span class="text-muted">(or press 1-{{ actions|length }})</span></h3>
+        <div class="action-header">
+            <span class="action-prompt">Choose Your Action</span>
+            <span class="text-muted">(1-{{ actions|length }})</span>
+            {% if state.turn > 4 and state.stability > 2 %}
+            <button type="button" class="settlement-btn" onclick="openSettlementPanel()"
+                    title="Negotiate a settlement to end the crisis">
+                Negotiate Settlement
+            </button>
+            {% endif %}
+        </div>
         <div class="action-menu">
             {% for action in actions %}
             <button type="submit" name="action_id" value="{{ action.id }}"
@@ -35,19 +45,36 @@
 </form>
 
 <script>
-// Keyboard shortcuts for actions (1-9)
-document.addEventListener('keydown', function(e) {
-    // Ignore if typing in an input field
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+(function() {
+    // Keyboard shortcuts for actions (1-9) with request-in-flight protection
+    let requestInFlight = false;
 
-    // Check for number keys 1-9
-    const key = parseInt(e.key);
-    if (key >= 1 && key <= 9) {
-        const btn = document.querySelector(`[data-action-index="${key}"]`);
-        if (btn) {
-            e.preventDefault();
-            btn.click();
+    document.body.addEventListener('htmx:beforeRequest', function(e) {
+        if (e.detail.elt.id === 'action-form') {
+            requestInFlight = true;
         }
-    }
-});
+    });
+
+    document.body.addEventListener('htmx:afterRequest', function(e) {
+        if (e.detail.elt.id === 'action-form') {
+            requestInFlight = false;
+        }
+    });
+
+    document.addEventListener('keydown', function(e) {
+        // Ignore if typing in an input field or request in flight
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        if (requestInFlight) return;
+
+        // Check for number keys 1-9
+        const key = parseInt(e.key);
+        if (key >= 1 && key <= 9) {
+            const btn = document.querySelector(`[data-action-index="${key}"]`);
+            if (btn && !btn.disabled) {
+                e.preventDefault();
+                btn.click();
+            }
+        }
+    });
+})();
 </script>

@@ -1,26 +1,73 @@
 {# Main game board component - swapped via htmx #}
 
-{% include "components/status_bar.html" %}
-
-<div class="box">
+{# History pane with narratives #}
+<div class="box game-history-pane">
     <div class="box-header">
-        <h3>Turn {{ state.turn }}</h3>
+        <h3>Crisis Log</h3>
     </div>
-    {% include "components/narrative.html" %}
+    <div class="history-narrative-list">
+        {% if state.history %}
+            {% for turn in state.history %}
+            <div class="history-entry {% if loop.last %}history-entry-latest{% endif %}">
+                <div class="history-turn-header">
+                    <span class="turn-label">Turn {{ turn.turn }}:</span>
+                    <span class="turn-plays">
+                        You <span class="{{ 'cooperative' if turn.player == 'C' else 'competitive' }}">{{ 'cooperated' if turn.player == 'C' else 'competed' }}</span>
+                        &mdash;
+                        Opponent <span class="{{ 'cooperative' if turn.opponent == 'C' else 'competitive' }}">{{ 'cooperated' if turn.opponent == 'C' else 'competed' }}</span>
+                    </span>
+                </div>
+                {% if turn.narrative %}
+                <div class="history-result">{{ turn.narrative }}</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        {% else %}
+        <p class="text-muted">No actions taken yet.</p>
+        {% endif %}
+    </div>
 </div>
 
-<div class="box">
+{# Current briefing #}
+<div class="box game-briefing">
     <div class="box-header">
-        <h3>Choose Your Action</h3>
+        <h3>Turn {{ state.turn }} Briefing</h3>
     </div>
-    {% include "components/action_menu.html" %}
+    <div class="briefing-text">
+        {{ state.briefing }}
+    </div>
 </div>
 
-{% if state.history %}
-<div class="box">
-    <div class="box-header">
-        <h3>History</h3>
+{# Bottom panel: info + actions #}
+<div class="game-bottom-panel">
+    {# Game state info - positions are HIDDEN per game design (information asymmetry) #}
+    {# Players learn outcomes from the Crisis Log narratives, not raw numbers #}
+    <div class="info-row">
+        <div class="shared-info-box" style="flex: 1;">
+            <div class="info-header">Crisis Status</div>
+            <div class="info-stats">
+                <div class="info-stat">
+                    <span class="stat-label">Risk Level</span>
+                    <span class="stat-value {% if state.risk_level >= 7 %}risk-high{% elif state.risk_level >= 4 %}risk-medium{% else %}risk-low{% endif %}">{{ "%.1f"|format(state.risk_level) }}/10</span>
+                </div>
+                <div class="info-stat">
+                    <span class="stat-label">Cooperation</span>
+                    <span class="stat-value">{{ state.cooperation_score }}/10</span>
+                </div>
+                <div class="info-stat">
+                    <span class="stat-label">Stability</span>
+                    <span class="stat-value">{{ state.stability }}/10</span>
+                </div>
+                <div class="info-stat">
+                    <span class="stat-label">Turn</span>
+                    <span class="stat-value">{{ state.turn }}</span>
+                </div>
+            </div>
+        </div>
     </div>
-    {% include "components/history.html" %}
+
+    {# Action menu #}
+    <div class="action-panel">
+        {% include "components/action_menu.html" %}
+    </div>
 </div>
-{% endif %}

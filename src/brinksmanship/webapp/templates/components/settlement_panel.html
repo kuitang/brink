@@ -1,0 +1,139 @@
+{# Settlement negotiation panel - chat-like interface #}
+<div class="settlement-panel" id="settlement-panel">
+    <div class="settlement-header">
+        <h3>Negotiate Settlement</h3>
+        <button type="button" class="close-btn" onclick="closeSettlementPanel()">&times;</button>
+    </div>
+
+    {% if not can_settle %}
+    <div class="settlement-unavailable">
+        <p class="text-muted">Settlement negotiations are not available yet.</p>
+        <p class="text-muted small">Requirements: Turn &gt; 4 and Stability &gt; 2</p>
+        <p class="text-muted small">Current: Turn {{ state.turn }}, Stability {{ state.stability }}</p>
+    </div>
+    {% elif opponent_proposal %}
+    {# Opponent has made a proposal - show response UI #}
+    <div class="settlement-chat">
+        <div class="chat-message opponent">
+            <div class="message-header">Opponent proposes:</div>
+            <div class="message-content">
+                <div class="proposal-terms">
+                    <span class="vp-offer">They get <strong>{{ opponent_proposal.offered_vp }} VP</strong></span>
+                    <span class="vp-you">You get <strong>{{ 100 - opponent_proposal.offered_vp }} VP</strong></span>
+                </div>
+                {% if opponent_proposal.argument %}
+                <div class="proposal-argument">"{{ opponent_proposal.argument }}"</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <form class="settlement-response-form"
+          hx-post="{{ url_for('game.respond_to_settlement', game_id=game_id) }}"
+          hx-target="#settlement-chat-area"
+          hx-swap="innerHTML">
+        <input type="hidden" name="opponent_vp" value="{{ opponent_proposal.offered_vp }}">
+        <input type="hidden" name="opponent_argument" value="{{ opponent_proposal.argument or '' }}">
+
+        <div class="response-options">
+            <button type="submit" name="action" value="accept" class="btn btn-success">
+                Accept (You: {{ 100 - opponent_proposal.offered_vp }} VP)
+            </button>
+            <button type="button" class="btn btn-primary" onclick="showCounterForm()">
+                Counter-Propose
+            </button>
+            <button type="submit" name="action" value="reject" class="btn btn-danger">
+                Reject
+            </button>
+        </div>
+
+        <div class="counter-form" id="counter-form" style="display: none;">
+            <div class="form-group">
+                <label>Your counter (VP for you):</label>
+                <input type="range" name="counter_vp" id="counter-vp-slider"
+                       min="20" max="80" value="{{ suggested_vp }}"
+                       oninput="updateCounterDisplay(this.value)">
+                <div class="vp-display">
+                    <span>You: <strong id="counter-your-vp">{{ suggested_vp }}</strong> VP</span>
+                    <span>Them: <strong id="counter-their-vp">{{ 100 - suggested_vp }}</strong> VP</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Argument (optional):</label>
+                <textarea name="counter_argument" rows="2" maxlength="500"
+                          placeholder="Make your case..."></textarea>
+            </div>
+            <button type="submit" name="action" value="counter" class="btn btn-primary">
+                Submit Counter
+            </button>
+        </div>
+    </form>
+
+    {% else %}
+    {# Player can propose #}
+    <div class="settlement-chat" id="settlement-chat-area">
+        <div class="chat-message system">
+            <div class="message-content">
+                <p>Negotiations are open. Based on current positions:</p>
+                <ul class="position-summary">
+                    <li>Your position: <strong>{{ "%.1f"|format(state.position_player) }}</strong></li>
+                    <li>Opponent position: <strong>{{ "%.1f"|format(state.position_opponent) }}</strong></li>
+                </ul>
+                <p class="suggested">Suggested split: <strong>{{ suggested_vp }} VP</strong> for you</p>
+            </div>
+        </div>
+    </div>
+
+    <form class="settlement-proposal-form"
+          hx-post="{{ url_for('game.propose_settlement', game_id=game_id) }}"
+          hx-target="#settlement-chat-area"
+          hx-swap="innerHTML"
+          hx-indicator="#settlement-thinking">
+        <div class="form-group">
+            <label>Victory Points for You:</label>
+            <input type="range" name="offered_vp" id="vp-slider"
+                   min="20" max="80" value="{{ suggested_vp }}"
+                   oninput="updateVPDisplay(this.value)">
+            <div class="vp-display">
+                <span>You: <strong id="your-vp">{{ suggested_vp }}</strong> VP</span>
+                <span>Opponent: <strong id="their-vp">{{ 100 - suggested_vp }}</strong> VP</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Your Argument (optional):</label>
+            <textarea name="argument" rows="2" maxlength="500"
+                      placeholder="Make your case for this split..."></textarea>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Propose Settlement</button>
+            <button type="button" class="btn btn-secondary" onclick="closeSettlementPanel()">Cancel</button>
+        </div>
+        <div id="settlement-thinking" class="htmx-indicator">
+            <span class="thinking-dots">Opponent considering<span>.</span><span>.</span><span>.</span></span>
+        </div>
+    </form>
+    {% endif %}
+</div>
+
+<script>
+function updateVPDisplay(value) {
+    document.getElementById('your-vp').textContent = value;
+    document.getElementById('their-vp').textContent = 100 - value;
+}
+
+function updateCounterDisplay(value) {
+    document.getElementById('counter-your-vp').textContent = value;
+    document.getElementById('counter-their-vp').textContent = 100 - value;
+}
+
+function showCounterForm() {
+    document.getElementById('counter-form').style.display = 'block';
+}
+
+function closeSettlementPanel() {
+    var panel = document.getElementById('settlement-modal');
+    if (panel) {
+        panel.style.display = 'none';
+    }
+}
+</script>

@@ -517,6 +517,154 @@ textarea:focus {
     60%, 100% { content: "..."; }
 }
 
+/* ===== GAME LAYOUT ===== */
+.game-history-pane {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.history-narrative-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.history-entry {
+    padding: var(--spacing-sm);
+    background-color: var(--bg);
+    border: 1px solid var(--border-light);
+    border-left: 3px solid var(--border);
+}
+
+.history-entry-latest {
+    border-left-color: var(--accent);
+    background-color: var(--warning-bg);
+}
+
+.history-turn-header {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+    margin-bottom: var(--spacing-xs);
+    font-size: 0.9rem;
+}
+
+.turn-label {
+    font-weight: bold;
+    color: var(--accent);
+}
+
+.turn-plays {
+    color: var(--text-muted);
+}
+
+.history-result {
+    font-style: italic;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.game-briefing .briefing-text {
+    line-height: 1.6;
+    padding: var(--spacing-sm);
+}
+
+.game-bottom-panel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.info-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: var(--spacing-md);
+}
+
+.player-info-box,
+.opponent-info-box,
+.shared-info-box {
+    border: var(--border-width) solid var(--border);
+    background-color: var(--bg-alt);
+}
+
+.player-info-box {
+    border-left: 4px solid var(--cooperative);
+}
+
+.opponent-info-box {
+    border-left: 4px solid var(--competitive);
+}
+
+.shared-info-box {
+    border-left: 4px solid var(--accent);
+}
+
+.info-header {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background-color: var(--accent);
+    color: var(--bg);
+    font-weight: bold;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+
+.player-info-box .info-header {
+    background-color: var(--cooperative);
+}
+
+.opponent-info-box .info-header {
+    background-color: var(--competitive);
+}
+
+.info-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm);
+}
+
+.info-stat {
+    display: flex;
+    flex-direction: column;
+    min-width: 60px;
+}
+
+.stat-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+.stat-value {
+    font-weight: bold;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+}
+
+.action-panel {
+    border: var(--border-width) solid var(--border);
+    background-color: var(--bg-alt);
+    padding: var(--spacing-md);
+}
+
+.action-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-sm);
+}
+
+.action-prompt {
+    font-weight: bold;
+}
+
+@media (max-width: 700px) {
+    .info-row {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* ===== GAME OVER ===== */
 .game-result {
     text-align: center;
@@ -868,4 +1016,320 @@ footer {
 .coaching-error {
     text-align: center;
     padding: var(--spacing-md);
+}
+
+/* ===== SETTLEMENT PANEL ===== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.settlement-panel {
+    background-color: var(--bg-alt);
+    border: var(--border-width) solid var(--border);
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.settlement-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-sm) var(--spacing-md);
+    background-color: var(--accent);
+    color: var(--bg);
+    border-bottom: var(--border-width) solid var(--border);
+}
+
+.settlement-header h3 {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: var(--bg);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.close-btn:hover {
+    opacity: 0.8;
+}
+
+.settlement-unavailable {
+    padding: var(--spacing-md);
+    text-align: center;
+}
+
+.settlement-unavailable .small {
+    font-size: 0.8rem;
+}
+
+/* Settlement Chat */
+.settlement-chat {
+    padding: var(--spacing-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.chat-message {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 1px solid var(--border-light);
+    max-width: 85%;
+}
+
+.chat-message.system {
+    background-color: var(--bg);
+    border-left: 3px solid var(--accent);
+    max-width: 100%;
+}
+
+.chat-message.player {
+    background-color: var(--success-bg);
+    border-left: 3px solid var(--cooperative);
+    align-self: flex-end;
+}
+
+.chat-message.opponent {
+    background-color: var(--danger-bg);
+    border-left: 3px solid var(--competitive);
+    align-self: flex-start;
+}
+
+.chat-message.error {
+    background-color: var(--danger-bg);
+    border-left: 3px solid var(--danger);
+    max-width: 100%;
+}
+
+.chat-message.success {
+    background-color: var(--success-bg);
+    border-left: 3px solid var(--success);
+    max-width: 100%;
+    text-align: center;
+}
+
+.message-header {
+    font-weight: bold;
+    margin-bottom: var(--spacing-xs);
+    font-size: 0.875rem;
+}
+
+.message-content {
+    line-height: 1.5;
+}
+
+.message-content p {
+    margin: var(--spacing-xs) 0;
+}
+
+.message-content p:last-child {
+    margin-bottom: 0;
+}
+
+/* Proposal terms display */
+.proposal-terms {
+    display: flex;
+    justify-content: space-around;
+    padding: var(--spacing-sm) 0;
+    font-size: 0.95rem;
+}
+
+.vp-offer {
+    color: var(--competitive);
+}
+
+.vp-you {
+    color: var(--cooperative);
+}
+
+.proposal-argument {
+    font-style: italic;
+    color: var(--text-muted);
+    margin-top: var(--spacing-sm);
+    padding-top: var(--spacing-sm);
+    border-top: 1px solid var(--border-light);
+}
+
+.rejection-reason {
+    font-style: italic;
+    color: var(--text-muted);
+}
+
+.position-summary {
+    margin: var(--spacing-sm) 0;
+    padding-left: var(--spacing-md);
+}
+
+.position-summary li {
+    margin: var(--spacing-xs) 0;
+}
+
+.suggested {
+    font-weight: bold;
+}
+
+.final-score {
+    font-size: 1.1rem;
+    margin: var(--spacing-md) 0;
+}
+
+/* Settlement Forms */
+.settlement-proposal-form,
+.settlement-response-form {
+    padding: var(--spacing-md);
+    border-top: 1px solid var(--border-light);
+}
+
+.settlement-proposal-form .form-group,
+.settlement-response-form .form-group {
+    margin-bottom: var(--spacing-md);
+}
+
+.settlement-proposal-form label,
+.settlement-response-form label {
+    font-size: 0.875rem;
+    margin-bottom: var(--spacing-xs);
+}
+
+.settlement-proposal-form input[type="range"],
+.settlement-response-form input[type="range"] {
+    width: 100%;
+    margin: var(--spacing-sm) 0;
+}
+
+.settlement-proposal-form textarea,
+.settlement-response-form textarea {
+    width: 100%;
+    resize: vertical;
+    min-height: 60px;
+}
+
+.form-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-md);
+}
+
+.settlement-actions {
+    padding: var(--spacing-md);
+    text-align: center;
+}
+
+/* VP Display in forms */
+.settlement-proposal-form .vp-display,
+.settlement-response-form .vp-display,
+.counter-form .vp-display {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    padding: var(--spacing-xs) 0;
+}
+
+/* Response options */
+.response-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+}
+
+.response-options .btn {
+    flex: 1;
+    min-width: 100px;
+    text-align: center;
+}
+
+/* Counter form */
+.counter-form {
+    margin-top: var(--spacing-md);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--border-light);
+}
+
+/* Settlement button in action menu */
+.settlement-btn {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    background-color: var(--info);
+    color: var(--bg);
+    border: var(--border-width) solid var(--info);
+    cursor: pointer;
+}
+
+.settlement-btn:hover {
+    background-color: var(--accent);
+    border-color: var(--accent);
+}
+
+/* Button variants */
+.btn-success {
+    background-color: var(--success);
+    color: var(--bg);
+    border-color: var(--success);
+}
+
+.btn-success:hover {
+    opacity: 0.9;
+}
+
+.btn-danger {
+    background-color: var(--danger);
+    color: var(--bg);
+    border-color: var(--danger);
+}
+
+.btn-danger:hover {
+    opacity: 0.9;
+}
+
+.btn-secondary {
+    background-color: var(--bg);
+    color: var(--text);
+    border-color: var(--border);
+}
+
+.btn-secondary:hover {
+    background-color: var(--bg-alt);
+}
+
+/* Settlement thinking indicator */
+#settlement-thinking {
+    text-align: center;
+    padding: var(--spacing-md);
+    color: var(--text-muted);
+}
+
+.thinking-dots span {
+    animation: thinking-blink 1.5s infinite;
+}
+
+.thinking-dots span:nth-child(2) {
+    animation-delay: 0.3s;
+}
+
+.thinking-dots span:nth-child(3) {
+    animation-delay: 0.6s;
+}
+
+@keyframes thinking-blink {
+    0%, 60%, 100% { opacity: 1; }
+    30% { opacity: 0; }
 }
