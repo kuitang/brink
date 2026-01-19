@@ -65,6 +65,7 @@ Thumbs.db
 scenarios/*.json
 !scenarios/.gitkeep
 instance/
+seed/
 
 # Environment variables
 .env

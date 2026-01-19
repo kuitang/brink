@@ -168,12 +168,33 @@ brinksmanship/
 4. Implement action-to-matrix-choice mapping
 5. Define special actions (Settlement, Reconnaissance)
 
+**Scenario-Specific Actions**:
+Scenarios can define context-specific actions for each turn using the `actions` array in `TurnDefinition`:
+```json
+"actions": [
+  {
+    "action_id": "escalate",
+    "narrative_description": "Order naval blockade of Cuba",
+    "action_type": "competitive",
+    "resource_cost": 0.3
+  }
+]
+```
+
+When `actions` is provided:
+- The narrative_description becomes the button/option text (not generic "Escalate")
+- The action_type determines cooperative/competitive classification for matrix resolution
+- The action_id maps to special action categories (e.g., "settlement", "reconnaissance")
+
+When `actions` is empty, the generic action menu based on Risk Level is used as fallback.
+
 **Acceptance Criteria**:
 - [x] Actions are correctly classified as COOPERATIVE or COMPETITIVE
 - [x] Action menus vary by Risk Level as specified in GAME_MANUAL.md
 - [x] Resource costs are enforced (cannot take action if insufficient resources)
 - [x] Settlement action has special handling (bypasses matrix resolution)
 - [x] Unit tests verify action classification
+- [x] Scenario-defined actions display narrative descriptions in UI
 
 ### Milestone 1.4: Storage Repository
 
@@ -475,7 +496,20 @@ PD_DELTA_TEMPLATE = {
         "punishment_severity": 0.5,
         "sucker_penalty": 2.0
       },
-      "action_menu": ["action1", "action2"],
+      "actions": [
+        {
+          "action_id": "escalate",
+          "narrative_description": "Order naval blockade of Cuba",
+          "action_type": "competitive",
+          "resource_cost": 0.3
+        },
+        {
+          "action_id": "hold",
+          "narrative_description": "Continue surveillance while assessing options",
+          "action_type": "cooperative",
+          "resource_cost": 0
+        }
+      ],
       "outcome_narratives": {
         "CC": "string",
         "CD": "string",
@@ -1381,38 +1415,492 @@ MECHANICS_ANALYSIS_PROMPT_TEMPLATE = """..."""
 
 ---
 
-## Phase 9: Playtesting Workflow
+## Phase 9: Automated Scenario Generation & Validation
 
-### Milestone 9.1: Playtest Pipeline
+### Overview
 
-**Deliverable**: Shell scripts for running the complete playtest pipeline
+Scenarios are the core content of Brinksmanship. This phase implements an **agentic pipeline** that generates scenarios from user prompts and iteratively refines them until they pass all validation checks. The pipeline uses Claude Code SDK to analyze playtest failures and automatically edit scenario files.
 
-**Workflow** (all deterministic Python, no LLM orchestration):
-```bash
-# 1. Generate scenarios
-python scripts/generate_scenario.py --theme "Cold War" --output scenarios/cold_war.json
-
-# 2. Validate scenarios
-python scripts/validate_scenario.py scenarios/cold_war.json
-
-# 3. Run playtests
-python scripts/run_playtest.py --scenario scenarios/cold_war.json \
-    --pairings "Nash:Nash,TitForTat:Opportunist" --games 100 --output results/
-
-# 4. Analyze mechanics
-python scripts/analyze_mechanics.py results/ --output analysis.json
+**Architecture**:
+```
+User Prompt (flexible length)
+    │
+    ▼
+generate_and_validate_scenario.py (agentic)
+    │
+    ├─► Generate initial scenario → scenarios/*.json
+    │
+    ├─► Run structural validation
+    │   └─► If fails: Agent analyzes, edits file, retry
+    │
+    ├─► Run balance simulation (50+ games)
+    │   └─► If fails (dominant strategy, bad variance):
+    │       └─► Agent analyzes failure stats
+    │       └─► Agent edits matrix parameters/game types
+    │       └─► Retry (max iterations)
+    │
+    └─► Output: validated scenario file OR failure report
 ```
 
-**Thresholds** (from GAME_MANUAL.md):
-- Dominant strategy: >60% win rate → CRITICAL
-- VP std dev outside 10-40 range → MAJOR
-- Settlement rate outside 30-70% → MAJOR
-- Average turns < 8 or > 15 → MINOR
+**Source of Truth**: `scenarios/*.json` files are the source of truth during development. The webapp uses SQLite exclusively (see Phase 10).
+
+### Milestone 9.1: Generate-and-Validate Agent
+
+**Deliverable**: `scripts/generate_and_validate_scenario.py` - Agentic script that generates scenarios from prompts and iteratively refines them until they pass validation.
+
+**Design Principle**: One command produces a validated scenario. The user provides a prompt of any length—from a simple title like "Medici family" to detailed historical context. More information yields more customized scenarios.
+
+**Script Interface**:
+```bash
+# Generate from simple prompt (Claude fills in details)
+python scripts/generate_and_validate_scenario.py "Medici family"
+
+# Generate from detailed prompt
+python scripts/generate_and_validate_scenario.py "The Medici banking family in 15th century Florence,
+    focusing on Lorenzo de' Medici's rivalry with the Pazzi family. Include themes of
+    papal politics, assassination plots, and financial leverage."
+
+# Generate from prompt file (for very long prompts)
+python scripts/generate_and_validate_scenario.py --prompt-file prompts/medici_detailed.txt
+
+# Validate/refine existing scenario (skip generation)
+python scripts/generate_and_validate_scenario.py --validate-only scenarios/medici_banking.json
+
+# With options
+python scripts/generate_and_validate_scenario.py "Cuban Missile Crisis" \
+    --max-iterations 5 \
+    --games-per-test 50 \
+    --output scenarios/cuban_missile_crisis.json \
+    --verbose
+```
+
+**System Prompt for Generation** (in `prompts.py`):
+```python
+SCENARIO_GENERATION_AGENT_SYSTEM_PROMPT = """You are an expert game designer creating scenarios for
+Brinksmanship, a game-theoretic strategy simulation. Your task is to generate engaging, historically
+or thematically grounded scenarios that produce balanced gameplay.
+
+When given a prompt (which may be brief or detailed):
+1. Research/recall relevant historical or thematic context
+2. Identify the key tensions, actors, and decision points
+3. Structure a 12-16 turn scenario with three acts:
+   - Act I (turns 1-4): Setup, low stakes, trust-building games (Stag Hunt, Inspection, Harmony)
+   - Act II (turns 5-8): Escalation, moderate stakes (Chicken, PD, Battle of Sexes)
+   - Act III (turns 9+): Crisis/resolution, high stakes (Chicken, Security Dilemma, Deadlock)
+4. Write compelling narrative briefings that immerse the player
+5. Select matrix types and parameters that create meaningful choices
+
+If the prompt is brief (e.g., just a title), use your knowledge to flesh out appropriate details.
+If the prompt is detailed, honor the user's specifications while ensuring game balance.
+
+You must use at least 8 distinct matrix types across the scenario for variety.
+"""
+```
+
+**Agent Implementation** (using Claude Code SDK):
+```python
+from claude_code_sdk import Claude
+
+async def generate_and_validate_scenario(
+    prompt: str,
+    output_path: Path | None = None,
+    max_iterations: int = 5,
+    games_per_test: int = 50,
+    validate_only: bool = False,
+) -> tuple[bool, Path]:
+    """Generate and validate a scenario from a user prompt.
+
+    Args:
+        prompt: User's scenario prompt (any length)
+        output_path: Where to save the scenario (auto-generated if None)
+        max_iterations: Max refinement iterations before giving up
+        games_per_test: Number of games per balance simulation
+        validate_only: If True, skip generation and just validate existing file
+
+    Returns:
+        Tuple of (success: bool, scenario_path: Path)
+    """
+    async with Claude() as claude:
+        if validate_only:
+            agent_prompt = f"""Validate and refine the scenario at {output_path}.
+
+For each iteration:
+1. Run: python scripts/validate_scenario.py {output_path} --simulate --games {games_per_test}
+2. If PASSED: Report success and stop.
+3. If FAILED: Analyze the failure output carefully:
+   - Dominant strategy (>60% win rate): Adjust matrix parameters to reduce advantage
+   - Variance too low (<10 VP std dev): Increase scale or risk_weight parameters
+   - Variance too high (>40 VP std dev): Decrease scale parameters
+   - Game variety (<8 types): Replace duplicate matrix types with unused ones
+4. Edit the scenario JSON file with targeted fixes
+5. Re-run validation
+
+You have {max_iterations} iterations. Make one focused change per iteration.
+After each edit, explain your reasoning briefly.
+"""
+        else:
+            agent_prompt = f"""Generate and validate a Brinksmanship scenario based on this prompt:
+
+---
+{prompt}
+---
+
+Steps:
+1. Generate a complete scenario JSON file based on the prompt above.
+   - Use the format shown in existing scenarios (see scenarios/*.json for examples)
+   - Include 12-16 turns with narrative briefings
+   - Use appropriate matrix types for each act
+   - Save to: {output_path or 'scenarios/<slugified-title>.json'}
+
+2. Validate the scenario:
+   Run: python scripts/validate_scenario.py <your-scenario-path> --simulate --games {games_per_test}
+
+3. If validation fails, refine iteratively:
+   - Analyze failure stats
+   - Edit the scenario file to fix issues
+   - Re-run validation
+   - Repeat up to {max_iterations} times
+
+4. Report final status (PASSED or FAILED with explanation).
+
+Be creative with the narrative while ensuring mechanical balance.
+"""
+
+        result = await claude.run(
+            prompt=agent_prompt,
+            allowed_tools=["Read", "Write", "Edit", "Bash", "Glob"],
+            max_turns=max_iterations * 4 + 10,  # Generation + iterations
+        )
+
+        success = "PASSED" in result.text or "passed" in result.text.lower()
+        # Extract path from result if not specified
+        final_path = output_path or _extract_path_from_result(result.text)
+
+        return success, final_path
+```
+
+**Validation Thresholds** (from GAME_MANUAL.md):
+| Check | Threshold | Severity |
+|-------|-----------|----------|
+| Dominant strategy | >60% win rate | CRITICAL |
+| VP std dev | Outside 10-40 | MAJOR |
+| Settlement rate | Outside 30-70% | MAJOR |
+| Game variety | <8 distinct types | MAJOR |
+| Avg game length | Outside 8-15 turns | MINOR |
 
 **Acceptance Criteria**:
-- [ ] All scripts run without LLM calls (except persona opponents)
-- [ ] Pipeline completes in <5 minutes for 100 games
-- [ ] Analysis output is machine-readable JSON
+- [ ] Single command generates validated scenario from any prompt length
+- [ ] Brief prompts (e.g., "Medici family") produce complete, playable scenarios
+- [ ] Detailed prompts honor user specifications
+- [ ] Agent correctly identifies imbalance causes from playtest stats
+- [ ] Agent makes targeted edits (not random changes)
+- [ ] Max iterations prevents infinite loops
+- [ ] `--verbose` shows agent reasoning
+- [ ] `--validate-only` works for existing scenarios
+
+### Milestone 9.2: Scenario Library Generation
+
+**Deliverable**: `scripts/generate_scenario_library.py` - Generates the full library of 10 seed scenarios.
+
+**Scenario Library**:
+
+| # | Prompt | Theme |
+|---|--------|-------|
+| 1 | "Cuban Missile Crisis, October 1962. Kennedy vs Khrushchev. Nuclear brinkmanship over Soviet missiles in Cuba." | crisis |
+| 2 | "Berlin Blockade 1948-49. Stalin's blockade of West Berlin, Allied airlift response." | crisis |
+| 3 | "Taiwan Strait Crisis. US-China tensions over Taiwan's status, ambiguity and deterrence." | crisis |
+| 4 | "Silicon Valley tech giants battling for market dominance. Acquisitions, platform wars, antitrust threats." | rivals |
+| 5 | "OPEC oil politics. Cartel discipline, production quotas, price wars between Saudi Arabia and rivals." | rivals |
+| 6 | "Brexit negotiations. UK-EU divorce terms, trade deals, Irish border question." | allies |
+| 7 | "NATO burden sharing. Free-riding accusations, credible commitment to collective defense." | allies |
+| 8 | "Cold War espionage. Mole hunts, double agents, disinformation campaigns." | espionage |
+| 9 | "Byzantine imperial succession. Palace factions, legitimacy claims, religious politics." | default |
+| 10 | "Medici banking dynasty. 15th century Florence, papal politics, rival families." | default |
+
+**Script**:
+```bash
+# Generate all 10 scenarios
+python scripts/generate_scenario_library.py
+
+# Generate specific scenarios by number
+python scripts/generate_scenario_library.py --scenarios 1,2,3
+
+# Skip already-valid scenarios
+python scripts/generate_scenario_library.py --skip-valid
+
+# Parallel generation (multiple Claude instances)
+python scripts/generate_scenario_library.py --parallel 3
+```
+
+**Acceptance Criteria**:
+- [ ] Generates all 10 scenarios to `scenarios/` directory
+- [ ] Each scenario passes validation before completion
+- [ ] Reports progress and which scenarios passed/failed
+- [ ] `--skip-valid` skips scenarios that already exist and pass validation
+- [ ] Parallel mode speeds up generation
+
+---
+
+## Phase 10: Seed Database & Deployment
+
+### Overview
+
+The webapp uses **SQLite exclusively** for all data (scenarios, users, game records). Development uses JSON files as source of truth; the seed database is the deployment artifact.
+
+**Data Flow**:
+```
+scenarios/*.json (development, source of truth)
+        │
+        │ build_seed_db.py
+        ▼
+seed/brinksmanship.seed.db (deployment artifact, gitignored)
+        │
+        │ copy to instance/
+        ▼
+instance/brinksmanship.db (runtime, accumulates users/games)
+```
+
+### Milestone 10.1: Seed Database Builder
+
+**Deliverable**: `scripts/build_seed_db.py` - Creates deployment-ready SQLite database.
+
+**Contents of seed database**:
+1. All validated scenarios from `scenarios/*.json`
+2. Default test account: username `test1234`, password `test1234`
+3. Empty tables for: game_records, leaderboard entries
+
+**Script**:
+```bash
+# Build seed database from all validated scenarios
+python scripts/build_seed_db.py
+
+# Build from specific scenarios
+python scripts/build_seed_db.py scenarios/cuban*.json scenarios/berlin*.json
+
+# Custom output location
+python scripts/build_seed_db.py --output seed/custom.db
+
+# Add additional test accounts
+python scripts/build_seed_db.py --add-user admin:securepassword
+```
+
+**Implementation**:
+```python
+def build_seed_db(
+    scenario_files: list[Path],
+    output_path: Path = Path("seed/brinksmanship.seed.db"),
+    default_users: list[tuple[str, str]] = [("test1234", "test1234")],
+) -> None:
+    """Build seed database from validated scenario files.
+
+    Args:
+        scenario_files: Paths to scenario JSON files
+        output_path: Where to create the seed database
+        default_users: List of (username, password) tuples to create
+    """
+    # Remove existing seed db (fresh build)
+    if output_path.exists():
+        output_path.unlink()
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    # Initialize database with schema
+    conn = sqlite3.connect(output_path)
+    _create_schema(conn)  # scenarios, users, games tables
+
+    # Import scenarios
+    scenario_repo = SQLiteScenarioRepository(str(output_path))
+    for scenario_file in scenario_files:
+        scenario = json.loads(scenario_file.read_text())
+        scenario_repo.save_scenario(scenario)
+        print(f"Imported: {scenario.get('title', scenario_file.name)}")
+
+    # Create default users with argon2 password hashing
+    from argon2 import PasswordHasher
+    ph = PasswordHasher()
+
+    cursor = conn.cursor()
+    for username, password in default_users:
+        password_hash = ph.hash(password)
+        cursor.execute(
+            "INSERT INTO users (username, password_hash, created_at) VALUES (?, ?, ?)",
+            (username, password_hash, datetime.utcnow().isoformat())
+        )
+
+    conn.commit()
+    conn.close()
+
+    print(f"\nSeed database created: {output_path}")
+    print(f"  Scenarios: {len(scenario_files)}")
+    print(f"  Users: {len(default_users)}")
+```
+
+**Acceptance Criteria**:
+- [ ] Creates `seed/brinksmanship.seed.db` with all scenarios
+- [ ] Default account `test1234`/`test1234` works for webapp login
+- [ ] Passwords hashed with argon2 (RFC 9106 compliant)
+- [ ] Database schema matches webapp expectations
+- [ ] Fresh build (overwrites existing seed db)
+
+### Milestone 10.2: Webapp SQLite-Only Storage
+
+**Deliverable**: Simplify webapp to always use SQLite; remove file backend configuration.
+
+**Changes to `webapp/config.py`**:
+```python
+class Config:
+    """Base configuration - webapp always uses SQLite."""
+
+    SECRET_KEY = os.environ.get("SECRET_KEY", "dev-key-change-in-prod")
+
+    # Database - single source of truth for webapp
+    PROJECT_ROOT = Path(__file__).parent.parent.parent.parent
+    INSTANCE_PATH = PROJECT_ROOT / "instance"
+    SQLALCHEMY_DATABASE_URI = f"sqlite:///{INSTANCE_PATH}/brinksmanship.db"
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    # Game engine
+    USE_MOCK_ENGINE = False
+
+    # LLM
+    LLM_TIMEOUT = 60
+
+    # REMOVED: SCENARIO_STORAGE, SCENARIOS_PATH
+    # Webapp always uses SQLite - no file backend option
+```
+
+**Changes to `webapp/services/engine_adapter.py`**:
+```python
+class RealGameEngine:
+    def __init__(self) -> None:
+        # Always use SQLite for webapp
+        from brinksmanship.storage import SQLiteScenarioRepository, get_database_uri
+        self._scenario_repo = SQLiteScenarioRepository(get_database_uri())
+        ...
+```
+
+**CLI retains flexibility** - can still use file or SQLite via environment variable for development/testing.
+
+**Acceptance Criteria**:
+- [ ] Webapp reads scenarios only from SQLite
+- [ ] Webapp reads/writes users only to SQLite
+- [ ] Webapp reads/writes game records only to SQLite
+- [ ] No `SCENARIO_STORAGE` config option in webapp
+- [ ] CLI still works with file backend (`BRINKSMANSHIP_STORAGE_BACKEND=file`)
+
+### Milestone 10.3: Runtime Scenario Generation
+
+**Deliverable**: Allow users to generate custom scenarios via webapp and CLI, with mandatory validation.
+
+**Webapp Flow**:
+```
+User: /scenarios/generate (POST)
+    → theme + custom_prompt
+    → Start background task (async)
+    → Agent generates scenario
+    → Agent runs validation loop
+    → If passes: Add to SQLite, notify user
+    → If fails: Notify user of failure
+```
+
+**Implementation** (`webapp/routes/scenarios.py`):
+```python
+@bp.route("/generate", methods=["POST"])
+@login_required
+async def generate():
+    """Generate a new scenario with validation."""
+    theme = request.form.get("theme", "")
+    custom_prompt = request.form.get("custom_prompt", "").strip()
+
+    if not theme and not custom_prompt:
+        flash("Please select a theme or enter a custom prompt.", "error")
+        return redirect(url_for("scenarios.generate_form"))
+
+    # Combine theme and prompt
+    full_prompt = f"{theme}: {custom_prompt}" if theme else custom_prompt
+
+    # Start async generation task
+    # In production, use Celery or similar task queue
+    task_id = schedule_scenario_generation(
+        prompt=full_prompt,
+        user_id=current_user.id,
+    )
+
+    flash(
+        "Scenario generation started. This may take a few minutes. "
+        "You'll see it in the scenario list when ready.",
+        "info"
+    )
+    return redirect(url_for("scenarios.index"))
+```
+
+**CLI Command**:
+```bash
+# Generate and validate interactively
+brinksmanship generate-scenario "Corporate merger battle between tech giants"
+
+# Import validated scenario to SQLite
+brinksmanship generate-scenario "Byzantine succession crisis" --import-to-db
+```
+
+**Acceptance Criteria**:
+- [ ] Webapp `/scenarios/generate` triggers async generation
+- [ ] Generated scenarios must pass validation before becoming available
+- [ ] Users see generation status in UI
+- [ ] CLI `generate-scenario` command works with validation
+- [ ] Custom scenarios stored in same SQLite as seed scenarios
+
+### Milestone 10.4: Deployment Workflow
+
+**Deliverable**: Clear deployment process and scripts.
+
+**Development Workflow**:
+```bash
+# 1. Generate/refine scenarios (writes to scenarios/*.json)
+python scripts/generate_and_validate_scenario.py "Your scenario prompt"
+
+# 2. Generate full library (if starting fresh)
+python scripts/generate_scenario_library.py
+
+# 3. Build seed database
+python scripts/build_seed_db.py
+# Creates: seed/brinksmanship.seed.db
+```
+
+**Deployment**:
+```bash
+# Copy seed to instance (first deployment)
+cp seed/brinksmanship.seed.db instance/brinksmanship.db
+
+# Run webapp
+brinksmanship-web
+```
+
+**Fresh Regeneration** (blow away everything):
+```bash
+rm scenarios/*.json
+rm seed/brinksmanship.seed.db
+rm instance/brinksmanship.db
+
+python scripts/generate_scenario_library.py
+python scripts/build_seed_db.py
+cp seed/brinksmanship.seed.db instance/brinksmanship.db
+```
+
+**Gitignore Additions**:
+```gitignore
+# Seed database (deployment artifact)
+seed/
+
+# Note: scenarios/*.json already gitignored
+# Note: instance/ already gitignored
+```
+
+**Acceptance Criteria**:
+- [ ] `seed/` directory gitignored
+- [ ] Deployment is: copy seed db → run webapp
+- [ ] Fresh regeneration workflow documented and tested
+- [ ] Default test account (`test1234`/`test1234`) works immediately
 
 ---
 
@@ -1637,7 +2125,8 @@ dev = [
 **Week 3**: Phase 4 (Opponents)
 **Week 4**: Phase 5 (Playtesting) + Phase 6 (Coaching)
 **Week 5**: Phase 7 (CLI) + Phase 8 (Integration)
-**Week 6**: Phase 9 (Playtesting and Iteration)
+**Week 6**: Phase 9 (Automated Scenario Generation & Validation)
+**Week 7**: Phase 10 (Seed Database & Deployment)
 
 Note: Milestone 1.4 (Storage Repository) is foundational infrastructure used by both the CLI and webapp. It should be completed early to enable parallel webapp development.
 
@@ -1655,5 +2144,5 @@ Note: Milestone 1.4 (Storage Repository) is foundational infrastructure used by 
 
 ---
 
-*Document Version: 1.0*
+*Document Version: 1.1*
 *Last Updated: January 2026*
