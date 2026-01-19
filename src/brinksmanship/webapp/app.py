@@ -6,6 +6,18 @@ from .config import Config
 from .extensions import db, login_manager
 
 
+def seed_db():
+    """Seed database with default test user if it doesn't exist."""
+    from .models.user import User
+
+    # Create default test user
+    if not User.query.filter_by(username="test1234").first():
+        user = User(username="test1234")
+        user.set_password("test1234")
+        db.session.add(user)
+        db.session.commit()
+
+
 def create_app(config_class=Config):
     """Create and configure the Flask application."""
     app = Flask(
@@ -33,9 +45,10 @@ def create_app(config_class=Config):
     app.register_blueprint(manual.bp)
     app.register_blueprint(scenarios.bp)
 
-    # Create database tables
+    # Create database tables and seed
     with app.app_context():
         db.create_all()
+        seed_db()
 
     return app
 

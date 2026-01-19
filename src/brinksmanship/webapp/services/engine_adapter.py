@@ -306,10 +306,19 @@ class RealGameEngine:
         engine.state.turn = saved_turn
         engine._current_turn_key = f"turn_{saved_turn}"
 
-        engine.state.player_a.position = state.get("position_player", 5.0)
-        engine.state.player_b.position = state.get("position_opponent", 5.0)
-        engine.state.player_a.resources = state.get("resources_player", 5.0)
-        engine.state.player_b.resources = state.get("resources_opponent", 5.0)
+        # Map player/opponent positions back to A/B based on which side player is
+        player_is_a = state.get("player_is_a", True)
+        if player_is_a:
+            engine.state.player_a.position = state.get("position_player", 5.0)
+            engine.state.player_b.position = state.get("position_opponent", 5.0)
+            engine.state.player_a.resources = state.get("resources_player", 5.0)
+            engine.state.player_b.resources = state.get("resources_opponent", 5.0)
+        else:
+            engine.state.player_b.position = state.get("position_player", 5.0)
+            engine.state.player_a.position = state.get("position_opponent", 5.0)
+            engine.state.player_b.resources = state.get("resources_player", 5.0)
+            engine.state.player_a.resources = state.get("resources_opponent", 5.0)
+
         engine.state.risk_level = state.get("risk_level", 2.0)
         engine.state.cooperation_score = float(state.get("cooperation_score", 5))
         engine.state.stability = float(state.get("stability", 5))

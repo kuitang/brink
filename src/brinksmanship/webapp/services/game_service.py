@@ -15,6 +15,7 @@ class GameEngineProtocol(Protocol):
         user_id: int,
         game_id: str | None = None,
         custom_persona: str | None = None,
+        player_is_a: bool = True,
     ) -> dict[str, Any]: ...
 
     def get_scenarios(self) -> list[dict[str, Any]]: ...

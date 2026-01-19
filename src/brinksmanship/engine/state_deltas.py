@@ -131,25 +131,31 @@ def _outcome_bounds(
 # Prisoner's Dilemma (T > R > P > S)
 # - CC: Mutual cooperation - both gain moderately, risk decreases
 # - CD/DC: Exploitation - exploiter gains, victim loses, risk increases
-# - DD: Mutual defection - both lose slightly, high resource cost, high risk
+# - DD: Mutual defection - both lose moderately, high resource cost, high risk
+#
+# BALANCE TUNING: Reduced exploitation advantage (T-R gap narrowed from 0.35 to 0.10)
+# and increased DD penalty (P more negative) to make cooperation more attractive.
+# This prevents Nash from easily dominating by exploiting early advantages.
+#
+# Ordinal check: T=0.65 > R=0.55 > P=-0.5 > S=-0.6 (verified)
 PD_DELTA_TEMPLATE = StateDeltaTemplate(
     matrix_type=MatrixType.PRISONERS_DILEMMA,
     cc=_outcome_bounds(
-        pos_a=(0.3, 0.7), pos_b=(0.3, 0.7), risk=(-1.0, 0.0)
-    ),  # Mutual gain
+        pos_a=(0.4, 0.7), pos_b=(0.4, 0.7), risk=(-1.0, -0.3)
+    ),  # R: Mutual gain (midpoint 0.55)
     cd=_outcome_bounds(
-        pos_a=(-1.2, -0.5), pos_b=(0.5, 1.2), risk=(0.0, 1.0)
-    ),  # A exploited
+        pos_a=(-0.8, -0.4), pos_b=(0.5, 0.8), risk=(0.3, 1.0)
+    ),  # S/T: A exploited (victim -0.6, exploiter 0.65)
     dc=_outcome_bounds(
-        pos_a=(0.5, 1.2), pos_b=(-1.2, -0.5), risk=(0.0, 1.0)
-    ),  # B exploited
+        pos_a=(0.5, 0.8), pos_b=(-0.8, -0.4), risk=(0.3, 1.0)
+    ),  # T/S: B exploited (exploiter 0.65, victim -0.6)
     dd=_outcome_bounds(
-        pos_a=(-0.7, 0.0),
-        pos_b=(-0.7, 0.0),
-        res_a=(0.3, 0.6),
-        res_b=(0.3, 0.6),
-        risk=(0.5, 1.5),
-    ),  # Mutual harm
+        pos_a=(-0.7, -0.3),
+        pos_b=(-0.7, -0.3),
+        res_a=(0.4, 0.7),
+        res_b=(0.4, 0.7),
+        risk=(0.8, 1.5),
+    ),  # P: Mutual harm (midpoint -0.5, increased from -0.35)
 )
 
 # Deadlock (T > P > R > S)
@@ -197,24 +203,27 @@ HARMONY_DELTA_TEMPLATE = StateDeltaTemplate(
 # - Dove-Dove: Both back down, modest gains, risk decreases
 # - Hawk-Dove: Hawk wins, Dove loses but survives
 # - Hawk-Hawk: CRASH - catastrophic for both, maximum risk
+#
+# BALANCE TUNING: Reduced hawk advantage (0.5-0.9 instead of 0.7-1.2)
+# and increased dove-dove reward to make mutual de-escalation more attractive.
 CHICKEN_DELTA_TEMPLATE = StateDeltaTemplate(
     matrix_type=MatrixType.CHICKEN,
     cc=_outcome_bounds(
-        pos_a=(0.2, 0.5), pos_b=(0.2, 0.5), risk=(-0.7, -0.2)
-    ),  # Both swerve
+        pos_a=(0.3, 0.6), pos_b=(0.3, 0.6), risk=(-0.8, -0.3)
+    ),  # Both swerve (increased reward from 0.2-0.5)
     cd=_outcome_bounds(
-        pos_a=(-0.7, -0.3), pos_b=(0.7, 1.2), risk=(0.2, 0.7)
-    ),  # Row swerves
+        pos_a=(-0.6, -0.2), pos_b=(0.5, 0.9), risk=(0.3, 0.8)
+    ),  # Row swerves (reduced hawk advantage from 0.7-1.2)
     dc=_outcome_bounds(
-        pos_a=(0.7, 1.2), pos_b=(-0.7, -0.3), risk=(0.2, 0.7)
-    ),  # Col swerves
+        pos_a=(0.5, 0.9), pos_b=(-0.6, -0.2), risk=(0.3, 0.8)
+    ),  # Col swerves (reduced hawk advantage from 0.7-1.2)
     dd=_outcome_bounds(
         pos_a=(-1.5, -1.0),
         pos_b=(-1.5, -1.0),
         res_a=(0.7, 1.0),
         res_b=(0.7, 1.0),
         risk=(1.5, 2.0),
-    ),  # CRASH
+    ),  # CRASH (unchanged - already severe)
 )
 
 # Volunteer's Dilemma (F > W > D)
@@ -402,24 +411,26 @@ RECONNAISSANCE_DELTA_TEMPLATE = StateDeltaTemplate(
 )
 
 # Security Dilemma (Same as PD but with defensive interpretation)
+# BALANCE TUNING: Same adjustments as PD to prevent Nash dominance
+# Ordinal check: T=0.65 > R=0.55 > P=-0.5 > S=-0.6 (verified)
 SECURITY_DILEMMA_DELTA_TEMPLATE = StateDeltaTemplate(
     matrix_type=MatrixType.SECURITY_DILEMMA,
     cc=_outcome_bounds(
-        pos_a=(0.3, 0.7), pos_b=(0.3, 0.7), risk=(-1.0, -0.3)
-    ),  # Mutual disarm
+        pos_a=(0.4, 0.7), pos_b=(0.4, 0.7), risk=(-1.0, -0.3)
+    ),  # R: Mutual disarm (midpoint 0.55)
     cd=_outcome_bounds(
-        pos_a=(-1.2, -0.5), pos_b=(0.5, 1.2), risk=(0.3, 1.0)
-    ),  # A vulnerable
+        pos_a=(-0.8, -0.4), pos_b=(0.5, 0.8), risk=(0.3, 1.0)
+    ),  # S/T: A vulnerable (victim -0.6, exploiter 0.65)
     dc=_outcome_bounds(
-        pos_a=(0.5, 1.2), pos_b=(-1.2, -0.5), risk=(0.3, 1.0)
-    ),  # B vulnerable
+        pos_a=(0.5, 0.8), pos_b=(-0.8, -0.4), risk=(0.3, 1.0)
+    ),  # T/S: B vulnerable (exploiter 0.65, victim -0.6)
     dd=_outcome_bounds(
-        pos_a=(-0.5, 0.0),
-        pos_b=(-0.5, 0.0),
-        res_a=(0.3, 0.6),
-        res_b=(0.3, 0.6),
-        risk=(0.3, 1.0),
-    ),  # Arms race
+        pos_a=(-0.7, -0.3),
+        pos_b=(-0.7, -0.3),
+        res_a=(0.4, 0.7),
+        res_b=(0.4, 0.7),
+        risk=(0.5, 1.2),
+    ),  # P: Arms race (midpoint -0.5)
 )
 
 

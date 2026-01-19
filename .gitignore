@@ -88,3 +88,6 @@ tmp/
 # Generated files
 src/brinksmanship/webapp/templates/generated/
 .playwright-mcp/
+
+# Playtest results (local data)
+playtest_results/

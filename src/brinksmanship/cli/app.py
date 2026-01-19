@@ -190,29 +190,48 @@ Screen {
     color: $warning;
 }
 
-.history-panel {
-    height: 3;
-    border: solid $primary;
+#status-bar {
+    dock: top;
+    height: 1;
+    background: $primary-darken-2;
+    color: $text;
     padding: 0 1;
 }
 
-#game-screen {
+#history-panel {
+    dock: top;
+    height: 8;
+    border: solid $success;
+    padding: 0 1;
+    margin-bottom: 1;
+}
+
+.history-title {
+    text-style: bold;
+    color: $success;
+}
+
+#history-content {
+    height: 100%;
+}
+
+#game-content {
     layout: grid;
     grid-size: 2;
     grid-columns: 1fr 1fr;
 }
 
 .left-column {
-    padding: 1;
+    padding: 0 1;
 }
 
 .right-column {
-    padding: 1;
+    padding: 0 1;
 }
 
 #briefing-panel {
     height: auto;
-    max-height: 10;
+    max-height: 8;
 }
 
 #state-panel {
@@ -221,11 +240,6 @@ Screen {
 
 #actions-panel {
     height: auto;
-}
-
-#history-bar {
-    dock: bottom;
-    height: 3;
 }
 
 .vp-display {
@@ -290,24 +304,33 @@ OptionList {
 
 #loading-modal {
     align: center middle;
+    background: $surface 80%;
 }
 
 .loading-container {
-    width: 40;
-    height: 7;
-    border: solid $warning;
+    width: 50;
+    height: 9;
+    border: double $warning;
     background: $surface;
-    padding: 1 2;
+    padding: 2;
 }
 
 .loading-text {
     text-align: center;
+    text-style: bold;
     color: $warning;
+    margin-bottom: 1;
+}
+
+.loading-subtext {
+    text-align: center;
+    color: $text-muted;
 }
 
 .loading-spinner {
     text-align: center;
     color: $primary;
+    text-style: bold;
 }
 """
 
@@ -318,29 +341,33 @@ OptionList {
 
 
 class LoadingModal(Screen):
-    """Simple modal showing a loading/thinking indicator."""
+    """Modal showing a loading/thinking indicator with animation."""
 
     def __init__(self, message: str = "Opponent is thinking...") -> None:
         super().__init__()
         self.message = message
-        self._spinner_frames = ["|", "/", "-", "\\"]
+        self._spinner_frames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
         self._frame_index = 0
+        self._dots = 0
 
     def compose(self) -> ComposeResult:
         with Container(id="loading-modal"):
             with Vertical(classes="loading-container"):
                 yield Static(self.message, classes="loading-text")
-                yield Static("|", id="spinner", classes="loading-spinner")
+                yield Static("Please wait...", id="subtext", classes="loading-subtext")
+                yield Static("⠋", id="spinner", classes="loading-spinner")
 
     def on_mount(self) -> None:
         """Start spinner animation."""
-        self.set_interval(0.1, self._update_spinner)
+        self.set_interval(0.08, self._update_spinner)
 
     def _update_spinner(self) -> None:
         """Animate the spinner."""
         self._frame_index = (self._frame_index + 1) % len(self._spinner_frames)
+        self._dots = (self._dots + 1) % 4
         spinner = self.query_one("#spinner", Static)
-        spinner.update(self._spinner_frames[self._frame_index])
+        dots = "." * self._dots + " " * (3 - self._dots)
+        spinner.update(f"{self._spinner_frames[self._frame_index]}  Processing{dots}")
 
 
 class MainMenuScreen(Screen):
@@ -589,10 +616,15 @@ class GameScreen(Screen):
 
     def compose(self) -> ComposeResult:
         yield Header()
-        with Horizontal(id="game-screen"):
+        # Status bar at top with game state
+        yield Static("Turn 1 | Risk: 2.0 | Coop: 5.0 | Stability: 5.0 | Act I", id="status-bar")
+        # History panel - scrollable, source of truth
+        with VerticalScroll(id="history-panel"):
+            yield Static("TURN HISTORY (scroll for more)", classes="history-title")
+            yield Static("No turns yet.", id="history-content")
+        # Main game content
+        with Horizontal(id="game-content"):
             with Vertical(classes="left-column"):
-                yield Static("Turn 1 | Risk: 2.0 | Coop: 5.0 | Stability: 5.0 | Act I", id="header-bar")
-                yield Rule()
                 with VerticalScroll(id="briefing-panel", classes="panel"):
                     yield Static("BRIEFING", classes="panel-title")
                     yield Static("Loading...", id="briefing-text")
@@ -608,11 +640,8 @@ class GameScreen(Screen):
                     yield Static("Resources: UNKNOWN", id="intel-resources")
                 yield Rule()
                 with Vertical(id="actions-panel", classes="panel"):
-                    yield Static("ACTIONS", classes="panel-title")
+                    yield Static("ACTIONS (press number to select)", classes="panel-title")
                     yield OptionList(id="action-list")
-        with Horizontal(id="history-bar", classes="history-panel"):
-            yield Static("HISTORY: ", id="history-label")
-            yield Static("", id="history-text")
         yield Footer()
 
     def on_mount(self) -> None:
@@ -655,10 +684,10 @@ class GameScreen(Screen):
 
         state = self.game.get_current_state()
 
-        # Update header bar
-        header = self.query_one("#header-bar", Static)
+        # Update status bar
+        status_bar = self.query_one("#status-bar", Static)
         act_str = {1: "Act I", 2: "Act II", 3: "Act III"}.get(state.act, f"Act {state.act}")
-        header.update(
+        status_bar.update(
             f"Turn {state.turn} | Risk: {state.risk_level:.1f} | "
             f"Coop: {state.cooperation_score:.1f} | Stability: {state.stability:.1f} | {act_str}"
         )
@@ -761,12 +790,16 @@ class GameScreen(Screen):
             action_list.add_option(Option(label, id=str(i)))
 
     def _update_history(self) -> None:
-        """Update the history bar."""
-        history_text = self.query_one("#history-text", Static)
+        """Update the history panel with detailed turn-by-turn history."""
+        history_content = self.query_one("#history-content", Static)
         if self.turn_history:
-            history_text.update(" | ".join(self.turn_history[-10:]))  # Show last 10 turns
+            # Show all turns with detailed info, newest at top
+            lines = []
+            for entry in reversed(self.turn_history):
+                lines.append(f"  {entry}")
+            history_content.update("\n".join(lines))
         else:
-            history_text.update("No history yet")
+            history_content.update("No turns yet. Press a number key (1-9) to select an action.")
 
     @on(OptionList.OptionSelected, "#action-list")
     def action_selected(self, event: OptionList.OptionSelected) -> None:
@@ -839,6 +872,18 @@ class GameScreen(Screen):
             self.opponent.choose_action, state, opponent_actions
         )
 
+        # Validate opponent action is in available actions - if not, use first valid action
+        if opponent_action not in opponent_actions:
+            # LLM might have returned invalid action - fall back to first available
+            opponent_action = opponent_actions[0] if opponent_actions else None
+            if opponent_action is None:
+                exec_result = ActionExecutionResult(
+                    success=False,
+                    error="Opponent has no valid actions available"
+                )
+                self.app.call_from_thread(self._handle_action_result, exec_result)
+                return
+
         # Submit actions in correct order (action_a, action_b)
         if self.human_is_player_a:
             result = self.game.submit_actions(human_action, opponent_action)
@@ -849,7 +894,13 @@ class GameScreen(Screen):
         exec_result = ActionExecutionResult(success=result.success)
         if result.success:
             if result.action_result:
-                exec_result.turn_history_entry = f"T{state.turn}:{result.action_result.outcome_code}"
+                # Create detailed history entry
+                you_type = "C" if human_action.action_type == ActionType.COOPERATIVE else "D"
+                opp_type = "C" if opponent_action.action_type == ActionType.COOPERATIVE else "D"
+                exec_result.turn_history_entry = (
+                    f"Turn {state.turn}: You={human_action.name} ({you_type}) vs "
+                    f"Opp={opponent_action.name} ({opp_type}) → {result.action_result.outcome_code}"
+                )
             exec_result.narrative = result.narrative
             exec_result.ending = result.ending
         else:
@@ -1223,9 +1274,21 @@ class BrinksmanshipApp(App):
 
 
 def main() -> None:
-    """Entry point for the CLI application."""
+    """Entry point for the CLI application.
+
+    For debugging with Textual devtools:
+        1. In one terminal: textual console
+        2. In another terminal: textual run --dev src/brinksmanship/cli/app.py
+    Or set TEXTUAL=1 environment variable for basic logging.
+    """
+    import os
+
     app = BrinksmanshipApp()
-    app.run()
+    # Enable devtools if TEXTUAL environment variable is set
+    if os.environ.get("TEXTUAL"):
+        app.run(inline=False)
+    else:
+        app.run()
 
 
 if __name__ == "__main__":
