@@ -31,6 +31,7 @@ This document describes the webapp frontend for Brinksmanship, built with Flask 
 | W6: Scenario Management | Phase 3.1 (schemas.py) | Phase 3 complete |
 | W7: Persona Selection | Phase 4.1-4.3 (opponents/) | Phase 4 complete |
 | W8: Integration | Phase 2 (engine) complete | Phase 2 complete |
+| W9: Post-Game Coaching | W8, coaching/ module | W8 complete |
 
 **Critical Interfaces** (defined in this document):
 1. `GameEngineInterface` - contract between webapp and engine
@@ -680,6 +681,7 @@ def get_opponent_types() -> list[dict]
 | 3 | W6.1 | Scenario management UI |
 | 4 | W7.1 | Persona selection UI |
 | 4+ | W8.1-W8.2 | Integration with real engine (after Core Phase 2) |
+| 5 | W9.1-W9.4 | Coaching service, routes, templates, game_over integration |
 
 ---
 
@@ -723,9 +725,134 @@ uv sync --extra webapp
 
 ---
 
+## Phase W9: Post-Game Coaching
+
+**Depends on**: W8 complete (real engine integration), existing `coaching/` module
+
+This phase adds LLM-powered post-game coaching analysis, reusing the existing coaching infrastructure from the CLI.
+
+### Milestone W9.1: Coaching Service
+
+**File**: `src/brinksmanship/webapp/services/coaching_service.py`
+
+**Purpose**: Thin wrapper around `coaching.PostGameCoach` that converts webapp game state to the format expected by the coach.
+
+**Functions**:
+```python
+async def generate_coaching_report(game_record: GameRecord) -> CoachingReport:
+    """Generate coaching analysis for a completed game.
+
+    Converts GameRecord's persisted state into the TurnRecord format
+    expected by PostGameCoach.analyze_game().
+
+    Returns:
+        CoachingReport with full LLM analysis and Bayesian inference.
+    """
+```
+
+**Implementation Notes**:
+- Reconstruct `TurnRecord` list from `game_record.state["history"]`
+- Reconstruct `GameEnding` from `game_record.ending_type`, `final_vp_*`
+- Reconstruct `GameState` from final state in history
+- Call `PostGameCoach().analyze_game()` with reconstructed data
+- Handle async properly (LLM calls may take 10-30 seconds)
+
+### Milestone W9.2: Coaching Routes
+
+**File**: `src/brinksmanship/webapp/routes/coaching.py`
+
+**Routes**:
+- `GET /game/<game_id>/coaching` - coaching page (requires login, game must be finished)
+- `GET /game/<game_id>/coaching/generate` - htmx endpoint that triggers async generation
+
+**Blueprint**: Register in `app.py`
+
+**Pattern for async LLM calls**:
+```python
+@bp.route("/<game_id>/coaching/generate")
+@login_required
+async def generate(game_id: str):
+    """htmx endpoint - generates coaching and returns partial."""
+    game_record = GameRecord.query.filter_by(
+        game_id=game_id, user_id=current_user.id
+    ).first_or_404()
+
+    if not game_record.is_finished:
+        return "Game not finished", 400
+
+    report = await generate_coaching_report(game_record)
+    return render_template("components/coaching_report.html", report=report)
+```
+
+### Milestone W9.3: Coaching Templates
+
+**Page Template**: `templates/pages/coaching.html`
+- Extends base.html
+- Contains loading indicator
+- Uses htmx to fetch analysis: `hx-get="/game/{id}/coaching/generate" hx-trigger="load"`
+- Swap target for coaching content
+
+**Component Template**: `templates/components/coaching_report.html`
+- Displays `CoachingReport` fields:
+
+| Section | Source Field | Display |
+|---------|--------------|---------|
+| Overall Assessment | `report.overall_assessment` | Prose block |
+| Critical Decisions | `report.critical_decisions` | Table or list with turn, actions, analysis |
+| Opponent Analysis | `report.opponent_analysis` | Prose block |
+| Bayesian Inference | `report.bayesian_inference_trace` | Preformatted/monospace block |
+| Inferred Type | `report.inferred_opponent_type`, `report.inferred_type_probability` | Badge with probability |
+| Strategic Lessons | `report.strategic_lessons` | Prose block |
+| Recommendations | `report.recommendations` | Numbered list |
+
+**CSS Classes** (add to `style.css`):
+```css
+.coaching-section { margin-bottom: 2rem; }
+.coaching-title { font-weight: bold; color: var(--accent); margin-bottom: 0.5rem; }
+.bayesian-trace { font-family: var(--font-mono); white-space: pre-wrap; background: var(--bg-alt); padding: 1rem; }
+.opponent-type-badge { display: inline-block; padding: 0.25rem 0.5rem; background: var(--accent); color: var(--bg); }
+.loading-coaching { text-align: center; padding: 2rem; }
+.loading-coaching .spinner { /* CSS animation */ }
+```
+
+### Milestone W9.4: Game Over Integration
+
+**Update**: `templates/pages/game_over.html`
+
+Add coaching button after the existing buttons:
+```html
+<a href="{{ url_for('coaching.view', game_id=game_id) }}" class="btn btn-primary">
+    View Coaching Analysis
+</a>
+```
+
+**Acceptance Criteria**:
+- [ ] Coaching link appears on game over screen for finished games
+- [ ] Coaching page loads with "Generating analysis..." indicator
+- [ ] htmx swaps in full coaching report after LLM completes
+- [ ] All report sections display correctly
+- [ ] Bayesian trace shows mathematical inference steps
+- [ ] Critical decisions reference specific turns
+- [ ] Recommendations are actionable and numbered
+- [ ] Error state shown if LLM fails (timeout, API error)
+- [ ] Coaching uses existing `PostGameCoach` - no duplicated logic
+
+### Milestone W9.5: Caching (Optional Enhancement)
+
+**Purpose**: Avoid regenerating coaching for repeated views.
+
+**Approach**: Store coaching result in `GameRecord`:
+- Add `coaching_report_json` column (Text, nullable)
+- Check cache before generating
+- Invalidate cache never (game is finished, analysis won't change)
+
+**Alternative**: Skip caching in initial implementation; regenerate each view.
+
+---
+
 ## Implementation Status
 
-**All milestones W1-W8 are COMPLETE.**
+**All milestones W1-W9 are COMPLETE.**
 
 | Milestone | Status | Notes |
 |-----------|--------|-------|
@@ -737,6 +864,7 @@ uv sync --extra webapp
 | W6: Scenario Management UI | Complete | Scenario list, generation |
 | W7: Persona Selection | Complete | All opponent types, custom persona |
 | W8: Real Engine Integration | Complete | `USE_MOCK_ENGINE=False` by default |
+| W9: Post-Game Coaching | Complete | Reuses `coaching.PostGameCoach`, htmx async loading |
 
 ### Additional Features
 
@@ -746,5 +874,5 @@ uv sync --extra webapp
 
 ---
 
-*Document Version: 1.1*
+*Document Version: 1.2*
 *Last Updated: January 2026*

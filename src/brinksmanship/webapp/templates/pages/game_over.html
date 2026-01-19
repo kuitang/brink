@@ -54,7 +54,8 @@
 </div>
 
 <div class="text-center mt-md">
-    <a href="{{ url_for('lobby.new_game') }}" class="btn btn-primary">New Game</a>
+    <a href="{{ url_for('coaching.view', game_id=game_id) }}" class="btn btn-primary">View Coaching Analysis</a>
+    <a href="{{ url_for('lobby.new_game') }}" class="btn">New Game</a>
     <a href="{{ url_for('leaderboard.view', scenario_id=game.scenario_id, opponent_type=game.opponent_type) }}" class="btn">View Leaderboard</a>
     <a href="{{ url_for('lobby.index') }}" class="btn">Back to Lobby</a>
 </div>

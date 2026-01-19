@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Coaching Analysis - Brinksmanship{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Coaching Analysis</h1>
+    <p class="text-muted">{{ state.scenario_name }} vs {{ state.opponent_type }}</p>
+</div>
+
+<div class="box">
+    <div class="box-header">
+        <h3>Game Summary</h3>
+    </div>
+    <div class="coaching-summary">
+        <div class="summary-item">
+            <span class="summary-label">Result</span>
+            <span class="summary-value">
+                <span class="vp-player">{{ game.final_vp_player }}</span>
+                -
+                <span class="vp-opponent">{{ game.final_vp_opponent }}</span>
+                VP
+            </span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-label">Turns Played</span>
+            <span class="summary-value">{{ state.turn }}</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-label">Ending</span>
+            <span class="summary-value">{{ game.ending_type | replace('_', ' ') | title }}</span>
+        </div>
+    </div>
+</div>
+
+<div id="coaching-content"
+     hx-get="{{ url_for('coaching.generate', game_id=game_id) }}"
+     hx-trigger="load"
+     hx-swap="innerHTML">
+    <div class="loading-coaching">
+        <div class="spinner"></div>
+        <p>Generating coaching analysis...</p>
+        <p class="text-muted">This may take 10-30 seconds while our AI coach reviews your game.</p>
+    </div>
+</div>
+
+<div class="text-center mt-md">
+    <a href="{{ url_for('game.game_over', game_id=game_id) }}" class="btn">Back to Game Summary</a>
+    <a href="{{ url_for('lobby.new_game') }}" class="btn btn-primary">New Game</a>
+</div>
+{% endblock %}

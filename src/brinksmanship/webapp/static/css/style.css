@@ -348,20 +348,23 @@ textarea:focus {
 
 /* ===== ACTION MENU ===== */
 .action-menu {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    display: flex;
+    flex-direction: column;
     gap: var(--spacing-sm);
 }
 
 .action-btn {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--spacing-sm);
     padding: var(--spacing-md);
     text-align: left;
     border: var(--border-width) solid var(--border);
     background-color: var(--bg);
     cursor: pointer;
     font-family: var(--font-body);
+    transition: background-color 0.15s ease;
 }
 
 .action-btn:hover {
@@ -376,14 +379,47 @@ textarea:focus {
     border-left: 4px solid var(--competitive);
 }
 
+.action-key {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    flex-shrink: 0;
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    font-weight: bold;
+    background-color: var(--bg-alt);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--text-muted);
+}
+
+.action-type-indicator {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    width: 1.5rem;
+    text-align: center;
+}
+
+.action-type-indicator.cooperative {
+    color: var(--cooperative);
+}
+
+.action-type-indicator.competitive {
+    color: var(--competitive);
+}
+
 .action-name {
     font-weight: bold;
-    margin-bottom: var(--spacing-xs);
+    flex-grow: 1;
 }
 
 .action-cost {
     font-size: 0.875rem;
     color: var(--text-muted);
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 
 /* ===== HISTORY ===== */
@@ -685,4 +721,137 @@ footer {
         max-height: none;
         margin-bottom: var(--spacing-md);
     }
+}
+
+/* ===== COACHING PAGE ===== */
+.coaching-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-lg);
+    justify-content: center;
+}
+
+.summary-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.summary-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+.summary-value {
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+.coaching-section {
+    margin-bottom: var(--spacing-lg);
+}
+
+.coaching-prose {
+    line-height: 1.6;
+    white-space: pre-wrap;
+}
+
+.opponent-type-badge {
+    display: inline-block;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+    background-color: var(--accent);
+    color: var(--bg);
+    font-weight: bold;
+}
+
+.opponent-type-badge .probability {
+    font-weight: normal;
+    opacity: 0.9;
+}
+
+.critical-decision {
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    background-color: var(--bg);
+    border: 1px solid var(--border-light);
+    border-left: 4px solid var(--accent);
+}
+
+.critical-decision:last-child {
+    margin-bottom: 0;
+}
+
+.decision-header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+    align-items: center;
+    margin-bottom: var(--spacing-sm);
+}
+
+.turn-badge {
+    display: inline-block;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background-color: var(--accent);
+    color: var(--bg);
+    font-size: 0.875rem;
+    font-weight: bold;
+}
+
+.decision-actions {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+.decision-analysis {
+    line-height: 1.5;
+}
+
+.recommendations-list {
+    margin: 0;
+    padding-left: var(--spacing-lg);
+}
+
+.recommendations-list li {
+    margin-bottom: var(--spacing-sm);
+    line-height: 1.5;
+}
+
+.bayesian-trace {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    white-space: pre-wrap;
+    background-color: var(--bg);
+    padding: var(--spacing-md);
+    border: 1px solid var(--border-light);
+    overflow-x: auto;
+    line-height: 1.4;
+}
+
+.loading-coaching {
+    text-align: center;
+    padding: var(--spacing-xl);
+}
+
+.loading-coaching .spinner {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--border-light);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: var(--spacing-md);
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.coaching-error {
+    text-align: center;
+    padding: var(--spacing-md);
 }

@@ -23,11 +23,12 @@ def create_app(config_class=Config):
     login_manager.init_app(app)
 
     # Register blueprints
-    from .routes import auth, game, leaderboard, lobby, manual, scenarios
+    from .routes import auth, coaching, game, leaderboard, lobby, manual, scenarios
 
     app.register_blueprint(auth.bp)
     app.register_blueprint(lobby.bp)
     app.register_blueprint(game.bp)
+    app.register_blueprint(coaching.bp)
     app.register_blueprint(leaderboard.bp)
     app.register_blueprint(manual.bp)
     app.register_blueprint(scenarios.bp)

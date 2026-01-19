@@ -1,0 +1,74 @@
+<div class="coaching-report">
+    <div class="box coaching-section">
+        <div class="box-header">
+            <h3>Overall Assessment</h3>
+        </div>
+        <div class="coaching-prose">
+            {{ report.overall_assessment }}
+        </div>
+    </div>
+
+    <div class="box coaching-section">
+        <div class="box-header">
+            <h3>Opponent Analysis</h3>
+        </div>
+        <div class="opponent-type-badge">
+            Inferred Type: {{ report.inferred_opponent_type.value | replace('_', ' ') | title }}
+            <span class="probability">({{ (report.inferred_type_probability * 100) | round(1) }}% confidence)</span>
+        </div>
+        <div class="coaching-prose">
+            {{ report.opponent_analysis }}
+        </div>
+    </div>
+
+    {% if report.critical_decisions %}
+    <div class="box coaching-section">
+        <div class="box-header">
+            <h3>Critical Decisions</h3>
+        </div>
+        {% for decision in report.critical_decisions %}
+        <div class="critical-decision">
+            {% if decision.turn > 0 %}
+            <div class="decision-header">
+                <span class="turn-badge">Turn {{ decision.turn }}</span>
+                <span class="decision-actions">
+                    You: <strong>{{ decision.player_action }}</strong> |
+                    Opponent: <strong>{{ decision.opponent_action }}</strong>
+                </span>
+            </div>
+            {% endif %}
+            <div class="decision-analysis">
+                {{ decision.analysis }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="box coaching-section">
+        <div class="box-header">
+            <h3>Strategic Lessons</h3>
+        </div>
+        <div class="coaching-prose">
+            {{ report.strategic_lessons }}
+        </div>
+    </div>
+
+    <div class="box coaching-section">
+        <div class="box-header">
+            <h3>Recommendations</h3>
+        </div>
+        <ol class="recommendations-list">
+            {% for rec in report.recommendations %}
+            <li>{{ rec }}</li>
+            {% endfor %}
+        </ol>
+    </div>
+
+    <div class="box coaching-section">
+        <div class="box-header">
+            <h3>Bayesian Inference Trace</h3>
+        </div>
+        <div class="bayesian-trace">{{ report.bayesian_inference_trace }}</div>
+    </div>
+</div>
