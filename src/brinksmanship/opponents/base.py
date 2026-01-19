@@ -84,10 +84,14 @@ class Opponent(ABC):
         self._history: list[tuple[Action, Action, "ActionResult"]] = []
 
     @abstractmethod
-    def choose_action(
+    async def choose_action(
         self, state: GameState, available_actions: list[Action]
     ) -> Action:
         """Choose strategic action for this turn.
+
+        This method is async because LLM-based opponents (HistoricalPersona)
+        require async LLM calls. Deterministic opponents implement this as
+        a trivial async method that returns immediately.
 
         Args:
             state: Current game state
@@ -111,7 +115,7 @@ class Opponent(ABC):
         pass
 
     @abstractmethod
-    def evaluate_settlement(
+    async def evaluate_settlement(
         self,
         proposal: SettlementProposal,
         state: GameState,
@@ -119,8 +123,9 @@ class Opponent(ABC):
     ) -> SettlementResponse:
         """Evaluate a settlement proposal and respond.
 
-        NOTE: Even deterministic opponents use LLM for this method,
-        as the argument text requires language understanding.
+        This method is async because it requires LLM calls to understand
+        the argument text. All opponents (deterministic and LLM-based)
+        use async LLM calls for settlement evaluation.
 
         Args:
             proposal: The settlement proposal to evaluate
@@ -133,8 +138,12 @@ class Opponent(ABC):
         pass
 
     @abstractmethod
-    def propose_settlement(self, state: GameState) -> SettlementProposal | None:
+    async def propose_settlement(self, state: GameState) -> SettlementProposal | None:
         """Optionally propose settlement.
+
+        This method is async because LLM-based opponents may require
+        async calls to decide whether to propose. Deterministic opponents
+        implement this as a trivial async method.
 
         Args:
             state: Current game state
@@ -207,7 +216,13 @@ OpponentType = Literal[
 ]
 
 
-def get_opponent_by_type(opponent_type: OpponentType | str) -> Opponent:
+def get_opponent_by_type(
+    opponent_type: OpponentType | str,
+    *,
+    is_player_a: bool = False,
+    role_name: str | None = None,
+    role_description: str | None = None,
+) -> Opponent:
     """Create opponent by type name.
 
     Factory function that returns the appropriate opponent instance
@@ -215,6 +230,9 @@ def get_opponent_by_type(opponent_type: OpponentType | str) -> Opponent:
 
     Args:
         opponent_type: Type of opponent to create
+        is_player_a: Whether the opponent is Player A (default False = Player B)
+        role_name: Scenario-specific role name (e.g., "Soviet Premier")
+        role_description: Description of the role in the scenario
 
     Returns:
         Opponent instance
@@ -276,7 +294,12 @@ def get_opponent_by_type(opponent_type: OpponentType | str) -> Opponent:
     ]
 
     if type_name in historical_personas:
-        return HistoricalPersona(persona_name=type_name)
+        return HistoricalPersona(
+            persona_name=type_name,
+            is_player_a=is_player_a,
+            role_name=role_name,
+            role_description=role_description,
+        )
 
     raise ValueError(
         f"Unknown opponent type: {opponent_type}. "

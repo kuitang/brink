@@ -10,6 +10,7 @@ The Agent SDK shells out to Claude Code CLI, which means:
 """
 
 import logging
+import re
 from collections.abc import AsyncIterator
 from typing import Any
 
@@ -73,10 +74,15 @@ async def generate_json(
 ) -> dict[str, Any]:
     """Generate structured JSON from Claude.
 
+    When a schema is provided, uses Claude Agent SDK's structured output feature
+    which guarantees valid JSON matching the schema. Without a schema, parses
+    the text response as JSON.
+
     Args:
         prompt: The user prompt to send to Claude.
         system_prompt: Optional system prompt to set context.
-        schema: Optional JSON schema for validation.
+        schema: Optional JSON schema for validation. When provided, uses
+            structured outputs for guaranteed valid JSON.
 
     Returns:
         The parsed JSON response as a dictionary.
@@ -87,22 +93,20 @@ async def generate_json(
     Example:
         >>> data = await generate_json(
         ...     prompt="Generate a game scenario with title and description.",
-        ...     system_prompt="Output valid JSON only, no markdown."
+        ...     system_prompt="Output valid JSON only, no markdown.",
+        ...     schema={"type": "object", "properties": {"title": {"type": "string"}}}
         ... )
         >>> print(data["title"])
     """
     import json
 
-    # Log the request
-    logger.info("=" * 60)
-    logger.info("LLM REQUEST (generate_json)")
-    logger.info("=" * 60)
-    logger.info(f"System prompt length: {len(system_prompt) if system_prompt else 0} chars")
-    logger.info(f"User prompt length: {len(prompt)} chars")
-    logger.debug(f"User prompt preview: {prompt[:500]}...")
+    logger.debug(f"generate_json: prompt={len(prompt)} chars, schema={schema is not None}")
 
     # Build options
-    options_kwargs: dict[str, Any] = {"max_turns": 1}
+    # When using structured output (schema provided), Claude uses a StructuredOutput tool
+    # Per docs, use higher max_turns (examples use 250) to allow agent to complete
+    # The structured_output field will be populated in ResultMessage when done
+    options_kwargs: dict[str, Any] = {"max_turns": 10 if schema is not None else 1}
     if system_prompt is not None:
         options_kwargs["system_prompt"] = system_prompt
     if schema is not None:
@@ -110,47 +114,55 @@ async def generate_json(
 
     options = ClaudeAgentOptions(**options_kwargs)
 
-    logger.info("Calling Claude Agent SDK...")
     response_text = ""
-    message_count = 0
+    structured_output = None
+
     async for message in query(prompt=prompt, options=options):
-        message_count += 1
         if isinstance(message, AssistantMessage):
             for block in message.content:
                 if isinstance(block, TextBlock):
                     response_text += block.text
-                    logger.debug(f"Received text block: {len(block.text)} chars")
         elif isinstance(message, ResultMessage):
-            logger.info(f"Received result message: subresult={message.subresult}")
-            if message.result:
+            # Structured output is populated in ResultMessage when schema is provided
+            if hasattr(message, 'structured_output') and message.structured_output:
+                structured_output = message.structured_output
+
+            elif message.result:
                 response_text = str(message.result)
 
-    logger.info(f"Received {message_count} messages, total response: {len(response_text)} chars")
+    # If we got structured output, use it (guaranteed valid when schema provided)
+    if structured_output is not None:
+        logger.debug(f"Received structured_output: {list(structured_output.keys())}")
+        return structured_output
 
-    # Clean up response (remove markdown code blocks if present)
+    # No structured_output - fall back to text parsing
+    if schema is not None:
+        logger.warning("Schema provided but structured_output not returned - falling back to text parsing")
+
     text = response_text.strip()
-    if text.startswith("```"):
-        # Extract content between code fences
-        lines = text.split("\n")
-        # Skip first line (```json or ```) and last line (```)
-        if lines[-1].strip() == "```":
-            lines = lines[1:-1]
-        else:
-            lines = lines[1:]
-        text = "\n".join(lines)
 
-    logger.info("=" * 60)
-    logger.info("LLM RESPONSE")
-    logger.info("=" * 60)
-    logger.debug(f"Response preview: {text[:1000]}...")
+    # Try to extract JSON from markdown code blocks anywhere in the response
+
+    # Pattern 1: Find ```json ... ``` block
+    json_block_match = re.search(r'```json\s*\n(.*?)\n```', text, re.DOTALL)
+    if json_block_match:
+        text = json_block_match.group(1).strip()
+    else:
+        # Pattern 2: Find ``` ... ``` block (generic code block)
+        code_block_match = re.search(r'```\s*\n(.*?)\n```', text, re.DOTALL)
+        if code_block_match:
+            text = code_block_match.group(1).strip()
+        else:
+            # Pattern 3: Find JSON object directly (starts with { and ends with })
+            json_obj_match = re.search(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}', text, re.DOTALL)
+            if json_obj_match:
+                text = json_obj_match.group(0).strip()
+            # Otherwise, keep text as-is and let json.loads fail with clear error
 
     try:
-        result = json.loads(text)
-        logger.info(f"Successfully parsed JSON with {len(result)} top-level keys")
-        return result
+        return json.loads(text)
     except json.JSONDecodeError as e:
-        logger.error(f"Failed to parse JSON: {e}")
-        logger.error(f"Raw response: {text[:2000]}")
+        logger.error(f"Failed to parse JSON: {e}\nRaw response: {response_text[:500]}")
         raise ValueError(f"Failed to parse JSON response: {e}\nResponse: {text}") from e
 
 

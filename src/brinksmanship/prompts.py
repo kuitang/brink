@@ -87,12 +87,18 @@ For each turn, provide:
 3. narrative_briefing (compelling situation description, 2-4 sentences)
 4. matrix_type (one of the 14 available types, appropriate for act and theme)
 5. matrix_parameters (valid parameters for the chosen type - see constraints below)
-6. actions (4-6 TurnAction objects with action_id, action_type=COOPERATIVE|COMPETITIVE, narrative_description, resource_cost=0.0)
+6. actions (4-6 TurnAction objects with action_id, action_type="cooperative"|"competitive", narrative_description, resource_cost=0.0)
 7. outcome_narratives (CC, CD, DC, DD descriptions)
-8. branches (which turn/branch to follow based on outcome)
-9. default_next (branch for failed settlement or skipped turn)
-10. settlement_available (true after turn 4 unless stability <= 2)
+8. branches (OPTIONAL: which turn to follow based on outcome - use null for linear progression)
+9. default_next (REQUIRED: next turn for linear progression, use "turn_N" format where N is the turn number)
+10. settlement_available (ONLY true for turns 5+ in Act II/III, MUST be false for turns 1-4 in Act I)
 11. settlement_failed_narrative (text for when negotiation fails)
+
+CRITICAL BRANCH RULES:
+- For LINEAR progression (most common): Set all branches to null and use default_next: "turn_N"
+- Valid turn targets: "turn_1", "turn_2", ..., "turn_{num_turns}" (use exactly this format)
+- Branch targets MUST match these exact IDs - no variations like "turn_2_cooperative"
+- Example for turn 5: default_next: "turn_6", branches: {{"CC": null, "CD": null, "DC": null, "DD": null}}
 
 Matrix Parameters Constraints by Type:
 
@@ -159,7 +165,7 @@ Output your response as valid JSON with this structure:
         "scale": 1.0
       }},
       "actions": [
-        {{"action_id": "action_slug", "action_type": "COOPERATIVE", "narrative_description": "What this action represents", "resource_cost": 0.0}},
+        {{"action_id": "action_slug", "action_type": "cooperative", "narrative_description": "What this action represents", "resource_cost": 0.0}},
         ...
       ],
       "outcome_narratives": {{
@@ -169,21 +175,17 @@ Output your response as valid JSON with this structure:
         "DD": "Both defected narrative..."
       }},
       "branches": {{
-        "CC": "turn_2_cooperative",
-        "CD": "turn_2_tension",
-        "DC": "turn_2_tension",
-        "DD": "turn_2_hostile"
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
       }},
-      "default_next": "turn_2_tension",
+      "default_next": "turn_2",
       "settlement_available": false
     }},
     ...
   ],
-  "branches": {{
-    "turn_2_cooperative": {{ ... }},
-    "turn_2_tension": {{ ... }},
-    ...
-  }}
+  "branches": {{}}
 }}
 """
 
@@ -1591,32 +1593,49 @@ Synthesize your findings into strategic behavior patterns."""
 # PERSONA ACTION SELECTION PROMPTS
 # =============================================================================
 
-PERSONA_ACTION_SELECTION_PROMPT = """You are {persona_name} in a strategic crisis game.
+PERSONA_ACTION_SELECTION_PROMPT = """You are {persona_name} playing as **{role_name}** ({player_side}) in a strategic crisis game called Brinksmanship.
 
 {persona_description}
 
-CURRENT SITUATION:
+=== YOUR ROLE IN THIS SCENARIO ===
+{role_description}
+
+=== GAME MECHANICS (CRITICAL - READ CAREFULLY) ===
+This is a two-player game where you make simultaneous decisions each turn.
+- Position (0-10): Your relative power/advantage. If it reaches 0, you lose.
+- Resources (0-10): Your reserves. Some actions cost resources. If it reaches 0, you lose.
+- Risk Level (0-10, SHARED): How dangerous the situation is. At 10, BOTH players suffer Mutual Destruction.
+- Cooperation Score (0-10, SHARED): The relationship trajectory between both players.
+
+Actions are classified as:
+- COOPERATIVE: De-escalate, Hold, Negotiate - tends to reduce Risk and improve relationship
+- COMPETITIVE: Escalate, Pressure, Demand - may gain Position but increases Risk
+
+IMPORTANT: You are choosing YOUR OWN actions as {role_name}. These are the actions available to YOU, not your opponent.
+
+=== CURRENT SITUATION ===
 - Turn: {turn} (game ends around turn 12-16, exact end unknown)
-- Your Position: {my_position}/10 (power/advantage)
+- Your Position: {my_position}/10
 - Your Resources: {my_resources}/10
 - Opponent Position estimate: {opp_position_est} (uncertainty: +/-{opp_uncertainty})
-- Risk Level: {risk_level}/10 (10 = mutual destruction)
-- Cooperation Score: {coop_score}/10 (relationship trajectory)
+- Risk Level: {risk_level}/10 (10 = mutual destruction for BOTH sides)
+- Cooperation Score: {coop_score}/10
 - Your last action type: {my_last_type}
 - Opponent's last action type: {opp_last_type}
 
-AVAILABLE ACTIONS:
+=== YOUR AVAILABLE ACTIONS ===
 {action_list}
 
-As {persona_name}, select ONE action. Consider:
+As {persona_name} playing {role_name}, select ONE action from YOUR available options above.
+Consider:
 1. What does your worldview suggest about this situation?
 2. Which action aligns with your strategic patterns?
 3. What would you historically have done in similar situations?
 
-Output JSON:
+You MUST select an action from the list above. Output JSON only:
 {{
     "reasoning": "Brief explanation as this persona (1-2 sentences)",
-    "selected_action": "Exact action name from the list"
+    "selected_action": "Exact action name from the list above"
 }}"""
 
 
@@ -2055,3 +2074,79 @@ def format_action_menu_prompt(
         narrative_briefing=narrative_briefing,
         matrix_description=matrix_description,
     )
+
+
+# =============================================================================
+# JSON SCHEMAS FOR STRUCTURED OUTPUTS
+# =============================================================================
+# These schemas are used with Claude Agent SDK's structured output feature to
+# guarantee valid JSON responses from LLM calls.
+
+# Schema for opponent action selection
+ACTION_SELECTION_SCHEMA: dict = {
+    "type": "object",
+    "properties": {
+        "reasoning": {
+            "type": "string",
+            "description": "Brief explanation of thought process (2-3 sentences)"
+        },
+        "selected_action": {
+            "type": "string",
+            "description": "Exact name of the action from the available options"
+        }
+    },
+    "required": ["reasoning", "selected_action"]
+}
+
+# Schema for settlement evaluation response
+SETTLEMENT_EVALUATION_SCHEMA: dict = {
+    "type": "object",
+    "properties": {
+        "reasoning": {
+            "type": "string",
+            "description": "Internal reasoning about the offer"
+        },
+        "action": {
+            "type": "string",
+            "enum": ["ACCEPT", "COUNTER", "REJECT"],
+            "description": "Decision: accept, counter-offer, or reject"
+        },
+        "counter_vp": {
+            "type": ["number", "null"],
+            "description": "Counter-offer VP (only if action is COUNTER)"
+        },
+        "counter_argument": {
+            "type": ["string", "null"],
+            "description": "Counter-offer argument (only if action is COUNTER)"
+        },
+        "rejection_reason": {
+            "type": ["string", "null"],
+            "description": "Rejection reason (only if action is REJECT)"
+        }
+    },
+    "required": ["reasoning", "action"]
+}
+
+# Schema for settlement proposal decision
+SETTLEMENT_PROPOSAL_SCHEMA: dict = {
+    "type": "object",
+    "properties": {
+        "propose": {
+            "type": "boolean",
+            "description": "Whether to propose a settlement"
+        },
+        "reasoning": {
+            "type": "string",
+            "description": "Brief explanation of decision"
+        },
+        "offered_vp": {
+            "type": ["number", "null"],
+            "description": "VP share to offer (only if propose is true)"
+        },
+        "argument": {
+            "type": ["string", "null"],
+            "description": "Settlement argument (only if propose is true)"
+        }
+    },
+    "required": ["propose", "reasoning"]
+}

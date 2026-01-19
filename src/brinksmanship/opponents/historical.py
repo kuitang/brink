@@ -8,7 +8,6 @@ See GAME_MANUAL.md for authoritative game mechanics.
 See prompts.py for persona definitions (PERSONA_BISMARCK, PERSONA_NIXON, etc.).
 """
 
-import asyncio
 from typing import Any
 
 from brinksmanship.llm import generate_json, generate_text
@@ -20,6 +19,7 @@ from brinksmanship.opponents.base import (
     SettlementResponse,
 )
 from brinksmanship.prompts import (
+    ACTION_SELECTION_SCHEMA,
     HISTORICAL_PERSONA_SYSTEM_PROMPT,
     PERSONA_ACTION_SELECTION_PROMPT,
     PERSONA_BISMARCK,
@@ -27,7 +27,9 @@ from brinksmanship.prompts import (
     PERSONA_NIXON,
     PERSONA_SETTLEMENT_PROPOSAL_PROMPT,
     SETTLEMENT_EVALUATION_PROMPT,
+    SETTLEMENT_EVALUATION_SCHEMA,
     SETTLEMENT_EVALUATION_SYSTEM_PROMPT,
+    SETTLEMENT_PROPOSAL_SCHEMA,
     format_settlement_evaluation_prompt,
 )
 
@@ -149,18 +151,24 @@ class HistoricalPersona(Opponent):
         display_name: Human-readable name for display
         action_history: History of actions taken for adaptation
         is_player_a: Whether this opponent is playing as Player A
+        role_name: The scenario-specific role name (e.g., "Soviet Premier")
+        role_description: Description of the role in the scenario
     """
 
     def __init__(
         self,
         persona_name: str,
         is_player_a: bool = False,
+        role_name: str | None = None,
+        role_description: str | None = None,
     ):
         """Initialize a historical persona opponent.
 
         Args:
             persona_name: The persona key (e.g., 'bismarck', 'nixon')
             is_player_a: Whether this opponent plays as Player A (default False)
+            role_name: Scenario-specific role name (e.g., "Soviet Premier")
+            role_description: Description of the role in the scenario
 
         Raises:
             ValueError: If persona_name is not recognized
@@ -181,6 +189,10 @@ class HistoricalPersona(Opponent):
         self.persona_description = _get_persona_description(normalized_name)
         self.display_name = display_name
         self.is_player_a = is_player_a
+
+        # Role information for scenario context
+        self.role_name = role_name or display_name
+        self.role_description = role_description or f"You are playing as {display_name} in this scenario."
 
         # History tracking for adaptation
         self.action_history: list[tuple[Action, GameState]] = []
@@ -211,13 +223,10 @@ class HistoricalPersona(Opponent):
 
         return info_state.get_position_estimate(state.turn)
 
-    def choose_action(
+    async def choose_action(
         self, state: GameState, available_actions: list[Action]
     ) -> Action:
         """Choose an action using LLM with persona prompt.
-
-        This method is synchronous but uses asyncio.run() internally to
-        call the async LLM functions.
 
         Args:
             state: Current game state
@@ -231,10 +240,16 @@ class HistoricalPersona(Opponent):
         _, _, opp_last_type = self._get_opponent_state(state)
         opp_position_est, opp_uncertainty = self._get_opponent_estimate(state)
 
+        # Determine player side label
+        player_side = "Player A" if self.is_player_a else "Player B"
+
         # Format the action selection prompt
         prompt = PERSONA_ACTION_SELECTION_PROMPT.format(
             persona_name=self.display_name,
             persona_description=self.persona_description,
+            role_name=self.role_name,
+            role_description=self.role_description,
+            player_side=player_side,
             turn=state.turn,
             my_position=f"{my_position:.1f}",
             my_resources=f"{my_resources:.1f}",
@@ -247,12 +262,11 @@ class HistoricalPersona(Opponent):
             action_list=_format_action_list(available_actions),
         )
 
-        # Call LLM (sync wrapper around async)
-        response = asyncio.run(
-            generate_json(
-                prompt=prompt,
-                system_prompt=HISTORICAL_PERSONA_SYSTEM_PROMPT,
-            )
+        # Call LLM with structured output
+        response = await generate_json(
+            prompt=prompt,
+            system_prompt=HISTORICAL_PERSONA_SYSTEM_PROMPT,
+            schema=ACTION_SELECTION_SCHEMA,
         )
 
         # Parse response and find matching action
@@ -282,7 +296,7 @@ class HistoricalPersona(Opponent):
 
         return selected_action
 
-    def evaluate_settlement(
+    async def evaluate_settlement(
         self,
         proposal: SettlementProposal,
         state: GameState,
@@ -323,12 +337,11 @@ class HistoricalPersona(Opponent):
             persona_description=self.persona_description,
         )
 
-        # Call LLM for evaluation
-        response = asyncio.run(
-            generate_json(
-                prompt=prompt,
-                system_prompt=SETTLEMENT_EVALUATION_SYSTEM_PROMPT,
-            )
+        # Call LLM with structured output
+        response = await generate_json(
+            prompt=prompt,
+            system_prompt=SETTLEMENT_EVALUATION_SYSTEM_PROMPT,
+            schema=SETTLEMENT_EVALUATION_SCHEMA,
         )
 
         # Parse response
@@ -368,7 +381,7 @@ class HistoricalPersona(Opponent):
 
         return result
 
-    def propose_settlement(self, state: GameState) -> SettlementProposal | None:
+    async def propose_settlement(self, state: GameState) -> SettlementProposal | None:
         """Decide whether to propose settlement using LLM with persona prompt.
 
         Args:
@@ -406,12 +419,11 @@ class HistoricalPersona(Opponent):
             max_vp=max_vp,
         )
 
-        # Call LLM
-        response = asyncio.run(
-            generate_json(
-                prompt=prompt,
-                system_prompt=HISTORICAL_PERSONA_SYSTEM_PROMPT,
-            )
+        # Call LLM with structured output
+        response = await generate_json(
+            prompt=prompt,
+            system_prompt=HISTORICAL_PERSONA_SYSTEM_PROMPT,
+            schema=SETTLEMENT_PROPOSAL_SCHEMA,
         )
 
         # Parse response

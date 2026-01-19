@@ -15,6 +15,8 @@ Milestone 7.1 deliverable - implements:
 from __future__ import annotations
 
 import asyncio
+import inspect
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, Optional
 
 from textual import on, work
@@ -66,6 +68,43 @@ from brinksmanship.storage import get_scenario_repository
 
 if TYPE_CHECKING:
     from brinksmanship.coaching.post_game import CoachingReport
+
+
+# =============================================================================
+# Helpers for async/sync opponent method handling
+# =============================================================================
+
+
+def run_opponent_method(method, *args, **kwargs):
+    """Run an opponent method, handling both sync and async implementations.
+
+    This must be called from a worker thread, not the main event loop.
+    For async methods, uses asyncio.run() which is safe in a thread.
+    For sync methods that internally use asyncio.run() (like HistoricalPersona),
+    this also works correctly since we're in a separate thread.
+    """
+    if inspect.iscoroutinefunction(method):
+        return asyncio.run(method(*args, **kwargs))
+    return method(*args, **kwargs)
+
+
+@dataclass
+class ActionExecutionResult:
+    """Result of executing an action in a worker thread."""
+
+    success: bool
+    turn_history_entry: Optional[str] = None
+    narrative: Optional[str] = None
+    ending: Optional[GameEnding] = None
+    error: Optional[str] = None
+
+
+@dataclass
+class SettlementExecutionResult:
+    """Result of settlement proposal evaluation."""
+
+    response: Optional[SettlementResponse] = None
+    error: Optional[str] = None
 
 
 # =============================================================================
@@ -453,7 +492,22 @@ class GameScreen(Screen):
         """Initialize the game engine and opponent."""
         repo = get_scenario_repository()
         self.game = create_game(self.scenario_id, repo)
-        self.opponent = get_opponent_by_type(self.opponent_type)
+
+        # Get scenario information for opponent role context
+        # The opponent plays as Player B, so we need player_b_role and player_b_description
+        scenario = repo.get_scenario(self.scenario_id)
+        role_name = None
+        role_description = None
+        if scenario:
+            role_name = scenario.get("player_b_role")
+            role_description = scenario.get("player_b_description")
+
+        self.opponent = get_opponent_by_type(
+            self.opponent_type,
+            is_player_a=False,  # Opponent is always Player B in CLI
+            role_name=role_name,
+            role_description=role_description,
+        )
         self.app.call_from_thread(self.update_display)
 
     def update_display(self) -> None:
@@ -608,7 +662,7 @@ class GameScreen(Screen):
         self._select_action(8)
 
     def _execute_action(self, action_index: int) -> None:
-        """Execute the selected action."""
+        """Execute the selected action (dispatches to worker thread)."""
         if not self.game or not self.opponent:
             return
 
@@ -622,30 +676,50 @@ class GameScreen(Screen):
             self.app.push_screen(SettlementProposalModal(self.game, self.opponent))
             return
 
-        # Get opponent's action
+        # Run the action execution in a worker thread to avoid blocking the event loop
+        # This is necessary because opponent.choose_action may use asyncio.run() internally
+        self._execute_action_worker(player_action)
+
+    @work(thread=True)
+    def _execute_action_worker(self, player_action: Action) -> None:
+        """Execute action in worker thread (handles async opponent methods)."""
         state = self.game.get_current_state()
         opponent_actions = self.game.get_available_actions("B")
-        opponent_action = self.opponent.choose_action(state, opponent_actions)
+
+        # Get opponent's action - this may call asyncio.run() internally
+        opponent_action = run_opponent_method(
+            self.opponent.choose_action, state, opponent_actions
+        )
 
         # Submit actions
         result = self.game.submit_actions(player_action, opponent_action)
 
+        # Build result for main thread
+        exec_result = ActionExecutionResult(success=result.success)
         if result.success:
-            # Update history
             if result.action_result:
-                code = result.action_result.outcome_code
-                self.turn_history.append(f"T{state.turn}:{code}")
+                exec_result.turn_history_entry = f"T{state.turn}:{result.action_result.outcome_code}"
+            exec_result.narrative = result.narrative
+            exec_result.ending = result.ending
+        else:
+            exec_result.error = result.error
 
-            # Show result narrative
+        # Update UI from main thread
+        self.app.call_from_thread(self._handle_action_result, exec_result)
+
+    def _handle_action_result(self, result: ActionExecutionResult) -> None:
+        """Handle action result on main thread."""
+        if result.success:
+            if result.turn_history_entry:
+                self.turn_history.append(result.turn_history_entry)
+
             if result.narrative:
                 self.notify(result.narrative, timeout=5)
 
-            # Check if game ended
             if result.ending:
                 self.app.push_screen(EndGameScreen(result.ending, self.game, self.opponent_type))
                 return
 
-            # Update display for new turn
             self.update_display()
         else:
             self.notify(f"Action failed: {result.error}", severity="error")
@@ -661,9 +735,10 @@ class GameScreen(Screen):
                 self.notify("Settlement not available (requires Turn > 4 and Stability > 2)", severity="warning")
 
     def action_confirm_quit(self) -> None:
-        """Confirm quitting the game."""
-        self.notify("Press Q again to quit, or continue playing", severity="warning")
-        self.app.pop_screen()
+        """Return to main menu (abandons current game)."""
+        # Pop all screens back to main menu
+        while len(self.app.screen_stack) > 1:
+            self.app.pop_screen()
 
 
 class SettlementProposalModal(Screen):
@@ -735,25 +810,37 @@ class SettlementProposalModal(Screen):
 
         argument = argument_input.text[:500]
 
-        # Create proposal
+        # Create proposal and run evaluation in worker thread
         proposal = SettlementProposal(offered_vp=offered_vp, argument=argument)
+        self.notify("Evaluating settlement...", timeout=2)
+        self._evaluate_settlement_worker(proposal, offered_vp)
 
-        # Get opponent response
+    @work(thread=True)
+    def _evaluate_settlement_worker(self, proposal: SettlementProposal, offered_vp: int) -> None:
+        """Evaluate settlement in worker thread (handles async opponent methods)."""
         state = self.game.get_current_state()
-        response = self.opponent.evaluate_settlement(proposal, state, is_final_offer=False)
 
-        # Handle response
+        # Get opponent response - this may call asyncio.run() internally
+        response = run_opponent_method(
+            self.opponent.evaluate_settlement, proposal, state, False
+        )
+
+        # Handle response on main thread
+        self.app.call_from_thread(self._handle_settlement_response, response, offered_vp, state.turn)
+
+    def _handle_settlement_response(
+        self, response: SettlementResponse, offered_vp: int, turn: int
+    ) -> None:
+        """Handle settlement response on main thread."""
         if response.action == "accept":
             # Settlement accepted - game ends
-            from brinksmanship.engine.game_engine import EndingType, GameEnding
-
             vp_a = offered_vp
             vp_b = 100 - offered_vp
             ending = GameEnding(
                 ending_type=EndingType.SETTLEMENT,
                 vp_a=float(vp_a),
                 vp_b=float(vp_b),
-                turn=state.turn,
+                turn=turn,
                 description=f"Settlement accepted. Player A: {vp_a} VP, Player B: {vp_b} VP",
             )
             self.game.ending = ending
