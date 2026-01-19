@@ -159,7 +159,12 @@ class MockGameEngine:
     }
 
     def create_game(
-        self, scenario_id: str, opponent_type: str, user_id: int
+        self,
+        scenario_id: str,
+        opponent_type: str,
+        user_id: int,
+        game_id: str | None = None,
+        custom_persona: str | None = None,
     ) -> dict[str, Any]:
         """Create a new game with initial state."""
         scenario = next(
@@ -168,6 +173,7 @@ class MockGameEngine:
         )
 
         return {
+            "game_id": game_id or f"mock_{user_id}_{scenario_id}",
             "scenario_id": scenario_id,
             "scenario_name": scenario["name"],
             "opponent_type": opponent_type,

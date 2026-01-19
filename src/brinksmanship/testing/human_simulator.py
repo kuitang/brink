@@ -19,6 +19,11 @@ from brinksmanship.models import (
     GameState,
     get_action_menu,
 )
+from brinksmanship.opponents.base import (
+    Opponent,
+    SettlementProposal as BaseSettlementProposal,
+    SettlementResponse as BaseSettlementResponse,
+)
 from brinksmanship.prompts import (
     HUMAN_ACTION_SELECTION_PROMPT,
     HUMAN_PERSONA_GENERATION_PROMPT,
@@ -171,34 +176,43 @@ class SettlementResponse(BaseModel):
     rejection_reason: str | None = None
 
 
-class HumanSimulator:
+class HumanSimulator(Opponent):
     """Simulates human player behavior for playtesting.
 
     The HumanSimulator generates diverse human personas and makes decisions
     that reflect realistic human play, including occasional mistakes and
     emotional reactions.
 
+    Inherits from Opponent to provide a consistent interface for use in
+    the game engine and playtesting framework.
+
     Example:
-        >>> simulator = HumanSimulator()
+        >>> simulator = HumanSimulator(is_player_a=False)
         >>> persona = await simulator.generate_persona()
         >>> print(f"Playing as: {persona.backstory}")
         >>>
-        >>> action = await simulator.choose_action(
+        >>> action = simulator.choose_action(
         ...     state=game_state,
         ...     available_actions=action_menu.all_actions(),
-        ...     is_player_a=True,
         ... )
         >>> print(f"Chose: {action.name}")
     """
 
-    def __init__(self, persona: HumanPersona | None = None):
+    def __init__(
+        self,
+        persona: HumanPersona | None = None,
+        is_player_a: bool = False,
+    ):
         """Initialize the human simulator.
 
         Args:
             persona: Optional pre-defined persona. If None, generate_persona()
                     must be called before choose_action().
+            is_player_a: Whether this simulator plays as Player A (default: False)
         """
+        super().__init__(name="Human Simulator")
         self.persona = persona
+        self.is_player_a = is_player_a
         self._turn_history: list[str] = []
 
     async def generate_persona(self) -> HumanPersona:
@@ -302,22 +316,43 @@ class HumanSimulator:
         b_code = "C" if action_b == ActionType.COOPERATIVE else "D"
         self._turn_history.append(f"Turn {turn}: {a_code}{b_code}")
 
-    async def choose_action(
+    def choose_action(
         self,
         state: GameState,
         available_actions: list[Action],
-        is_player_a: bool,
-        narrative: str = "",
     ) -> Action:
         """Choose an action based on human-like reasoning.
 
         Makes a decision as the simulated human persona, potentially including
         realistic mistakes based on sophistication and emotional state.
 
+        This implements the Opponent interface. Uses asyncio.run() internally
+        to call async LLM functions.
+
         Args:
             state: Current game state
             available_actions: List of actions to choose from
-            is_player_a: Whether this simulator is player A
+
+        Returns:
+            The selected Action
+
+        Raises:
+            ValueError: If no persona has been set
+        """
+        import asyncio
+        return asyncio.run(self._choose_action_async(state, available_actions))
+
+    async def _choose_action_async(
+        self,
+        state: GameState,
+        available_actions: list[Action],
+        narrative: str = "",
+    ) -> Action:
+        """Async implementation of action selection.
+
+        Args:
+            state: Current game state
+            available_actions: List of actions to choose from
             narrative: Optional narrative context for the decision
 
         Returns:
@@ -328,6 +363,7 @@ class HumanSimulator:
         """
         if self.persona is None:
             raise ValueError("No persona set. Call generate_persona() first.")
+        is_player_a = self.is_player_a
 
         # Get player state
         if is_player_a:
@@ -572,23 +608,42 @@ class HumanSimulator:
         else:
             return random.choice(available_actions)
 
-    async def evaluate_settlement(
+    def evaluate_settlement(
         self,
-        opponent_vp: int,
-        your_vp: int,
-        argument: str,
+        proposal: BaseSettlementProposal,
         state: GameState,
-        is_player_a: bool,
-        is_final_offer: bool = False,
-    ) -> SettlementResponse:
+        is_final_offer: bool,
+    ) -> BaseSettlementResponse:
         """Evaluate a settlement proposal as this persona.
 
+        Implements the Opponent interface. Uses asyncio.run() internally
+        to call async LLM functions.
+
         Args:
-            opponent_vp: VP the opponent wants
-            your_vp: VP offered to this player
-            argument: The opponent's argument text
+            proposal: The settlement proposal to evaluate
             state: Current game state
-            is_player_a: Whether this simulator is player A
+            is_final_offer: Whether this is a final offer (no counter possible)
+
+        Returns:
+            SettlementResponse with decision
+
+        Raises:
+            ValueError: If no persona has been set
+        """
+        import asyncio
+        return asyncio.run(self._evaluate_settlement_async(proposal, state, is_final_offer))
+
+    async def _evaluate_settlement_async(
+        self,
+        proposal: BaseSettlementProposal,
+        state: GameState,
+        is_final_offer: bool,
+    ) -> BaseSettlementResponse:
+        """Async implementation of settlement evaluation.
+
+        Args:
+            proposal: The settlement proposal to evaluate
+            state: Current game state
             is_final_offer: Whether this is a final offer (no counter possible)
 
         Returns:
@@ -600,7 +655,12 @@ class HumanSimulator:
         if self.persona is None:
             raise ValueError("No persona set. Call generate_persona() first.")
 
-        if is_player_a:
+        # Calculate VP from proposal (proposal.offered_vp is what proposer wants)
+        opponent_vp = proposal.offered_vp
+        your_vp = 100 - opponent_vp
+        argument = proposal.argument
+
+        if self.is_player_a:
             player_position = state.position_a
             info = state.player_a.information
         else:
@@ -644,21 +704,26 @@ class HumanSimulator:
             system_prompt=HUMAN_SIMULATOR_SYSTEM_PROMPT,
         )
 
-        return SettlementResponse.model_validate(result)
+        internal_response = SettlementResponse.model_validate(result)
 
-    async def propose_settlement(
-        self,
-        state: GameState,
-        is_player_a: bool,
-    ) -> tuple[int, str] | None:
+        # Convert to base class SettlementResponse
+        return BaseSettlementResponse(
+            action=internal_response.decision,
+            counter_vp=internal_response.counter_vp,
+            counter_argument=internal_response.counter_argument,
+            rejection_reason=internal_response.rejection_reason,
+        )
+
+    def propose_settlement(self, state: GameState) -> BaseSettlementProposal | None:
         """Decide whether to propose settlement and what offer to make.
+
+        Implements the Opponent interface.
 
         Args:
             state: Current game state
-            is_player_a: Whether this simulator is player A
 
         Returns:
-            Tuple of (vp_for_self, argument) if proposing, None otherwise
+            SettlementProposal if proposing, None otherwise
         """
         if self.persona is None:
             raise ValueError("No persona set. Call generate_persona() first.")
@@ -667,7 +732,7 @@ class HumanSimulator:
         if state.turn <= 4 or state.stability <= 2:
             return None
 
-        if is_player_a:
+        if self.is_player_a:
             player_position = state.position_a
             info = state.player_a.information
         else:
@@ -747,7 +812,7 @@ class HumanSimulator:
                 f"The current situation is unstable. Let's end this."
             )
 
-        return (offered_vp, argument)
+        return BaseSettlementProposal(offered_vp=offered_vp, argument=argument)
 
     def update_emotional_state(
         self,

@@ -17,7 +17,6 @@
             <tr>
                 <th style="text-align: left; padding: 8px; border-bottom: 2px solid var(--border);">Name</th>
                 <th style="text-align: left; padding: 8px; border-bottom: 2px solid var(--border);">Setting</th>
-                <th style="text-align: right; padding: 8px; border-bottom: 2px solid var(--border);">Max Turns</th>
                 <th style="text-align: center; padding: 8px; border-bottom: 2px solid var(--border);">Actions</th>
             </tr>
         </thead>
@@ -31,9 +30,6 @@
                 </td>
                 <td style="padding: 8px; border-bottom: 1px solid var(--border-light);">
                     {{ scenario.setting }}
-                </td>
-                <td style="text-align: right; padding: 8px; border-bottom: 1px solid var(--border-light);">
-                    {{ scenario.max_turns }}
                 </td>
                 <td style="text-align: center; padding: 8px; border-bottom: 1px solid var(--border-light);">
                     {% if current_user.is_authenticated %}

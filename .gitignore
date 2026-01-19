@@ -83,3 +83,7 @@ tmp/
 
 # Build artifacts
 *.zip
+
+# Generated files
+src/brinksmanship/webapp/templates/generated/
+.playwright-mcp/

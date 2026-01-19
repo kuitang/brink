@@ -42,6 +42,7 @@ class RealGameEngine:
         scenario_id: str,
         opponent_type: str,
         user_id: int,
+        game_id: Optional[str] = None,
         custom_persona: Optional[str] = None,
     ) -> dict[str, Any]:
         """Create a new game with initial state.
@@ -50,6 +51,7 @@ class RealGameEngine:
             scenario_id: ID of scenario to play
             opponent_type: Type of opponent (e.g., "tit_for_tat", "bismarck", "custom")
             user_id: ID of the player
+            game_id: Optional game ID (generated if not provided)
             custom_persona: Description for custom persona (if opponent_type="custom")
 
         Returns:
@@ -65,8 +67,9 @@ class RealGameEngine:
         else:
             opponent = get_opponent_by_type(opponent_type)
 
-        # Generate unique game ID
-        game_id = f"{user_id}_{scenario_id}_{random.randint(10000, 99999)}"
+        # Use provided game ID or generate unique one
+        if not game_id:
+            game_id = f"{user_id}_{scenario_id}_{random.randint(10000, 99999)}"
 
         # Store in cache
         self._active_games[game_id] = (engine, opponent)

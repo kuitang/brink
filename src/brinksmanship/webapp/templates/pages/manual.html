@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Game Manual - Brinksmanship{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Game Manual</h1>
+    <p class="text-muted">Complete rules and mechanics reference</p>
+</div>
+
+<div class="two-column manual-layout">
+    {% if toc_content %}
+    <div class="box manual-toc">
+        <div class="box-header">
+            <h3>Contents</h3>
+        </div>
+        {{ toc_content | safe }}
+    </div>
+    {% endif %}
+
+    <div class="box manual-content">
+        {{ manual_content | safe }}
+    </div>
+</div>
+{% endblock %}

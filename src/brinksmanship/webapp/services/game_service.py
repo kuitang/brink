@@ -11,7 +11,12 @@ class GameEngineProtocol(Protocol):
     """Protocol defining the game engine interface."""
 
     def create_game(
-        self, scenario_id: str, opponent_type: str, user_id: int
+        self,
+        scenario_id: str,
+        opponent_type: str,
+        user_id: int,
+        game_id: str | None = None,
+        custom_persona: str | None = None,
     ) -> dict[str, Any]: ...
 
     def get_scenarios(self) -> list[dict[str, Any]]: ...

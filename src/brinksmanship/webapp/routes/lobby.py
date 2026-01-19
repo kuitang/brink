@@ -45,6 +45,7 @@ def new_game():
     if request.method == "POST":
         scenario_id = request.form.get("scenario_id", "")
         opponent_type = request.form.get("opponent_type", "")
+        custom_persona = request.form.get("custom_persona", "").strip() or None
 
         if not scenario_id or not opponent_type:
             flash("Please select a scenario and opponent.", "error")
@@ -52,7 +53,13 @@ def new_game():
 
         # Create game via service
         game_id = str(uuid.uuid4())[:8]
-        state = game_service.create_game(scenario_id, opponent_type, current_user.id)
+        state = game_service.create_game(
+            scenario_id=scenario_id,
+            opponent_type=opponent_type,
+            user_id=current_user.id,
+            game_id=game_id,
+            custom_persona=custom_persona,
+        )
 
         # Persist game record
         game_record = GameRecord(

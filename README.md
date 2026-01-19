@@ -1,70 +1,46 @@
 # Brinksmanship
 
-A game-theoretic strategy simulation exploring nuclear brinkmanship, deterrence theory, and coordination games. Powered by Claude AI.
+A game-theoretic strategy simulation exploring nuclear brinkmanship, deterrence theory, and coordination games. Built with Python, htmx, and Claude AI.
 
-## Overview
+## What is this?
 
-Brinksmanship is an interactive strategy game where players navigate complex diplomatic and strategic scenarios using principles from game theory, including:
+Play through diplomatic crises using real game theory. Each turn presents a strategic dilemma—Prisoner's Dilemma, Chicken, Stag Hunt—where your outcome depends on both your choice and your opponent's. Manage risk, build (or destroy) trust, and decide when to negotiate.
 
-- **Coordination games** (Schelling's focal points)
-- **Deterrence theory** (credible threats, commitment devices)
-- **Repeated games** (reputation, trust-building)
-- **Information asymmetry** (signaling, screening)
+The AI opponent uses Claude to roleplay distinct personas: a cautious diplomat, an aggressive hawk, or an unpredictable wild card. Post-game coaching explains what happened in game-theoretic terms.
 
-## Installation
+**[Read the full game manual →](GAME_MANUAL.md)**
+
+## Quick Start
 
 ```bash
-# Using uv (recommended)
+# Install dependencies (requires uv)
 uv sync
 
-# Or using pip
-pip install -e .
-```
-
-## Development
-
-```bash
-uv sync --extra dev
-```
-
-## Usage
-
-```bash
-# Run the game
-uv run brinksmanship
+# Run the webapp
+uv run python -m brinksmanship.webapp.app
 
 # Run tests
 uv run pytest
-
-# Run the SDK test suite
-uv run python test_claude_sdk.py
 ```
 
-## Architecture
+## Key Features
 
-The game uses the Claude Agent SDK for all LLM interactions:
-
-- **No API key required** if you have Claude Code authenticated (Max plan, etc.)
-- Shells out to the bundled Claude Code CLI
-- Full access to Claude's reasoning capabilities
+- **24 game types** from game theory literature (Prisoner's Dilemma, Chicken, Stag Hunt, etc.)
+- **LLM-powered opponents** with distinct strategic personalities
+- **Scenario generation** creates historically-themed crises
+- **Post-game coaching** analyzes your decisions
 
 ## Project Structure
 
 ```
-brinksmanship/
-├── src/brinksmanship/
-│   ├── models/       # Game state, actions, matrices
-│   ├── engine/       # Core game logic
-│   ├── generation/   # Scenario generation via LLM
-│   ├── opponents/    # AI opponents (deterministic + LLM personas)
-│   ├── testing/      # Automated playtesting
-│   ├── coaching/     # Post-game analysis
-│   ├── cli/          # Textual CLI interface
-│   ├── llm.py        # LLM utilities
-│   └── prompts.py    # All LLM prompts
-├── scenarios/        # Generated scenario files
-├── tests/            # Test suite
-└── scripts/          # Utility scripts
+src/brinksmanship/
+├── engine/       # Core game logic and resolution
+├── models/       # Game state, actions, payoff matrices
+├── generation/   # LLM scenario generation
+├── opponents/    # AI opponent strategies
+├── coaching/     # Post-game analysis
+├── webapp/       # Flask + htmx web interface
+└── testing/      # Playtesting framework
 ```
 
 ## License

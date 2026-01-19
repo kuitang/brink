@@ -19,10 +19,12 @@
                     <a href="{{ url_for('lobby.new_game') }}">New Game</a>
                     <a href="{{ url_for('scenarios.index') }}">Scenarios</a>
                     <a href="{{ url_for('leaderboard.index') }}">Leaderboards</a>
+                    <a href="{{ url_for('manual.index') }}">Rules</a>
                     <a href="{{ url_for('auth.logout') }}">Logout ({{ current_user.username }})</a>
                 {% else %}
                     <a href="{{ url_for('scenarios.index') }}">Scenarios</a>
                     <a href="{{ url_for('leaderboard.index') }}">Leaderboards</a>
+                    <a href="{{ url_for('manual.index') }}">Rules</a>
                     <a href="{{ url_for('auth.login') }}">Login</a>
                     <a href="{{ url_for('auth.register') }}">Register</a>
                 {% endif %}

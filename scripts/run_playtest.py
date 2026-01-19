@@ -24,6 +24,7 @@ import argparse
 import json
 import os
 import random
+import statistics
 import sys
 import time
 from concurrent.futures import ProcessPoolExecutor, as_completed
@@ -106,6 +107,8 @@ class GameResult:
     final_res_a: float
     final_res_b: float
     final_risk: float
+    vp_a: float = 0.0
+    vp_b: float = 0.0
     history_a: list = field(default_factory=list)
     history_b: list = field(default_factory=list)
 
@@ -189,6 +192,50 @@ def check_ending(state: GameState) -> Optional[EndingType]:
         return EndingType.MAX_TURNS
 
     return None
+
+
+def final_resolution(state: GameState) -> tuple[float, float]:
+    """Calculate final VP scores using variance formula.
+
+    From GAME_MANUAL.md Section 4.3:
+    - Expected value from position ratio
+    - Symmetric noise application
+    - Clamp and renormalize to sum to 100
+
+    Returns:
+        Tuple of (vp_a, vp_b)
+    """
+    total_pos = state.player_a.position + state.player_b.position
+    if total_pos == 0:
+        ev_a = 50.0
+    else:
+        ev_a = (state.player_a.position / total_pos) * 100.0
+    ev_b = 100.0 - ev_a
+
+    # Calculate shared variance per GAME_MANUAL.md Section 4.3
+    base_sigma = 8.0 + (state.risk * 1.2)
+    # Cooperation score ranges 0-10, so divide by 50 for proper scaling
+    chaos_factor = 1.2 - (5.0 / 50.0)  # Use default coop score of 5
+    instability_factor = 1.0 + (10.0 - 5.0) / 20.0  # Use default stability of 5
+    act_multiplier = 1.3  # Act III for final resolution
+
+    shared_sigma = base_sigma * chaos_factor * instability_factor * act_multiplier
+
+    # Symmetric noise
+    noise = random.gauss(0, shared_sigma)
+
+    vp_a_raw = ev_a + noise
+    vp_b_raw = ev_b - noise
+
+    # Clamp and renormalize
+    vp_a_clamped = max(5.0, min(95.0, vp_a_raw))
+    vp_b_clamped = max(5.0, min(95.0, vp_b_raw))
+
+    total = vp_a_clamped + vp_b_clamped
+    vp_a = vp_a_clamped * 100.0 / total
+    vp_b = vp_b_clamped * 100.0 / total
+
+    return vp_a, vp_b
 
 
 # =============================================================================
@@ -318,17 +365,22 @@ def run_game(
         if ending:
             break
 
-    # Determine winner
+    # Determine VP and winner based on ending type
     if ending == EndingType.MUTUAL_DESTRUCTION:
+        vp_a, vp_b = 20.0, 20.0
         winner = "mutual_destruction"
     elif ending in (EndingType.POSITION_LOSS_A, EndingType.RESOURCE_LOSS_A):
+        vp_a, vp_b = 10.0, 90.0
         winner = "B"
     elif ending in (EndingType.POSITION_LOSS_B, EndingType.RESOURCE_LOSS_B):
+        vp_a, vp_b = 90.0, 10.0
         winner = "A"
     else:
-        if state.player_a.position > state.player_b.position:
+        # MAX_TURNS or CRISIS_TERMINATION: use variance formula
+        vp_a, vp_b = final_resolution(state)
+        if vp_a > vp_b + 0.01:
             winner = "A"
-        elif state.player_b.position > state.player_a.position:
+        elif vp_b > vp_a + 0.01:
             winner = "B"
         else:
             winner = "tie"
@@ -342,6 +394,8 @@ def run_game(
         final_res_a=state.player_a.resources,
         final_res_b=state.player_b.resources,
         final_risk=state.risk,
+        vp_a=vp_a,
+        vp_b=vp_b,
         history_a=[a.value for a in state.history_a],
         history_b=[a.value for a in state.history_b],
     )
@@ -384,6 +438,8 @@ def run_single_game_for_worker(args: tuple) -> dict:
         "turns_played": result.turns_played,
         "final_pos_a": result.final_pos_a,
         "final_pos_b": result.final_pos_b,
+        "vp_a": result.vp_a,
+        "vp_b": result.vp_b,
         "log_path": log_path,
     }
 
@@ -431,6 +487,17 @@ def run_pairing(
     total_turns = sum(r["turns_played"] for r in results)
     avg_turns = total_turns / games if games > 0 else 0
 
+    # VP statistics
+    vp_a_list = [r["vp_a"] for r in results]
+    vp_b_list = [r["vp_b"] for r in results]
+    avg_vp_a = sum(vp_a_list) / len(vp_a_list) if vp_a_list else 0
+    avg_vp_b = sum(vp_b_list) / len(vp_b_list) if vp_b_list else 0
+
+    # Calculate standard deviation for VP
+    vp_std_a = statistics.stdev(vp_a_list) if len(vp_a_list) > 1 else 0
+    vp_std_b = statistics.stdev(vp_b_list) if len(vp_b_list) > 1 else 0
+    vp_std_dev = statistics.stdev(vp_a_list + vp_b_list) if len(vp_a_list) > 1 else 0
+
     ending_counts = {}
     for r in results:
         et = r["ending_type"]
@@ -457,6 +524,13 @@ def run_pairing(
         "mutual_destruction_rate": mutual_destructions / games if games > 0 else 0,
         "avg_turns": avg_turns,
         "total_turns": total_turns,
+        "avg_vp_a": avg_vp_a,
+        "avg_vp_b": avg_vp_b,
+        "vp_std_a": vp_std_a,
+        "vp_std_b": vp_std_b,
+        "vp_std_dev": vp_std_dev,
+        "vp_a_list": vp_a_list,
+        "vp_b_list": vp_b_list,
         "ending_counts": ending_counts,
         "elimination_rate": eliminations / games if games > 0 else 0,
         "log_paths": log_paths,
@@ -567,6 +641,17 @@ def run_playtest(
     total_games = sum(r["total_games"] for r in pairing_results.values())
     total_turns = sum(r["total_turns"] for r in pairing_results.values())
 
+    # Aggregate VP statistics
+    all_vp_a = []
+    all_vp_b = []
+    for r in pairing_results.values():
+        all_vp_a.extend(r.get("vp_a_list", []))
+        all_vp_b.extend(r.get("vp_b_list", []))
+
+    avg_vp_a = sum(all_vp_a) / len(all_vp_a) if all_vp_a else 0
+    avg_vp_b = sum(all_vp_b) / len(all_vp_b) if all_vp_b else 0
+    vp_std_dev = statistics.stdev(all_vp_a + all_vp_b) if len(all_vp_a) > 1 else 0
+
     aggregate_ending_counts = {}
     for r in pairing_results.values():
         for et, count in r.get("ending_counts", {}).items():
@@ -583,6 +668,9 @@ def run_playtest(
         "total_pairings": len(pairings),
         "games_per_pairing": games,
         "avg_turns": total_turns / total_games if total_games > 0 else 0,
+        "avg_vp_a": avg_vp_a,
+        "avg_vp_b": avg_vp_b,
+        "vp_std_dev": vp_std_dev,
         "settlement_rate": settlements / total_games if total_games > 0 else 0,
         "elimination_rate": eliminations / total_games if total_games > 0 else 0,
         "mutual_destruction_rate": aggregate_ending_counts.get("mutual_destruction", 0) / total_games if total_games > 0 else 0,
