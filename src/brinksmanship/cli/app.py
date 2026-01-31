@@ -431,12 +431,19 @@ class BrinksmanshipCLI:
 
         state = self.game.get_current_state()
 
-        # Calculate suggested VP
+        # Show current surplus pool
+        print(f"Current Surplus Pool: {state.cooperation_surplus:.1f} VP")
+        print()
+
+        # Calculate suggested VP and position advantage
         if self.human_is_player_a:
             my_position = state.position_a
+            opp_position = state.position_b
         else:
             my_position = state.position_b
+            opp_position = state.position_a
 
+        position_diff = my_position - opp_position
         total_pos = state.position_a + state.position_b
         if total_pos > 0:
             suggested = int((my_position / total_pos) * 100)
@@ -449,14 +456,21 @@ class BrinksmanshipCLI:
         min_vp = max(20, suggested - 10)
         max_vp = min(80, suggested + 10)
 
-        print(f"Suggested VP: {suggested} (based on situation)")
-        print(f"Valid range: {min_vp}-{max_vp}")
+        # Show position advantage
+        if position_diff > 0:
+            print(f"Your Position Advantage: +{position_diff:.1f} (suggested VP: {suggested})")
+        elif position_diff < 0:
+            print(f"Your Position Disadvantage: {position_diff:.1f} (suggested VP: {suggested})")
+        else:
+            print(f"Positions Equal (suggested VP: {suggested})")
+
+        print(f"Valid VP range: {min_vp}-{max_vp}")
         print()
 
         # Get VP offer
         while True:
             try:
-                vp_str = input(f"Enter VP for yourself [{suggested}]: ").strip()
+                vp_str = input(f"Enter your VP offer (valid range {min_vp}-{max_vp}) [{suggested}]: ").strip()
                 if not vp_str:
                     offered_vp = suggested
                 else:
@@ -469,14 +483,35 @@ class BrinksmanshipCLI:
             except ValueError:
                 print("Please enter a valid number")
 
+        # Get surplus split percentage
+        print()
+        while True:
+            try:
+                surplus_str = input("Enter your surplus share % (you get this much) [50]: ").strip()
+                if not surplus_str:
+                    surplus_split = 50
+                else:
+                    surplus_split = int(surplus_str)
+
+                if not (0 <= surplus_split <= 100):
+                    print("Surplus share must be between 0 and 100")
+                    continue
+                break
+            except ValueError:
+                print("Please enter a valid number")
+
         # Get argument
-        print("\nSettlement argument (max 500 chars, press Enter to skip):")
+        print("\nEnter your argument (max 500 chars, press Enter to skip):")
         argument = input("> ").strip()[:500]
 
-        # Create proposal
-        proposal = SettlementProposal(offered_vp=offered_vp, argument=argument)
+        # Create proposal with surplus split
+        proposal = SettlementProposal(
+            offered_vp=offered_vp,
+            surplus_split_percent=surplus_split,
+            argument=argument if argument else "Settlement proposed."
+        )
 
-        print("\nEvaluating settlement...")
+        print("\nSubmitting proposal...")
 
         # Get opponent response (async)
         response = run_async(
@@ -493,17 +528,34 @@ class BrinksmanshipCLI:
                 counter_vp=response.counter_vp if response.action == "counter" else None,
             )
 
-        self._handle_settlement_response(response, offered_vp, state.turn)
+        self._handle_settlement_response(response, offered_vp, surplus_split, state)
 
     def _handle_settlement_response(
         self,
         response: SettlementResponse,
         offered_vp: int,
-        turn: int,
+        surplus_split: int,
+        state: GameState,
+        exchange_number: int = 1,
     ) -> None:
-        """Handle the opponent's response to a settlement proposal."""
+        """Handle the opponent's response to a settlement proposal.
+
+        Args:
+            response: The opponent's settlement response
+            offered_vp: The VP offered in the proposal
+            surplus_split: The surplus split percentage in the proposal
+            state: Current game state
+            exchange_number: Which exchange this is (1, 2, or 3)
+        """
+        from brinksmanship.parameters import calculate_rejection_penalty, REJECTION_BASE_PENALTY
+        from brinksmanship.engine.resolution import MAX_SETTLEMENT_EXCHANGES
+
         if response.action == "accept":
-            # Settlement accepted
+            # Settlement accepted - distribute surplus
+            surplus_pool = state.cooperation_surplus
+            your_surplus = surplus_pool * (surplus_split / 100.0)
+            their_surplus = surplus_pool - your_surplus
+
             if self.human_is_player_a:
                 vp_a = offered_vp
                 vp_b = 100 - offered_vp
@@ -515,7 +567,7 @@ class BrinksmanshipCLI:
                 ending_type=EndingType.SETTLEMENT,
                 vp_a=float(vp_a),
                 vp_b=float(vp_b),
-                turn=turn,
+                turn=state.turn,
                 description=f"Settlement accepted. Player A: {vp_a} VP, Player B: {vp_b} VP",
             )
             self.game.ending = ending
@@ -528,26 +580,45 @@ class BrinksmanshipCLI:
                     description=ending.description,
                 )
 
-            print("\nSettlement ACCEPTED!")
-            input("Press Enter to continue...")
+            print("\n" + "=" * 50)
+            print("SETTLEMENT ACCEPTED!")
+            print("=" * 50)
+            print(f"\nVP Split:")
+            print(f"  You: {offered_vp} VP")
+            print(f"  Opponent: {100 - offered_vp} VP")
+            print(f"\nSurplus Distribution (Pool: {surplus_pool:.1f} VP):")
+            print(f"  You: {your_surplus:.1f} VP ({surplus_split}%)")
+            print(f"  Opponent: {their_surplus:.1f} VP ({100 - surplus_split}%)")
+            input("\nPress Enter to continue...")
 
         elif response.action == "counter":
-            print(f"\nOpponent counters with {response.counter_vp} VP for themselves")
+            # Get counter surplus split if available
+            counter_surplus = getattr(response, 'counter_surplus_split_percent', 50) or 50
+
+            print("\n" + "-" * 50)
+            print("Opponent Response: COUNTER")
+            print("-" * 50)
+            print(f"  Counter VP: {response.counter_vp}")
+            print(f"  Counter Surplus Split: {counter_surplus}%")
             if response.counter_argument:
-                print(f"Argument: {response.counter_argument}")
+                print(f"  Argument: \"{response.counter_argument}\"")
+            print()
 
             # Ask if player accepts counter
             menu = TerminalMenu(
-                ["Accept counter-offer", "Reject"],
-                title="What do you want to do?",
+                ["Accept counter-offer", "Reject (adds risk penalty)"],
+                title="Accept counter?",
             )
             choice = menu.show()
 
             if choice == 0:
-                # Accept counter
-                state = self.game.get_current_state()
+                # Accept counter - recalculate surplus distribution
+                surplus_pool = state.cooperation_surplus
                 their_vp = response.counter_vp
                 your_vp = 100 - their_vp
+                # When accepting counter, surplus split is from opponent's perspective
+                their_surplus = surplus_pool * (counter_surplus / 100.0)
+                your_surplus = surplus_pool - their_surplus
 
                 if self.human_is_player_a:
                     vp_a = your_vp
@@ -573,17 +644,59 @@ class BrinksmanshipCLI:
                         description=ending.description,
                     )
 
-                print("\nYou accepted the counter-offer!")
-                input("Press Enter to continue...")
+                print("\n" + "=" * 50)
+                print("COUNTER-OFFER ACCEPTED!")
+                print("=" * 50)
+                print(f"\nVP Split:")
+                print(f"  You: {your_vp} VP")
+                print(f"  Opponent: {their_vp} VP")
+                print(f"\nSurplus Distribution (Pool: {surplus_pool:.1f} VP):")
+                print(f"  You: {your_surplus:.1f} VP ({100 - counter_surplus}%)")
+                print(f"  Opponent: {their_surplus:.1f} VP ({counter_surplus}%)")
+                input("\nPress Enter to continue...")
             else:
-                print("\nSettlement rejected. Risk +1")
-                input("Press Enter to continue...")
+                # Rejection - apply escalating penalty
+                risk_penalty = calculate_rejection_penalty(exchange_number)
+                remaining = MAX_SETTLEMENT_EXCHANGES - exchange_number
+
+                print(f"\nSettlement rejected.")
+                print(f"Risk penalty: +{risk_penalty:.2f}")
+
+                if remaining > 0:
+                    next_penalty = calculate_rejection_penalty(exchange_number + 1)
+                    print(f"Warning: {remaining} exchange(s) remaining. Next rejection: +{next_penalty:.2f} risk")
+                else:
+                    print("Maximum exchanges reached. Negotiation has ended.")
+
+                # Apply the penalty to game state
+                new_risk = min(10.0, state.risk_level + risk_penalty)
+                self.game.state = state.model_copy(update={"risk_level": new_risk})
+
+                input("\nPress Enter to continue...")
 
         else:
-            # Rejected
-            print(f"\nSettlement REJECTED: {response.rejection_reason or 'No reason given'}")
-            print("Risk +1")
-            input("Press Enter to continue...")
+            # Rejected outright
+            risk_penalty = calculate_rejection_penalty(exchange_number)
+            remaining = MAX_SETTLEMENT_EXCHANGES - exchange_number
+
+            print("\n" + "-" * 50)
+            print("Opponent Response: REJECT")
+            print("-" * 50)
+            if response.rejection_reason:
+                print(f"  Reason: \"{response.rejection_reason}\"")
+            print(f"\nRisk penalty: +{risk_penalty:.2f}")
+
+            if remaining > 0:
+                next_penalty = calculate_rejection_penalty(exchange_number + 1)
+                print(f"Warning: {remaining} exchange(s) remaining. Next rejection: +{next_penalty:.2f} risk")
+            else:
+                print("Maximum exchanges reached. Negotiation has ended.")
+
+            # Apply the penalty to game state
+            new_risk = min(10.0, state.risk_level + risk_penalty)
+            self.game.state = state.model_copy(update={"risk_level": new_risk})
+
+            input("\nPress Enter to continue...")
 
     def show_ending(self) -> None:
         """Display the game ending."""

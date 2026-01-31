@@ -23,16 +23,20 @@ class SettlementProposal:
 
     Attributes:
         offered_vp: VP proposed for the proposer (0-100)
+        surplus_split_percent: Percentage of cooperation surplus for the proposer (0-100)
         argument: Free-text rationale (max 500 chars)
     """
 
     offered_vp: int
+    surplus_split_percent: int = 50
     argument: str = ""
 
     def __post_init__(self) -> None:
         """Validate proposal constraints."""
         if not 0 <= self.offered_vp <= 100:
             raise ValueError(f"offered_vp must be 0-100, got {self.offered_vp}")
+        if not 0 <= self.surplus_split_percent <= 100:
+            raise ValueError(f"surplus_split_percent must be 0-100, got {self.surplus_split_percent}")
         if len(self.argument) > 500:
             self.argument = self.argument[:500]
 
@@ -44,12 +48,14 @@ class SettlementResponse:
     Attributes:
         action: The response action - accept, counter, or reject
         counter_vp: VP for counter-proposal (if countering)
+        counter_surplus_split_percent: Surplus split % for counter-proposal (if countering)
         counter_argument: Argument for counter-proposal (if countering)
         rejection_reason: Reason for rejection (if rejecting)
     """
 
     action: Literal["accept", "counter", "reject"]
     counter_vp: int | None = None
+    counter_surplus_split_percent: int | None = None
     counter_argument: str | None = None
     rejection_reason: str | None = None
 
@@ -60,6 +66,9 @@ class SettlementResponse:
                 raise ValueError("counter_vp required when action is 'counter'")
             if not 0 <= self.counter_vp <= 100:
                 raise ValueError(f"counter_vp must be 0-100, got {self.counter_vp}")
+            if self.counter_surplus_split_percent is not None:
+                if not 0 <= self.counter_surplus_split_percent <= 100:
+                    raise ValueError(f"counter_surplus_split_percent must be 0-100, got {self.counter_surplus_split_percent}")
 
 
 class Opponent(ABC):

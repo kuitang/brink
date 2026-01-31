@@ -14,14 +14,14 @@ Create the settlement flow in CLI: propose, counter, accept, reject with surplus
 - T12 (CLI game loop)
 
 ## Acceptance Criteria
-- [ ] Settlement action available in menu when eligible
-- [ ] Prompt for VP split (with valid range shown)
-- [ ] Prompt for surplus split percentage
-- [ ] Free text argument input via readline
-- [ ] Show opponent response
-- [ ] Handle counter-offer flow
-- [ ] Display rejection penalty warning
-- [ ] Show escalating risk on rejection
+- [x] Settlement action available in menu when eligible
+- [x] Prompt for VP split (with valid range shown)
+- [x] Prompt for surplus split percentage
+- [x] Free text argument input via readline
+- [x] Show opponent response
+- [x] Handle counter-offer flow
+- [x] Display rejection penalty warning
+- [x] Show escalating risk on rejection (1.5 → 2.25 → 3.0)
 
 ## Files to Modify
 - `src/brinksmanship/cli/app.py`
