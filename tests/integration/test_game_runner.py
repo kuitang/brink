@@ -420,15 +420,15 @@ class TestIntegration:
 
 
 # =============================================================================
-# LLM Opponent Tests (requires API key)
+# LLM Opponent Tests (requires Claude Code CLI with OAuth credentials)
 # =============================================================================
 
 
-@pytest.mark.skip(reason="Requires ANTHROPIC_API_KEY environment variable")
+@pytest.mark.skip(reason="Requires Claude Code CLI with OAuth credentials")
 class TestLLMOpponents:
     """Tests for LLM-based opponents (HistoricalPersona).
 
-    These tests require an ANTHROPIC_API_KEY environment variable.
+    These tests require Claude Code CLI with valid OAuth credentials.
     Run with: pytest tests/test_game_runner.py::TestLLMOpponents -v
     """
 
