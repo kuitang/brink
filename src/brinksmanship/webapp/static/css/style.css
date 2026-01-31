@@ -1869,7 +1869,10 @@ footer {
 
 .settlement-notification .proposal-argument {
     font-style: italic;
-    opacity: 0.9;
+    background-color: rgba(255, 255, 255, 0.15);
+    padding: var(--spacing-sm);
+    border-radius: var(--border-radius);
+    margin-top: var(--spacing-xs);
 }
 
 .settlement-notification .notification-actions {
