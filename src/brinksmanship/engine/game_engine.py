@@ -1163,18 +1163,18 @@ class GameEngine:
         """Check for deterministic game endings.
 
         From GAME_MANUAL.md Section 4.5:
-        - Risk = 10: Mutual Destruction (both get 20 VP)
+        - Risk = 10: Mutual Destruction (both get 0 VP - worst outcome)
         - Position = 0: That player loses (10 VP, opponent 90 VP)
         - Resources = 0: That player loses (15 VP, opponent 85 VP)
         """
-        # Risk = 10: Mutual Destruction
+        # Risk = 10: Mutual Destruction - worst possible outcome, all value lost
         if self.state.risk_level >= 10:
             return GameEnding(
                 ending_type=EndingType.MUTUAL_DESTRUCTION,
-                vp_a=20.0,
-                vp_b=20.0,
+                vp_a=0.0,
+                vp_b=0.0,
                 turn=self.state.turn,
-                description="Risk reached critical level. Mutual destruction.",
+                description="The crisis has spiraled out of control. Mutual destruction - all value is lost.",
             )
 
         # Position = 0: That player loses

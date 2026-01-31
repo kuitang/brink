@@ -538,11 +538,9 @@ class TestMutualDestructionGivesZeroZero:
         assert ending is not None
         assert ending.ending_type == EndingType.MUTUAL_DESTRUCTION
 
-        # Current implementation gives 20,20 VP for mutual destruction
-        # GAME_MANUAL.md Section 4.5 says it should be 0,0
-        # Documenting current behavior - may need adjustment
-        assert ending.vp_a == pytest.approx(20.0)
-        assert ending.vp_b == pytest.approx(20.0)
+        # Per GAME_MANUAL.md Section 4.5: mutual destruction = 0,0 VP (worst outcome)
+        assert ending.vp_a == pytest.approx(0.0)
+        assert ending.vp_b == pytest.approx(0.0)
 
     def test_mutual_destruction_loses_all_surplus(
         self, mock_repo, cooperative_action, competitive_action

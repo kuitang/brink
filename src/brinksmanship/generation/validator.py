@@ -1097,7 +1097,7 @@ def _run_scenario_sim_game(
 
     if ending == SimEndingType.MUTUAL_DESTRUCTION:
         winner = "mutual_destruction"
-        vp_a, vp_b = 20.0, 20.0
+        vp_a, vp_b = 0.0, 0.0  # Per GAME_MANUAL.md: worst possible outcome
     elif ending in (SimEndingType.POSITION_LOSS_A, SimEndingType.RESOURCE_LOSS_A):
         winner = "B"
         vp_a, vp_b = 10.0, 90.0
@@ -1157,7 +1157,7 @@ def _run_sim_game(strategy_a_name: str, strategy_b_name: str) -> SimGameResult:
 
     if ending == SimEndingType.MUTUAL_DESTRUCTION:
         winner = "mutual_destruction"
-        vp_a, vp_b = 20.0, 20.0
+        vp_a, vp_b = 0.0, 0.0  # Per GAME_MANUAL.md: worst possible outcome
     elif ending in (SimEndingType.POSITION_LOSS_A, SimEndingType.RESOURCE_LOSS_A):
         winner = "B"
         vp_a, vp_b = 10.0, 90.0
