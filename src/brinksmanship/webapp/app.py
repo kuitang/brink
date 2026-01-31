@@ -33,26 +33,39 @@ def seed_db():
 def check_claude_api_credentials():
     """Check if Claude API credentials are available.
 
-    The claude-agent-sdk uses ANTHROPIC_API_KEY environment variable.
-    If not set, LLM-based opponents will fail. Deterministic opponents will still work.
+    The claude-agent-sdk spawns Claude Code CLI which uses OAuth authentication.
+    Claude Code checks for credentials in this order:
+    1. CLAUDE_CODE_OAUTH_TOKEN environment variable (for server/CI deployments)
+    2. ~/.claude/.credentials.json file (from 'claude login' or 'claude setup-token')
+
+    If neither is available, LLM-based opponents will fail. Deterministic opponents still work.
 
     Returns:
-        bool: True if API key is configured, False otherwise
+        bool: True if credentials are configured, False otherwise
     """
-    api_key = os.environ.get("ANTHROPIC_API_KEY")
-    if api_key:
-        # Mask key for logging (show first 10 chars)
-        masked = api_key[:10] + "..." if len(api_key) > 10 else "***"
-        logger.info(f"ANTHROPIC_API_KEY is set ({masked})")
+    from pathlib import Path
+
+    # Check for OAuth token env var (server/CI deployment)
+    oauth_token = os.environ.get("CLAUDE_CODE_OAUTH_TOKEN")
+    if oauth_token:
+        masked = oauth_token[:20] + "..." if len(oauth_token) > 20 else "***"
+        logger.info(f"CLAUDE_CODE_OAUTH_TOKEN is set ({masked})")
         return True
-    else:
-        logger.warning(
-            "ANTHROPIC_API_KEY is not set! "
-            "LLM-based opponents (historical personas, custom) will not work. "
-            "Deterministic opponents (tit_for_tat, nash_calculator, etc.) will still work. "
-            "Set via: flyctl secrets set ANTHROPIC_API_KEY=sk-ant-..."
-        )
-        return False
+
+    # Check for credentials file (local development)
+    credentials_path = Path.home() / ".claude" / ".credentials.json"
+    if credentials_path.exists():
+        logger.info(f"Claude credentials file found at {credentials_path}")
+        return True
+
+    logger.warning(
+        "Claude Code OAuth credentials not found! "
+        "LLM-based opponents (historical personas, custom) will not work. "
+        "Deterministic opponents (tit_for_tat, nash_calculator, etc.) will still work. "
+        "For local dev: run 'claude login' or 'claude setup-token'. "
+        "For Fly.io: set CLAUDE_CODE_OAUTH_TOKEN secret."
+    )
+    return False
 
 
 def create_app(config_class=Config):

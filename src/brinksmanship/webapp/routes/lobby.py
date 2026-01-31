@@ -77,12 +77,12 @@ def new_game():
             flash("Please select a scenario and opponent.", "error")
             return redirect(url_for("lobby.new_game"))
 
-        # Check if LLM opponent is selected but API key is not available
+        # Check if LLM opponent is selected but Claude credentials not available
         if opponent_type in LLM_OPPONENT_TYPES and not current_app.config.get("CLAUDE_API_AVAILABLE"):
             flash(
-                f"LLM-based opponent '{opponent_type}' requires ANTHROPIC_API_KEY. "
+                f"LLM-based opponent '{opponent_type}' requires Claude Code authentication. "
                 "Please use a deterministic opponent (Tit For Tat, Nash Calculator, etc.) "
-                "or contact the administrator to configure API credentials.",
+                "or contact the administrator to configure Claude OAuth credentials.",
                 "error",
             )
             return redirect(url_for("lobby.new_game"))

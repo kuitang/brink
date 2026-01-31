@@ -156,10 +156,19 @@ git push origin main && gh run list --limit 3
 ~/.fly/bin/flyctl logs --app brink
 ```
 
-**Set secrets (NEVER commit secrets to git):**
+**Set Claude OAuth token for LLM opponents:**
+
+The Claude Agent SDK spawns Claude Code CLI, which uses OAuth authentication.
+To get a long-lived token for server deployment:
+
+1. Run `claude setup-token` locally (requires Claude subscription)
+2. Copy the token from `~/.claude/.credentials.json` (`claudeAiOauth.accessToken`)
+3. Set as Fly secret:
 ```bash
-~/.fly/bin/flyctl secrets set ANTHROPIC_API_KEY=sk-ant-... --app brink
+~/.fly/bin/flyctl secrets set CLAUDE_CODE_OAUTH_TOKEN=sk-ant-oat01-... --app brink
 ```
+
+Note: NEVER commit the actual token to git.
 
 **List current secrets:**
 ```bash
