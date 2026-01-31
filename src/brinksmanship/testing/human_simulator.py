@@ -254,27 +254,21 @@ class HumanSimulator(Opponent):
             info = state.player_b.information
             opponent_prev = state.previous_type_a
 
+        # GAME DESIGN: Per GAME_MANUAL.md Section 3.4, positions are HIDDEN
+        # Players only see intelligence-gathered estimates with uncertainty
+        # Resources removed from game
         pos_est, pos_unc = info.get_position_estimate(state.turn)
-        res_est, res_unc = info.get_resources_estimate(state.turn)
 
         lines = []
         if info.known_position is not None:
             lines.append(
-                f"- Position: Last known {info.known_position:.1f} "
-                f"(turn {info.known_position_turn}), uncertainty +/-{pos_unc:.1f}"
+                f"- Opponent position estimate: ~{info.known_position:.1f} "
+                f"(intelligence from turn {info.known_position_turn}, uncertainty +/-{pos_unc:.1f})"
             )
         else:
-            lines.append(f"- Position: Unknown, estimate {pos_est:.1f} +/-{pos_unc:.1f}")
+            lines.append(f"- Opponent position: Unknown (no intelligence gathered)")
 
-        if info.known_resources is not None:
-            lines.append(
-                f"- Resources: Last known {info.known_resources:.1f} "
-                f"(turn {info.known_resources_turn}), uncertainty +/-{res_unc:.1f}"
-            )
-        else:
-            lines.append(f"- Resources: Unknown, estimate {res_est:.1f} +/-{res_unc:.1f}")
-
-        lines.append(f"- Last Action Type: {opponent_prev.value if opponent_prev else 'None'}")
+        lines.append(f"- Opponent's last action: {opponent_prev.value if opponent_prev else 'None'}")
 
         return "\n".join(lines)
 

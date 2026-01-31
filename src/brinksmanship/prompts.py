@@ -26,8 +26,8 @@ SCENARIO_GENERATION_SYSTEM_PROMPT = """You are a game designer creating scenario
 CRITICAL FIRST STEP: Before generating any scenario, read the GAME_MANUAL.md file at /home/kuitang/git/brink/GAME_MANUAL.md
 This document contains the AUTHORITATIVE game rules for:
 - All 14 matrix types and their parameters
-- Information game mechanics (INSPECTION_GAME, RECONNAISSANCE)
-- State delta formulas
+- Intelligence game mechanics (Section 3.6): 4 types for information gathering
+- State delta formulas (positions are HIDDEN and zero-sum)
 - Act structure and scaling
 - Settlement mechanics
 You MUST reference this file to ensure scenarios conform to game rules.
@@ -102,15 +102,36 @@ Variety Constraints:
 - Low cooperation (<=3): Favor confrontational games (Chicken, Deadlock)
 
 INTELLIGENCE GAMES REQUIREMENT (CRITICAL):
-Information is a game, not a passive observation. Scenarios MUST include intelligence games:
-- INSPECTION_GAME: Arms verification, compliance monitoring, resource intelligence (learn opponent Resources)
-- RECONNAISSANCE: Surveillance, probing, position intelligence (learn opponent Position)
+Information is a game, not a passive observation. Scenarios MUST include intelligence games.
+See GAME_MANUAL.md Section 3.6 for the 4 intelligence game types:
+
+1. RECONNAISSANCE (Matching Pennies variant): Probe vs. mask - learn opponent's hidden Position
+   - Best for: espionage themes, surveillance scenarios, covert intelligence gathering
+   - Matrix type: RECONNAISSANCE or MATCHING_PENNIES
+
+2. DIPLOMATIC_STANDOFF (Chicken variant): Both stand firm → mutual position exposure
+   - Best for: crisis themes, confrontations, diplomatic brinkmanship
+   - Matrix type: CHICKEN (with information-revealing narrative framing)
+
+3. BACK_CHANNEL_EXCHANGE (Stag Hunt variant): Both share → mutual clarity, one shares → exploitation
+   - Best for: allies themes, secret negotiations, trust-building scenarios
+   - Matrix type: STAG_HUNT (with information-sharing narrative framing)
+
+4. VERIFICATION_DILEMMA (Prisoner's Dilemma variant): Verify vs. trust - verifying reveals opponent
+   - Best for: arms control, compliance monitoring, treaty verification
+   - Matrix type: INSPECTION_GAME or PRISONERS_DILEMMA (with verification narrative framing)
+
+NARRATIVE FIT IS CRITICAL: Only select intelligence games that make sense for your scenario's theme:
+- Espionage/Cold War: All 4 types fit well, especially Reconnaissance
+- Crisis/Confrontation: Diplomatic Standoff and Verification Dilemma fit best
+- Allies/Negotiations: Back-Channel Exchange fits best
+- Corporate/Rivals: Verification Dilemma fits best (compliance monitoring framing)
 
 Minimum requirements:
-- At least 2 intelligence game turns per scenario (INSPECTION_GAME or RECONNAISSANCE)
+- At least 2 intelligence game turns per scenario (any of the 4 types that fit narratively)
 - At least 1 intelligence game in Act I or early Act II (information gathering phase)
-- At least 1 intelligence game in Act II (testing/verification phase)
-- Intelligence games are about information acquisition under strategic uncertainty, NOT guaranteed outcomes
+- At least 1 intelligence game in Act II or III (testing/verification phase)
+- Select ONLY intelligence games that make narrative sense for your specific scenario
 
 BRANCHING NARRATIVE STRUCTURE:
 Scenarios MUST use branching paths based on outcomes (CC, CD, DC, DD) to create narrative diversity.
@@ -443,8 +464,7 @@ Previous Briefing (for continuity):
 {previous_briefing}
 
 Player's Perspective: {player_role}
-Player's Current Position: {player_position}/10
-Player's Current Resources: {player_resources}/10
+Player's Current Position: {player_position}/10 (HIDDEN from opponent)
 
 Requirements:
 1. Create a sense of the current tension level (Risk {risk_level})
@@ -742,9 +762,8 @@ Current Game State:
 - Turn: {turn_number}
 - Risk Level: {risk_level}/10
 - Cooperation Score: {cooperation_score}/10
-- Your Position: {your_position}/10
-- Opponent Position: {opponent_position}/10
-- Your Resources: {your_resources}/10
+- Your Position: {your_position}/10 (HIDDEN from opponent)
+- Opponent Position: {opponent_position}/10 (estimate based on intelligence)
 
 Proposal:
 - Offered VP: {offered_vp} for them, {your_vp} for you
@@ -887,8 +906,7 @@ HUMAN_SIMULATOR_SYSTEM_PROMPT = """You are simulating a human player in a strate
 Brinksmanship is a game-theoretic simulation where two players face a series of strategic dilemmas over 12-16 turns. Each turn, players choose from a menu of actions classified as either Cooperative (C) or Competitive (D). The game uses classic game theory matrices (Prisoner's Dilemma, Chicken, Stag Hunt, etc.) to resolve outcomes.
 
 KEY GAME MECHANICS:
-- Position (0-10): Your relative power/advantage. If it reaches 0, you lose.
-- Resources (0-10): Your reserves. Some actions cost resources. If it reaches 0, you lose.
+- Position (0-10, HIDDEN): Your relative power/advantage. Positions are zero-sum (one gains = other loses).
 - Risk Level (0-10, shared): How dangerous the situation is. At 10, both players suffer Mutual Destruction.
 - Cooperation Score (0-10, shared): The relationship trajectory. Affects final variance.
 - Stability (1-10, shared): How predictable players have been. Switching behavior crashes stability.
@@ -1045,17 +1063,15 @@ CURRENT GAME STATE:
 - Turn: {turn} of approximately 12-16 (exact end unknown)
 - Act: {act} (I=early/setup, II=confrontation, III=endgame)
 
-YOUR STATUS:
-- Position: {player_position}/10 (your power/advantage)
-- Resources: {player_resources}/10 (your reserves)
-
-OPPONENT INTELLIGENCE:
-{opponent_intelligence}
-
-SHARED STATE:
+SHARED STATE (visible to both players):
 - Risk Level: {risk_level}/10 (danger level, 10=mutual destruction)
 - Cooperation Score: {cooperation_score}/10 (relationship trajectory)
 - Stability: {stability}/10 (behavioral predictability)
+
+OPPONENT INTELLIGENCE (from intelligence-gathering actions):
+{opponent_intelligence}
+
+NOTE: Your own position is HIDDEN from you. Infer your standing from outcomes and history.
 
 YOUR LAST ACTION TYPE: {previous_type}
 OPPONENT'S LAST ACTION TYPE: {opponent_previous_type}
@@ -1775,8 +1791,7 @@ PERSONA_ACTION_SELECTION_PROMPT = """You are {persona_name} playing as **{role_n
 
 === GAME MECHANICS (CRITICAL - READ CAREFULLY) ===
 This is a two-player game where you make simultaneous decisions each turn.
-- Position (0-10): Your relative power/advantage. If it reaches 0, you lose.
-- Resources (0-10): Your reserves. Some actions cost resources. If it reaches 0, you lose.
+- Position (0-10, HIDDEN): Your relative power/advantage. Positions are HIDDEN from opponent and ZERO-SUM.
 - Risk Level (0-10, SHARED): How dangerous the situation is. At 10, BOTH players suffer Mutual Destruction.
 - Cooperation Score (0-10, SHARED): The relationship trajectory between both players.
 
@@ -1788,8 +1803,7 @@ IMPORTANT: You are choosing YOUR OWN actions as {role_name}. These are the actio
 
 === CURRENT SITUATION ===
 - Turn: {turn} (game ends around turn 12-16, exact end unknown)
-- Your Position: {my_position}/10
-- Your Resources: {my_resources}/10
+- Your Position: {my_position}/10 (HIDDEN from opponent)
 - Opponent Position estimate: {opp_position_est} (uncertainty: +/-{opp_uncertainty})
 - Risk Level: {risk_level}/10 (10 = mutual destruction for BOTH sides)
 - Cooperation Score: {coop_score}/10
@@ -1818,8 +1832,7 @@ PERSONA_SETTLEMENT_PROPOSAL_PROMPT = """You are {persona_name} in a strategic cr
 
 CURRENT SITUATION:
 - Turn: {turn} (game ends around turn 12-16, exact end unknown)
-- Your Position: {my_position}/10 (power/advantage)
-- Your Resources: {my_resources}/10
+- Your Position: {my_position}/10 (power/advantage, HIDDEN from opponent)
 - Opponent Position estimate: {opp_position_est} (uncertainty: +/-{opp_uncertainty})
 - Risk Level: {risk_level}/10 (10 = mutual destruction)
 - Cooperation Score: {coop_score}/10 (relationship trajectory)
@@ -1855,8 +1868,7 @@ GENERATED_PERSONA_ACTION_PROMPT = """Current Game State:
 - Risk Level: {risk_level}/10
 - Cooperation Score: {cooperation_score}/10
 - Stability: {stability}/10
-- Your Position: {my_position}/10
-- Your Resources: {my_resources}/10
+- Your Position: {my_position}/10 (HIDDEN from opponent)
 - Opponent Position estimate: {opp_position_est} (+/-{opp_uncertainty})
 
 Your previous action type: {my_last_type}
@@ -1883,8 +1895,7 @@ GENERATED_PERSONA_SETTLEMENT_PROMPT = """You are {figure_name}.
 
 CURRENT SITUATION:
 - Turn: {turn} (game ends around turn 12-16, exact end unknown)
-- Your Position: {my_position}/10
-- Your Resources: {my_resources}/10
+- Your Position: {my_position}/10 (HIDDEN from opponent)
 - Opponent Position estimate: {opp_position_est} (+/-{opp_uncertainty})
 - Risk Level: {risk_level}/10
 - Cooperation Score: {cooperation_score}/10

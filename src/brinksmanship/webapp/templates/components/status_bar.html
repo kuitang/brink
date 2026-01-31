@@ -1,18 +1,10 @@
 {# Status bar showing game state variables #}
+{# GAME DESIGN: Positions are HIDDEN per GAME_MANUAL.md Section 3.4 #}
+{# Players infer their standing from narrative outcomes and payoff results #}
 <div class="status-bar">
     <div class="status-item">
         <span class="status-label">Turn</span>
         <span class="status-value">{{ state.turn }}</span>
-    </div>
-
-    <div class="status-item">
-        <span class="status-label">Your Position</span>
-        <span class="status-value">{{ "%.1f"|format(state.position_player) }}</span>
-    </div>
-
-    <div class="status-item">
-        <span class="status-label">Your Resources</span>
-        <span class="status-value">{{ "%.1f"|format(state.resources_player) }}</span>
     </div>
 
     <div class="status-item">

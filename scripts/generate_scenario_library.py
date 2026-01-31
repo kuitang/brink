@@ -42,6 +42,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 from brinksmanship.generation.scenario_generator import ScenarioGenerator
 from brinksmanship.generation.validator import ScenarioValidator, ValidationResult
 from brinksmanship.generation.schemas import Scenario, save_scenario, load_scenario
+from brinksmanship.prompts import SCENARIO_GENERATION_SYSTEM_PROMPT
 
 # Set up logging to both console and file
 LOG_DIR = Path("playtest_results")
@@ -242,13 +243,20 @@ async def generate_single_scenario(
     max_iterations: int,
     games_per_test: int,
 ) -> tuple[bool, str]:
-    """Generate and validate a single scenario with agentic error feedback.
+    """Generate and validate a single scenario with Edit-based error fixing.
 
-    This function:
-    1. Generates a scenario using LLM
-    2. Runs DETERMINISTIC checks first (fast fail on structural issues)
-    3. Only runs balance simulation if deterministic checks pass
-    4. Feeds back errors to LLM for retry with context
+    This function uses a hybrid approach:
+    1. First iteration: Generate full scenario using LLM
+    2. Save to file immediately
+    3. Validate (deterministic checks first, then simulation)
+    4. If errors: Use ClaudeSDKClient with Edit tool to fix the file (not regenerate!)
+    5. Repeat validation + edit loop
+
+    This approach is more efficient for large scenarios (70-90KB) as it only
+    makes surgical edits instead of regenerating the entire scenario.
+
+    Per Claude Agent SDK docs, we use ClaudeSDKClient to maintain conversation
+    context so Claude remembers what it generated and can fix it intelligently.
 
     Args:
         spec: Scenario specification
@@ -259,39 +267,66 @@ async def generate_single_scenario(
     Returns:
         Tuple of (success, message)
     """
+    from claude_agent_sdk import ClaudeSDKClient, ClaudeAgentOptions, AssistantMessage, TextBlock
+
     output_path = output_dir / spec.filename
+    abs_output_path = str(output_path.resolve())
 
     logger.info(f"[{spec.number}] Generating: {spec.title}")
 
     generator = ScenarioGenerator()
     validator = ScenarioValidator(simulation_games=games_per_test)
 
-    previous_errors: list[str] = []
     reasoning_traces: list[dict] = []
 
-    for iteration in range(max_iterations):
-        try:
-            # Generate scenario with previous error feedback
-            logger.info(f"[{spec.number}] Iteration {iteration+1}: Calling LLM...")
-            if previous_errors:
-                logger.info(f"[{spec.number}] Feeding back {len(previous_errors)} errors from previous attempt")
+    # PHASE 1: Initial generation
+    try:
+        logger.info(f"[{spec.number}] Initial generation...")
+        scenario = await generator.generate_scenario(
+            theme=spec.theme,
+            setting=spec.prompt,
+            additional_context=f"Title: {spec.title}",
+            num_turns=14,
+        )
 
-            scenario = await generator.generate_scenario(
-                theme=spec.theme,
-                setting=spec.prompt,
-                additional_context=f"Title: {spec.title}",
-                num_turns=14,
-                previous_errors=previous_errors if previous_errors else None,
-            )
+        # Update title if needed
+        if scenario.title.startswith("Scenario:"):
+            scenario_dict = scenario.model_dump(mode="json")
+            scenario_dict["title"] = spec.title
+            scenario = Scenario.model_validate(scenario_dict)
 
-            # Update title if needed
-            if scenario.title.startswith("Scenario:"):
-                scenario_dict = scenario.model_dump(mode="json")
-                scenario_dict["title"] = spec.title
-                scenario = Scenario.model_validate(scenario_dict)
+        # Save immediately so Edit tool can work on it
+        save_scenario(scenario, str(output_path))
+        logger.info(f"[{spec.number}] Saved initial scenario to {output_path}")
+
+    except Exception as e:
+        logger.error(f"[{spec.number}] Initial generation failed: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
+        return False, f"Initial generation failed: {spec.title}"
+
+    # PHASE 2: Validate and fix loop using ClaudeSDKClient with Edit tool
+    # This maintains conversation context so Claude can fix issues intelligently
+    options = ClaudeAgentOptions(
+        max_turns=30,
+        allowed_tools=["Read", "Edit"],
+        permission_mode="acceptEdits",
+        cwd=str(output_dir.resolve()),
+        setting_sources=["project"],  # Load CLAUDE.md for GAME_MANUAL.md reference
+        system_prompt=SCENARIO_GENERATION_SYSTEM_PROMPT,
+    )
+
+    async with ClaudeSDKClient(options=options) as client:
+        for iteration in range(max_iterations):
+            # Reload scenario from file (may have been edited)
+            try:
+                scenario = load_scenario(str(output_path))
+            except Exception as e:
+                logger.error(f"[{spec.number}] Failed to load scenario: {e}")
+                break
 
             logger.info(
-                f"[{spec.number}] Generated: {len(scenario.turns)} turns, "
+                f"[{spec.number}] Iteration {iteration+1}: {len(scenario.turns)} turns, "
                 f"{len(scenario.get_all_matrix_types())} types"
             )
 
@@ -299,41 +334,59 @@ async def generate_single_scenario(
             logger.info(f"[{spec.number}] Running deterministic checks...")
             deterministic_result = validator.validate(
                 scenario=scenario,
-                run_simulation=False,  # Skip simulation for now
+                run_simulation=False,
                 check_narrative=False,
             )
 
-            # Collect deterministic errors
             deterministic_errors = []
             for issue in deterministic_result.get_critical_issues() + deterministic_result.get_major_issues():
                 deterministic_errors.append(issue.message)
 
             if deterministic_errors:
-                logger.warning(
-                    f"[{spec.number}] Deterministic checks failed ({len(deterministic_errors)} issues)"
-                )
+                logger.warning(f"[{spec.number}] Deterministic checks failed ({len(deterministic_errors)} issues)")
                 for err in deterministic_errors[:5]:
                     logger.warning(f"[{spec.number}]   - {err}")
 
-                # Save trace with deterministic failure
                 save_validation_trace(spec, iteration + 1, deterministic_result, scenario)
-
-                # Store reasoning trace
                 reasoning_traces.append({
                     "iteration": iteration + 1,
                     "phase": "deterministic",
                     "passed": False,
                     "errors": deterministic_errors,
-                    "action": "retry with error feedback",
+                    "action": "edit to fix",
                 })
 
-                # Feed back errors for next iteration
-                previous_errors = deterministic_errors
-                continue  # Skip simulation, retry immediately
+                # Use Edit to fix (maintains conversation context)
+                if iteration < max_iterations - 1:
+                    error_list = "\n".join(f"- {e}" for e in deterministic_errors[:10])
+                    fix_prompt = f"""The scenario file at {abs_output_path} has validation errors:
+
+{error_list}
+
+CRITICAL CONSTRAINTS TO PRESERVE:
+- Must have at least 8 distinct matrix_type values across all turns
+- Must have at least 2 intelligence games (INSPECTION_GAME, RECONNAISSANCE, or MATCHING_PENNIES)
+- Keep all existing turns - only change matrix_type on a few turns to add variety
+
+Read the file and use the Edit tool to fix ONLY the specific issues above.
+Make MINIMAL surgical edits. Do NOT:
+- Remove turns
+- Change more than necessary
+- Break existing constraints while fixing new ones"""
+
+                    logger.info(f"[{spec.number}] Sending fix request to agent...")
+                    await client.query(fix_prompt)
+                    async for message in client.receive_response():
+                        if isinstance(message, AssistantMessage):
+                            for block in message.content:
+                                if isinstance(block, TextBlock):
+                                    logger.debug(f"[{spec.number}] Agent: {block.text[:100]}...")
+
+                continue  # Retry validation
 
             logger.info(f"[{spec.number}] Deterministic checks PASSED")
 
-            # STEP 2: Run simulation checks (only if deterministic passed)
+            # STEP 2: Run simulation checks
             logger.info(f"[{spec.number}] Running balance simulation ({games_per_test} games per pairing)...")
             full_result = validator.validate(
                 scenario=scenario,
@@ -341,67 +394,88 @@ async def generate_single_scenario(
                 check_narrative=False,
             )
 
-            # Save trace for every iteration
             save_validation_trace(spec, iteration + 1, full_result, scenario)
 
             if full_result.overall_passed:
-                # Save scenario
-                save_scenario(scenario, str(output_path))
-                logger.info(f"[{spec.number}] PASSED: Saved to {output_path}")
-
-                # Save reasoning trace
+                logger.info(f"[{spec.number}] PASSED: {output_path}")
                 reasoning_traces.append({
                     "iteration": iteration + 1,
                     "phase": "simulation",
                     "passed": True,
-                    "action": "saved scenario",
+                    "action": "validated",
                 })
                 _save_reasoning_trace(spec, reasoning_traces)
-
                 return True, f"Success: {spec.title}"
 
-            # Collect simulation errors
             simulation_errors = []
             for issue in full_result.get_critical_issues() + full_result.get_major_issues():
                 simulation_errors.append(issue.message)
 
-            logger.warning(
-                f"[{spec.number}] Simulation checks failed ({len(simulation_errors)} issues)"
-            )
+            logger.warning(f"[{spec.number}] Simulation checks failed ({len(simulation_errors)} issues)")
             for err in simulation_errors[:3]:
                 logger.warning(f"[{spec.number}]   - {err}")
 
-            # Store reasoning trace
             reasoning_traces.append({
                 "iteration": iteration + 1,
                 "phase": "simulation",
                 "passed": False,
                 "errors": simulation_errors,
-                "action": "retry with error feedback",
+                "action": "edit to fix",
             })
 
-            # Feed back errors for next iteration
-            previous_errors = simulation_errors
+            # Use Edit to fix simulation errors - include full simulation context
+            if iteration < max_iterations - 1:
+                error_list = "\n".join(f"- {e}" for e in simulation_errors[:10])
 
-        except Exception as e:
-            logger.error(f"[{spec.number}] Error in iteration {iteration+1}: {e}")
-            import traceback
-            logger.error(traceback.format_exc())
+                # Get detailed simulation results for context
+                sim_context = ""
+                if full_result.simulation_results:
+                    sr = full_result.simulation_results
+                    win_rates = "\n".join(f"  {k}: {v*100:.1f}%" for k, v in sr.strategy_win_rates.items())
+                    sim_context = f"""
+SIMULATION RESULTS (strategies are defined in validator.py):
+Win rates by strategy:
+{win_rates}
 
-            # Store error in reasoning trace
-            reasoning_traces.append({
-                "iteration": iteration + 1,
-                "phase": "generation",
-                "passed": False,
-                "errors": [str(e)],
-                "action": "retry after exception",
-            })
+Game statistics:
+- Avg game length: {sr.avg_game_length:.1f} turns
+- Mutual destruction rate: {sr.mutual_destruction_rate*100:.1f}%
+- VP std dev: {sr.vp_std_dev:.1f}
 
-            previous_errors = [f"Generation error: {str(e)}"]
+Strategy behaviors:
+- TitForTat: cooperates first, then mirrors opponent's last move
+- AlwaysDefect: always chooses competitive action
+- AlwaysCooperate: always chooses cooperative action
+- GrimTrigger: cooperates until opponent defects, then always defects
+- Pavlov: repeats if rewarded (CC or DD), switches if punished"""
 
-    # Save final reasoning trace even on failure
+                fix_prompt = f"""The scenario file at {abs_output_path} has balance/simulation issues:
+
+{error_list}
+{sim_context}
+
+CRITICAL CONSTRAINTS TO PRESERVE:
+- Must have at least 8 distinct matrix_type values
+- Must have at least 2 intelligence games
+- Do NOT remove turns or change matrix_type unless necessary
+
+To fix dominant strategy issues:
+1. If AlwaysDefect/GrimTrigger dominates: REDUCE scale on CHICKEN/PRISONERS_DILEMMA turns
+2. If TitForTat/AlwaysCooperate dominates: INCREASE scale on competitive games
+3. Adjust "scale" field (0.5-2.0 range) - lower = less impact
+
+Read the file and use the Edit tool to adjust scale values on a few turns.
+Make MINIMAL changes - typically adjusting 2-3 scale values is enough."""
+
+                logger.info(f"[{spec.number}] Sending fix request to agent...")
+                await client.query(fix_prompt)
+                async for message in client.receive_response():
+                    if isinstance(message, AssistantMessage):
+                        for block in message.content:
+                            if isinstance(block, TextBlock):
+                                logger.debug(f"[{spec.number}] Agent: {block.text[:100]}...")
+
     _save_reasoning_trace(spec, reasoning_traces)
-
     return False, f"Failed after {max_iterations} iterations: {spec.title}"
 
 

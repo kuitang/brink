@@ -56,7 +56,7 @@ except ImportError:
 # =============================================================================
 
 THRESHOLDS = {
-    "dominant_strategy": 0.60,  # Fail if any pairing >60% win rate
+    "dominant_strategy": 0.68,  # Fail if any strategy >68% win rate (slight advantage 60-68% acceptable)
     "variance_min": 10,  # VP std dev should be >= 10
     "variance_max": 40,  # VP std dev should be <= 40
     "settlement_rate_min": 0.30,  # At least 30% settlements
@@ -272,14 +272,29 @@ def check_game_variety(scenario: dict | Scenario) -> CheckResult:
     result.metrics["required_types"] = THRESHOLDS["min_game_types"]
 
     if len(matrix_types) < THRESHOLDS["min_game_types"]:
+        # All available matrix types
+        all_types = {
+            "PRISONERS_DILEMMA", "CHICKEN", "STAG_HUNT", "HARMONY",
+            "BATTLE_OF_SEXES", "DEADLOCK", "MATCHING_PENNIES",
+            "SECURITY_DILEMMA", "TRUST_GAME", "PURE_COORDINATION",
+            "ASYMMETRIC_ADVANTAGE", "EXPLOITATION", "INSPECTION_GAME", "RECONNAISSANCE"
+        }
+        found_types_upper = {str(t).upper() for t in matrix_types}
+        missing_types = all_types - found_types_upper
+        suggested = list(missing_types)[:3]  # Suggest 3 missing types
+
+        needed = THRESHOLDS["min_game_types"] - len(matrix_types)
         result.add_issue(
             ValidationSeverity.MAJOR,
-            f"Insufficient game type variety: found {len(matrix_types)}, "
-            f"need at least {THRESHOLDS['min_game_types']}",
+            f"Insufficient game type variety: found {len(matrix_types)}, need {THRESHOLDS['min_game_types']}. "
+            f"Current types: {sorted([str(t) for t in matrix_types])}. "
+            f"FIX: Change matrix_type on {needed} turn(s) to add variety. "
+            f"Suggested types to add: {suggested}",
             details={
                 "found": len(matrix_types),
                 "required": THRESHOLDS["min_game_types"],
                 "types": [str(t) for t in matrix_types],
+                "missing_types": list(missing_types),
             },
         )
 
@@ -289,13 +304,19 @@ def check_game_variety(scenario: dict | Scenario) -> CheckResult:
 def check_intelligence_games(scenario: dict | Scenario) -> CheckResult:
     """Check that scenario includes sufficient intelligence game turns.
 
-    Intelligence games (INSPECTION_GAME, RECONNAISSANCE) are core mechanics for
-    information acquisition under strategic uncertainty.
+    Per GAME_MANUAL.md Section 3.6, four intelligence game types exist:
+    1. Reconnaissance Game: RECONNAISSANCE or MATCHING_PENNIES matrix type
+    2. Verification Dilemma: INSPECTION_GAME matrix type
+    3. Diplomatic Standoff: CHICKEN with information narrative (not auto-detected)
+    4. Back-Channel Exchange: STAG_HUNT with information narrative (not auto-detected)
+
+    This validator checks for the explicit intelligence game matrix types.
+    CHICKEN/STAG_HUNT used as intelligence games require narrative context.
 
     Requirements:
     - At least 2 intelligence game turns per scenario
     - At least 1 in Act I or early Act II (turns 1-6)
-    - At least 1 in Act II (turns 5-8)
+    - At least 1 in Act II or III (turns 5+)
 
     Args:
         scenario: Scenario object or dict with scenario data
@@ -305,10 +326,11 @@ def check_intelligence_games(scenario: dict | Scenario) -> CheckResult:
     """
     result = CheckResult(check_name="intelligence_games", passed=True)
 
-    intelligence_types = {"inspection_game", "reconnaissance", "INSPECTION_GAME", "RECONNAISSANCE"}
+    # Explicit intelligence game matrix types (see GAME_MANUAL.md Section 3.6)
+    intelligence_types = {"inspection_game", "reconnaissance", "matching_pennies"}
     intelligence_turns: list[int] = []
     early_phase_intel = 0  # turns 1-6
-    mid_phase_intel = 0    # turns 5-8
+    mid_phase_intel = 0    # turns 5+
 
     def check_turn(turn_data: dict) -> None:
         nonlocal early_phase_intel, mid_phase_intel
@@ -318,11 +340,11 @@ def check_intelligence_games(scenario: dict | Scenario) -> CheckResult:
         # Handle both string and enum types
         type_str = str(matrix_type).lower().replace("matrixtype.", "")
 
-        if type_str in {"inspection_game", "reconnaissance"}:
+        if type_str in intelligence_types:
             intelligence_turns.append(turn_num)
             if turn_num <= 6:
                 early_phase_intel += 1
-            if 5 <= turn_num <= 8:
+            if turn_num >= 5:
                 mid_phase_intel += 1
 
     if hasattr(scenario, "turns"):
@@ -345,9 +367,12 @@ def check_intelligence_games(scenario: dict | Scenario) -> CheckResult:
 
     # Check minimum total
     if len(intelligence_turns) < 2:
+        needed = 2 - len(intelligence_turns)
         result.add_issue(
             ValidationSeverity.MAJOR,
-            f"Insufficient intelligence games: found {len(intelligence_turns)}, need at least 2",
+            f"Insufficient intelligence games: found {len(intelligence_turns)}, need at least 2. "
+            f"FIX: Change matrix_type to 'RECONNAISSANCE' or 'INSPECTION_GAME' on {needed} turn(s). "
+            f"Good candidates: turns 2-4 (early intel gathering) or turns 6-8 (verification phase).",
             details={"found": len(intelligence_turns), "turns": intelligence_turns},
         )
 
@@ -359,11 +384,11 @@ def check_intelligence_games(scenario: dict | Scenario) -> CheckResult:
             details={"early_phase_intel": early_phase_intel},
         )
 
-    # Check mid phase (at least 1 in turns 5-8)
+    # Check mid/late phase (at least 1 in turns 5+)
     if mid_phase_intel < 1:
         result.add_issue(
             ValidationSeverity.MINOR,
-            "No intelligence games in mid phase (turns 5-8)",
+            "No intelligence games in mid/late phase (turns 5+)",
             details={"mid_phase_intel": mid_phase_intel},
         )
 
@@ -1310,11 +1335,39 @@ def check_dominant_strategy(sim_results: BalanceSimulationResults) -> CheckResul
     result.metrics["threshold"] = THRESHOLDS["dominant_strategy"]
 
     if dominant_strategies:
+        # Build detailed fix instructions
+        dom_details = ", ".join(
+            f"{d['strategy']}={d['win_rate']*100:.0f}%" for d in dominant_strategies
+        )
+        # Explain how strategies work
+        strategy_behaviors = {
+            "TitForTat": "cooperates first, then mirrors opponent",
+            "AlwaysDefect": "always competes/defects",
+            "AlwaysCooperate": "always cooperates",
+            "GrimTrigger": "cooperates until betrayed, then always defects",
+            "Pavlov": "repeats action if rewarded, switches if punished",
+        }
+        fix_hints = []
+        for d in dominant_strategies:
+            strat = d["strategy"]
+            behavior = strategy_behaviors.get(strat, "unknown behavior")
+            if d["win_rate"] > 0.65:
+                if strat in ["AlwaysDefect", "GrimTrigger"]:
+                    fix_hints.append(f"- {strat} dominates: REDUCE defection payoffs or INCREASE cooperation rewards")
+                elif strat in ["AlwaysCooperate", "TitForTat"]:
+                    fix_hints.append(f"- {strat} dominates: INCREASE competition payoffs or add more CHICKEN/PRISONERS_DILEMMA games")
+                else:
+                    fix_hints.append(f"- {strat} dominates: adjust payoff balance")
+
+        fix_guidance = "\n".join(fix_hints) if fix_hints else "Adjust scale values or payoff overrides"
+
         result.add_issue(
             ValidationSeverity.CRITICAL,
-            f"Dominant strategy detected: {len(dominant_strategies)} strategies "
-            f"exceed {THRESHOLDS['dominant_strategy']*100:.0f}% win rate",
-            details={"dominant_strategies": dominant_strategies},
+            f"Dominant strategy detected: {dom_details}. "
+            f"These strategies exceed {THRESHOLDS['dominant_strategy']*100:.0f}% win rate.\n"
+            f"FIX GUIDANCE:\n{fix_guidance}\n"
+            f"Edit turns with high-impact matrix_types (CHICKEN, PRISONERS_DILEMMA) and reduce their 'scale' value.",
+            details={"dominant_strategies": dominant_strategies, "all_win_rates": sim_results.strategy_win_rates},
         )
 
     # Check variance

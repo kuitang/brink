@@ -261,6 +261,124 @@ async def agentic_query(
     return response_text
 
 
+async def generate_and_fix_json(
+    initial_prompt: str,
+    output_path: str,
+    validation_fn: callable,
+    system_prompt: str | None = None,
+    max_iterations: int = 5,
+    cwd: str | None = None,
+) -> dict[str, Any]:
+    """Generate JSON to a file and iteratively fix validation errors.
+
+    Uses ClaudeSDKClient for conversation continuity. The agent:
+    1. Generates JSON and writes to output_path
+    2. External validation_fn is called
+    3. If errors, agent uses Edit tool to fix them
+    4. Repeat until valid or max_iterations reached
+
+    Per Claude Agent SDK docs, we use ClaudeSDKClient for continuous
+    conversation so the agent maintains context about what it generated.
+
+    Args:
+        initial_prompt: The generation prompt
+        output_path: Absolute path to write the JSON file
+        validation_fn: Callable that takes the file path and returns
+            (is_valid: bool, errors: list[str])
+        system_prompt: Optional system prompt
+        max_iterations: Maximum fix iterations
+        cwd: Working directory for file operations
+
+    Returns:
+        The final valid JSON as a dictionary
+
+    Raises:
+        ValueError: If validation fails after max_iterations
+    """
+    import json
+    from pathlib import Path
+    from claude_agent_sdk import ClaudeSDKClient
+
+    # Ensure absolute path
+    output_path = str(Path(output_path).resolve())
+    cwd = cwd or str(Path(output_path).parent)
+
+    logger.info(f"generate_and_fix_json: output={output_path}, max_iter={max_iterations}")
+
+    options_kwargs: dict[str, Any] = {
+        "max_turns": 50,  # Allow multiple tool uses per iteration
+        "allowed_tools": ["Read", "Write", "Edit"],
+        "permission_mode": "acceptEdits",
+        "cwd": cwd,
+        "setting_sources": ["project"],  # Load CLAUDE.md for GAME_MANUAL.md reference
+    }
+    if system_prompt is not None:
+        options_kwargs["system_prompt"] = system_prompt
+
+    options = ClaudeAgentOptions(**options_kwargs)
+
+    async with ClaudeSDKClient(options=options) as client:
+        # Initial generation - tell agent to write to specific file
+        generation_prompt = f"""{initial_prompt}
+
+IMPORTANT: Write the complete JSON output to this exact file path:
+{output_path}
+
+Use the Write tool to create the file with the full JSON content."""
+
+        await client.query(generation_prompt)
+
+        # Process response (agent will use Write tool)
+        async for message in client.receive_response():
+            if isinstance(message, AssistantMessage):
+                for block in message.content:
+                    if isinstance(block, TextBlock):
+                        logger.debug(f"Agent: {block.text[:200]}...")
+
+        # Iteration loop for fixes
+        for iteration in range(max_iterations):
+            # Validate externally
+            is_valid, errors = validation_fn(output_path)
+
+            if is_valid:
+                logger.info(f"Validation passed after {iteration} fix iterations")
+                # Read and return the valid JSON
+                with open(output_path) as f:
+                    return json.load(f)
+
+            if iteration >= max_iterations - 1:
+                break
+
+            # Send error feedback for fixing
+            error_list = "\n".join(f"- {e}" for e in errors[:10])  # Limit to 10 errors
+            fix_prompt = f"""The JSON file at {output_path} has validation errors:
+
+{error_list}
+
+Please read the file using the Read tool, then use the Edit tool to fix these issues.
+Make surgical edits to fix only the specific problems identified above.
+Do NOT regenerate the entire file - edit the existing content."""
+
+            logger.info(f"Fix iteration {iteration + 1}: {len(errors)} errors")
+
+            await client.query(fix_prompt)
+
+            # Process fix response
+            async for message in client.receive_response():
+                if isinstance(message, AssistantMessage):
+                    for block in message.content:
+                        if isinstance(block, TextBlock):
+                            logger.debug(f"Agent fix: {block.text[:200]}...")
+
+    # Final validation
+    is_valid, errors = validation_fn(output_path)
+    if is_valid:
+        with open(output_path) as f:
+            return json.load(f)
+
+    raise ValueError(f"Validation failed after {max_iterations} iterations: {errors}")
+
+
 class LLMClient:
     """Client for LLM interactions with consistent configuration.
 

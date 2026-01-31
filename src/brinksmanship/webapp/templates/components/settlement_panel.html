@@ -74,12 +74,13 @@
     <div class="settlement-chat" id="settlement-chat-area">
         <div class="chat-message system">
             <div class="message-content">
-                <p>Negotiations are open. Based on current positions:</p>
-                <ul class="position-summary">
-                    <li>Your position: <strong>{{ "%.1f"|format(state.position_player) }}</strong></li>
-                    <li>Opponent position: <strong>{{ "%.1f"|format(state.position_opponent) }}</strong></li>
+                {# GAME DESIGN: Positions are HIDDEN per GAME_MANUAL.md Section 3.4 #}
+                <p>Negotiations are open. Consider the current state of the crisis:</p>
+                <ul class="state-summary">
+                    <li>Risk Level: <strong>{{ "%.1f"|format(state.risk_level) }}</strong>/10</li>
+                    <li>Cooperation: <strong>{{ state.cooperation_score }}</strong>/10</li>
                 </ul>
-                <p class="suggested">Suggested split: <strong>{{ suggested_vp }} VP</strong> for you</p>
+                <p class="suggested">Your estimated fair share: <strong>{{ suggested_vp }} VP</strong></p>
             </div>
         </div>
     </div>
