@@ -184,3 +184,55 @@ Note: NEVER commit the actual token to git.
 ```bash
 ~/.fly/bin/flyctl ssh console --app brink
 ```
+
+---
+
+## Common Mistakes to Avoid
+
+### Docker & Claude CLI
+
+- **Use `bash` for Claude install script** - The native installer uses bash-specific syntax. Use `bash` not `sh`:
+  ```dockerfile
+  RUN curl -fsSL https://claude.ai/install.sh | bash
+  ```
+
+- **Add Claude CLI to PATH** - After installing, add the install location:
+  ```dockerfile
+  ENV PATH="/root/.local/bin:${PATH}"
+  ```
+
+### Testing
+
+- **Scenario IDs are filename stems** - Use underscores, not hyphens. The ID comes from the JSON filename:
+  - File: `cuban_missile_crisis.json` → ID: `cuban_missile_crisis`
+  - NOT: `cuban-missile-crisis`
+
+- **Module cleanup in tests** - When deleting `sys.modules` entries in tests, ALWAYS save and restore them:
+  ```python
+  @pytest.fixture(autouse=True)
+  def cleanup_modules():
+      saved = {k: v for k, v in sys.modules.items() if k.startswith("mypackage")}
+      for mod in saved:
+          del sys.modules[mod]
+      yield
+      for mod in list(sys.modules.keys()):
+          if mod.startswith("mypackage"):
+              del sys.modules[mod]
+      sys.modules.update(saved)
+  ```
+
+- **Mock webapp Claude check in fixtures** - All webapp test fixtures must mock the Claude check:
+  ```python
+  with patch("brinksmanship.webapp.app.check_claude_api_credentials", return_value=True):
+      from brinksmanship.webapp import create_app
+      app = create_app(TestConfig)
+  ```
+
+### Startup Checks
+
+- **Use subprocess for CLI verification** - For simple power-on tests, use `subprocess.run()` not async SDK:
+  ```python
+  result = subprocess.run(["claude", "-p", "test", "--output-format", "text"], ...)
+  if result.returncode != 0:
+      raise RuntimeError(f"Claude CLI failed: {result.stderr}")
+  ```
