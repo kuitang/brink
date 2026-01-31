@@ -704,25 +704,8 @@ class BrinksmanshipCLI:
         if not ending:
             return
 
-        clear_screen()
-        print_header("GAME OVER")
-
-        ending_name = ending.ending_type.value.replace("_", " ").title()
-        print(f"Ending: {ending_name}")
-        print(f"Turn: {ending.turn}")
-        print()
-
-        if self.human_is_player_a:
-            your_vp = ending.vp_a
-            opp_vp = ending.vp_b
-        else:
-            your_vp = ending.vp_b
-            opp_vp = ending.vp_a
-
-        print(f"Your VP:      {your_vp:.1f}")
-        print(f"Opponent VP:  {opp_vp:.1f}")
-        print()
-        print(ending.description)
+        # Show the educational scorecard
+        self.show_scorecard()
 
         if self.trace_logger:
             print(f"\nTrace saved to: {self.trace_logger._output_file}")
@@ -737,6 +720,214 @@ class BrinksmanshipCLI:
             self.show_coaching()
         elif choice == 2:
             sys.exit(0)
+
+    def show_scorecard(self) -> None:
+        """Display the multi-criteria educational scorecard.
+
+        Shows Personal Success, Joint Success, and Strategic Profile
+        metrics as described in GAME_MANUAL.md Section 4.4.
+        """
+        ending = self.game.get_ending()
+        if not ending:
+            return
+
+        state = self.game.get_current_state()
+        history = self.game.get_history()
+
+        # Determine labels based on which side human played
+        if self.human_is_player_a:
+            your_label = "You"
+            opp_label = "Opponent"
+            your_vp = ending.vp_a
+            opp_vp = ending.vp_b
+            your_captured = state.surplus_captured_a
+            opp_captured = state.surplus_captured_b
+        else:
+            your_label = "You"
+            opp_label = "Opponent"
+            your_vp = ending.vp_b
+            opp_vp = ending.vp_a
+            your_captured = state.surplus_captured_b
+            opp_captured = state.surplus_captured_a
+
+        # Calculate metrics
+        total_value = your_vp + opp_vp
+        your_share = (your_vp / total_value * 100) if total_value > 0 else 50.0
+        opp_share = (opp_vp / total_value * 100) if total_value > 0 else 50.0
+        value_vs_baseline = total_value - 100
+
+        # Pareto Efficiency: min VP / (total / 2) * 100
+        # This measures how evenly distributed the value is
+        min_vp = min(your_vp, opp_vp)
+        pareto_efficiency = (min_vp / (total_value / 2) * 100) if total_value > 0 else 0.0
+
+        # Check if settlement was reached
+        settlement_reached = ending.ending_type == EndingType.SETTLEMENT
+        surplus_distributed = your_captured + opp_captured
+
+        # Calculate strategic profile from history
+        your_max_streak, opp_max_streak = self._calculate_max_streaks(history)
+        your_times_exploited, opp_times_exploited = self._calculate_times_exploited(history)
+        settlement_initiator = self._get_settlement_initiator()
+
+        # Clear screen and display scorecard
+        clear_screen()
+
+        # Header
+        print("=" * 55)
+        print(" " * 18 + "GAME RESULTS")
+        print("=" * 55)
+        print()
+
+        # Personal Success section
+        print(f"PERSONAL SUCCESS{' ' * 21}{your_label:>8}  {opp_label:>8}")
+        print("-" * 55)
+        print(f"Final VP{' ' * 30}{your_vp:>8.1f}  {opp_vp:>8.1f}")
+        print(f"VP Share{' ' * 30}{your_share:>7.1f}%  {opp_share:>7.1f}%")
+        print()
+
+        # Joint Success section
+        print(f"JOINT SUCCESS{' ' * 26}BOTH")
+        print("-" * 55)
+        print(f"Total Value Created{' ' * 19}{total_value:>8.1f} VP")
+        if value_vs_baseline >= 0:
+            print(f"Value vs Zero-Sum Baseline{' ' * 12}+{value_vs_baseline:.1f} VP")
+        else:
+            print(f"Value vs Zero-Sum Baseline{' ' * 12}{value_vs_baseline:+.1f} VP")
+        print(f"Pareto Efficiency{' ' * 21}{pareto_efficiency:>7.1f}%")
+        print(f"Settlement Reached?{' ' * 19}{'Yes' if settlement_reached else 'No':>8}")
+        print(f"Surplus Distributed{' ' * 19}{surplus_distributed:>8.1f} VP")
+        print()
+
+        # Strategic Profile section
+        print(f"STRATEGIC PROFILE{' ' * 20}{your_label:>8}  {opp_label:>8}")
+        print("-" * 55)
+        print(f"Cooperation Streak (max){' ' * 14}{your_max_streak:>8}  {opp_max_streak:>8}")
+        print(f"Times Exploited{' ' * 23}{your_times_exploited:>8}  {opp_times_exploited:>8}")
+
+        # Settlement initiator
+        if settlement_initiator == "you":
+            print(f"Settlement Initiated By{' ' * 15}{your_label:>8}  {'-':>8}")
+        elif settlement_initiator == "opponent":
+            print(f"Settlement Initiated By{' ' * 15}{'-':>8}  {opp_label:>8}")
+        elif settlement_initiator == "both":
+            print(f"Settlement Initiated By{' ' * 15}{'Both':>8}  {'-':>8}")
+        else:
+            print(f"Settlement Initiated By{' ' * 15}{'-':>8}  {'-':>8}")
+
+        print("=" * 55)
+        print()
+
+        # Wait for keypress
+        input("Press Enter to continue...")
+
+    def _calculate_max_streaks(self, history: list) -> tuple[int, int]:
+        """Calculate max cooperation streak for each player.
+
+        A player's streak increases when their action is cooperative
+        and the outcome is CC. We track streaks separately for each player.
+
+        Returns:
+            Tuple of (your_max_streak, opponent_max_streak)
+        """
+        your_streak = 0
+        opp_streak = 0
+        your_max = 0
+        opp_max = 0
+
+        for record in history:
+            if not record.outcome:
+                continue
+
+            outcome_code = record.outcome.outcome_code
+
+            # Human's streak
+            if self.human_is_player_a:
+                human_cooperated = outcome_code.startswith("C")
+            else:
+                human_cooperated = outcome_code.endswith("C")
+
+            # Opponent's streak
+            if self.human_is_player_a:
+                opp_cooperated = outcome_code.endswith("C")
+            else:
+                opp_cooperated = outcome_code.startswith("C")
+
+            # Update streaks - streak increases on CC outcome
+            if outcome_code == "CC":
+                your_streak += 1
+                opp_streak += 1
+                your_max = max(your_max, your_streak)
+                opp_max = max(opp_max, opp_streak)
+            else:
+                # Reset streaks on any non-CC outcome
+                your_streak = 0
+                opp_streak = 0
+
+        return your_max, opp_max
+
+    def _calculate_times_exploited(self, history: list) -> tuple[int, int]:
+        """Calculate how many times each player was exploited.
+
+        A player is exploited when they cooperate and opponent defects.
+
+        Returns:
+            Tuple of (your_times_exploited, opponent_times_exploited)
+        """
+        your_exploited = 0
+        opp_exploited = 0
+
+        for record in history:
+            if not record.outcome:
+                continue
+
+            outcome_code = record.outcome.outcome_code
+
+            if self.human_is_player_a:
+                # CD means A (you) cooperated, B defected - you were exploited
+                # DC means A (you) defected, B cooperated - opponent was exploited
+                if outcome_code == "CD":
+                    your_exploited += 1
+                elif outcome_code == "DC":
+                    opp_exploited += 1
+            else:
+                # CD means A defected, B (you) cooperated - opponent exploited (you)
+                # Wait, CD = A cooperates, B defects. If you're B:
+                # CD = A cooperated, B (you) defected - opponent was exploited
+                # DC = A defected, B (you) cooperated - you were exploited
+                if outcome_code == "DC":
+                    your_exploited += 1
+                elif outcome_code == "CD":
+                    opp_exploited += 1
+
+        return your_exploited, opp_exploited
+
+    def _get_settlement_initiator(self) -> str:
+        """Determine who initiated the settlement.
+
+        Returns:
+            "you", "opponent", "both", or "none"
+        """
+        if self.trace_logger and self.trace_logger.trace.settlement_attempts:
+            # Get the last successful settlement attempt
+            for attempt in reversed(self.trace_logger.trace.settlement_attempts):
+                if attempt.get("response") == "accept":
+                    proposer = attempt.get("proposer", "")
+                    if proposer == "human":
+                        return "you"
+                    elif proposer == "opponent":
+                        return "opponent"
+
+            # If no accepted settlement, check who proposed
+            if self.trace_logger.trace.settlement_attempts:
+                first_attempt = self.trace_logger.trace.settlement_attempts[0]
+                proposer = first_attempt.get("proposer", "")
+                if proposer == "human":
+                    return "you"
+                elif proposer == "opponent":
+                    return "opponent"
+
+        return "none"
 
     def show_coaching(self) -> None:
         """Display post-game coaching analysis."""

@@ -84,6 +84,14 @@ class RealGameEngine:
             opponent_position = engine.state.position_a
             opponent_resources = engine.state.resources_a
 
+        # Get surplus captured based on which side the player is
+        if player_is_a:
+            surplus_captured_player = engine.state.surplus_captured_a
+            surplus_captured_opponent = engine.state.surplus_captured_b
+        else:
+            surplus_captured_player = engine.state.surplus_captured_b
+            surplus_captured_opponent = engine.state.surplus_captured_a
+
         return {
             "game_id": game_id,
             "scenario_id": scenario_id,
@@ -103,6 +111,11 @@ class RealGameEngine:
             "briefing": engine.get_briefing(),
             "history": [],
             "is_finished": False,
+            # Surplus mechanics
+            "cooperation_surplus": engine.state.cooperation_surplus,
+            "surplus_captured_player": surplus_captured_player,
+            "surplus_captured_opponent": surplus_captured_opponent,
+            "cooperation_streak": engine.state.cooperation_streak,
         }
 
     def get_scenarios(self) -> list[dict[str, Any]]:
@@ -234,17 +247,21 @@ class RealGameEngine:
         player_symbol = "C" if player_action.action_type == ActionType.COOPERATIVE else "D"
         opponent_symbol = "C" if opponent_action.action_type == ActionType.COOPERATIVE else "D"
 
-        # Get positions/resources based on which side the player is
+        # Get positions/resources/surplus based on which side the player is
         if player_is_a:
             player_position = gs.position_a
             player_resources = gs.resources_a
             opponent_position = gs.position_b
             opponent_resources = gs.resources_b
+            surplus_captured_player = gs.surplus_captured_a
+            surplus_captured_opponent = gs.surplus_captured_b
         else:
             player_position = gs.position_b
             player_resources = gs.resources_b
             opponent_position = gs.position_a
             opponent_resources = gs.resources_a
+            surplus_captured_player = gs.surplus_captured_b
+            surplus_captured_opponent = gs.surplus_captured_a
 
         # Maintain history in state dict (with narrative for display)
         history = list(state.get("history", []))
@@ -276,6 +293,11 @@ class RealGameEngine:
             "last_outcome": result.narrative,
             "briefing": engine.get_briefing(),
             "history": history,
+            # Surplus mechanics
+            "cooperation_surplus": gs.cooperation_surplus,
+            "surplus_captured_player": surplus_captured_player,
+            "surplus_captured_opponent": surplus_captured_opponent,
+            "cooperation_streak": gs.cooperation_streak,
             # Turn info for GameRecord.add_turn() with full trace data
             "new_turn_player": player_symbol,
             "new_turn_opponent": opponent_symbol,
@@ -292,6 +314,10 @@ class RealGameEngine:
                 "risk_level": gs.risk_level,
                 "cooperation_score": int(gs.cooperation_score),
                 "stability": int(gs.stability),
+                "cooperation_surplus": gs.cooperation_surplus,
+                "surplus_captured_player": surplus_captured_player,
+                "surplus_captured_opponent": surplus_captured_opponent,
+                "cooperation_streak": gs.cooperation_streak,
             },
             "is_finished": result.ending is not None,
         }

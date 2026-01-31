@@ -26,6 +26,10 @@ from brinksmanship.models.matrices import (
 # Type alias for outcome codes
 OutcomeCode = Literal["CC", "CD", "DC", "DD"]
 
+# Valid theme options for scenarios
+ThemeType = Literal["default", "cold-war", "renaissance", "byzantine", "corporate"]
+VALID_THEMES: list[str] = ["default", "cold-war", "renaissance", "byzantine", "corporate"]
+
 
 class OutcomeNarratives(BaseModel):
     """Narrative descriptions for each matrix outcome.
@@ -326,6 +330,10 @@ class Scenario(BaseModel):
     setting: str = Field(
         min_length=1,
         description="Theme/setting description"
+    )
+    theme: ThemeType = Field(
+        default="default",
+        description="Visual theme for the scenario UI"
     )
 
     # Game length (hidden from players during play)

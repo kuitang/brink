@@ -107,3 +107,132 @@ class TestAsyncHandling:
 
         result = run_async(async_multiply(6, 7))
         assert result == 42
+
+
+class TestScorecardCalculations:
+    """Tests for the scorecard calculation methods."""
+
+    @pytest.fixture
+    def cli_with_mock_repo(self):
+        """Create a CLI instance with mocked repository."""
+        with patch("brinksmanship.cli.app.get_scenario_repository") as mock_get_repo:
+            mock_get_repo.return_value = MagicMock()
+            cli = BrinksmanshipCLI()
+            return cli
+
+    def test_calculate_max_streaks_empty_history(self, cli_with_mock_repo):
+        """Max streaks should be 0 with empty history."""
+        cli = cli_with_mock_repo
+        cli.human_is_player_a = True
+
+        your_max, opp_max = cli._calculate_max_streaks([])
+        assert your_max == 0
+        assert opp_max == 0
+
+    def test_calculate_max_streaks_all_cc(self, cli_with_mock_repo):
+        """Max streaks should count consecutive CC outcomes."""
+        cli = cli_with_mock_repo
+        cli.human_is_player_a = True
+
+        # Create mock history with 5 consecutive CC outcomes
+        mock_records = []
+        for i in range(5):
+            record = MagicMock()
+            record.outcome = MagicMock()
+            record.outcome.outcome_code = "CC"
+            mock_records.append(record)
+
+        your_max, opp_max = cli._calculate_max_streaks(mock_records)
+        assert your_max == 5
+        assert opp_max == 5
+
+    def test_calculate_max_streaks_broken_streak(self, cli_with_mock_repo):
+        """Streak should reset on non-CC outcome."""
+        cli = cli_with_mock_repo
+        cli.human_is_player_a = True
+
+        # 3 CC, then CD (breaks streak), then 2 CC
+        mock_records = []
+        codes = ["CC", "CC", "CC", "CD", "CC", "CC"]
+        for code in codes:
+            record = MagicMock()
+            record.outcome = MagicMock()
+            record.outcome.outcome_code = code
+            mock_records.append(record)
+
+        your_max, opp_max = cli._calculate_max_streaks(mock_records)
+        assert your_max == 3  # Max was the first 3 CC
+        assert opp_max == 3
+
+    def test_calculate_times_exploited_player_a(self, cli_with_mock_repo):
+        """Test exploitation counting when human is player A."""
+        cli = cli_with_mock_repo
+        cli.human_is_player_a = True
+
+        # CD = A cooperated, B defected (you exploited)
+        # DC = A defected, B cooperated (opponent exploited)
+        mock_records = []
+        codes = ["CC", "CD", "DC", "CD", "DD"]
+        for code in codes:
+            record = MagicMock()
+            record.outcome = MagicMock()
+            record.outcome.outcome_code = code
+            mock_records.append(record)
+
+        your_exploited, opp_exploited = cli._calculate_times_exploited(mock_records)
+        assert your_exploited == 2  # Two CD outcomes
+        assert opp_exploited == 1  # One DC outcome
+
+    def test_calculate_times_exploited_player_b(self, cli_with_mock_repo):
+        """Test exploitation counting when human is player B."""
+        cli = cli_with_mock_repo
+        cli.human_is_player_a = False
+
+        # CD = A cooperated, B (you) defected (opponent exploited)
+        # DC = A defected, B (you) cooperated (you exploited)
+        mock_records = []
+        codes = ["CC", "CD", "DC", "CD", "DD"]
+        for code in codes:
+            record = MagicMock()
+            record.outcome = MagicMock()
+            record.outcome.outcome_code = code
+            mock_records.append(record)
+
+        your_exploited, opp_exploited = cli._calculate_times_exploited(mock_records)
+        assert your_exploited == 1  # One DC outcome
+        assert opp_exploited == 2  # Two CD outcomes
+
+    def test_get_settlement_initiator_no_attempts(self, cli_with_mock_repo):
+        """Should return 'none' when no settlement attempts."""
+        cli = cli_with_mock_repo
+        cli.trace_logger = None
+
+        result = cli._get_settlement_initiator()
+        assert result == "none"
+
+    def test_get_settlement_initiator_human_accepted(self, cli_with_mock_repo):
+        """Should return 'you' when human's proposal was accepted."""
+        cli = cli_with_mock_repo
+
+        # Mock trace logger with settlement attempt
+        mock_trace = MagicMock()
+        mock_trace.trace.settlement_attempts = [
+            {"proposer": "human", "response": "accept"}
+        ]
+        cli.trace_logger = mock_trace
+
+        result = cli._get_settlement_initiator()
+        assert result == "you"
+
+    def test_get_settlement_initiator_opponent_accepted(self, cli_with_mock_repo):
+        """Should return 'opponent' when opponent's proposal was accepted."""
+        cli = cli_with_mock_repo
+
+        mock_trace = MagicMock()
+        mock_trace.trace.settlement_attempts = [
+            {"proposer": "opponent", "response": "accept"}
+        ]
+        cli.trace_logger = mock_trace
+
+        result = cli._get_settlement_initiator()
+        assert result == "opponent"

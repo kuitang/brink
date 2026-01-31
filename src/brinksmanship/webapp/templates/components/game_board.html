@@ -43,7 +43,7 @@
     {# Game state info - positions are HIDDEN per game design (information asymmetry) #}
     {# Players learn outcomes from the Crisis Log narratives, not raw numbers #}
     <div class="info-row">
-        <div class="shared-info-box" style="flex: 1;">
+        <div class="shared-info-box">
             <div class="info-header">Crisis Status</div>
             <div class="info-stats">
                 <div class="info-stat">
@@ -61,6 +61,28 @@
                 <div class="info-stat">
                     <span class="stat-label">Turn</span>
                     <span class="stat-value">{{ state.turn }}</span>
+                </div>
+            </div>
+        </div>
+        {# Surplus info box #}
+        <div class="surplus-info-box">
+            <div class="info-header">Surplus</div>
+            <div class="info-stats">
+                <div class="info-stat">
+                    <span class="stat-label">Pool</span>
+                    <span class="stat-value surplus-pool">{{ "%.1f"|format(state.cooperation_surplus|default(0)) }} VP</span>
+                </div>
+                <div class="info-stat">
+                    <span class="stat-label">Your Captured</span>
+                    <span class="stat-value surplus-player">{{ "%.1f"|format(state.surplus_captured_player|default(0)) }} VP</span>
+                </div>
+                <div class="info-stat">
+                    <span class="stat-label">Opponent Captured</span>
+                    <span class="stat-value surplus-opponent">{{ "%.1f"|format(state.surplus_captured_opponent|default(0)) }} VP</span>
+                </div>
+                <div class="info-stat">
+                    <span class="stat-label">Streak</span>
+                    <span class="stat-value {% if state.cooperation_streak|default(0) >= 3 %}streak-high{% elif state.cooperation_streak|default(0) >= 1 %}streak-active{% endif %}">{{ state.cooperation_streak|default(0) }}</span>
                 </div>
             </div>
         </div>

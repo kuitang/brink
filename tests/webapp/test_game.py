@@ -32,6 +32,11 @@ def create_game_record(app, user_id):
             "briefing": "Test briefing",
             "last_outcome": None,
             "is_finished": False,
+            # Surplus mechanics
+            "cooperation_surplus": 0.0,
+            "surplus_captured_player": 0.0,
+            "surplus_captured_opponent": 0.0,
+            "cooperation_streak": 0,
         }
         db.session.add(record)
         db.session.commit()
@@ -141,6 +146,11 @@ def test_game_over_page(auth_client, app, user):
             "history": [{"turn": 1, "player": "C", "opponent": "C"}],
             "last_outcome": "The crisis has concluded.",
             "is_finished": True,
+            # Surplus mechanics
+            "cooperation_surplus": 5.0,
+            "surplus_captured_player": 2.5,
+            "surplus_captured_opponent": 2.5,
+            "cooperation_streak": 0,
         }
         db.session.add(record)
         db.session.commit()

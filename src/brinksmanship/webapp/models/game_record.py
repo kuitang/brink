@@ -91,6 +91,12 @@ class GameRecord(db.Model):
     cooperation_score = db.Column(db.Integer, default=5, nullable=False)
     stability = db.Column(db.Integer, default=5, nullable=False)
 
+    # Surplus mechanics (Joint Investment model)
+    cooperation_surplus = db.Column(db.Float, default=0.0, nullable=False)
+    surplus_captured_player = db.Column(db.Float, default=0.0, nullable=False)
+    surplus_captured_opponent = db.Column(db.Float, default=0.0, nullable=False)
+    cooperation_streak = db.Column(db.Integer, default=0, nullable=False)
+
     # Last actions (for display)
     last_action_player = db.Column(db.String(64), nullable=True)
     last_action_opponent = db.Column(db.String(64), nullable=True)
@@ -273,6 +279,11 @@ class GameRecord(db.Model):
             "ending_type": self.ending_type,
             "vp_player": self.final_vp_player,
             "vp_opponent": self.final_vp_opponent,
+            # Surplus mechanics
+            "cooperation_surplus": self.cooperation_surplus,
+            "surplus_captured_player": self.surplus_captured_player,
+            "surplus_captured_opponent": self.surplus_captured_opponent,
+            "cooperation_streak": self.cooperation_streak,
         }
 
     def update_from_state(self, value: dict[str, Any]) -> None:
@@ -298,6 +309,11 @@ class GameRecord(db.Model):
             "ending_type": "ending_type",
             "scenario_name": "scenario_name",
             "custom_persona": "custom_persona",
+            # Surplus mechanics
+            "cooperation_surplus": "cooperation_surplus",
+            "surplus_captured_player": "surplus_captured_player",
+            "surplus_captured_opponent": "surplus_captured_opponent",
+            "cooperation_streak": "cooperation_streak",
         }
         for key, attr in field_map.items():
             if key in value:

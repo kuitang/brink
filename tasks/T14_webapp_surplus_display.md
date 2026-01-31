@@ -13,11 +13,11 @@ Update webapp templates to show cooperation surplus, captured amounts, and strea
 - T07 (Settlement complete)
 
 ## Acceptance Criteria
-- [ ] Game page shows "Surplus Pool: X VP"
-- [ ] Shows "Your Captured: X VP" and "Opponent Captured: X VP"
-- [ ] Shows cooperation streak count
-- [ ] Updates via htmx after each turn
-- [ ] Clear visual hierarchy
+- [x] Game page shows "Surplus Pool: X VP"
+- [x] Shows "Your Captured: X VP" and "Opponent Captured: X VP"
+- [x] Shows cooperation streak count (color-coded)
+- [x] Updates via htmx after each turn
+- [x] Clear visual hierarchy (blue pool, green captured, red opponent)
 
 ## Files to Modify
 - `src/brinksmanship/webapp/templates/game.html`

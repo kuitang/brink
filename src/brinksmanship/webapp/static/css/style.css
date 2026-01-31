@@ -328,6 +328,13 @@ textarea:focus {
 .status-value.risk-medium { color: var(--risk-medium); }
 .status-value.risk-high { color: var(--risk-high); }
 
+/* Surplus styling */
+.stat-value.surplus-pool { color: var(--info); }
+.stat-value.surplus-player { color: var(--cooperative); }
+.stat-value.surplus-opponent { color: var(--competitive); }
+.stat-value.streak-active { color: var(--warning); }
+.stat-value.streak-high { color: var(--success); font-weight: bold; }
+
 /* ===== NARRATIVE ===== */
 .narrative {
     padding: var(--spacing-md);
@@ -577,7 +584,7 @@ textarea:focus {
 
 .info-row {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
     gap: var(--spacing-md);
 }
 
@@ -598,6 +605,16 @@ textarea:focus {
 
 .shared-info-box {
     border-left: 4px solid var(--accent);
+}
+
+.surplus-info-box {
+    border: var(--border-width) solid var(--border);
+    background-color: var(--bg-alt);
+    border-left: 4px solid var(--info);
+}
+
+.surplus-info-box .info-header {
+    background-color: var(--info);
 }
 
 .info-header {
