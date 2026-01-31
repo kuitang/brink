@@ -6,21 +6,28 @@ Tests verify that:
 3. Conversation turn count is tracked correctly
 """
 
+import os
+from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-# Check if claude_agent_sdk is available (requires Claude Code CLI)
-try:
-    import claude_agent_sdk  # noqa: F401
-
-    HAS_CLAUDE_SDK = True
-except ImportError:
-    HAS_CLAUDE_SDK = False
-
 from brinksmanship.models.actions import Action, ActionType
 from brinksmanship.models.state import GameState
 from brinksmanship.opponents.historical import HistoricalPersona
+
+
+def _has_claude_cli():
+    """Check if Claude Code CLI credentials are available."""
+    # Check for OAuth token env var (server/CI deployment)
+    if os.environ.get("CLAUDE_CODE_OAUTH_TOKEN"):
+        return True
+    # Check for credentials file (local development)
+    credentials_path = Path.home() / ".claude" / ".credentials.json"
+    return credentials_path.exists()
+
+
+HAS_CLAUDE_CLI = _has_claude_cli()
 
 
 class TestPersonaClientReuse:
@@ -74,7 +81,7 @@ class TestConversationHistory:
     """Tests for conversation history accumulation."""
 
     @pytest.mark.asyncio
-    @pytest.mark.skipif(not HAS_CLAUDE_SDK, reason="Requires Claude Code CLI with claude_agent_sdk")
+    @pytest.mark.skipif(not HAS_CLAUDE_CLI, reason="Requires Claude Code CLI with valid credentials")
     async def test_conversation_turn_count_increments(self):
         """Test that conversation turn count increments on each query."""
         from claude_agent_sdk import AssistantMessage, TextBlock
