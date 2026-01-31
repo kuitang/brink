@@ -212,6 +212,7 @@ async def _try_settlement(
     evaluator: Opponent,
     state: GameState,
     proposer_is_a: bool,
+    scenario_id: str,
 ) -> GameResult | None:
     """Try to reach a settlement between proposer and evaluator."""
     if not hasattr(proposer, "propose_settlement") or not hasattr(evaluator, "evaluate_settlement"):
@@ -233,7 +234,7 @@ async def _try_settlement(
         vp_b = 100 - vp_a
 
     return GameResult(
-        scenario_id=state.scenario_id,
+        scenario_id=scenario_id,
         player_a=proposer.name if proposer_is_a else evaluator.name,
         player_b=evaluator.name if proposer_is_a else proposer.name,
         winner="A" if vp_a > vp_b else "B",
@@ -265,10 +266,14 @@ async def run_single_game(
 
             # Try settlement negotiations
             if state.turn > 4 and state.stability > 2:
-                settlement = await _try_settlement(player_a, player_b, state, proposer_is_a=True)
+                settlement = await _try_settlement(
+                    player_a, player_b, state, proposer_is_a=True, scenario_id=scenario_id
+                )
                 if settlement:
                     return settlement
-                settlement = await _try_settlement(player_b, player_a, state, proposer_is_a=False)
+                settlement = await _try_settlement(
+                    player_b, player_a, state, proposer_is_a=False, scenario_id=scenario_id
+                )
                 if settlement:
                     return settlement
 

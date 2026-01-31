@@ -253,10 +253,11 @@ class HistoricalPersona(Opponent):
         prompt: str,
         schema: dict[str, Any],
     ) -> dict[str, Any]:
-        """Query the LLM with conversation continuity.
+        """Query the LLM using the SDK's query function.
 
-        Uses the persistent ClaudeSDKClient to maintain conversation history
-        across turns, allowing the persona to reference prior reasoning.
+        Note: The current SDK version (0.1.20) does not properly support
+        ClaudeSDKClient for conversation continuity, so we use the simpler
+        query() function instead. Each call is independent.
 
         Args:
             prompt: The prompt to send to the LLM
@@ -271,24 +272,28 @@ class HistoricalPersona(Opponent):
         import json
         import re
 
-        client = self._get_client()
+        from claude_agent_sdk import query
+
         self._conversation_turn_count += 1
 
         logger.debug(f"{self.display_name}: LLM query #{self._conversation_turn_count}, prompt={len(prompt)} chars")
 
-        # Enter client context if not already active
-        if not client._active:
-            await client.__aenter__()
+        # Build options for this query
+        options = ClaudeAgentOptions(
+            max_turns=10,
+            allowed_tools=["Read"],
+            system_prompt=HISTORICAL_PERSONA_SYSTEM_PROMPT,
+        )
 
         # Send the prompt with schema request
         schema_instruction = f"\n\nRespond with valid JSON matching this schema:\n{json.dumps(schema, indent=2)}"
-        await client.query(prompt + schema_instruction)
+        full_prompt = prompt + schema_instruction
 
         # Collect the response
         response_text = ""
         structured_output = None
 
-        async for message in client.receive_response():
+        async for message in query(prompt=full_prompt, options=options):
             if isinstance(message, AssistantMessage):
                 for block in message.content:
                     if isinstance(block, TextBlock):

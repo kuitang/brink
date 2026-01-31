@@ -66,13 +66,16 @@ generate_jobs() {
         [[ -f "$scenario_file" ]] || continue
         [[ "$scenario_file" != *".gitkeep"* ]] || continue
 
-        # Extract scenario ID and personas using python
+        # Extract scenario ID (from filename) and personas using python
         local info
         info=$(uv run python -c "
 import json
-with open('$scenario_file') as f:
+from pathlib import Path
+scenario_path = Path('$scenario_file')
+# Use filename stem as scenario ID (this is what FileScenarioRepository expects)
+sid = scenario_path.stem
+with open(scenario_path) as f:
     s = json.load(f)
-    sid = s.get('scenario_id', '')
     p = s.get('personas', {})
     pa = p.get('side_a', {}).get('persona', '')
     pb = p.get('side_b', {}).get('persona', '')
@@ -194,9 +197,9 @@ main() {
     while IFS= read -r line; do
         IFS='|' read -r scenario player_a player_b matchup_type <<< "$line"
         if is_job_complete "$scenario" "$matchup_type"; then
-            ((completed_jobs++))
+            completed_jobs=$((completed_jobs + 1))
         else
-            ((pending_jobs++))
+            pending_jobs=$((pending_jobs + 1))
         fi
     done < "$job_file"
 
