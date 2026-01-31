@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "A game-theoretic strategy simulation exploring nuclear brinkmanship and coordination games"
 readme = "README.md"
 requires-python = ">=3.11"
-license = "MIT"
+license = "AGPL-3.0"
 authors = [
     { name = "Your Name", email = "you@example.com" }
 ]
