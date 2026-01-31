@@ -28,11 +28,11 @@ def test_imports():
         return False
 
     try:
-        import textual
+        import simple_term_menu
 
-        print(f"  textual (v{textual.__version__}): OK")
+        print(f"  simple_term_menu: OK")
     except ImportError as e:
-        print(f"  textual: FAIL ({e})")
+        print(f"  simple_term_menu: FAIL ({e})")
         return False
 
     try:

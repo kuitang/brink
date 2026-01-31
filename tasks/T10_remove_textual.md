@@ -13,11 +13,13 @@ Replace any Textual-based CLI code with simple-term-menu. The CLI should use rea
 - T01 (Delete obsolete docs)
 
 ## Acceptance Criteria
-- [ ] No imports from `textual` package
-- [ ] `pyproject.toml` removes textual from dependencies
-- [ ] CLI uses `simple-term-menu` for menus
-- [ ] CLI uses `readline` for text input
-- [ ] `uv run brinksmanship` launches without textual
+- [x] No imports from `textual` package
+- [x] `pyproject.toml` removes textual from dependencies
+- [x] CLI uses `simple-term-menu` for menus
+- [x] CLI uses `readline` for text input
+- [x] `uv run brinksmanship` launches without textual
+
+**Note**: CLI completely rewritten from 1800+ line Textual TUI to ~680 line simple-term-menu interface. All core functionality preserved.
 
 ## Files to Modify
 - `pyproject.toml`
