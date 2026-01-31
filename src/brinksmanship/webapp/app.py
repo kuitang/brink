@@ -43,9 +43,12 @@ async def check_claude_api_credentials():
     Returns:
         bool: True if credentials are configured and working, False otherwise
     """
+    import traceback
     from pathlib import Path
 
     from brinksmanship.llm import generate_text
+
+    logger.info("=== Claude Agent SDK Power-On Self-Test ===")
 
     # Check for OAuth token env var (server/CI deployment)
     oauth_token = os.environ.get("CLAUDE_CODE_OAUTH_TOKEN")
@@ -53,7 +56,8 @@ async def check_claude_api_credentials():
 
     if oauth_token:
         masked = oauth_token[:20] + "..." if len(oauth_token) > 20 else "***"
-        logger.info(f"CLAUDE_CODE_OAUTH_TOKEN is set ({masked})")
+        logger.info(f"CLAUDE_CODE_OAUTH_TOKEN is set: {masked}")
+        logger.info(f"Token length: {len(oauth_token)} chars")
     elif credentials_path.exists():
         logger.info(f"Claude credentials file found at {credentials_path}")
     else:
@@ -68,12 +72,23 @@ async def check_claude_api_credentials():
 
     # Power-on test: use Claude Agent SDK to verify connection
     # The SDK spawns Claude Code CLI, so this fully exercises both layers
-    # No exception handling - let it crash with full traceback if broken
-    logger.info("Testing Claude Agent SDK with 'say hi' prompt...")
-    response = await generate_text(prompt="Say hello in one word", max_turns=1)
-    response_preview = response.strip()[:50]
-    logger.info(f"Claude Agent SDK power-on test SUCCESS: '{response_preview}...'")
-    return True
+    logger.info("Calling Claude Agent SDK generate_text()...")
+    logger.info("Prompt: 'Say hello in one word'")
+    logger.info("max_turns: 1")
+
+    try:
+        response = await generate_text(prompt="Say hello in one word", max_turns=1)
+        response_preview = response.strip()[:50]
+        logger.info("Claude Agent SDK power-on test SUCCESS!")
+        logger.info(f"Response: '{response_preview}'")
+        logger.info("=== Power-On Self-Test PASSED ===")
+        return True
+    except Exception as e:
+        logger.error("=== Power-On Self-Test FAILED ===")
+        logger.error(f"Exception type: {type(e).__name__}")
+        logger.error(f"Exception message: {e}")
+        logger.error(f"Full traceback:\n{traceback.format_exc()}")
+        raise
 
 
 def create_app(config_class=Config):

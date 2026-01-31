@@ -282,3 +282,9 @@ Note: NEVER commit the actual token to git.
 - **Capture stderr** - Always add `2>&1` when piping output: `command 2>&1 | tail -50`
 - **Limit output** - Use `| tail -50` or `| head -100` to avoid truncation issues.
 - **Skip problematic tests** - Use `--ignore` flag: `uv run pytest --ignore=tests/broken_test.py`
+
+### Never Revert to Easier Solutions
+
+- **Debug root causes, don't take shortcuts** - When asked to implement something specific (e.g., "use Claude Agent SDK for power-on test"), NEVER revert to an easier approach when it fails. Debug the root cause instead.
+- **Example**: If the SDK fails in Docker, debug why it fails (run container locally, check logs, fix the issue). Don't revert to subprocess just because it's easier.
+- **Ask before reverting** - If you truly believe the requested approach won't work, explain why and ask for guidance rather than silently reverting.
