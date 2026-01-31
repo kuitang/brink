@@ -2,10 +2,10 @@
 
 import json
 import os
+from unittest.mock import patch
 
 import pytest
 
-from brinksmanship.webapp import create_app
 from brinksmanship.webapp.config import TestConfig
 from brinksmanship.webapp.extensions import db
 from brinksmanship.webapp.models import User
@@ -50,11 +50,15 @@ def test_scenario_file():
 @pytest.fixture
 def real_engine_app(test_scenario_file):
     """Create test application with real engine."""
-    app = create_app(TestConfig)
-    with app.app_context():
-        db.create_all()
-        yield app
-        db.drop_all()
+    # Mock Claude check so tests work without Claude CLI
+    with patch("brinksmanship.webapp.app.check_claude_api_credentials", return_value=True):
+        from brinksmanship.webapp import create_app
+
+        app = create_app(TestConfig)
+        with app.app_context():
+            db.create_all()
+            yield app
+            db.drop_all()
 
 
 @pytest.fixture

@@ -1,0 +1,1 @@
+{"id": "integration-test", "name": "Integration Test Scenario", "setting": "Test Setting", "description": "A test scenario for integration tests.", "max_turns": 10, "turns": [{"turn": 1, "narrative_briefing": "The integration test begins.", "matrix_type": "PRISONERS_DILEMMA"}, {"turn": 2, "narrative_briefing": "The test continues.", "matrix_type": "STAG_HUNT"}]}
