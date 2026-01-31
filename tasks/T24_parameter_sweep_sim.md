@@ -13,20 +13,22 @@ Build a grid search simulation that tests combinations of key parameters and rep
 - T23 (Exploitation timing sim - uses similar infrastructure)
 
 ## Acceptance Criteria
-- [ ] Script `scripts/parameter_sweep.py` exists
-- [ ] Accepts parameter ranges as arguments
-- [ ] Default sweep:
+- [x] Script `scripts/parameter_sweep.py` exists
+- [x] Accepts parameter ranges as arguments
+- [x] Default sweep:
   - CAPTURE_RATE: [0.3, 0.4, 0.5]
   - REJECTION_BASE_PENALTY: [1.0, 1.5, 2.0]
   - DD_RISK_INCREASE: [1.5, 1.8, 2.0]
-- [ ] For each combination, runs balance validation (100 games per pairing)
-- [ ] Checks all pass criteria:
+- [x] For each combination, runs balance validation (100 games per pairing)
+- [x] Checks all pass criteria:
   - No dominant strategy (>120 total AND >55% share)
   - Variance 10-40 range
   - Settlement rate 30-70%
   - Mutual destruction rate <20%
   - Game length 10-16 turns
-- [ ] Outputs ranked results showing which combinations pass/fail
+- [x] Outputs ranked results showing which combinations pass/fail
+
+**Note**: Uses monkey-patching in ProcessPoolExecutor workers to isolate parameter changes
 
 ## Expected Output
 ```
