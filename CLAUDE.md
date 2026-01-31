@@ -266,3 +266,12 @@ Note: NEVER commit the actual token to git.
 
 - **Tests should be fast** - Be parsimonious with tests. Focus on end-to-end flows, remove redundant coverage.
 - **Async Playwright, no static waits** - Use async Playwright and avoid `time.sleep()` or static wait calls.
+- **Skip Claude CLI tests in CI** - Tests requiring Claude Code CLI must be conditionally skipped in CI (Docker only has Python packages, not the CLI binary).
+
+### Engine State Persistence
+
+- **Sync surplus fields when recreating engines** - When recreating a `GameEngine` from stored state, surplus fields (`cooperation_surplus`, etc.) must be synchronized from the persisted `GameState`.
+
+### Deterministic Opponents
+
+- **Deterministic opponents need deterministic settlement** - Don't use LLM-based `evaluate_settlement()` for deterministic opponents. Implement rule-based evaluation using game state metrics.
