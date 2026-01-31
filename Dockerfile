@@ -22,10 +22,8 @@ RUN uv pip install gunicorn
 # Copy application code
 COPY src/ src/
 
-# Copy scenarios if they exist (they may not be tracked in git)
-# Create empty directory if scenarios don't exist
-RUN mkdir -p scenarios
-COPY scenarios/ scenarios/ 2>/dev/null || true
+# Copy scenarios (now tracked in git)
+COPY scenarios/ scenarios/
 
 # Copy and run manual generation script
 COPY scripts/generate_manual.py scripts/generate_manual.py
