@@ -16,12 +16,12 @@ Currently, each LLM call for action selection/settlement evaluation is stateless
 - None (standalone feature)
 
 ## Acceptance Criteria
-- [ ] `HistoricalPersona` maintains conversation history across a game session
-- [ ] Settlement evaluations reference prior proposals/responses
-- [ ] Action choices can reference prior reasoning
-- [ ] Unit tests verify history is maintained (not just stored)
+- [x] `HistoricalPersona` maintains conversation history across a game session
+- [x] Settlement evaluations reference prior proposals/responses
+- [x] Action choices can reference prior reasoning
+- [x] Unit tests verify history is maintained (not just stored)
 - [ ] Manual CLI test confirms LLM references prior context
-- [ ] No regression in existing playtest performance
+- [x] No regression in existing playtest performance
 
 ## Files to Modify
 - `src/brinksmanship/opponents/historical.py` - Hold ClaudeSDKClient instance, reuse across turns

@@ -17,8 +17,9 @@ uv run ruff check .
 echo "   PASSED"
 echo ""
 
-echo "3. Run tests..."
-uv run pytest tests/ -v --ignore=tests/test_real_llm_integration.py
+echo "3. Run tests with coverage..."
+uv run pytest tests/ -v --ignore=tests/test_real_llm_integration.py \
+    --cov=brinksmanship --cov-report=term-missing --cov-report=html
 echo "   PASSED"
 echo ""
 
