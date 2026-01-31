@@ -247,6 +247,38 @@ class TestGameState:
         assert restored.resources_b == pytest.approx(3.0)
         assert restored.previous_type_a == ActionType.COOPERATIVE
 
+    def test_surplus_fields_serialize(self):
+        """Verify surplus fields initialize, modify, and serialize correctly."""
+        state = GameState(
+            cooperation_surplus=10.5,
+            surplus_captured_a=3.0,
+            surplus_captured_b=2.0,
+            cooperation_streak=5,
+        )
+
+        # Test computed properties
+        assert state.total_surplus_captured == pytest.approx(5.0)
+        assert state.surplus_remaining == pytest.approx(10.5)
+
+        # Round-trip serialization via dict
+        data = state.to_dict()
+        restored = GameState.from_dict(data)
+
+        assert restored.cooperation_surplus == pytest.approx(10.5)
+        assert restored.surplus_captured_a == pytest.approx(3.0)
+        assert restored.surplus_captured_b == pytest.approx(2.0)
+        assert restored.cooperation_streak == 5
+        assert restored.total_surplus_captured == pytest.approx(5.0)
+
+        # Round-trip serialization via JSON
+        json_str = state.to_json()
+        restored_json = GameState.from_json(json_str)
+
+        assert restored_json.cooperation_surplus == pytest.approx(10.5)
+        assert restored_json.surplus_captured_a == pytest.approx(3.0)
+        assert restored_json.surplus_captured_b == pytest.approx(2.0)
+        assert restored_json.cooperation_streak == 5
+
 
 class TestActionResult:
     """Tests for ActionResult class."""
@@ -567,6 +599,27 @@ class TestApplyActionResult:
         new_state = apply_action_result(state, result)
 
         assert new_state.max_turns == 15
+
+    def test_surplus_fields_preserved(self):
+        """Surplus fields are preserved when applying action result."""
+        state = GameState(
+            cooperation_surplus=8.5,
+            surplus_captured_a=2.0,
+            surplus_captured_b=1.5,
+            cooperation_streak=3,
+        )
+
+        result = ActionResult(
+            action_a=ActionType.COOPERATIVE,
+            action_b=ActionType.COOPERATIVE,
+        )
+
+        new_state = apply_action_result(state, result)
+
+        assert new_state.cooperation_surplus == pytest.approx(8.5)
+        assert new_state.surplus_captured_a == pytest.approx(2.0)
+        assert new_state.surplus_captured_b == pytest.approx(1.5)
+        assert new_state.cooperation_streak == 3
 
 
 class TestEdgeCases:

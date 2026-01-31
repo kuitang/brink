@@ -14,14 +14,16 @@ Extend the GameState model to track the Joint Investment mechanics. This is the 
 - T02 (parameters.py exists)
 
 ## Acceptance Criteria
-- [ ] `GameState` in `models/state.py` has:
+- [x] `GameState` in `models/state.py` has:
   - `cooperation_surplus: float = 0.0` (shared pool)
   - `surplus_captured_a: float = 0.0` (VP locked by A)
   - `surplus_captured_b: float = 0.0` (VP locked by B)
   - `cooperation_streak: int = 0` (consecutive CC outcomes)
-- [ ] All fields serialize/deserialize correctly
-- [ ] Existing tests pass
-- [ ] New tests verify field initialization
+- [x] All fields serialize/deserialize correctly
+- [x] Existing tests pass
+- [x] New tests verify field initialization
+
+**Note**: Added convenience properties `total_surplus_captured` and `surplus_remaining`. Updated `apply_action_result` to preserve surplus fields.
 
 ## Files to Modify
 - `src/brinksmanship/models/state.py`

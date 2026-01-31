@@ -135,6 +135,12 @@ class GameState(BaseModel):
     turn: int = Field(default=1, ge=1)
     max_turns: int = Field(default=14, ge=12, le=16)
 
+    # Surplus mechanics (Joint Investment model)
+    cooperation_surplus: float = Field(default=0.0, ge=0.0)  # Shared pool created by CC
+    surplus_captured_a: float = Field(default=0.0, ge=0.0)   # VP locked by player A
+    surplus_captured_b: float = Field(default=0.0, ge=0.0)   # VP locked by player B
+    cooperation_streak: int = Field(default=0, ge=0)          # Consecutive CC outcomes
+
     @field_validator("cooperation_score", mode="before")
     @classmethod
     def clamp_cooperation(cls, v: float) -> float:
@@ -290,6 +296,17 @@ class GameState(BaseModel):
             * self.instability_factor
             * self.act_multiplier
         )
+
+    # Surplus convenience properties
+    @property
+    def total_surplus_captured(self) -> float:
+        """Total surplus captured by both players."""
+        return self.surplus_captured_a + self.surplus_captured_b
+
+    @property
+    def surplus_remaining(self) -> float:
+        """Surplus still in the shared pool (not yet captured or distributed)."""
+        return self.cooperation_surplus
 
     # Serialization methods
     def to_json(self) -> str:
@@ -517,4 +534,9 @@ def apply_action_result(state: GameState, result: ActionResult) -> GameState:
         risk_level=new_risk,
         turn=state.turn + 1,
         max_turns=state.max_turns,
+        # Preserve surplus fields (actual mechanics implemented in T04)
+        cooperation_surplus=state.cooperation_surplus,
+        surplus_captured_a=state.surplus_captured_a,
+        surplus_captured_b=state.surplus_captured_b,
+        cooperation_streak=state.cooperation_streak,
     )
