@@ -1,6 +1,6 @@
 """Pytest fixtures for webapp tests."""
 
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 
@@ -13,7 +13,9 @@ from brinksmanship.webapp.models import User
 def app():
     """Create test application with mocked Claude check."""
     # Mock Claude check so webapp tests work without Claude CLI
-    with patch("brinksmanship.webapp.app.check_claude_api_credentials", return_value=True):
+    # The function is async, so use AsyncMock that returns True
+    mock_check = AsyncMock(return_value=True)
+    with patch("brinksmanship.webapp.app.check_claude_api_credentials", mock_check):
         from brinksmanship.webapp import create_app
 
         app = create_app(TestConfig)

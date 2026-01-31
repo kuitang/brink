@@ -30,7 +30,7 @@ def seed_db():
         db.session.commit()
 
 
-def check_claude_api_credentials():
+async def check_claude_api_credentials():
     """Check if Claude API credentials are available and test the connection.
 
     The claude-agent-sdk spawns Claude Code CLI which uses OAuth authentication.
@@ -44,6 +44,8 @@ def check_claude_api_credentials():
         bool: True if credentials are configured and working, False otherwise
     """
     from pathlib import Path
+
+    from brinksmanship.llm import generate_text
 
     # Check for OAuth token env var (server/CI deployment)
     oauth_token = os.environ.get("CLAUDE_CODE_OAUTH_TOKEN")
@@ -64,32 +66,23 @@ def check_claude_api_credentials():
         )
         return False
 
-    # Power-on test: verify Claude CLI actually works using subprocess
+    # Power-on test: use Claude Agent SDK to verify connection
+    # The SDK spawns Claude Code CLI, so this fully exercises both layers
     # No exception handling - let it crash with full traceback if broken
-    import subprocess
-
-    logger.info("Testing Claude CLI with 'say hi' prompt...")
-    result = subprocess.run(
-        ["claude", "-p", "Say hello in one word", "--output-format", "text"],
-        capture_output=True,
-        text=True,
-        timeout=30,
-    )
-    if result.returncode != 0:
-        logger.error(f"Claude CLI FAILED with exit code {result.returncode}")
-        logger.error(f"stdout: {result.stdout}")
-        logger.error(f"stderr: {result.stderr}")
-        raise RuntimeError(f"Claude CLI failed: {result.stderr}")
-
-    response = result.stdout.strip()[:50]
-    logger.info(f"Claude CLI power-on test SUCCESS: '{response}...'")
+    logger.info("Testing Claude Agent SDK with 'say hi' prompt...")
+    response = await generate_text(prompt="Say hello in one word", max_turns=1)
+    response_preview = response.strip()[:50]
+    logger.info(f"Claude Agent SDK power-on test SUCCESS: '{response_preview}...'")
     return True
 
 
 def create_app(config_class=Config):
     """Create and configure the Flask application."""
+    import asyncio
+
     # Check API credentials at startup - FAIL HARD if not working
-    has_claude = check_claude_api_credentials()
+    # Use asyncio.run() since check_claude_api_credentials is async (uses SDK)
+    has_claude = asyncio.run(check_claude_api_credentials())
     if not has_claude:
         raise RuntimeError(
             "Claude CLI is not working! Cannot start webapp without LLM support. "

@@ -1,11 +1,11 @@
-"""Test that webapp requires working Claude CLI.
+"""Test that webapp requires working Claude Agent SDK.
 
-This test verifies the hard requirement: if Claude CLI doesn't work,
+This test verifies the hard requirement: if Claude Agent SDK doesn't work,
 the webapp should crash on startup.
 """
 
 import sys
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 
@@ -29,17 +29,14 @@ def cleanup_webapp_modules():
     sys.modules.update(saved_modules)
 
 
-def test_create_app_crashes_if_claude_fails():
-    """create_app should raise RuntimeError if Claude CLI fails."""
-    # Mock subprocess.run to simulate Claude CLI failure
-    mock_result = MagicMock()
-    mock_result.returncode = 1
-    mock_result.stdout = ""
-    mock_result.stderr = "authentication failed"
+def test_create_app_crashes_if_claude_sdk_fails():
+    """create_app should raise RuntimeError if Claude Agent SDK fails."""
+    # Mock generate_text to simulate SDK failure
+    mock_generate = AsyncMock(side_effect=RuntimeError("SDK authentication failed"))
 
     with patch.dict("os.environ", {"CLAUDE_CODE_OAUTH_TOKEN": "fake-token"}):
-        with patch("subprocess.run", return_value=mock_result):
+        with patch("brinksmanship.llm.generate_text", mock_generate):
             from brinksmanship.webapp.app import create_app
 
-            with pytest.raises(RuntimeError, match="Claude CLI"):
+            with pytest.raises(RuntimeError):
                 create_app()
