@@ -1,8 +1,9 @@
 """Pytest fixtures for webapp tests."""
 
+from unittest.mock import patch
+
 import pytest
 
-from brinksmanship.webapp import create_app
 from brinksmanship.webapp.config import TestConfig
 from brinksmanship.webapp.extensions import db
 from brinksmanship.webapp.models import User
@@ -10,12 +11,16 @@ from brinksmanship.webapp.models import User
 
 @pytest.fixture
 def app():
-    """Create test application."""
-    app = create_app(TestConfig)
-    with app.app_context():
-        db.create_all()
-        yield app
-        db.drop_all()
+    """Create test application with mocked Claude check."""
+    # Mock Claude check so webapp tests work without Claude CLI
+    with patch("brinksmanship.webapp.app.check_claude_api_credentials", return_value=True):
+        from brinksmanship.webapp import create_app
+
+        app = create_app(TestConfig)
+        with app.app_context():
+            db.create_all()
+            yield app
+            db.drop_all()
 
 
 @pytest.fixture
