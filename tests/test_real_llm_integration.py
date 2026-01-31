@@ -18,12 +18,12 @@ import logging
 
 import pytest
 
-from brinksmanship.cli.app import run_opponent_method
 from brinksmanship.engine import create_game
 from brinksmanship.models.actions import ActionType
 from brinksmanship.opponents import get_opponent_by_type
 from brinksmanship.opponents.deterministic import NashCalculator, TitForTat
 from brinksmanship.storage import get_scenario_repository
+from brinksmanship.webapp.services.engine_adapter import _run_opponent_method as run_opponent_method
 
 # Enable logging to see what's happening
 logging.basicConfig(level=logging.INFO)

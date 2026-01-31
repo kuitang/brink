@@ -72,3 +72,32 @@ uv run python scripts/balance_simulation.py --games 100
 | `src/brinksmanship/models/state.py` | GameState with cooperation_surplus |
 | `src/brinksmanship/webapp/static/css/style.css` | CSS themes |
 | `scenarios/*.json` | Scenario definitions |
+
+---
+
+## Fly.io Deployment
+
+**View logs:**
+```bash
+~/.fly/bin/flyctl logs --app brink
+```
+
+**Set secrets (NEVER commit secrets to git):**
+```bash
+~/.fly/bin/flyctl secrets set ANTHROPIC_API_KEY=sk-ant-... --app brink
+```
+
+**List current secrets:**
+```bash
+~/.fly/bin/flyctl secrets list --app brink
+```
+
+**Deploy manually:**
+```bash
+~/.fly/bin/flyctl deploy --app brink
+```
+
+**SSH into running container:**
+```bash
+~/.fly/bin/flyctl ssh console --app brink
+```

@@ -74,6 +74,12 @@
             <p class="text-muted" style="margin-bottom: 8px; font-size: 0.9em;">
                 AI-powered opponents embodying documented historical figures.
             </p>
+            {% if not claude_api_available %}
+            <div class="flash flash-warning" style="margin-bottom: 12px;">
+                LLM-based opponents are currently unavailable (API key not configured).
+                Please use Algorithmic Opponents above.
+            </div>
+            {% endif %}
 
             <h5 style="margin-top: 12px; color: var(--text-muted);">Political Figures</h5>
             {% for opponent in opponent_types if opponent.category == 'historical_political' %}

@@ -1,9 +1,14 @@
 """Flask application factory."""
 
+import logging
+import os
+
 from flask import Flask, request
 
 from .config import Config
 from .extensions import db, login_manager
+
+logger = logging.getLogger(__name__)
 
 # Available themes
 THEMES = ["default", "cold-war", "renaissance", "byzantine", "corporate"]
@@ -25,14 +30,45 @@ def seed_db():
         db.session.commit()
 
 
+def check_claude_api_credentials():
+    """Check if Claude API credentials are available.
+
+    The claude-agent-sdk uses ANTHROPIC_API_KEY environment variable.
+    If not set, LLM-based opponents will fail. Deterministic opponents will still work.
+
+    Returns:
+        bool: True if API key is configured, False otherwise
+    """
+    api_key = os.environ.get("ANTHROPIC_API_KEY")
+    if api_key:
+        # Mask key for logging (show first 10 chars)
+        masked = api_key[:10] + "..." if len(api_key) > 10 else "***"
+        logger.info(f"ANTHROPIC_API_KEY is set ({masked})")
+        return True
+    else:
+        logger.warning(
+            "ANTHROPIC_API_KEY is not set! "
+            "LLM-based opponents (historical personas, custom) will not work. "
+            "Deterministic opponents (tit_for_tat, nash_calculator, etc.) will still work. "
+            "Set via: flyctl secrets set ANTHROPIC_API_KEY=sk-ant-..."
+        )
+        return False
+
+
 def create_app(config_class=Config):
     """Create and configure the Flask application."""
+    # Check API credentials at startup
+    has_api_key = check_claude_api_credentials()
+
     app = Flask(
         __name__,
         template_folder="templates",
         static_folder="static",
     )
     app.config.from_object(config_class)
+
+    # Store API availability for routes to check
+    app.config["CLAUDE_API_AVAILABLE"] = has_api_key
 
     # Ensure instance folder exists
     config_class.INSTANCE_PATH.mkdir(parents=True, exist_ok=True)

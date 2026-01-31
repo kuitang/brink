@@ -1,9 +1,11 @@
 {# Action selection menu with htmx #}
+{# Timeout of 90 seconds for LLM opponent responses #}
 <form id="action-form" hx-post="{{ url_for('game.submit_action', game_id=game_id) }}"
       hx-target="#game-board"
       hx-swap="innerHTML"
       hx-indicator="#thinking"
-      hx-disabled-elt="button[type='submit']">
+      hx-disabled-elt="button[type='submit']"
+      hx-request='{"timeout": 90000}'>
 
     <div class="hide-on-request">
         <div class="action-header">
@@ -52,12 +54,43 @@
     document.body.addEventListener('htmx:beforeRequest', function(e) {
         if (e.detail.elt.id === 'action-form') {
             requestInFlight = true;
+            // Hide any previous error
+            var errorEl = document.getElementById('action-error');
+            if (errorEl) errorEl.style.display = 'none';
         }
     });
 
     document.body.addEventListener('htmx:afterRequest', function(e) {
         if (e.detail.elt.id === 'action-form') {
             requestInFlight = false;
+
+            // Check for errors
+            if (!e.detail.successful) {
+                var errorEl = document.getElementById('action-error');
+                if (!errorEl) {
+                    errorEl = document.createElement('div');
+                    errorEl.id = 'action-error';
+                    errorEl.className = 'flash flash-error';
+                    errorEl.style.marginTop = '12px';
+                    document.getElementById('action-form').appendChild(errorEl);
+                }
+                var msg = 'Failed to submit action. ';
+                if (e.detail.xhr && e.detail.xhr.status === 0) {
+                    msg += 'Network error or timeout.';
+                } else if (e.detail.xhr) {
+                    msg += 'Server returned ' + e.detail.xhr.status + '.';
+                }
+                errorEl.textContent = msg + ' Please try again.';
+                errorEl.style.display = 'block';
+
+                // Re-enable buttons
+                var buttons = document.querySelectorAll('#action-form button[type="submit"]');
+                buttons.forEach(function(btn) { btn.disabled = false; });
+
+                // Hide thinking indicator
+                var thinking = document.getElementById('thinking');
+                if (thinking) thinking.classList.remove('htmx-request');
+            }
         }
     });
 
