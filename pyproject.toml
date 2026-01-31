@@ -21,7 +21,7 @@ classifiers = [
 
 dependencies = [
     "claude-agent-sdk>=0.1.0",
-    "textual>=0.50.0",
+    "simple-term-menu>=1.6.0",
     "pydantic>=2.0.0",
     "numpy>=1.24.0",
     "argon2-cffi>=25.1.0",
@@ -31,6 +31,7 @@ dependencies = [
 dev = [
     "pytest>=7.0.0",
     "pytest-asyncio>=0.21.0",
+    "pytest-playwright>=0.4.0",
     "mypy>=1.0.0",
     "ruff>=0.1.0",
 ]
@@ -68,6 +69,12 @@ warn_unused_ignores = true
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "llm_integration: marks tests requiring LLM API calls",
+    "e2e: marks end-to-end Playwright tests",
+    "webapp: marks webapp-specific tests",
+]
 
 [dependency-groups]
 dev = [

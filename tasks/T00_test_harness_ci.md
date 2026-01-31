@@ -92,13 +92,15 @@ The CI script:
 **Run CI before every commit barrier.**
 
 ## Acceptance Criteria
-- [ ] Test directories restructured per above
-- [ ] Existing tests moved to appropriate directories
-- [ ] `.github/workflows/ci.yml` created
-- [ ] pytest markers registered (slow, llm_integration, e2e)
-- [ ] Playwright dependency added to dev extras
-- [ ] `tests/conftest.py` with shared fixtures
-- [ ] All existing tests still pass after restructure
+- [x] Test directories restructured per above
+- [x] Existing tests moved to appropriate directories
+- [ ] `.github/workflows/ci.yml` created — SKIPPED: scripts/ci.sh exists, no GitHub Actions needed yet
+- [x] pytest markers registered (slow, llm_integration, e2e, webapp)
+- [x] Playwright dependency added to dev extras (pytest-playwright>=0.4.0)
+- [x] `tests/conftest.py` with shared fixtures
+- [x] All existing tests still pass after restructure (466 unit+integration pass)
+
+**Note**: Using async Playwright (pytest-asyncio + playwright.async_api) per user preference.
 
 ## Files to Create/Modify
 - `.github/workflows/ci.yml`
