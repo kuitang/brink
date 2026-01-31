@@ -1,5 +1,31 @@
 {# Main game board component - swapped via htmx #}
 
+{# Opponent settlement proposal notification - shown when opponent wants to negotiate #}
+{% if opponent_proposal %}
+<div class="settlement-notification" id="settlement-notification">
+    <div class="notification-content">
+        <strong>Opponent requests negotiation!</strong>
+        <p>They propose: You get <strong>{{ 100 - opponent_proposal.offered_vp }} VP</strong>, They get <strong>{{ opponent_proposal.offered_vp }} VP</strong></p>
+        {% if opponent_proposal.argument %}
+        <p class="proposal-argument">"{{ opponent_proposal.argument }}"</p>
+        {% endif %}
+        <div class="notification-actions">
+            <button type="button" class="btn btn-primary" onclick="openSettlementWithProposal()">Respond</button>
+            <button type="button" class="btn btn-secondary" onclick="dismissNotification()">Later</button>
+        </div>
+    </div>
+</div>
+<script>
+function openSettlementWithProposal() {
+    document.getElementById('settlement-notification').style.display = 'none';
+    openSettlementPanel();
+}
+function dismissNotification() {
+    document.getElementById('settlement-notification').style.display = 'none';
+}
+</script>
+{% endif %}
+
 {# History pane with narratives #}
 <div class="box game-history-pane">
     <div class="box-header">

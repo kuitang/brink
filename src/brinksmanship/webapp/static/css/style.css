@@ -1791,6 +1791,50 @@ footer {
     border-color: var(--accent);
 }
 
+/* Settlement notification - shown when opponent wants to negotiate */
+.settlement-notification {
+    background-color: var(--info);
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    animation: pulse-notification 2s ease-in-out infinite;
+}
+
+@keyframes pulse-notification {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(var(--info-rgb, 70, 130, 180), 0.4); }
+    50% { box-shadow: 0 0 0 8px rgba(var(--info-rgb, 70, 130, 180), 0); }
+}
+
+.settlement-notification .notification-content {
+    color: #ffffff;
+}
+
+.settlement-notification .notification-content strong {
+    display: block;
+    font-size: 1.1rem;
+    margin-bottom: var(--spacing-xs);
+}
+
+.settlement-notification .notification-content p {
+    margin: var(--spacing-xs) 0;
+}
+
+.settlement-notification .proposal-argument {
+    font-style: italic;
+    opacity: 0.9;
+}
+
+.settlement-notification .notification-actions {
+    margin-top: var(--spacing-sm);
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.settlement-notification .notification-actions .btn {
+    padding: var(--spacing-xs) var(--spacing-md);
+}
+
 /* Button variants */
 .btn-success {
     background-color: var(--success);

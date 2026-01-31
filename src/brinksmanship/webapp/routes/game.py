@@ -25,11 +25,22 @@ def play(game_id: str):
     state = game_record.state
     actions = game_service.get_available_actions(state)
 
+    # Check if opponent wants to propose settlement proactively
+    opponent_proposal = None
+    can_settle = game_service.can_propose_settlement(state)
+    if can_settle:
+        opponent_proposal = game_service.check_opponent_settlement(state)
+
+    suggested_vp = game_service.get_suggested_settlement_vp(state) if can_settle else 50
+
     return render_template(
         "pages/game.html",
         game_id=game_id,
         state=state,
         actions=actions,
+        opponent_proposal=opponent_proposal,
+        can_settle=can_settle,
+        suggested_vp=suggested_vp,
     )
 
 
@@ -83,11 +94,23 @@ def submit_action(game_id: str):
             response.headers["HX-Redirect"] = url_for("game.game_over", game_id=game_id)
             return response
         actions = game_service.get_available_actions(new_state)
+
+        # Check if opponent wants to propose settlement proactively
+        opponent_proposal = None
+        can_settle = game_service.can_propose_settlement(new_state)
+        if can_settle:
+            opponent_proposal = game_service.check_opponent_settlement(new_state)
+
+        suggested_vp = game_service.get_suggested_settlement_vp(new_state) if can_settle else 50
+
         return render_template(
             "components/game_board.html",
             game_id=game_id,
             state=new_state,
             actions=actions,
+            opponent_proposal=opponent_proposal,
+            can_settle=can_settle,
+            suggested_vp=suggested_vp,
         )
 
     return redirect(url_for("game.play", game_id=game_id))
