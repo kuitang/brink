@@ -236,3 +236,33 @@ Note: NEVER commit the actual token to git.
   if result.returncode != 0:
       raise RuntimeError(f"Claude CLI failed: {result.stderr}")
   ```
+
+---
+
+## Critical Process Rules
+
+### Authentication
+
+- **Use Claude Code OAuth, NOT Anthropic API keys** - The project uses `ClaudeSDKClient` with `CLAUDE_CODE_OAUTH_TOKEN`. Never add `ANTHROPIC_API_KEY` references.
+
+### Package Management
+
+- **No npm** - Use native installers for tools. Python packages via `uv` only.
+
+### CI/CD Parity
+
+- **Local CI must match GitHub Actions exactly** - No surprises on push. The push is just a double-check, not a discovery step. Run `scripts/ci.sh` locally before pushing.
+
+### Documentation Consistency
+
+- **Update GAME_MANUAL.md when changing mechanics** - Code and documentation must stay synchronized. Parameters and formulas in GAME_MANUAL.md are the source of truth.
+
+### Balance Tuning
+
+- **Fix mechanics before tuning parameters** - If something seems broken, write unit tests to reproduce the bug first. Only tune parameters if underlying mechanics are confirmed working.
+- **Try parameter tuning first** - Before proposing mechanics changes, attempt to solve balance issues with parameter adjustments. Ask the user before making mechanics changes.
+
+### Test Efficiency
+
+- **Tests should be fast** - Be parsimonious with tests. Focus on end-to-end flows, remove redundant coverage.
+- **Async Playwright, no static waits** - Use async Playwright and avoid `time.sleep()` or static wait calls.
