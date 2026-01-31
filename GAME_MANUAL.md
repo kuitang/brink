@@ -672,12 +672,13 @@ EXPLOIT_RISK_INCREASE = 0.8
 #
 # TUNING GUIDANCE:
 #   - TARGET: Mutual destruction rate should be 10-20% of games
-#   - If MD rate > 20%: decrease toward 1.5
-#   - If MD rate < 10%: increase toward 2.0
-#   - Current default (1.8) calibrated for ~15-18% MD rate
+#   - If MD rate > 20%: decrease toward 0.8
+#   - If MD rate < 10%: increase toward 1.2
+#   - Current default (1.0) calibrated for ~10% MD rate with settlement >= 70%
+#   - Reduced from 1.8 to give more time for settlement/de-escalation
 #   - Remember: MD is now 0,0 VP (worst outcome) - players should fear it
 #
-DD_RISK_INCREASE = 1.8
+DD_RISK_INCREASE = 1.0
 
 # ═══════════════════════════════════════════════════════════════════════════
 # DD_BURN_RATE: Fraction of surplus destroyed on mutual defection
@@ -829,7 +830,7 @@ Method: Grid search over key parameters
 Parameters to sweep:
   - CAPTURE_RATE: [0.3, 0.4, 0.5]
   - REJECTION_BASE_PENALTY: [1.0, 1.5, 2.0]
-  - DD_RISK_INCREASE: [1.5, 1.8, 2.0]
+  - DD_RISK_INCREASE: [0.8, 1.0, 1.2]  # Reduced range for higher settlement rates
 Measure: All balance metrics from simulation #3
 Target: Find parameter set that best meets all criteria
 ```
