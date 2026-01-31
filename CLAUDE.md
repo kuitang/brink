@@ -43,7 +43,6 @@ uv run brinksmanship
 **Webapp:**
 ```bash
 uv sync --extra webapp
-uv run python scripts/generate_manual.py
 uv run brinksmanship-web
 ```
 
@@ -126,6 +125,27 @@ browser_snapshot  # Verify game started
 | `src/brinksmanship/models/state.py` | GameState with cooperation_surplus |
 | `src/brinksmanship/webapp/static/css/style.css` | CSS themes |
 | `scenarios/*.json` | Scenario definitions |
+
+---
+
+## Git Workflow
+
+**After pushing, always check CI/CD status:**
+```bash
+# Check all recent workflow runs
+gh run list --limit 5
+
+# Watch a specific run
+gh run watch
+
+# View logs for a failed run
+gh run view <run-id> --log
+```
+
+**Push and monitor:**
+```bash
+git push origin main && gh run list --limit 3
+```
 
 ---
 

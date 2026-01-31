@@ -100,6 +100,7 @@ traces/
 # Documentation (not needed in container)
 *.md
 !README.md
+!GAME_MANUAL.md
 
 # Fly.io
 fly.toml
