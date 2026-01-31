@@ -10,6 +10,14 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
+# Check if claude_agent_sdk is available (requires Claude Code CLI)
+try:
+    import claude_agent_sdk  # noqa: F401
+
+    HAS_CLAUDE_SDK = True
+except ImportError:
+    HAS_CLAUDE_SDK = False
+
 from brinksmanship.models.actions import Action, ActionType
 from brinksmanship.models.state import GameState
 from brinksmanship.opponents.historical import HistoricalPersona
@@ -66,8 +74,11 @@ class TestConversationHistory:
     """Tests for conversation history accumulation."""
 
     @pytest.mark.asyncio
+    @pytest.mark.skipif(not HAS_CLAUDE_SDK, reason="Requires Claude Code CLI with claude_agent_sdk")
     async def test_conversation_turn_count_increments(self):
         """Test that conversation turn count increments on each query."""
+        from claude_agent_sdk import AssistantMessage, TextBlock
+
         persona = HistoricalPersona("nixon", is_player_a=True)
 
         # Create a mock client that simulates the SDK behavior
@@ -77,8 +88,6 @@ class TestConversationHistory:
 
         # Mock the response iterator to yield a simple response
         async def mock_receive():
-            from claude_agent_sdk import AssistantMessage, TextBlock
-
             msg = MagicMock(spec=AssistantMessage)
             msg.content = [MagicMock(spec=TextBlock, text='{"selected_action": "De-escalate", "reasoning": "test"}')]
             yield msg
