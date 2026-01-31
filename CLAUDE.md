@@ -15,10 +15,21 @@
 
 ## Code Style
 
-- All imports at top of file (stdlib, third-party, local)
+- **All imports at top of file** - group in order: stdlib, third-party, local. Never import inside functions or methods.
 - No try/except unless you have meaningful recovery
 - No defensive programming against impossible states
 - Trust internal code; only validate at system boundaries
+
+---
+
+## Task Execution with Barriers
+
+When implementing code according to a plan with commit barriers (see `tasks/INDEX.md`):
+
+1. **Commit after each barrier** - Don't wait until the end. Each barrier is a stable checkpoint.
+2. **Update task docs** - Check off completed items in task .md files as you work
+3. **Run tests before commit** - `uv run pytest` must pass at each barrier
+4. **Use barrier commit messages** - Format: `"Barrier N: Description (T01, T02, ...)"`
 
 ---
 

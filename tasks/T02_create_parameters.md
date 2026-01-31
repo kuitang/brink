@@ -13,20 +13,22 @@ Create a single source of truth for all game balance constants. This file must b
 - None (foundation task)
 
 ## Acceptance Criteria
-- [ ] File `src/brinksmanship/parameters.py` exists
-- [ ] All parameters from GAME_MANUAL.md Appendix C are defined
-- [ ] Each parameter has docstring with:
+- [x] File `src/brinksmanship/parameters.py` exists
+- [x] All parameters from GAME_MANUAL.md Appendix C are defined
+- [x] Each parameter has docstring with:
   - Current value
   - Analysis of what it does
   - Tuning guidance (what to change if X happens)
   - Related parameters that interact with it
-- [ ] Parameters are grouped by category:
+- [x] Parameters are grouped by category:
   - Surplus Creation
   - Exploitation (including streak protection)
   - Risk
   - Settlement (including escalating rejection)
-- [ ] File can be imported without circular dependencies
-- [ ] Constants use SCREAMING_SNAKE_CASE naming
+- [x] File can be imported without circular dependencies
+- [x] Constants use SCREAMING_SNAKE_CASE naming
+
+**Note**: Also added helper functions: `calculate_surplus_for_streak()`, `calculate_max_theoretical_surplus()`, `calculate_rejection_penalty()`, `calculate_total_rejection_risk()`
 
 ## Parameters to Include
 
