@@ -71,7 +71,7 @@ class RealGameEngine:
             game_id = f"{user_id}_{scenario_id}_{random.randint(10000, 99999)}"
 
         scenario = self._scenario_repo.get_scenario(scenario_id)
-        scenario_name = scenario.get("name", scenario_id) if scenario else scenario_id
+        scenario_name = scenario.get("name", scenario.get("title", scenario_id)) if scenario else scenario_id
 
         # Map A/B state to player/opponent based on which side the player is
         if player_is_a:

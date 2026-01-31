@@ -10,11 +10,11 @@ def create_game_record(app, user_id):
         record = GameRecord(
             game_id="test-game",
             user_id=user_id,
-            scenario_id="cuban-missile-crisis",
+            scenario_id="cuban_missile_crisis",
             opponent_type="tit-for-tat",
         )
         record.state = {
-            "scenario_id": "cuban-missile-crisis",
+            "scenario_id": "cuban_missile_crisis",
             "scenario_name": "Cuban Missile Crisis",
             "opponent_type": "tit-for-tat",
             "turn": 1,
@@ -63,16 +63,17 @@ def test_game_page_renders(auth_client, app, user):
 
 
 def test_game_page_shows_status_bar(auth_client, app, user):
-    """Test game page shows status bar."""
+    """Test game page shows status bar (Crisis Status)."""
     create_game_record(app, user)
 
     response = auth_client.get("/game/test-game")
     assert response.status_code == 200
-    assert b"Position" in response.data
-    assert b"Resources" in response.data
+    # Check for current UI elements
+    assert b"Crisis Status" in response.data
     assert b"Risk Level" in response.data
     assert b"Cooperation" in response.data
     assert b"Stability" in response.data
+    assert b"Surplus" in response.data
 
 
 def test_game_page_shows_actions(auth_client, app, user):
@@ -115,8 +116,8 @@ def test_submit_action_htmx(auth_client, app, user):
         headers={"HX-Request": "true"},
     )
     assert response.status_code == 200
-    # Should return partial HTML
-    assert b"status-bar" in response.data
+    # Should return partial HTML with game board components
+    assert b"game-history-pane" in response.data
 
 
 def test_game_over_page(auth_client, app, user):
@@ -125,7 +126,7 @@ def test_game_over_page(auth_client, app, user):
         record = GameRecord(
             game_id="finished-game",
             user_id=user,  # user is now the user_id directly
-            scenario_id="cuban-missile-crisis",
+            scenario_id="cuban_missile_crisis",
             opponent_type="tit-for-tat",
             is_finished=True,
             ending_type="natural",

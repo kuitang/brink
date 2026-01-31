@@ -47,7 +47,7 @@ def test_create_game(auth_client, app):
     response = auth_client.post(
         "/new",
         data={
-            "scenario_id": "cuban-missile-crisis",
+            "scenario_id": "cuban_missile_crisis",
             "opponent_type": "tit-for-tat",
         },
         follow_redirects=True,

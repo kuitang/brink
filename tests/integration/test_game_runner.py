@@ -390,7 +390,7 @@ class TestIntegration:
             assert results.aggregate["total_games"] == 60  # 6 pairings * 10 games
 
             # Verify each pairing has valid stats (not checking balance - that's a separate concern)
-            for pairing_key, stats in results.pairings.items():
+            for _pairing_key, stats in results.pairings.items():
                 assert stats.total_games == 10
                 assert 0 <= stats.win_rate_a <= 1
                 assert 0 <= stats.win_rate_b <= 1

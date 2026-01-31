@@ -381,7 +381,7 @@ class TestDDBurnsSurplus:
 
         Risk changes from two sources:
         1. Matrix delta (PD DD): risk bounds (1.8, 2.2), midpoint 2.0, scaled by act multiplier
-        2. Surplus effect: DD_RISK_INCREASE = 1.8 (not scaled)
+        2. Surplus effect: DD_RISK_INCREASE = 1.0 (not scaled)
 
         The act multiplier varies by turn:
         - Act I (turns 1-4): 0.7
@@ -400,8 +400,8 @@ class TestDDBurnsSurplus:
         # DD should increase risk significantly (matrix + surplus effect)
         # We verify it increased, not the exact amount since matrix deltas vary
         assert engine.state.risk_level > risk_before_dd
-        # With DD_RISK_INCREASE of 1.8 plus matrix delta, should increase by at least 1.5
-        assert engine.state.risk_level > risk_before_dd + 1.5
+        # With DD_RISK_INCREASE of 1.0 plus matrix delta, should increase by at least 0.8
+        assert engine.state.risk_level > risk_before_dd + 0.8
 
 
 # =============================================================================
@@ -499,7 +499,7 @@ class TestMutualDestructionGivesZeroZero:
         engine.state.risk_level = 9.5
 
         # DD should push risk to 10 and trigger mutual destruction
-        # DD adds DD_RISK_INCREASE (1.8) which exceeds 10
+        # DD adds DD_RISK_INCREASE (1.0) which pushes risk to 10+
         result = engine.submit_actions(competitive_action, competitive_action)
 
         assert result.success is True
@@ -817,8 +817,8 @@ class TestParameterValues:
         assert CC_RISK_REDUCTION == 0.5
 
     def test_dd_risk_increase_value(self):
-        """Verify DD_RISK_INCREASE is 1.8 as documented."""
-        assert DD_RISK_INCREASE == 1.8
+        """Verify DD_RISK_INCREASE is 1.0 as documented in GAME_MANUAL.md."""
+        assert DD_RISK_INCREASE == 1.0
 
     def test_surplus_calculation_formula(self):
         """Verify surplus calculation formula from GAME_MANUAL.md."""

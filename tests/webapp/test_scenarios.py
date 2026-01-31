@@ -18,7 +18,7 @@ def test_scenarios_index_shows_scenarios(client):
 
 def test_scenario_detail_renders(client):
     """Test scenario detail page renders."""
-    response = client.get("/scenarios/cuban-missile-crisis")
+    response = client.get("/scenarios/cuban_missile_crisis")
     assert response.status_code == 200
     assert b"Cuban Missile Crisis" in response.data
     assert b"Cold War" in response.data
@@ -67,5 +67,5 @@ def test_scenarios_public_access(client):
     assert response.status_code == 200
 
     # Detail should be public
-    response = client.get("/scenarios/cuban-missile-crisis")
+    response = client.get("/scenarios/cuban_missile_crisis")
     assert response.status_code == 200

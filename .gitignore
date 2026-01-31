@@ -89,6 +89,7 @@ tmp/
 src/brinksmanship/webapp/templates/generated/
 .playwright-mcp/
 
-# Playtest results (local data)
+# Playtest results and work directories (local data)
 playtest_results/
+playtest_work/
 traces/
