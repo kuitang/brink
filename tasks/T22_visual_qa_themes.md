@@ -15,16 +15,18 @@ Perform visual quality assurance on all theme implementations by capturing scree
 - T19 (Webapp scorecard - game over page must be complete)
 
 ## Acceptance Criteria
-- [ ] Screenshots captured for all 5 themes: default, cold-war, renaissance, byzantine, corporate
-- [ ] Each theme tested on 6 pages: login, lobby, new game, game play, game over, manual
-- [ ] Total of 30 screenshots (5 themes x 6 pages)
-- [ ] All themes maintain text readability (no contrast issues)
-- [ ] No visual bugs: broken layouts, missing styles, overlapping elements
-- [ ] Theme colors apply consistently across all components
-- [ ] Accent colors visible on interactive elements (buttons, links)
-- [ ] Surplus display and scorecard render correctly in all themes
-- [ ] Screenshots saved with naming convention: `{theme}-{page}.png`
-- [ ] Visual comparison confirms each theme is distinct
+- [x] Screenshots captured for all 5 themes: default, cold-war, renaissance, byzantine, corporate
+- [x] Each theme tested on 6 pages: login, lobby, new game, game play, game over, manual
+- [x] Total of 30 screenshots (5 themes x 6 pages)
+- [x] All themes maintain text readability (no contrast issues)
+- [x] No visual bugs: broken layouts, missing styles, overlapping elements
+- [x] Theme colors apply consistently across all components
+- [x] Accent colors visible on interactive elements (buttons, links)
+- [x] Surplus display and scorecard render correctly in all themes
+- [x] Screenshots saved with naming convention: `{theme}-{page}.png`
+- [x] Visual comparison confirms each theme is distinct
+
+**Script**: `scripts/visual_qa_themes.py` - automated Playwright screenshot capture
 
 ## Files to Modify
 - Create `scripts/visual_qa_themes.py` - Playwright test script for automated screenshots
