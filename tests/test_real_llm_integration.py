@@ -39,7 +39,7 @@ def scenario_repo():
 @pytest.fixture
 def cuban_missile_game(scenario_repo):
     """Create a Cuban Missile Crisis game."""
-    return create_game("cuban-missile-crisis", scenario_repo)
+    return create_game("cuban_missile_crisis", scenario_repo)
 
 
 class TestRealLLMOpponentChooseAction:
@@ -69,7 +69,7 @@ class TestRealLLMOpponentChooseAction:
         game = cuban_missile_game
 
         # Get scenario role information for Player B (the opponent)
-        scenario = scenario_repo.get_scenario("cuban-missile-crisis")
+        scenario = scenario_repo.get_scenario("cuban_missile_crisis")
         role_name = scenario.get("player_b_role", "Premier Khrushchev")
         role_description = scenario.get("player_b_description", "You are the Soviet leader.")
 
@@ -102,7 +102,7 @@ class TestRealLLMOpponentChooseAction:
         game = cuban_missile_game
 
         # Get scenario role information for Player B (the opponent)
-        scenario = scenario_repo.get_scenario("cuban-missile-crisis")
+        scenario = scenario_repo.get_scenario("cuban_missile_crisis")
         role_name = scenario.get("player_b_role", "Premier Khrushchev")
         role_description = scenario.get("player_b_description", "You are the Soviet leader.")
 
@@ -168,7 +168,7 @@ class TestRealLLMFullGameFlow:
         game = cuban_missile_game
 
         # Get scenario role information
-        scenario = scenario_repo.get_scenario("cuban-missile-crisis")
+        scenario = scenario_repo.get_scenario("cuban_missile_crisis")
         role_name = scenario.get("player_b_role", "Premier Khrushchev")
         role_description = scenario.get("player_b_description", "You are the Soviet leader.")
 
