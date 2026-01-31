@@ -373,7 +373,81 @@ Before finalizing parameters, run these simulations (see GAME_MANUAL.md Appendix
 4. **Full Balance Validation**: Verify no dominant strategy
 5. **Parameter Sweep**: Grid search for optimal configuration
 
-### 5.2 Scenario Validation
+### 5.4 LLM Playtest Infrastructure
+
+Comprehensive playtesting with LLM-based opponents. Each scenario includes pre-defined
+historical personas for both sides.
+
+**Scenario Persona Definitions:**
+
+Each scenario JSON includes a `personas` field defining appropriate historical figures:
+```json
+{
+  "scenario_id": "cuban_missile_crisis_1962",
+  "personas": {
+    "side_a": {
+      "persona": "nixon",
+      "role_name": "American President",
+      "role_description": "Leader of the United States..."
+    },
+    "side_b": {
+      "persona": "khrushchev",
+      "role_name": "Soviet Premier",
+      "role_description": "Leader of the Soviet Union..."
+    }
+  }
+}
+```
+
+**Available Historical Personas:**
+- Cold War: nixon, kissinger, khrushchev
+- European Diplomacy: bismarck, metternich, richelieu
+- Tech Industry: gates, jobs
+- Byzantine/Roman: theodora, livia
+
+**Playtest Matchups (3x3 per scenario):**
+1. Historical A vs Historical B (period-appropriate figures)
+2. Smart Rational Player vs Historical B
+3. Historical A vs Smart Rational Player
+
+**Smart Rational Player:**
+- Opus 4.5 with explicit game-theoretic knowledge
+- Understands surplus mechanics (CC creates, CD captures, DD burns)
+- Knows risk management principles
+- Makes settlement decisions based on position and risk
+
+**Running Playtests:**
+```bash
+# Full playtest (10 scenarios × 3 matchups × 3 games = 90 games)
+./scripts/playtest/driver.sh --games-per-matchup 3
+
+# Quick test with specific scenarios
+./scripts/playtest/driver.sh --games-per-matchup 1 --scenarios cuban_missile_crisis
+
+# Resume interrupted playtest (checks work directory for completed jobs)
+./scripts/playtest/driver.sh --work-dir playtest_work
+```
+
+**Work Directory Structure:**
+```
+playtest_work/
+├── jobs/           # Job definitions
+│   └── all_jobs.txt
+├── results/        # JSON results per matchup
+│   ├── cuban_missile_crisis__hist_vs_hist.json
+│   ├── cuban_missile_crisis__smart_vs_hist_b.json
+│   └── ...
+└── logs/           # Per-job logs
+```
+
+**Report Generation:**
+```bash
+uv run python scripts/playtest/generate_report.py \
+    --work-dir playtest_work \
+    --output docs/COMPREHENSIVE_PLAYTEST_REPORT.md
+```
+
+### 5.5 Scenario Validation
 
 ```bash
 uv run python scripts/validate_scenario.py scenarios/cuban_missile_crisis.json
@@ -385,6 +459,7 @@ Checks:
 - Valid act/turn structure
 - All branch targets exist
 - Balance simulation passes
+- **Personas defined for both sides**
 
 ---
 

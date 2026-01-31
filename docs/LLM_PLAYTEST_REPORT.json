@@ -1,0 +1,42 @@
+{
+  "timestamp": "2026-01-31T01:53:27.989147",
+  "total_games": 2,
+  "scenarios": [
+    "cuban_missile_crisis"
+  ],
+  "personas": [
+    "nixon"
+  ],
+  "games": [
+    {
+      "scenario_id": "cuban_missile_crisis",
+      "persona_name": "nixon",
+      "opponent_name": "Tit for Tat",
+      "winner": "opponent",
+      "ending_type": "settlement",
+      "turns_played": 7,
+      "vp_persona": 45,
+      "vp_opponent": 55,
+      "settlement_proposed": true,
+      "settlement_accepted": true,
+      "cooperation_final": 10.0,
+      "risk_final": 0.0,
+      "error": null
+    },
+    {
+      "scenario_id": "cuban_missile_crisis",
+      "persona_name": "nixon",
+      "opponent_name": "Tit for Tat",
+      "winner": "opponent",
+      "ending_type": "settlement",
+      "turns_played": 7,
+      "vp_persona": 45,
+      "vp_opponent": 55,
+      "settlement_proposed": true,
+      "settlement_accepted": true,
+      "cooperation_final": 10.0,
+      "risk_final": 0.0,
+      "error": null
+    }
+  ]
+}
