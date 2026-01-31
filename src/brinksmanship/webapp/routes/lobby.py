@@ -2,7 +2,7 @@
 
 import uuid
 
-from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
+from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
 from ..extensions import db
@@ -77,17 +77,7 @@ def new_game():
             flash("Please select a scenario and opponent.", "error")
             return redirect(url_for("lobby.new_game"))
 
-        # Check if LLM opponent is selected but Claude credentials not available
-        if opponent_type in LLM_OPPONENT_TYPES and not current_app.config.get("CLAUDE_API_AVAILABLE"):
-            flash(
-                f"LLM-based opponent '{opponent_type}' requires Claude Code authentication. "
-                "Please use a deterministic opponent (Tit For Tat, Nash Calculator, etc.) "
-                "or contact the administrator to configure Claude OAuth credentials.",
-                "error",
-            )
-            return redirect(url_for("lobby.new_game"))
-
-        # Create game via service
+        # Create game via service (Claude is verified working at startup)
         game_id = str(uuid.uuid4())[:8]
         state = game_service.create_game(
             scenario_id=scenario_id,
@@ -111,14 +101,13 @@ def new_game():
 
         return redirect(url_for("game.play", game_id=game_id))
 
-    # GET - show new game form
+    # GET - show new game form (Claude is verified working at startup)
     scenarios = game_service.get_scenarios()
     opponent_types = game_service.get_opponent_types()
-    claude_api_available = current_app.config.get("CLAUDE_API_AVAILABLE", False)
 
     return render_template(
         "pages/new_game.html",
         scenarios=scenarios,
         opponent_types=opponent_types,
-        claude_api_available=claude_api_available,
+        claude_api_available=True,  # Always True - app won't start without it
     )

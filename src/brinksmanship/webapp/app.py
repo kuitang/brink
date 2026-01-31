@@ -31,7 +31,7 @@ def seed_db():
 
 
 def check_claude_api_credentials():
-    """Check if Claude API credentials are available.
+    """Check if Claude API credentials are available and test the connection.
 
     The claude-agent-sdk spawns Claude Code CLI which uses OAuth authentication.
     Claude Code checks for credentials in this order:
@@ -41,37 +41,60 @@ def check_claude_api_credentials():
     If neither is available, LLM-based opponents will fail. Deterministic opponents still work.
 
     Returns:
-        bool: True if credentials are configured, False otherwise
+        bool: True if credentials are configured and working, False otherwise
     """
     from pathlib import Path
 
     # Check for OAuth token env var (server/CI deployment)
     oauth_token = os.environ.get("CLAUDE_CODE_OAUTH_TOKEN")
+    credentials_path = Path.home() / ".claude" / ".credentials.json"
+
     if oauth_token:
         masked = oauth_token[:20] + "..." if len(oauth_token) > 20 else "***"
         logger.info(f"CLAUDE_CODE_OAUTH_TOKEN is set ({masked})")
-        return True
-
-    # Check for credentials file (local development)
-    credentials_path = Path.home() / ".claude" / ".credentials.json"
-    if credentials_path.exists():
+    elif credentials_path.exists():
         logger.info(f"Claude credentials file found at {credentials_path}")
-        return True
+    else:
+        logger.warning(
+            "Claude Code OAuth credentials not found! "
+            "LLM-based opponents (historical personas, custom) will not work. "
+            "Deterministic opponents (tit_for_tat, nash_calculator, etc.) will still work. "
+            "For local dev: run 'claude login' or 'claude setup-token'. "
+            "For Fly.io: set CLAUDE_CODE_OAUTH_TOKEN secret."
+        )
+        return False
 
-    logger.warning(
-        "Claude Code OAuth credentials not found! "
-        "LLM-based opponents (historical personas, custom) will not work. "
-        "Deterministic opponents (tit_for_tat, nash_calculator, etc.) will still work. "
-        "For local dev: run 'claude login' or 'claude setup-token'. "
-        "For Fly.io: set CLAUDE_CODE_OAUTH_TOKEN secret."
+    # Power-on test: verify Claude CLI actually works using subprocess
+    # No exception handling - let it crash with full traceback if broken
+    import subprocess
+
+    logger.info("Testing Claude CLI with 'say hi' prompt...")
+    result = subprocess.run(
+        ["claude", "-p", "Say hello in one word", "--output-format", "text"],
+        capture_output=True,
+        text=True,
+        timeout=30,
     )
-    return False
+    if result.returncode != 0:
+        logger.error(f"Claude CLI FAILED with exit code {result.returncode}")
+        logger.error(f"stdout: {result.stdout}")
+        logger.error(f"stderr: {result.stderr}")
+        raise RuntimeError(f"Claude CLI failed: {result.stderr}")
+
+    response = result.stdout.strip()[:50]
+    logger.info(f"Claude CLI power-on test SUCCESS: '{response}...'")
+    return True
 
 
 def create_app(config_class=Config):
     """Create and configure the Flask application."""
-    # Check API credentials at startup
-    has_api_key = check_claude_api_credentials()
+    # Check API credentials at startup - FAIL HARD if not working
+    has_claude = check_claude_api_credentials()
+    if not has_claude:
+        raise RuntimeError(
+            "Claude CLI is not working! Cannot start webapp without LLM support. "
+            "Check Claude Code installation and CLAUDE_CODE_OAUTH_TOKEN secret."
+        )
 
     app = Flask(
         __name__,
@@ -80,8 +103,8 @@ def create_app(config_class=Config):
     )
     app.config.from_object(config_class)
 
-    # Store API availability for routes to check
-    app.config["CLAUDE_API_AVAILABLE"] = has_api_key
+    # Claude is confirmed working
+    app.config["CLAUDE_API_AVAILABLE"] = True
 
     # Ensure instance folder exists
     config_class.INSTANCE_PATH.mkdir(parents=True, exist_ok=True)
