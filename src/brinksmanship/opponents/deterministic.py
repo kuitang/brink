@@ -13,18 +13,12 @@ from __future__ import annotations
 import random
 from typing import TYPE_CHECKING, ClassVar
 
-from brinksmanship.llm import generate_json
 from brinksmanship.models.actions import Action, ActionType
 from brinksmanship.models.state import GameState
 from brinksmanship.opponents.base import (
     Opponent,
     SettlementProposal,
     SettlementResponse,
-)
-from brinksmanship.prompts import (
-    SETTLEMENT_EVALUATION_PROMPT,
-    SETTLEMENT_EVALUATION_SCHEMA,
-    SETTLEMENT_EVALUATION_SYSTEM_PROMPT,
 )
 
 if TYPE_CHECKING:
@@ -34,13 +28,15 @@ if TYPE_CHECKING:
 class DeterministicOpponent(Opponent):
     """Base class for deterministic opponents.
 
-    Strategic actions are purely deterministic (testable, reproducible).
-    Settlement evaluation uses LLM with persona-specific prompts.
+    Strategic actions and settlement evaluation are purely deterministic
+    (testable, reproducible). No LLM calls required.
     """
 
-    # Subclasses should override these
-    settlement_persona: ClassVar[str] = "A rational game theorist"
-    default_settlement_threshold: ClassVar[float] = 0.0  # VP difference threshold
+    # Subclasses can override these for settlement evaluation
+    # Generous thresholds to encourage settlement (target >= 70%)
+    settlement_threshold: ClassVar[float] = -15.0  # Accept if offer within 15 VP of fair
+    counter_threshold: ClassVar[float] = -25.0  # Counter if within 25 VP
+    counter_adjustment: ClassVar[float] = 0.0  # Counter at fair value
 
     def __init__(self, name: str = "Opponent"):
         """Initialize the deterministic opponent.
@@ -125,10 +121,9 @@ class DeterministicOpponent(Opponent):
         state: GameState,
         is_final_offer: bool,
     ) -> SettlementResponse:
-        """Evaluate a settlement proposal using LLM with persona prompt.
+        """Evaluate a settlement proposal using simple deterministic rules.
 
-        Even deterministic opponents use LLM for settlement evaluation
-        because the argument text requires language understanding.
+        Simple policy: Accept if offer is within threshold of fair value.
 
         Args:
             proposal: The settlement proposal to evaluate
@@ -138,54 +133,28 @@ class DeterministicOpponent(Opponent):
         Returns:
             Response to the proposal
         """
-        my_position = self._get_my_position(state)
-        opponent_position = self._get_opponent_position(state)
-        my_resources = self._get_my_resources(state)
         my_vp = 100 - proposal.offered_vp
-
-        # Format the evaluation prompt
-        prompt = SETTLEMENT_EVALUATION_PROMPT.format(
-            turn_number=state.turn,
-            risk_level=state.risk_level,
-            cooperation_score=state.cooperation_score,
-            your_position=my_position,
-            opponent_position=opponent_position,
-            your_resources=my_resources,
-            offered_vp=proposal.offered_vp,
-            your_vp=my_vp,
-            argument=proposal.argument,
-            is_final_offer="Yes" if is_final_offer else "No",
-            persona_description=self.settlement_persona,
+        fair_vp = self.get_position_fair_vp(
+            state, self._is_player_a if self._is_player_a is not None else False
         )
 
-        # Call LLM with structured output
-        response = await generate_json(
-            prompt=prompt,
-            system_prompt=SETTLEMENT_EVALUATION_SYSTEM_PROMPT,
-            schema=SETTLEMENT_EVALUATION_SCHEMA,
-        )
+        # Simple rule: accept if offer is at least (fair - threshold)
+        vp_diff = my_vp - fair_vp
 
-        # Parse response
-        action = response.get("action", "REJECT").upper()
-
-        if action == "ACCEPT":
+        if vp_diff >= self.settlement_threshold:
             return SettlementResponse(action="accept")
-        elif action == "COUNTER" and not is_final_offer:
-            counter_vp = response.get("counter_vp")
-            counter_arg = response.get("counter_argument", "")
-            if counter_vp is not None:
-                # Ensure counter_vp is valid
-                counter_vp = max(20, min(80, counter_vp))
-                return SettlementResponse(
-                    action="counter",
-                    counter_vp=counter_vp,
-                    counter_argument=counter_arg[:500] if counter_arg else None,
-                )
-        # Default to reject
-        return SettlementResponse(
-            action="reject",
-            rejection_reason=response.get("rejection_reason", "Offer rejected."),
-        )
+        elif not is_final_offer and vp_diff >= self.counter_threshold:
+            counter_vp = max(20, min(80, int(fair_vp + self.counter_adjustment)))
+            return SettlementResponse(
+                action="counter",
+                counter_vp=counter_vp,
+                counter_argument="Consider this fair counter-offer.",
+            )
+        else:
+            return SettlementResponse(
+                action="reject",
+                rejection_reason="This offer is unacceptable.",
+            )
 
     async def propose_settlement(self, state: GameState) -> SettlementProposal | None:
         """Optionally propose settlement based on strategy.
@@ -218,13 +187,13 @@ class NashCalculator(DeterministicOpponent):
     - In Chicken: mixed strategy, but favor holding firm when ahead
     - In Stag Hunt: risk-dominant choice (defect/hare) unless cooperation is high
 
-    Settlement: Accepts if offer >= position-fair value
+    Settlement: Accepts fair offers (within 5 VP of position-fair value)
     """
 
-    settlement_persona: ClassVar[str] = """A pure game theorist who evaluates
-    offers based on expected value calculations. Accepts fair offers but
-    recognizes that continued play has variance costs. Values predictability
-    and rational outcomes over emotional considerations."""
+    # Nash: accepts fair offers, values rationality
+    settlement_threshold: ClassVar[float] = -5.0  # Accept if within 5 VP of fair
+    counter_threshold: ClassVar[float] = -15.0  # Counter if within 15 VP
+    counter_adjustment: ClassVar[float] = 0.0  # Counter at fair value
 
     def __init__(self) -> None:
         """Initialize NashCalculator opponent."""
@@ -250,12 +219,18 @@ class NashCalculator(DeterministicOpponent):
         my_position = self._get_my_position(state)
         opponent_position = self._get_opponent_position(state)
 
-        # Risk-aware Nash: at very high risk, survival matters more
+        # Risk-aware Nash: at high risk, survival probability matters
+        # Start de-escalating at risk 6, always de-escalate at risk 8+
         if state.risk_level >= 8:
-            # Mutual destruction is worst outcome - consider de-escalation
             coop_actions = self._get_cooperative_actions(available_actions)
             if coop_actions:
                 return random.choice(coop_actions)
+        elif state.risk_level >= 6:
+            # Elevated risk: 60% chance to de-escalate
+            if random.random() < 0.6:
+                return self._select_random_from_type(
+                    available_actions, ActionType.COOPERATIVE
+                )
 
         # Standard Nash reasoning: defection is typically dominant or risk-dominant
         # Position advantage reinforces this
@@ -266,8 +241,8 @@ class NashCalculator(DeterministicOpponent):
             )
         else:
             # Behind: still defect (Nash), but less aggressively
-            # 70% competitive, 30% cooperative (hedge)
-            if random.random() < 0.7:
+            # 60% competitive, 40% cooperative (hedge)
+            if random.random() < 0.6:
                 return self._select_random_from_type(
                     available_actions, ActionType.COMPETITIVE
                 )
@@ -277,9 +252,9 @@ class NashCalculator(DeterministicOpponent):
                 )
 
     async def propose_settlement(self, state: GameState) -> SettlementProposal | None:
-        """Propose settlement when position advantage is clear.
+        """Propose settlement when position advantage is clear or risk is high.
 
-        Nash reasoning: lock in gains when ahead.
+        Nash reasoning: lock in gains when ahead, or preserve value at high risk.
         """
         if state.turn <= 4 or state.stability <= 2:
             return None
@@ -287,8 +262,12 @@ class NashCalculator(DeterministicOpponent):
         my_position = self._get_my_position(state)
         opponent_position = self._get_opponent_position(state)
 
-        # Propose when clearly ahead and risk is non-trivial
-        if my_position > opponent_position + 1.0 and state.risk_level >= 4:
+        # Propose when: (1) clearly ahead, or (2) risk is elevated
+        should_propose = (
+            (my_position > opponent_position + 1.0 and state.risk_level >= 3) or
+            (state.risk_level >= 5)  # High risk: propose to preserve value
+        )
+        if should_propose:
             fair_vp = self.get_position_fair_vp(
                 state, self._is_player_a if self._is_player_a is not None else False
             )
@@ -315,13 +294,13 @@ class SecuritySeeker(DeterministicOpponent):
     - Escalate only in response to opponent's competitive actions
     - De-escalate when opponent cooperates
 
-    Settlement: Prefers settlement, accepts generous offers
+    Settlement: Strongly prefers settlement, accepts unfavorable offers for peace
     """
 
-    settlement_persona: ClassVar[str] = """A security-focused actor who prefers
-    stability over gains. Worries about spiral dynamics and mutual destruction.
-    Willing to accept slightly unfavorable terms to achieve peace. Becomes
-    defensive when threatened but doesn't initiate aggression."""
+    # Security seeker: values stability, accepts even unfavorable offers
+    settlement_threshold: ClassVar[float] = -15.0  # Accept up to 15 VP below fair
+    counter_threshold: ClassVar[float] = -25.0  # Counter even bad offers
+    counter_adjustment: ClassVar[float] = -5.0  # Counter below fair (concedes)
 
     def __init__(self) -> None:
         """Initialize SecuritySeeker opponent."""
@@ -370,15 +349,15 @@ class SecuritySeeker(DeterministicOpponent):
             )
 
     async def propose_settlement(self, state: GameState) -> SettlementProposal | None:
-        """Propose settlement when risk is elevated.
+        """Propose settlement proactively to ensure stability.
 
-        Security seekers value stability - propose when dangerous.
+        Security seekers strongly value stability - propose early and often.
         """
         if state.turn <= 4 or state.stability <= 2:
             return None
 
-        # Propose when risk is concerning
-        if state.risk_level >= 5:
+        # Propose when risk is even slightly elevated, or after several turns
+        if state.risk_level >= 3 or state.turn >= 7:
             fair_vp = self.get_position_fair_vp(
                 state, self._is_player_a if self._is_player_a is not None else False
             )
@@ -406,13 +385,13 @@ class Opportunist(DeterministicOpponent):
     - Defect when ahead in position
     - Cooperate tactically to set up exploitation
 
-    Settlement: Rejects unless dominant, exploits weak arguments
+    Settlement: Only accepts if offer is clearly advantageous
     """
 
-    settlement_persona: ClassVar[str] = """A calculating opportunist who sees
-    negotiation as another arena for advantage. Rejects offers that don't
-    reflect dominance. Looks for weakness in arguments to exploit. Only
-    accepts settlements that lock in clear victories."""
+    # Opportunist: demanding, only accepts advantageous offers
+    settlement_threshold: ClassVar[float] = 5.0  # Only accept if 5+ VP above fair
+    counter_threshold: ClassVar[float] = -5.0  # Counter if close to fair
+    counter_adjustment: ClassVar[float] = 10.0  # Counter well above fair (demands)
 
     def __init__(self) -> None:
         """Initialize Opportunist opponent."""
@@ -436,6 +415,19 @@ class Opportunist(DeterministicOpponent):
         my_position = self._get_my_position(state)
         opponent_position = self._get_opponent_position(state)
 
+        # Risk-aware: even opportunists fear mutual destruction
+        if state.risk_level >= 7:
+            # Very high risk: survival mode
+            return self._select_random_from_type(
+                available_actions, ActionType.COOPERATIVE
+            )
+        elif state.risk_level >= 5:
+            # Elevated risk: 40% chance to de-escalate
+            if random.random() < 0.4:
+                return self._select_random_from_type(
+                    available_actions, ActionType.COOPERATIVE
+                )
+
         # Check if we're ahead
         position_advantage = my_position - opponent_position
 
@@ -456,8 +448,8 @@ class Opportunist(DeterministicOpponent):
                 )
         else:
             # Roughly even: probe for weakness
-            # 70% competitive, 30% cooperative (feel out opponent)
-            if random.random() < 0.7:
+            # 60% competitive, 40% cooperative (feel out opponent)
+            if random.random() < 0.6:
                 return self._select_random_from_type(
                     available_actions, ActionType.COMPETITIVE
                 )
@@ -467,9 +459,9 @@ class Opportunist(DeterministicOpponent):
                 )
 
     async def propose_settlement(self, state: GameState) -> SettlementProposal | None:
-        """Propose settlement only when clearly dominant.
+        """Propose settlement when dominant, or at high risk to preserve gains.
 
-        Opportunists only settle to lock in clear victories.
+        Opportunists prefer to lock in victories, but will settle at high risk.
         """
         if state.turn <= 4 or state.stability <= 2:
             return None
@@ -477,8 +469,12 @@ class Opportunist(DeterministicOpponent):
         my_position = self._get_my_position(state)
         opponent_position = self._get_opponent_position(state)
 
-        # Only propose when significantly ahead
-        if my_position > opponent_position + 2.0:
+        # Propose when: (1) significantly ahead, or (2) high risk
+        should_propose = (
+            (my_position > opponent_position + 2.0) or
+            (state.risk_level >= 6 and my_position >= opponent_position)
+        )
+        if should_propose:
             fair_vp = self.get_position_fair_vp(
                 state, self._is_player_a if self._is_player_a is not None else False
             )
@@ -506,13 +502,8 @@ class Erratic(DeterministicOpponent):
     - No consistent response to opponent actions
     - Random settlement behavior
 
-    Settlement: Unpredictable acceptance
+    Settlement: Random acceptance (50% at fair, random threshold)
     """
-
-    settlement_persona: ClassVar[str] = """An unpredictable actor whose
-    decision-making defies rational analysis. May accept or reject based on
-    factors that seem arbitrary. Sometimes generous, sometimes demanding.
-    Decisions feel impulsive rather than calculated."""
 
     def __init__(self) -> None:
         """Initialize Erratic opponent."""
@@ -523,7 +514,8 @@ class Erratic(DeterministicOpponent):
     ) -> Action:
         """Choose action randomly with competitive bias.
 
-        ~40% cooperative, 60% competitive - no strategy, pure chaos.
+        ~40% cooperative, 60% competitive - but erratic actors also
+        have survival instincts at extreme risk.
 
         Args:
             state: Current game state
@@ -532,7 +524,15 @@ class Erratic(DeterministicOpponent):
         Returns:
             The chosen action
         """
-        # 40% cooperative, 60% competitive
+        # Survival instinct at very high risk
+        if state.risk_level >= 8:
+            # 70% chance to cooperate at extreme risk
+            if random.random() < 0.7:
+                return self._select_random_from_type(
+                    available_actions, ActionType.COOPERATIVE
+                )
+
+        # Normal erratic behavior: 40% cooperative, 60% competitive
         if random.random() < 0.4:
             return self._select_random_from_type(
                 available_actions, ActionType.COOPERATIVE
@@ -540,6 +540,35 @@ class Erratic(DeterministicOpponent):
         else:
             return self._select_random_from_type(
                 available_actions, ActionType.COMPETITIVE
+            )
+
+    async def evaluate_settlement(
+        self,
+        proposal: SettlementProposal,
+        state: GameState,
+        is_final_offer: bool,
+    ) -> SettlementResponse:
+        """Evaluate settlement randomly (erratic behavior).
+
+        ~40% accept, ~30% counter, ~30% reject regardless of fairness.
+        """
+        roll = random.random()
+        if roll < 0.4:
+            # 40% chance to accept
+            return SettlementResponse(action="accept")
+        elif roll < 0.7 and not is_final_offer:
+            # 30% chance to counter with random VP
+            counter_vp = random.randint(30, 70)
+            return SettlementResponse(
+                action="counter",
+                counter_vp=counter_vp,
+                counter_argument="Let's try this instead. Or not. Whatever.",
+            )
+        else:
+            # 30% chance to reject
+            return SettlementResponse(
+                action="reject",
+                rejection_reason="I don't like it. Don't ask me why.",
             )
 
     async def propose_settlement(self, state: GameState) -> SettlementProposal | None:
@@ -580,13 +609,13 @@ class TitForTat(DeterministicOpponent):
     - Forgiving: returns to cooperation if opponent does
     - Clear: behavior is predictable and easy to understand
 
-    Settlement: Accepts fair offers from cooperative opponents
+    Settlement: Accepts fair offers, more generous when cooperation is high
     """
 
-    settlement_persona: ClassVar[str] = """A fair-minded reciprocator who
-    values cooperation but won't be exploited. Willing to settle with
-    opponents who have shown good faith. Suspicious of offers from those
-    who have defected. Values reciprocity and fairness in negotiations."""
+    # TitForTat: fair-minded, accepts fair offers
+    settlement_threshold: ClassVar[float] = -5.0  # Accept within 5 VP of fair
+    counter_threshold: ClassVar[float] = -15.0  # Counter if within 15 VP
+    counter_adjustment: ClassVar[float] = 0.0  # Counter at fair value
 
     def __init__(self) -> None:
         """Initialize TitForTat opponent."""
@@ -625,6 +654,46 @@ class TitForTat(DeterministicOpponent):
                 available_actions, ActionType.COMPETITIVE
             )
 
+    async def evaluate_settlement(
+        self,
+        proposal: SettlementProposal,
+        state: GameState,
+        is_final_offer: bool,
+    ) -> SettlementResponse:
+        """Evaluate settlement with cooperation-aware thresholds.
+
+        TitForTat becomes more generous when cooperation has been high.
+        """
+        # Adjust threshold based on cooperation score
+        coop_bonus = max(0, (state.cooperation_score - 5) * 2)  # +2 per point above 5
+        adjusted_threshold = self.settlement_threshold - coop_bonus
+
+        my_vp = 100 - proposal.offered_vp
+        fair_vp = self.get_position_fair_vp(
+            state, self._is_player_a if self._is_player_a is not None else False
+        )
+        vp_diff = my_vp - fair_vp
+
+        # Risk and turn bonuses from parent
+        risk_bonus = max(0, (state.risk_level - 4) * 2)
+        turn_bonus = max(0, (state.turn - 6) * 1)
+        effective_threshold = adjusted_threshold - risk_bonus - turn_bonus
+
+        if vp_diff >= effective_threshold:
+            return SettlementResponse(action="accept")
+        elif not is_final_offer and vp_diff >= self.counter_threshold - risk_bonus:
+            counter_vp = max(20, min(80, int(fair_vp + self.counter_adjustment)))
+            return SettlementResponse(
+                action="counter",
+                counter_vp=counter_vp,
+                counter_argument="We've cooperated well. Let's find a fair middle ground.",
+            )
+        else:
+            return SettlementResponse(
+                action="reject",
+                rejection_reason="This doesn't reflect our mutual cooperation.",
+            )
+
     async def propose_settlement(self, state: GameState) -> SettlementProposal | None:
         """Propose settlement when cooperation has been established.
 
@@ -633,8 +702,12 @@ class TitForTat(DeterministicOpponent):
         if state.turn <= 4 or state.stability <= 2:
             return None
 
-        # Propose when cooperation is high and risk is moderate
-        if state.cooperation_score >= 6 and state.risk_level >= 3:
+        # Propose when: (1) cooperation is good, or (2) after several turns
+        should_propose = (
+            (state.cooperation_score >= 5 and state.risk_level >= 2) or
+            (state.turn >= 8)  # Proactively settle in later game
+        )
+        if should_propose:
             fair_vp = self.get_position_fair_vp(
                 state, self._is_player_a if self._is_player_a is not None else False
             )
@@ -660,14 +733,13 @@ class GrimTrigger(DeterministicOpponent):
     - After any defection: defect forever
     - No forgiveness, no second chances
 
-    Settlement: Never accepts after betrayal
+    Settlement: Very generous when trust intact, never accepts after betrayal
     """
 
-    settlement_persona: ClassVar[str] = """A stern actor who values trust
-    above all. Willing to cooperate and settle fairly with trustworthy
-    opponents. Once betrayed, will never forgive - views any settlement
-    offer after betrayal as an attempt at manipulation. Holds grudges
-    permanently."""
+    # GrimTrigger: generous to trustworthy partners, harsh to betrayers
+    settlement_threshold: ClassVar[float] = -10.0  # Accept up to 10 VP below fair
+    counter_threshold: ClassVar[float] = -20.0  # Counter even unfavorable offers
+    counter_adjustment: ClassVar[float] = 0.0  # Counter at fair value
 
     def __init__(self) -> None:
         """Initialize GrimTrigger opponent."""
@@ -711,7 +783,14 @@ class GrimTrigger(DeterministicOpponent):
             self._triggered = True
 
         if self._triggered:
-            # Betrayed: defect forever
+            # Betrayed, but self-preservation overrides at extreme risk
+            if state.risk_level >= 8:
+                # Survival instinct: 70% de-escalate at extreme risk
+                if random.random() < 0.7:
+                    return self._select_random_from_type(
+                        available_actions, ActionType.COOPERATIVE
+                    )
+            # Otherwise, defect (punishment mode)
             return self._select_random_from_type(
                 available_actions, ActionType.COMPETITIVE
             )
@@ -727,11 +806,22 @@ class GrimTrigger(DeterministicOpponent):
         state: GameState,
         is_final_offer: bool,
     ) -> SettlementResponse:
-        """Evaluate settlement - auto-reject if triggered.
+        """Evaluate settlement - harsh after betrayal, but self-preserving.
 
-        After betrayal, GrimTrigger never accepts settlement.
+        After betrayal, GrimTrigger usually rejects, but will consider
+        settlement at extreme risk to avoid mutual destruction.
         """
         if self._triggered:
+            # Self-preservation: accept fair+ offers at extreme risk
+            if state.risk_level >= 7:
+                my_vp = 100 - proposal.offered_vp
+                fair_vp = self.get_position_fair_vp(
+                    state, self._is_player_a if self._is_player_a is not None else False
+                )
+                # Accept if offer is at least fair (no worse than 5 below fair)
+                if my_vp >= fair_vp - 5:
+                    return SettlementResponse(action="accept")
+            # Otherwise, reject with grudge
             return SettlementResponse(
                 action="reject",
                 rejection_reason=(
@@ -739,7 +829,7 @@ class GrimTrigger(DeterministicOpponent):
                     "No settlement. Only consequences."
                 ),
             )
-        # If not triggered, use normal LLM evaluation
+        # If not triggered, use deterministic evaluation (generous thresholds)
         return await super().evaluate_settlement(proposal, state, is_final_offer)
 
     async def propose_settlement(self, state: GameState) -> SettlementProposal | None:
@@ -754,8 +844,12 @@ class GrimTrigger(DeterministicOpponent):
         if self._triggered:
             return None
 
-        # Propose when cooperation is high
-        if state.cooperation_score >= 7:
+        # Propose when: (1) cooperation is good, or (2) after several turns with trust intact
+        should_propose = (
+            (state.cooperation_score >= 5) or
+            (state.turn >= 8)  # Trust has held for many turns
+        )
+        if should_propose:
             fair_vp = self.get_position_fair_vp(
                 state, self._is_player_a if self._is_player_a is not None else False
             )

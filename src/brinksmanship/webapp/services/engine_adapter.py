@@ -364,6 +364,18 @@ class RealGameEngine:
         engine.state.cooperation_score = float(state.get("cooperation_score", 5))
         engine.state.stability = float(state.get("stability", 5))
 
+        # Sync surplus fields (critical for surplus mechanics to work across turns)
+        engine.state.cooperation_surplus = state.get("cooperation_surplus", 0.0)
+        engine.state.cooperation_streak = state.get("cooperation_streak", 0)
+
+        # Map surplus captured back to A/B based on which side player is
+        if player_is_a:
+            engine.state.surplus_captured_a = state.get("surplus_captured_player", 0.0)
+            engine.state.surplus_captured_b = state.get("surplus_captured_opponent", 0.0)
+        else:
+            engine.state.surplus_captured_b = state.get("surplus_captured_player", 0.0)
+            engine.state.surplus_captured_a = state.get("surplus_captured_opponent", 0.0)
+
         return engine
 
     def _create_opponent(self, state: dict[str, Any]) -> Opponent:

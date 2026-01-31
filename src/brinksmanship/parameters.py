@@ -165,29 +165,32 @@ Tuning:
 Related: CC_RISK_REDUCTION, DD_RISK_INCREASE
 """
 
-DD_RISK_INCREASE = 1.8
+DD_RISK_INCREASE = 1.0
 """Risk level increase on mutual defection (DD outcome).
 
-Current: 1.8
+Current: 1.0
 
 Analysis:
     Mutual defection is DANGEROUS - the stick in the game.
-    - From starting risk 2.0, only 4-5 DDs to hit risk=10 (mutual destruction)
+    - From starting risk 2.0, need 8 DDs to hit risk=10 (mutual destruction)
     - This makes DD the worst outcome for both players (Chicken logic)
     - Mutual destruction = 0 VP for BOTH players (total loss)
 
     Risk progression with sustained mutual defection:
-    - Turn 1: 2.0 -> 3.8
-    - Turn 2: 3.8 -> 5.6
-    - Turn 3: 5.6 -> 7.4
-    - Turn 4: 7.4 -> 9.2
-    - Turn 5: 9.2 -> 10.0 = MUTUAL DESTRUCTION
+    - Turn 1: 2.0 -> 3.0
+    - Turn 2: 3.0 -> 4.0
+    - Turn 3: 4.0 -> 5.0
+    - Turn 4: 5.0 -> 6.0
+    - Turn 5: 6.0 -> 7.0
+    - Turn 6: 7.0 -> 8.0
+    - Turn 7: 8.0 -> 9.0
+    - Turn 8: 9.0 -> 10.0 = MUTUAL DESTRUCTION
 
 Tuning:
     - TARGET: Mutual destruction rate should be 10-20% of games
-    - If MD rate > 20%: decrease toward 1.5
-    - If MD rate < 10%: increase toward 2.0
-    - Current default (1.8) calibrated for ~15-18% MD rate
+    - If MD rate > 20%: decrease toward 0.8
+    - If MD rate < 10%: increase toward 1.2
+    - Reduced from 1.8 to 1.0 to give more time for settlement/de-escalation
     - Remember: MD is 0,0 VP (worst outcome) - players should fear it
 
 Related: DD_BURN_RATE, CC_RISK_REDUCTION

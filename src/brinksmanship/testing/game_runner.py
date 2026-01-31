@@ -25,7 +25,7 @@ from brinksmanship.engine.game_engine import (
 )
 from brinksmanship.models.actions import Action, ActionType
 from brinksmanship.models.state import GameState
-from brinksmanship.opponents.base import Opponent
+from brinksmanship.opponents.base import Opponent, SettlementProposal
 from brinksmanship.storage import get_scenario_repository
 
 if TYPE_CHECKING:
@@ -143,9 +143,17 @@ class GameRunner:
         )
 
         history: list[tuple[str, str]] = []
+        settlement_ending: Optional[GameEnding] = None
 
         while not engine.is_game_over():
             state = engine.get_current_state()
+
+            # Check for settlement opportunities (turn > 4 and stability > 2)
+            if state.turn > 4 and state.stability > 2:
+                settlement_ending = await self._try_settlement(state, engine)
+                if settlement_ending:
+                    break
+
             actions_a = engine.get_available_actions("A")
             actions_b = engine.get_available_actions("B")
 
@@ -170,9 +178,106 @@ class GameRunner:
 
         # Build result
         final_state = engine.get_current_state()
-        ending = engine.get_ending()
+        ending = settlement_ending or engine.get_ending()
 
         return self._build_result(final_state, ending, history)
+
+    async def _try_settlement(
+        self,
+        state: GameState,
+        engine: GameEngine,
+    ) -> Optional[GameEnding]:
+        """Try settlement negotiation between opponents.
+
+        Checks if either opponent wants to propose settlement, then
+        evaluates the proposal.
+
+        Returns:
+            GameEnding if settlement reached, None otherwise
+        """
+        # Check if opponent A wants to propose
+        if hasattr(self.opponent_a, "propose_settlement"):
+            proposal_a = await self.opponent_a.propose_settlement(state)
+            if proposal_a:
+                # A proposes, B evaluates
+                if hasattr(self.opponent_b, "evaluate_settlement"):
+                    response = await self.opponent_b.evaluate_settlement(
+                        proposal_a, state, is_final_offer=False
+                    )
+                    if response.action == "accept":
+                        # Settlement accepted - A's offer to B
+                        vp_b = proposal_a.offered_vp
+                        vp_a = 100 - vp_b
+                        return GameEnding(
+                            ending_type=EndingType.SETTLEMENT,
+                            vp_a=vp_a,
+                            vp_b=vp_b,
+                            turn=state.turn,
+                            description="Settlement accepted",
+                        )
+                    elif response.action == "counter" and response.counter_vp:
+                        # Counter-offer - let A evaluate
+                        counter = SettlementProposal(
+                            offered_vp=response.counter_vp,
+                            argument=response.counter_argument or "",
+                        )
+                        if hasattr(self.opponent_a, "evaluate_settlement"):
+                            counter_response = await self.opponent_a.evaluate_settlement(
+                                counter, state, is_final_offer=True
+                            )
+                            if counter_response.action == "accept":
+                                vp_a = counter.offered_vp
+                                vp_b = 100 - vp_a
+                                return GameEnding(
+                                    ending_type=EndingType.SETTLEMENT,
+                                    vp_a=vp_a,
+                                    vp_b=vp_b,
+                                    turn=state.turn,
+                                    description="Counter-offer accepted",
+                                )
+
+        # Check if opponent B wants to propose
+        if hasattr(self.opponent_b, "propose_settlement"):
+            proposal_b = await self.opponent_b.propose_settlement(state)
+            if proposal_b:
+                # B proposes, A evaluates
+                if hasattr(self.opponent_a, "evaluate_settlement"):
+                    response = await self.opponent_a.evaluate_settlement(
+                        proposal_b, state, is_final_offer=False
+                    )
+                    if response.action == "accept":
+                        # Settlement accepted - B's offer to A
+                        vp_a = proposal_b.offered_vp
+                        vp_b = 100 - vp_a
+                        return GameEnding(
+                            ending_type=EndingType.SETTLEMENT,
+                            vp_a=vp_a,
+                            vp_b=vp_b,
+                            turn=state.turn,
+                            description="Settlement accepted",
+                        )
+                    elif response.action == "counter" and response.counter_vp:
+                        # Counter-offer - let B evaluate
+                        counter = SettlementProposal(
+                            offered_vp=response.counter_vp,
+                            argument=response.counter_argument or "",
+                        )
+                        if hasattr(self.opponent_b, "evaluate_settlement"):
+                            counter_response = await self.opponent_b.evaluate_settlement(
+                                counter, state, is_final_offer=True
+                            )
+                            if counter_response.action == "accept":
+                                vp_b = counter.offered_vp
+                                vp_a = 100 - vp_b
+                                return GameEnding(
+                                    ending_type=EndingType.SETTLEMENT,
+                                    vp_a=vp_a,
+                                    vp_b=vp_b,
+                                    turn=state.turn,
+                                    description="Counter-offer accepted",
+                                )
+
+        return None
 
     def _build_result(
         self,
