@@ -100,17 +100,103 @@ def submit_action(game_id: str):
 @bp.route("/<game_id>/over")
 @login_required
 def game_over(game_id: str):
-    """Game over screen."""
+    """Game over screen with multi-criteria scorecard."""
     game_record = GameRecord.query.filter_by(
         game_id=game_id, user_id=current_user.id
     ).first_or_404()
+
+    # Calculate scorecard metrics
+    scorecard = _compute_scorecard(game_record)
 
     return render_template(
         "pages/game_over.html",
         game_id=game_id,
         game=game_record,
         state=game_record.state,
+        scorecard=scorecard,
     )
+
+
+def _compute_scorecard(game_record: GameRecord) -> dict:
+    """Compute multi-criteria scorecard metrics for game end display.
+
+    Based on GAME_MANUAL.md section 4.4 Multi-Criteria Scorecard.
+    """
+    vp_player = game_record.final_vp_player or 0
+    vp_opponent = game_record.final_vp_opponent or 0
+    total_vp = vp_player + vp_opponent
+
+    # Personal Success
+    vp_share_player = (vp_player / total_vp * 100) if total_vp > 0 else 50.0
+    vp_share_opponent = (vp_opponent / total_vp * 100) if total_vp > 0 else 50.0
+
+    # Joint Success
+    baseline_vp = 100  # Zero-sum baseline
+    value_vs_baseline = total_vp - baseline_vp
+
+    # Pareto efficiency: ratio of actual total to theoretical maximum
+    # Theoretical max depends on game length and perfect cooperation
+    # Simplified: use 150 as max achievable (100 base + 50 max surplus)
+    theoretical_max = 150
+    pareto_efficiency = min(100.0, (total_vp / theoretical_max) * 100)
+
+    # Settlement info
+    settlement_reached = game_record.ending_type == "settlement"
+    surplus_distributed = 0.0
+    settlement_initiator = None
+
+    if settlement_reached:
+        # Calculate surplus distributed (total captured surplus)
+        surplus_distributed = (
+            game_record.surplus_captured_player +
+            game_record.surplus_captured_opponent
+        )
+        # Find who initiated settlement
+        first_attempt = game_record.settlement_attempts.first()
+        if first_attempt:
+            settlement_initiator = first_attempt.proposer
+
+    # Strategic Profile
+    history = list(game_record.turns.all())
+
+    # Calculate max cooperation streak
+    max_streak = 0
+    current_streak = 0
+    for turn in history:
+        if turn.outcome_code == "CC":
+            current_streak += 1
+            max_streak = max(max_streak, current_streak)
+        else:
+            current_streak = 0
+
+    # Also check game record's stored streak if higher
+    if game_record.cooperation_streak > max_streak:
+        max_streak = game_record.cooperation_streak
+
+    # Count times exploited (CD for player, DC for opponent)
+    times_player_exploited = sum(1 for t in history if t.outcome_code == "CD")
+    times_opponent_exploited = sum(1 for t in history if t.outcome_code == "DC")
+
+    return {
+        # Personal Success
+        "vp_player": vp_player,
+        "vp_opponent": vp_opponent,
+        "vp_share_player": round(vp_share_player, 1),
+        "vp_share_opponent": round(vp_share_opponent, 1),
+        # Joint Success
+        "total_vp": total_vp,
+        "value_vs_baseline": value_vs_baseline,
+        "pareto_efficiency": round(pareto_efficiency, 1),
+        # Settlement Info
+        "settlement_reached": settlement_reached,
+        "surplus_distributed": round(surplus_distributed, 1),
+        "surplus_remaining": round(game_record.cooperation_surplus, 1),
+        "settlement_initiator": settlement_initiator,
+        # Strategic Profile
+        "max_streak": max_streak,
+        "times_player_exploited": times_player_exploited,
+        "times_opponent_exploited": times_opponent_exploited,
+    }
 
 
 @bp.route("/<game_id>/trace")

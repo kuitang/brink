@@ -1,9 +1,12 @@
 """Flask application factory."""
 
-from flask import Flask
+from flask import Flask, request
 
 from .config import Config
 from .extensions import db, login_manager
+
+# Available themes
+THEMES = ["default", "cold-war", "renaissance", "byzantine", "corporate"]
 
 
 def seed_db():
@@ -48,6 +51,23 @@ def create_app(config_class=Config):
     app.register_blueprint(leaderboard.bp)
     app.register_blueprint(manual.bp)
     app.register_blueprint(scenarios.bp)
+
+    # Context processor to inject theme into all templates
+    @app.context_processor
+    def inject_theme():
+        """Inject theme variable into all templates.
+
+        Theme can be set via:
+        1. Query parameter: ?theme=cold-war
+        2. Cookie: theme=cold-war
+        3. Default: 'default'
+        """
+        theme = request.args.get("theme")
+        if not theme:
+            theme = request.cookies.get("theme", "default")
+        if theme not in THEMES:
+            theme = "default"
+        return {"theme": theme, "available_themes": THEMES}
 
     # Create database tables and seed
     with app.app_context():

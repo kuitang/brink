@@ -1,8 +1,26 @@
-/* Brinksmanship - Kingdom of Loathing inspired theme */
-/* Design: Serif fonts, earth tones, box borders, text-heavy, minimal */
+/* Brinksmanship - Multi-theme CSS */
+/* Supports: default (KoL-inspired), cold-war, renaissance, byzantine, corporate */
 
-/* ===== CSS CUSTOM PROPERTIES ===== */
+/* ===== CSS CUSTOM PROPERTIES - Defaults ===== */
 :root {
+    /* Spacing (shared across all themes) */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+
+    /* Box styling (shared) */
+    --border-width: 2px;
+    --box-padding: var(--spacing-md);
+    --border-radius: 0;
+    --box-shadow: none;
+}
+
+/* ===== THEME: DEFAULT (Kingdom of Loathing inspired) ===== */
+/* Design: Serif fonts, earth tones, box borders, text-heavy, minimal */
+body.theme-default,
+body:not([class*="theme-"]) {
     /* Colors - Muted earth-tone palette */
     --bg: #f5f0e6;
     --bg-alt: #ebe5d8;
@@ -33,35 +51,301 @@
 
     /* Typography */
     --font-body: Georgia, "Times New Roman", serif;
+    --font-heading: Georgia, "Times New Roman", serif;
     --font-mono: "Courier New", Courier, monospace;
     --font-size-base: 15px;
     --line-height: 1.5;
 
-    /* Spacing */
-    --spacing-xs: 4px;
-    --spacing-sm: 8px;
-    --spacing-md: 16px;
-    --spacing-lg: 24px;
-    --spacing-xl: 32px;
-
-    /* Box styling */
-    --border-width: 2px;
-    --box-padding: var(--spacing-md);
+    /* Theme-specific styling */
+    --border-radius: 0;
+    --box-shadow: none;
+    --header-decoration: none;
 }
 
-/* ===== THEME VARIATIONS ===== */
-body.theme-crisis {
-    --bg: #f0e6e6;
-    --bg-alt: #e8dada;
-    --accent: #6b3a3a;
-    --border: #8b5555;
-}
-
+/* ===== THEME: COLD WAR ===== */
+/* Design: Typewriter fonts, institutional gray, declassified document aesthetic */
 body.theme-cold-war {
-    --bg: #e6eaf0;
-    --bg-alt: #dce0e8;
-    --accent: #3a4a6b;
-    --border: #556688;
+    /* Colors - Institutional grays with document feel */
+    --bg: #e8e8e8;
+    --bg-alt: #d8d8d8;
+    --text: #1a1a1a;
+    --text-muted: #4a4a4a;
+    --border: #666666;
+    --border-light: #999999;
+    --accent: #333333;
+    --link: #1a4a7a;
+    --link-hover: #0a2a4a;
+
+    /* Semantic colors - muted, document-like */
+    --danger: #8b0000;
+    --danger-bg: #ffe0e0;
+    --success: #2a5a2a;
+    --success-bg: #e0f0e0;
+    --warning: #6b5a00;
+    --warning-bg: #f5f0d0;
+    --info: #1a4a7a;
+    --info-bg: #e0e8f5;
+
+    /* Game-specific colors */
+    --cooperative: #2a5a2a;
+    --competitive: #8b0000;
+    --risk-low: #2a5a2a;
+    --risk-medium: #6b5a00;
+    --risk-high: #8b0000;
+
+    /* Typography - Typewriter aesthetic */
+    --font-body: "Courier New", Courier, "Liberation Mono", monospace;
+    --font-heading: "Courier New", Courier, "Liberation Mono", monospace;
+    --font-mono: "Courier New", Courier, monospace;
+    --font-size-base: 14px;
+    --line-height: 1.6;
+
+    /* Theme-specific styling */
+    --border-radius: 0;
+    --box-shadow: none;
+    --header-decoration: underline;
+}
+
+/* ===== THEME: RENAISSANCE ===== */
+/* Design: Palatino/Garamond, parchment colors, gold accents */
+body.theme-renaissance {
+    /* Colors - Parchment and gold */
+    --bg: #f8f4e8;
+    --bg-alt: #f0ead8;
+    --text: #2a2318;
+    --text-muted: #6b5d4d;
+    --border: #8b7355;
+    --border-light: #c9b896;
+    --accent: #8b6914;
+    --link: #5c3d1e;
+    --link-hover: #3d280f;
+
+    /* Semantic colors - warm, aged feel */
+    --danger: #8b2500;
+    --danger-bg: #f8e8e0;
+    --success: #2d5016;
+    --success-bg: #e8f0e0;
+    --warning: #8b6914;
+    --warning-bg: #f8f0d8;
+    --info: #3d4a6b;
+    --info-bg: #e8ecf5;
+
+    /* Game-specific colors */
+    --cooperative: #2d5016;
+    --competitive: #8b2500;
+    --risk-low: #2d5016;
+    --risk-medium: #8b6914;
+    --risk-high: #8b2500;
+
+    /* Typography - Classical elegance */
+    --font-body: Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif;
+    --font-heading: Garamond, "EB Garamond", "Times New Roman", serif;
+    --font-mono: "Courier New", Courier, monospace;
+    --font-size-base: 16px;
+    --line-height: 1.6;
+
+    /* Theme-specific styling */
+    --border-radius: 2px;
+    --box-shadow: 0 1px 3px rgba(139, 105, 20, 0.15);
+    --header-decoration: none;
+}
+
+/* ===== THEME: BYZANTINE ===== */
+/* Design: Uncial-inspired fonts, imperial purple, gold leaf accents */
+body.theme-byzantine {
+    /* Colors - Imperial purple and gold */
+    --bg: #f5f0f8;
+    --bg-alt: #ebe4f0;
+    --text: #1a1428;
+    --text-muted: #5a4a6b;
+    --border: #6b4a8b;
+    --border-light: #9a7ab8;
+    --accent: #4a2a6b;
+    --link: #8b6914;
+    --link-hover: #5c4a0a;
+
+    /* Semantic colors - royal palette */
+    --danger: #8b1a3a;
+    --danger-bg: #f8e0e8;
+    --success: #1a5a3a;
+    --success-bg: #e0f0e8;
+    --warning: #8b6914;
+    --warning-bg: #f8f0d8;
+    --info: #1a4a8b;
+    --info-bg: #e0e8f8;
+
+    /* Game-specific colors */
+    --cooperative: #1a5a3a;
+    --competitive: #8b1a3a;
+    --risk-low: #1a5a3a;
+    --risk-medium: #8b6914;
+    --risk-high: #8b1a3a;
+
+    /* Typography - Medieval/Byzantine inspired */
+    --font-body: "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+    --font-heading: "Palatino Linotype", Palatino, Georgia, serif;
+    --font-mono: "Courier New", Courier, monospace;
+    --font-size-base: 15px;
+    --line-height: 1.55;
+
+    /* Theme-specific styling */
+    --border-radius: 0;
+    --box-shadow: 0 2px 4px rgba(75, 42, 107, 0.12);
+    --header-decoration: none;
+}
+
+/* ===== THEME: CORPORATE ===== */
+/* Design: Inter/system sans, pure white, subtle shadows, modern minimal */
+body.theme-corporate {
+    /* Colors - Clean whites and grays */
+    --bg: #ffffff;
+    --bg-alt: #f8f9fa;
+    --text: #1a1a2e;
+    --text-muted: #6c757d;
+    --border: #dee2e6;
+    --border-light: #e9ecef;
+    --accent: #2563eb;
+    --link: #2563eb;
+    --link-hover: #1d4ed8;
+
+    /* Semantic colors - modern, clean */
+    --danger: #dc2626;
+    --danger-bg: #fef2f2;
+    --success: #16a34a;
+    --success-bg: #f0fdf4;
+    --warning: #ca8a04;
+    --warning-bg: #fefce8;
+    --info: #2563eb;
+    --info-bg: #eff6ff;
+
+    /* Game-specific colors */
+    --cooperative: #16a34a;
+    --competitive: #dc2626;
+    --risk-low: #16a34a;
+    --risk-medium: #ca8a04;
+    --risk-high: #dc2626;
+
+    /* Typography - Modern system fonts */
+    --font-body: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-heading: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: "SF Mono", SFMono-Regular, ui-monospace, Menlo, Consolas, monospace;
+    --font-size-base: 14px;
+    --line-height: 1.5;
+
+    /* Theme-specific styling */
+    --border-radius: 6px;
+    --box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+    --header-decoration: none;
+}
+
+/* ===== THEME-SPECIFIC ENHANCEMENTS ===== */
+
+/* Cold War: Declassified document aesthetic */
+body.theme-cold-war .site-title {
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+}
+
+body.theme-cold-war .box-header,
+body.theme-cold-war .info-header {
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+body.theme-cold-war .narrative {
+    position: relative;
+    font-style: normal;
+}
+
+body.theme-cold-war .narrative::before {
+    content: "CLASSIFIED";
+    position: absolute;
+    top: -8px;
+    right: 10px;
+    font-size: 0.7rem;
+    color: var(--danger);
+    border: 1px solid var(--danger);
+    padding: 2px 6px;
+    background-color: var(--bg);
+    letter-spacing: 0.1em;
+}
+
+/* Renaissance: Decorative gold borders and elegant styling */
+body.theme-renaissance .box-header,
+body.theme-renaissance .info-header {
+    border-bottom: 2px solid #c9a227;
+}
+
+body.theme-renaissance h1,
+body.theme-renaissance h2 {
+    color: var(--accent);
+}
+
+body.theme-renaissance .site-title {
+    letter-spacing: 0.05em;
+}
+
+body.theme-renaissance .narrative {
+    border-left-color: #c9a227;
+}
+
+/* Byzantine: Imperial purple with gold leaf accents */
+body.theme-byzantine .box-header,
+body.theme-byzantine .info-header {
+    background: linear-gradient(135deg, var(--accent) 0%, #3a1a5b 100%);
+    border-bottom: 2px solid #c9a227;
+}
+
+body.theme-byzantine h1,
+body.theme-byzantine h2 {
+    color: var(--accent);
+}
+
+body.theme-byzantine .site-title {
+    color: #c9a227;
+    text-shadow: 1px 1px 2px rgba(74, 42, 107, 0.3);
+}
+
+body.theme-byzantine .site-title:hover {
+    color: var(--accent);
+}
+
+body.theme-byzantine .narrative {
+    border-left-color: #c9a227;
+}
+
+body.theme-byzantine .btn-primary {
+    background: linear-gradient(135deg, var(--accent) 0%, #3a1a5b 100%);
+}
+
+/* Corporate: Clean modern styling with hover effects */
+body.theme-corporate .btn {
+    transition: all 0.2s ease;
+}
+
+body.theme-corporate .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+body.theme-corporate .box,
+body.theme-corporate .status-bar,
+body.theme-corporate .action-panel {
+    transition: box-shadow 0.2s ease;
+}
+
+body.theme-corporate .box:hover,
+body.theme-corporate .action-panel:hover {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+body.theme-corporate .action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+}
+
+body.theme-corporate header {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 /* ===== RESET & BASE ===== */
@@ -93,8 +377,10 @@ a:hover {
 
 h1, h2, h3, h4, h5, h6 {
     margin: 0 0 var(--spacing-md) 0;
+    font-family: var(--font-heading);
     font-weight: bold;
     line-height: 1.2;
+    text-decoration: var(--header-decoration);
 }
 
 h1 { font-size: 1.75rem; }
@@ -161,9 +447,11 @@ nav a:hover {
 /* ===== BOX COMPONENTS ===== */
 .box {
     border: var(--border-width) solid var(--border);
+    border-radius: var(--border-radius);
     background-color: var(--bg-alt);
     padding: var(--box-padding);
     margin-bottom: var(--spacing-md);
+    box-shadow: var(--box-shadow);
 }
 
 .box-header {
@@ -191,8 +479,10 @@ nav a:hover {
     text-decoration: none;
     cursor: pointer;
     border: var(--border-width) solid var(--border);
+    border-radius: var(--border-radius);
     background-color: var(--bg);
     color: var(--text);
+    box-shadow: var(--box-shadow);
 }
 
 .btn:hover {
@@ -255,6 +545,7 @@ textarea {
     font-family: var(--font-body);
     font-size: 1rem;
     border: var(--border-width) solid var(--border);
+    border-radius: var(--border-radius);
     background-color: var(--bg);
 }
 
@@ -270,6 +561,7 @@ textarea:focus {
     padding: var(--spacing-sm) var(--spacing-md);
     margin-bottom: var(--spacing-md);
     border: var(--border-width) solid;
+    border-radius: var(--border-radius);
 }
 
 .flash-error {
@@ -304,9 +596,11 @@ textarea:focus {
     padding: var(--spacing-md);
     background-color: var(--bg-alt);
     border: var(--border-width) solid var(--border);
+    border-radius: var(--border-radius);
     margin-bottom: var(--spacing-md);
     font-family: var(--font-mono);
     font-size: 0.875rem;
+    box-shadow: var(--box-shadow);
 }
 
 .status-item {
@@ -341,6 +635,7 @@ textarea:focus {
     background-color: var(--bg);
     border: var(--border-width) solid var(--border-light);
     border-left: 4px solid var(--accent);
+    border-radius: var(--border-radius);
     margin-bottom: var(--spacing-md);
     font-style: italic;
 }
@@ -368,10 +663,12 @@ textarea:focus {
     padding: var(--spacing-md);
     text-align: left;
     border: var(--border-width) solid var(--border);
+    border-radius: var(--border-radius);
     background-color: var(--bg);
     cursor: pointer;
     font-family: var(--font-body);
     transition: background-color 0.15s ease;
+    box-shadow: var(--box-shadow);
 }
 
 .action-btn:hover {
@@ -592,7 +889,9 @@ textarea:focus {
 .opponent-info-box,
 .shared-info-box {
     border: var(--border-width) solid var(--border);
+    border-radius: var(--border-radius);
     background-color: var(--bg-alt);
+    box-shadow: var(--box-shadow);
 }
 
 .player-info-box {
@@ -609,8 +908,10 @@ textarea:focus {
 
 .surplus-info-box {
     border: var(--border-width) solid var(--border);
+    border-radius: var(--border-radius);
     background-color: var(--bg-alt);
     border-left: 4px solid var(--info);
+    box-shadow: var(--box-shadow);
 }
 
 .surplus-info-box .info-header {
@@ -661,8 +962,10 @@ textarea:focus {
 
 .action-panel {
     border: var(--border-width) solid var(--border);
+    border-radius: var(--border-radius);
     background-color: var(--bg-alt);
     padding: var(--spacing-md);
+    box-shadow: var(--box-shadow);
 }
 
 .action-header {
@@ -702,6 +1005,133 @@ textarea:focus {
     color: var(--competitive);
 }
 
+/* ===== SCORECARD ===== */
+.scorecard {
+    margin-bottom: var(--spacing-lg);
+}
+
+.scorecard .box {
+    margin-bottom: var(--spacing-md);
+}
+
+.scorecard-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+}
+
+.scorecard-table th,
+.scorecard-table td {
+    padding: var(--spacing-sm);
+    text-align: left;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.scorecard-table th {
+    font-weight: bold;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+}
+
+.scorecard-table th.player-col,
+.scorecard-table td.player-col {
+    text-align: center;
+    color: var(--cooperative);
+    font-weight: bold;
+}
+
+.scorecard-table th.opponent-col,
+.scorecard-table td.opponent-col {
+    text-align: center;
+    color: var(--competitive);
+    font-weight: bold;
+}
+
+.scorecard-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.scorecard-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+    justify-content: space-around;
+}
+
+.scorecard-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    min-width: 100px;
+}
+
+.scorecard-stat .stat-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: var(--spacing-xs);
+}
+
+.scorecard-stat .stat-value {
+    font-size: 1.25rem;
+    font-weight: bold;
+    font-family: var(--font-mono);
+}
+
+.scorecard-stat .stat-value.positive {
+    color: var(--success);
+}
+
+.scorecard-stat .stat-value.negative {
+    color: var(--danger);
+}
+
+.scorecard-stat .stat-value.neutral {
+    color: var(--warning);
+}
+
+/* Game over action buttons */
+.game-over-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    justify-content: center;
+    margin-top: var(--spacing-lg);
+    padding: var(--spacing-md);
+}
+
+.game-over-actions .btn {
+    min-width: 150px;
+    text-align: center;
+}
+
+@media (max-width: 600px) {
+    .scorecard-stats {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .scorecard-stat {
+        width: 100%;
+        padding: var(--spacing-sm) 0;
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .scorecard-stat:last-child {
+        border-bottom: none;
+    }
+
+    .game-over-actions {
+        flex-direction: column;
+    }
+
+    .game-over-actions .btn {
+        width: 100%;
+    }
+}
+
 /* ===== TWO COLUMN LAYOUT ===== */
 .two-column {
     display: grid;
@@ -719,10 +1149,34 @@ textarea:focus {
 footer {
     margin-top: var(--spacing-xl);
     padding: var(--spacing-md);
-    text-align: center;
     color: var(--text-muted);
     font-size: 0.875rem;
     border-top: 1px solid var(--border-light);
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+}
+
+.theme-switcher {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.theme-switcher label {
+    font-weight: normal;
+    margin-bottom: 0;
+}
+
+.theme-switcher select {
+    width: auto;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: 0.8rem;
 }
 
 /* ===== UTILITY CLASSES ===== */
@@ -1052,10 +1506,12 @@ footer {
 .settlement-panel {
     background-color: var(--bg-alt);
     border: var(--border-width) solid var(--border);
+    border-radius: var(--border-radius);
     max-width: 500px;
     width: 90%;
     max-height: 80vh;
     overflow-y: auto;
+    box-shadow: var(--box-shadow);
 }
 
 .settlement-header {

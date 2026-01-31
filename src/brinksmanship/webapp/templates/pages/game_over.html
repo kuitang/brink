@@ -39,6 +39,121 @@
     <p>Final turn: {{ state.turn }}</p>
 </div>
 
+<!-- Multi-Criteria Scorecard -->
+<div class="scorecard">
+    <div class="box">
+        <div class="box-header">
+            <h3>Personal Success</h3>
+        </div>
+        <table class="scorecard-table">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th class="player-col">You</th>
+                    <th class="opponent-col">Opponent</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Final VP</td>
+                    <td class="player-col">{{ scorecard.vp_player }}</td>
+                    <td class="opponent-col">{{ scorecard.vp_opponent }}</td>
+                </tr>
+                <tr>
+                    <td>VP Share</td>
+                    <td class="player-col">{{ scorecard.vp_share_player }}%</td>
+                    <td class="opponent-col">{{ scorecard.vp_share_opponent }}%</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="box">
+        <div class="box-header">
+            <h3>Joint Success</h3>
+        </div>
+        <div class="scorecard-stats">
+            <div class="scorecard-stat">
+                <span class="stat-label">Total Value Created</span>
+                <span class="stat-value {% if scorecard.total_vp > 100 %}positive{% elif scorecard.total_vp < 100 %}negative{% endif %}">
+                    {{ scorecard.total_vp }} VP
+                </span>
+            </div>
+            <div class="scorecard-stat">
+                <span class="stat-label">vs Zero-Sum Baseline</span>
+                <span class="stat-value {% if scorecard.value_vs_baseline > 0 %}positive{% elif scorecard.value_vs_baseline < 0 %}negative{% endif %}">
+                    {% if scorecard.value_vs_baseline >= 0 %}+{% endif %}{{ scorecard.value_vs_baseline }} VP
+                </span>
+            </div>
+            <div class="scorecard-stat">
+                <span class="stat-label">Pareto Efficiency</span>
+                <span class="stat-value">{{ scorecard.pareto_efficiency }}%</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="box">
+        <div class="box-header">
+            <h3>Settlement</h3>
+        </div>
+        <div class="scorecard-stats">
+            <div class="scorecard-stat">
+                <span class="stat-label">Settlement Reached?</span>
+                <span class="stat-value {% if scorecard.settlement_reached %}positive{% else %}negative{% endif %}">
+                    {% if scorecard.settlement_reached %}Yes{% else %}No{% endif %}
+                </span>
+            </div>
+            {% if scorecard.settlement_reached %}
+            <div class="scorecard-stat">
+                <span class="stat-label">Surplus Distributed</span>
+                <span class="stat-value positive">{{ scorecard.surplus_distributed }} VP</span>
+            </div>
+            <div class="scorecard-stat">
+                <span class="stat-label">Initiated By</span>
+                <span class="stat-value">
+                    {% if scorecard.settlement_initiator == 'player' %}You{% else %}Opponent{% endif %}
+                </span>
+            </div>
+            {% else %}
+            <div class="scorecard-stat">
+                <span class="stat-label">Surplus Lost</span>
+                <span class="stat-value negative">{{ scorecard.surplus_remaining }} VP</span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="box">
+        <div class="box-header">
+            <h3>Strategic Profile</h3>
+        </div>
+        <table class="scorecard-table">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th class="player-col">You</th>
+                    <th class="opponent-col">Opponent</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Times Exploited</td>
+                    <td class="player-col">{{ scorecard.times_player_exploited }}</td>
+                    <td class="opponent-col">{{ scorecard.times_opponent_exploited }}</td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="scorecard-stats mt-md">
+            <div class="scorecard-stat">
+                <span class="stat-label">Max Cooperation Streak</span>
+                <span class="stat-value {% if scorecard.max_streak >= 5 %}positive{% elif scorecard.max_streak >= 3 %}neutral{% else %}negative{% endif %}">
+                    {{ scorecard.max_streak }} turns
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="box">
     <div class="box-header">
         <h3>Final State</h3>
@@ -53,10 +168,10 @@
     {% include "components/history.html" %}
 </div>
 
-<div class="text-center mt-md">
-    <a href="{{ url_for('coaching.view', game_id=game_id) }}" class="btn btn-primary">View Coaching Analysis</a>
-    <a href="{{ url_for('lobby.new_game') }}" class="btn">New Game</a>
+<div class="game-over-actions">
+    <a href="{{ url_for('lobby.new_game') }}" class="btn btn-primary">Play Again</a>
+    <a href="{{ url_for('lobby.index') }}" class="btn">Return to Lobby</a>
+    <a href="{{ url_for('coaching.view', game_id=game_id) }}" class="btn">View Coaching Analysis</a>
     <a href="{{ url_for('leaderboard.view', scenario_id=game.scenario_id, opponent_type=game.opponent_type) }}" class="btn">View Leaderboard</a>
-    <a href="{{ url_for('lobby.index') }}" class="btn">Back to Lobby</a>
 </div>
 {% endblock %}

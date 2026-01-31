@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <script src="{{ url_for('static', filename='js/htmx.min.js') }}" defer></script>
 </head>
-<body class="{% block body_class %}{% endblock %}">
+<body class="theme-{{ theme|default('default') }} {% block body_class %}{% endblock %}">
     <header>
         <div class="container">
             <a href="{{ url_for('lobby.index') }}" class="site-title">Brinksmanship</a>
@@ -46,8 +46,26 @@
 
     <footer>
         <div class="container">
-            A game-theoretic strategy simulation
+            <div class="footer-content">
+                <span>A game-theoretic strategy simulation</span>
+                <div class="theme-switcher">
+                    <label for="theme-select">Theme:</label>
+                    <select id="theme-select" onchange="switchTheme(this.value)">
+                        {% for t in available_themes %}
+                        <option value="{{ t }}" {% if t == theme %}selected{% endif %}>{{ t|replace('-', ' ')|title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
         </div>
     </footer>
+    <script>
+        function switchTheme(theme) {
+            // Set cookie for persistence
+            document.cookie = "theme=" + theme + ";path=/;max-age=31536000";
+            // Reload page to apply theme
+            window.location.reload();
+        }
+    </script>
 </body>
 </html>
