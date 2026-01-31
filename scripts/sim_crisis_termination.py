@@ -19,6 +19,7 @@ from dataclasses import dataclass, field
 @dataclass
 class TerminationStats:
     """Statistics for crisis termination at a specific risk level."""
+
     trials: int = 0
     terminations: int = 0
     turns_when_terminated: list = field(default_factory=list)
@@ -132,10 +133,7 @@ def run_reach_turn_simulation(num_games: int = 5000) -> dict[int, dict[int, floa
                     break  # Game terminated
 
         # Calculate probability of reaching each turn
-        results[risk] = {
-            turn: turn_counts[turn] / num_games
-            for turn in range(10, 17)
-        }
+        results[risk] = {turn: turn_counts[turn] / num_games for turn in range(10, 17)}
 
     return results
 
@@ -170,8 +168,10 @@ def print_results(per_turn: dict, cumulative: dict, reach_turn: dict, num_trials
 
     for risk in range(8, 10):
         stats = cumulative[risk]
-        print(f"{risk:<15} {stats.terminations:>18} {stats.termination_rate * 100:>17.1f}% "
-              f"{stats.avg_termination_turn:>12.1f}")
+        print(
+            f"{risk:<15} {stats.terminations:>18} {stats.termination_rate * 100:>17.1f}% "
+            f"{stats.avg_termination_turn:>12.1f}"
+        )
 
     # Probability of reaching specific turns
     print("\n" + "-" * 80)
@@ -230,27 +230,20 @@ def print_results(per_turn: dict, cumulative: dict, reach_turn: dict, num_trials
 
 def main():
     """Run the crisis termination simulation."""
-    parser = argparse.ArgumentParser(
-        description="Simulate crisis termination mechanic"
+    parser = argparse.ArgumentParser(description="Simulate crisis termination mechanic")
+    parser.add_argument(
+        "--trials", type=int, default=10000, help="Number of trials for per-turn simulation (default: 10000)"
     )
     parser.add_argument(
-        "--trials", type=int, default=10000,
-        help="Number of trials for per-turn simulation (default: 10000)"
+        "--games", type=int, default=5000, help="Number of games for cumulative simulation (default: 5000)"
     )
-    parser.add_argument(
-        "--games", type=int, default=5000,
-        help="Number of games for cumulative simulation (default: 5000)"
-    )
-    parser.add_argument(
-        "--seed", type=int, default=None,
-        help="Random seed for reproducibility"
-    )
+    parser.add_argument("--seed", type=int, default=None, help="Random seed for reproducibility")
     args = parser.parse_args()
 
     if args.seed is not None:
         random.seed(args.seed)
 
-    print(f"Running crisis termination simulation...")
+    print("Running crisis termination simulation...")
     print(f"  Per-turn trials: {args.trials}")
     print(f"  Cumulative games: {args.games}")
 

@@ -12,29 +12,27 @@ See test_removal_log.md for details.
 """
 
 import json
+
+# Import from scripts directory - need to add to path or use importlib
+import sys
 import tempfile
 from pathlib import Path
 
 import pytest
 
-# Import from scripts directory - need to add to path or use importlib
-import sys
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 
 from analyze_mechanics import (
+    AnalysisReport,
     # Enums and dataclasses
     IssueSeverity,
-    Issue,
-    AnalysisReport,
-    # Constants
-    DEFAULT_THRESHOLDS,
-    # Functions
-    compute_summary_from_results,
-    check_dominant_strategy,
-    check_variance_calibration,
-    check_settlement_rate,
-    check_game_length,
     analyze_mechanics,
+    check_dominant_strategy,
+    check_game_length,
+    check_settlement_rate,
+    check_variance_calibration,
+    # Constants
+    compute_summary_from_results,
     format_text_report,
     load_playtest_results,
 )
@@ -100,7 +98,7 @@ class TestComputeSummaryFromResults:
                     "settlements": 45,
                 }
             },
-            "aggregate": {}
+            "aggregate": {},
         }
         summary = compute_summary_from_results(results)
         assert "total_games" in summary
@@ -320,7 +318,7 @@ class TestAnalyzeMechanics:
             },
             "aggregate": {
                 "vp_std_dev": 18.0,
-            }
+            },
         }
         report = analyze_mechanics(results)
         # Should pass with no critical issues
@@ -340,7 +338,7 @@ class TestAnalyzeMechanics:
             },
             "aggregate": {
                 "vp_std_dev": 20.0,
-            }
+            },
         }
         report = analyze_mechanics(results)
         assert report.passed is False
@@ -361,7 +359,7 @@ class TestAnalyzeMechanics:
             },
             "aggregate": {
                 "vp_std_dev": 20.0,
-            }
+            },
         }
         # With stricter threshold, 55% should trigger dominant
         thresholds = {"dominant_strategy": 0.50}
@@ -382,7 +380,7 @@ class TestAnalyzeMechanics:
             },
             "aggregate": {
                 "vp_std_dev": 18.0,
-            }
+            },
         }
         report = analyze_mechanics(results)
         assert "total_games" in report.summary
@@ -505,7 +503,7 @@ class TestIntegration:
             },
             "aggregate": {
                 "vp_std_dev": 22.0,
-            }
+            },
         }
 
         report = analyze_mechanics(results)
@@ -537,7 +535,7 @@ class TestIntegration:
             },
             "aggregate": {
                 "vp_std_dev": 5.0,  # Low variance
-            }
+            },
         }
 
         report = analyze_mechanics(results)

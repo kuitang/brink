@@ -41,14 +41,14 @@ import argparse
 import json
 import statistics
 import sys
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import Optional
 
 
 class IssueSeverity(Enum):
     """Severity levels for detected issues."""
+
     CRITICAL = "critical"
     MAJOR = "major"
     MINOR = "minor"
@@ -57,6 +57,7 @@ class IssueSeverity(Enum):
 @dataclass
 class Issue:
     """A detected issue in the mechanics analysis."""
+
     severity: IssueSeverity
     message: str
     metric: str
@@ -77,6 +78,7 @@ class Issue:
 @dataclass
 class AnalysisReport:
     """Report from mechanics analysis."""
+
     issues: list[Issue] = field(default_factory=list)
     passed: bool = True
     summary: dict = field(default_factory=dict)
@@ -98,13 +100,15 @@ class AnalysisReport:
             value: Actual value of the metric
             threshold: Threshold that was violated
         """
-        self.issues.append(Issue(
-            severity=IssueSeverity(severity.lower()),
-            message=message,
-            metric=metric,
-            value=value,
-            threshold=threshold,
-        ))
+        self.issues.append(
+            Issue(
+                severity=IssueSeverity(severity.lower()),
+                message=message,
+                metric=metric,
+                value=value,
+                threshold=threshold,
+            )
+        )
         if severity.lower() == "critical":
             self.passed = False
 
@@ -119,13 +123,13 @@ class AnalysisReport:
 
 # Default thresholds from GAME_MANUAL.md and ENGINEERING_DESIGN.md
 DEFAULT_THRESHOLDS = {
-    "dominant_strategy": 0.60,      # Fail if any pairing >60% win rate
-    "variance_min": 10.0,           # VP std dev should be >=10
-    "variance_max": 40.0,           # VP std dev should be <=40
-    "settlement_rate_min": 0.30,    # At least 30% settlements
-    "settlement_rate_max": 0.70,    # At most 70% settlements
-    "avg_game_length_min": 8.0,     # Games shouldn't be too short
-    "avg_game_length_max": 16.0,    # Games shouldn't exceed max turns
+    "dominant_strategy": 0.60,  # Fail if any pairing >60% win rate
+    "variance_min": 10.0,  # VP std dev should be >=10
+    "variance_max": 40.0,  # VP std dev should be <=40
+    "settlement_rate_min": 0.30,  # At least 30% settlements
+    "settlement_rate_max": 0.70,  # At most 70% settlements
+    "avg_game_length_min": 8.0,  # Games shouldn't be too short
+    "avg_game_length_max": 16.0,  # Games shouldn't exceed max turns
 }
 
 
@@ -219,11 +223,13 @@ def compute_summary_from_results(playtest_results: dict) -> dict:
         if games > 0:
             win_rate = wins / games
             if win_rate > DEFAULT_THRESHOLDS["dominant_strategy"]:
-                dominant_strategies.append({
-                    "strategy": strat,
-                    "win_rate": win_rate,
-                    "games": games,
-                })
+                dominant_strategies.append(
+                    {
+                        "strategy": strat,
+                        "win_rate": win_rate,
+                        "games": games,
+                    }
+                )
 
     return {
         "total_games": total_games,
@@ -266,35 +272,41 @@ def check_dominant_strategy(
         if win_rate_a > threshold:
             strategies = pairing_name.split(":")
             strat_a = strategies[0] if strategies else pairing_name
+            msg = f"Dominant strategy: {strat_a} wins {win_rate_a:.0%} in {pairing_name}"
             report.add_issue(
                 severity="critical",
-                message=f"Dominant strategy detected: {strat_a} wins {win_rate_a:.0%} in {pairing_name}",
+                message=msg,
                 metric="dominant_strategy",
                 value=win_rate_a,
                 threshold=threshold,
             )
-            dominant_strategies.append({
-                "pairing": pairing_name,
-                "strategy": strat_a,
-                "win_rate": win_rate_a,
-            })
+            dominant_strategies.append(
+                {
+                    "pairing": pairing_name,
+                    "strategy": strat_a,
+                    "win_rate": win_rate_a,
+                }
+            )
 
         # Check if strategy B is dominant in this pairing
         if win_rate_b > threshold:
             strategies = pairing_name.split(":")
             strat_b = strategies[1] if len(strategies) > 1 else pairing_name
+            msg = f"Dominant strategy: {strat_b} wins {win_rate_b:.0%} in {pairing_name}"
             report.add_issue(
                 severity="critical",
-                message=f"Dominant strategy detected: {strat_b} wins {win_rate_b:.0%} in {pairing_name}",
+                message=msg,
                 metric="dominant_strategy",
                 value=win_rate_b,
                 threshold=threshold,
             )
-            dominant_strategies.append({
-                "pairing": pairing_name,
-                "strategy": strat_b,
-                "win_rate": win_rate_b,
-            })
+            dominant_strategies.append(
+                {
+                    "pairing": pairing_name,
+                    "strategy": strat_b,
+                    "win_rate": win_rate_b,
+                }
+            )
 
     return dominant_strategies
 
@@ -380,18 +392,20 @@ def check_game_length(
         length_max: Maximum acceptable average game length (default 16)
     """
     if avg_turns < length_min:
+        msg = f"Game length too short: {avg_turns:.1f} turns (min {length_min})"
         report.add_issue(
             severity="minor",
-            message=f"Average game length too short: {avg_turns:.1f} turns (expected >= {length_min})",
+            message=msg,
             metric="avg_game_length",
             value=avg_turns,
             threshold=length_min,
         )
 
     if avg_turns > length_max:
+        msg = f"Game length too long: {avg_turns:.1f} turns (max {length_max})"
         report.add_issue(
             severity="minor",
-            message=f"Average game length too long: {avg_turns:.1f} turns (expected <= {length_max})",
+            message=msg,
             metric="avg_game_length",
             value=avg_turns,
             threshold=length_max,
@@ -400,7 +414,7 @@ def check_game_length(
 
 def analyze_mechanics(
     playtest_results: dict,
-    thresholds: Optional[dict] = None,
+    thresholds: dict | None = None,
 ) -> AnalysisReport:
     """Analyze playtest results against expected thresholds.
 
@@ -575,14 +589,16 @@ Thresholds (from GAME_MANUAL.md):
     )
 
     parser.add_argument(
-        "-o", "--output",
+        "-o",
+        "--output",
         type=Path,
         default=None,
         help="Output path for analysis report (default: stdout)",
     )
 
     parser.add_argument(
-        "-f", "--format",
+        "-f",
+        "--format",
         choices=["json", "text"],
         default="json",
         help="Output format (default: json)",
@@ -593,49 +609,49 @@ Thresholds (from GAME_MANUAL.md):
         "--dominant-strategy",
         type=float,
         default=DEFAULT_THRESHOLDS["dominant_strategy"],
-        help=f"Win rate threshold for dominant strategy detection (default: {DEFAULT_THRESHOLDS['dominant_strategy']})",
+        help="Win rate threshold for dominant strategy",
     )
 
     parser.add_argument(
         "--variance-min",
         type=float,
         default=DEFAULT_THRESHOLDS["variance_min"],
-        help=f"Minimum acceptable VP std dev (default: {DEFAULT_THRESHOLDS['variance_min']})",
+        help="Minimum acceptable VP std dev",
     )
 
     parser.add_argument(
         "--variance-max",
         type=float,
         default=DEFAULT_THRESHOLDS["variance_max"],
-        help=f"Maximum acceptable VP std dev (default: {DEFAULT_THRESHOLDS['variance_max']})",
+        help="Maximum acceptable VP std dev",
     )
 
     parser.add_argument(
         "--settlement-rate-min",
         type=float,
         default=DEFAULT_THRESHOLDS["settlement_rate_min"],
-        help=f"Minimum acceptable settlement rate (default: {DEFAULT_THRESHOLDS['settlement_rate_min']})",
+        help="Minimum acceptable settlement rate",
     )
 
     parser.add_argument(
         "--settlement-rate-max",
         type=float,
         default=DEFAULT_THRESHOLDS["settlement_rate_max"],
-        help=f"Maximum acceptable settlement rate (default: {DEFAULT_THRESHOLDS['settlement_rate_max']})",
+        help="Maximum acceptable settlement rate",
     )
 
     parser.add_argument(
         "--avg-game-length-min",
         type=float,
         default=DEFAULT_THRESHOLDS["avg_game_length_min"],
-        help=f"Minimum acceptable average game length (default: {DEFAULT_THRESHOLDS['avg_game_length_min']})",
+        help="Minimum acceptable average game length",
     )
 
     parser.add_argument(
         "--avg-game-length-max",
         type=float,
         default=DEFAULT_THRESHOLDS["avg_game_length_max"],
-        help=f"Maximum acceptable average game length (default: {DEFAULT_THRESHOLDS['avg_game_length_max']})",
+        help="Maximum acceptable average game length",
     )
 
     args = parser.parse_args()

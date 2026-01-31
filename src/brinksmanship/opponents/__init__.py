@@ -27,9 +27,9 @@ from brinksmanship.opponents.deterministic import (
     TitForTat,
 )
 from brinksmanship.opponents.historical import (
-    HistoricalPersona,
     PERSONA_DISPLAY_NAMES,
     PERSONA_PROMPTS,
+    HistoricalPersona,
 )
 from brinksmanship.opponents.persona_generator import (
     GeneratedPersona,

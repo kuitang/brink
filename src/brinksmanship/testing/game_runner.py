@@ -14,16 +14,14 @@ the game loop between two Opponent instances.
 from __future__ import annotations
 
 import asyncio
-import random
-from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Optional
+from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
 from brinksmanship.engine.game_engine import (
     EndingType,
-    GameEngine,
     GameEnding,
+    GameEngine,
 )
-from brinksmanship.models.actions import Action, ActionType
 from brinksmanship.models.state import GameState
 from brinksmanship.opponents.base import Opponent, SettlementProposal
 from brinksmanship.storage import get_scenario_repository
@@ -105,8 +103,8 @@ class GameRunner:
         scenario_id: str,
         opponent_a: Opponent,
         opponent_b: Opponent,
-        repo: Optional[ScenarioRepository] = None,
-        random_seed: Optional[int] = None,
+        repo: ScenarioRepository | None = None,
+        random_seed: int | None = None,
     ):
         """Initialize the game runner.
 
@@ -143,7 +141,7 @@ class GameRunner:
         )
 
         history: list[tuple[str, str]] = []
-        settlement_ending: Optional[GameEnding] = None
+        settlement_ending: GameEnding | None = None
 
         while not engine.is_game_over():
             state = engine.get_current_state()
@@ -186,7 +184,7 @@ class GameRunner:
         self,
         state: GameState,
         engine: GameEngine,
-    ) -> Optional[GameEnding]:
+    ) -> GameEnding | None:
         """Try settlement negotiation between opponents.
 
         Checks if either opponent wants to propose settlement, then
@@ -197,9 +195,7 @@ class GameRunner:
             (self.opponent_a, self.opponent_b, True),
             (self.opponent_b, self.opponent_a, False),
         ]:
-            ending = await self._negotiate_settlement(
-                proposer, evaluator, proposer_is_a, state
-            )
+            ending = await self._negotiate_settlement(proposer, evaluator, proposer_is_a, state)
             if ending:
                 return ending
         return None
@@ -210,7 +206,7 @@ class GameRunner:
         evaluator: Opponent,
         proposer_is_a: bool,
         state: GameState,
-    ) -> Optional[GameEnding]:
+    ) -> GameEnding | None:
         """Handle settlement negotiation between proposer and evaluator."""
         if not hasattr(proposer, "propose_settlement"):
             return None
@@ -249,9 +245,7 @@ class GameRunner:
                 offered_vp=response.counter_vp,
                 argument=response.counter_argument or "",
             )
-            counter_response = await proposer.evaluate_settlement(
-                counter, state, is_final_offer=True
-            )
+            counter_response = await proposer.evaluate_settlement(counter, state, is_final_offer=True)
             if counter_response.action == "accept":
                 # Evaluator's counter-offer VP goes to proposer
                 if proposer_is_a:
@@ -273,7 +267,7 @@ class GameRunner:
     def _build_result(
         self,
         final_state: GameState,
-        ending: Optional[GameEnding],
+        ending: GameEnding | None,
         history: list[tuple[str, str]],
     ) -> GameResult:
         """Build a GameResult from the final state and ending."""
@@ -320,8 +314,8 @@ def run_game_sync(
     scenario_id: str,
     opponent_a: Opponent,
     opponent_b: Opponent,
-    repo: Optional[ScenarioRepository] = None,
-    random_seed: Optional[int] = None,
+    repo: ScenarioRepository | None = None,
+    random_seed: int | None = None,
 ) -> GameResult:
     """Synchronous wrapper for running a single game.
 

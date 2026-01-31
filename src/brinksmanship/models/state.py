@@ -36,6 +36,7 @@ class InformationState(BaseModel):
         known_resources: Last known resources from successful inspection
         known_resources_turn: Turn when resources were last learned
     """
+
     position_bounds: tuple[float, float] = Field(default=(0.0, 10.0))
     resources_bounds: tuple[float, float] = Field(default=(0.0, 10.0))
     known_position: float | None = Field(default=None)
@@ -96,6 +97,7 @@ class PlayerState(BaseModel):
         previous_type: Player's last action classification (None on turn 1)
         information: What this player knows about their opponent
     """
+
     position: float = Field(default=5.0, ge=0.0, le=10.0)
     resources: float = Field(default=5.0, ge=0.0, le=10.0)
     previous_type: ActionType | None = Field(default=None)
@@ -124,6 +126,7 @@ class GameState(BaseModel):
         player_a: State for player A
         player_b: State for player B
     """
+
     # Per-player state
     player_a: PlayerState = Field(default_factory=PlayerState)
     player_b: PlayerState = Field(default_factory=PlayerState)
@@ -137,9 +140,9 @@ class GameState(BaseModel):
 
     # Surplus mechanics (Joint Investment model)
     cooperation_surplus: float = Field(default=0.0, ge=0.0)  # Shared pool created by CC
-    surplus_captured_a: float = Field(default=0.0, ge=0.0)   # VP locked by player A
-    surplus_captured_b: float = Field(default=0.0, ge=0.0)   # VP locked by player B
-    cooperation_streak: int = Field(default=0, ge=0)          # Consecutive CC outcomes
+    surplus_captured_a: float = Field(default=0.0, ge=0.0)  # VP locked by player A
+    surplus_captured_b: float = Field(default=0.0, ge=0.0)  # VP locked by player B
+    cooperation_streak: int = Field(default=0, ge=0)  # Consecutive CC outcomes
 
     @field_validator("cooperation_score", mode="before")
     @classmethod
@@ -290,12 +293,7 @@ class GameState(BaseModel):
 
         Expected range: ~10 (peaceful early) to ~37 (chaotic crisis)
         """
-        return (
-            self.base_sigma
-            * self.chaos_factor
-            * self.instability_factor
-            * self.act_multiplier
-        )
+        return self.base_sigma * self.chaos_factor * self.instability_factor * self.act_multiplier
 
     # Surplus convenience properties
     @property
@@ -346,6 +344,7 @@ class ActionResult(BaseModel):
         outcome_code: The outcome code (e.g., "CC", "CD", "DC", "DD")
         narrative: Narrative description of the outcome
     """
+
     action_a: ActionType
     action_b: ActionType
     position_delta_a: float = Field(default=0.0)
@@ -370,18 +369,12 @@ class ActionResult(BaseModel):
     @property
     def is_mutual_cooperation(self) -> bool:
         """Both players cooperated."""
-        return (
-            self.action_a == ActionType.COOPERATIVE
-            and self.action_b == ActionType.COOPERATIVE
-        )
+        return self.action_a == ActionType.COOPERATIVE and self.action_b == ActionType.COOPERATIVE
 
     @property
     def is_mutual_defection(self) -> bool:
         """Both players competed/defected."""
-        return (
-            self.action_a == ActionType.COMPETITIVE
-            and self.action_b == ActionType.COMPETITIVE
-        )
+        return self.action_a == ActionType.COMPETITIVE and self.action_b == ActionType.COMPETITIVE
 
     @property
     def is_mixed(self) -> bool:
@@ -485,31 +478,11 @@ def apply_action_result(state: GameState, result: ActionResult) -> GameState:
     act_mult = state.act_multiplier
 
     # Calculate new values
-    new_position_a = clamp(
-        state.position_a + (result.position_delta_a * act_mult),
-        0.0,
-        10.0
-    )
-    new_position_b = clamp(
-        state.position_b + (result.position_delta_b * act_mult),
-        0.0,
-        10.0
-    )
-    new_resources_a = clamp(
-        state.resources_a - result.resource_cost_a,
-        0.0,
-        10.0
-    )
-    new_resources_b = clamp(
-        state.resources_b - result.resource_cost_b,
-        0.0,
-        10.0
-    )
-    new_risk = clamp(
-        state.risk_level + (result.risk_delta * act_mult),
-        0.0,
-        10.0
-    )
+    new_position_a = clamp(state.position_a + (result.position_delta_a * act_mult), 0.0, 10.0)
+    new_position_b = clamp(state.position_b + (result.position_delta_b * act_mult), 0.0, 10.0)
+    new_resources_a = clamp(state.resources_a - result.resource_cost_a, 0.0, 10.0)
+    new_resources_b = clamp(state.resources_b - result.resource_cost_b, 0.0, 10.0)
+    new_risk = clamp(state.risk_level + (result.risk_delta * act_mult), 0.0, 10.0)
 
     # Calculate cooperation and stability updates
     new_cooperation = update_cooperation_score(state, result)

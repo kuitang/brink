@@ -32,7 +32,7 @@ import json
 import logging
 import sys
 import time
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 
@@ -40,8 +40,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from brinksmanship.generation.scenario_generator import ScenarioGenerator
+from brinksmanship.generation.schemas import Scenario, load_scenario, save_scenario
 from brinksmanship.generation.validator import ScenarioValidator, ValidationResult
-from brinksmanship.generation.schemas import Scenario, save_scenario, load_scenario
 from brinksmanship.prompts import SCENARIO_GENERATION_SYSTEM_PROMPT
 
 # Set up logging to both console and file
@@ -66,9 +66,11 @@ logger.info(f"Logging to: {log_file}")
 # Scenario Library Definition
 # =============================================================================
 
+
 @dataclass
 class ScenarioSpec:
     """Specification for a scenario to generate."""
+
     number: int
     title: str
     prompt: str
@@ -267,7 +269,7 @@ async def generate_single_scenario(
     Returns:
         Tuple of (success, message)
     """
-    from claude_agent_sdk import ClaudeSDKClient, ClaudeAgentOptions, AssistantMessage, TextBlock
+    from claude_agent_sdk import AssistantMessage, ClaudeAgentOptions, ClaudeSDKClient, TextBlock
 
     output_path = output_dir / spec.filename
     abs_output_path = str(output_path.resolve())
@@ -302,6 +304,7 @@ async def generate_single_scenario(
     except Exception as e:
         logger.error(f"[{spec.number}] Initial generation failed: {e}")
         import traceback
+
         logger.error(traceback.format_exc())
         return False, f"Initial generation failed: {spec.title}"
 
@@ -326,7 +329,7 @@ async def generate_single_scenario(
                 break
 
             logger.info(
-                f"[{spec.number}] Iteration {iteration+1}: {len(scenario.turns)} turns, "
+                f"[{spec.number}] Iteration {iteration + 1}: {len(scenario.turns)} turns, "
                 f"{len(scenario.get_all_matrix_types())} types"
             )
 
@@ -348,13 +351,15 @@ async def generate_single_scenario(
                     logger.warning(f"[{spec.number}]   - {err}")
 
                 save_validation_trace(spec, iteration + 1, deterministic_result, scenario)
-                reasoning_traces.append({
-                    "iteration": iteration + 1,
-                    "phase": "deterministic",
-                    "passed": False,
-                    "errors": deterministic_errors,
-                    "action": "edit to fix",
-                })
+                reasoning_traces.append(
+                    {
+                        "iteration": iteration + 1,
+                        "phase": "deterministic",
+                        "passed": False,
+                        "errors": deterministic_errors,
+                        "action": "edit to fix",
+                    }
+                )
 
                 # Use Edit to fix (maintains conversation context)
                 if iteration < max_iterations - 1:
@@ -398,12 +403,14 @@ Make MINIMAL surgical edits. Do NOT:
 
             if full_result.overall_passed:
                 logger.info(f"[{spec.number}] PASSED: {output_path}")
-                reasoning_traces.append({
-                    "iteration": iteration + 1,
-                    "phase": "simulation",
-                    "passed": True,
-                    "action": "validated",
-                })
+                reasoning_traces.append(
+                    {
+                        "iteration": iteration + 1,
+                        "phase": "simulation",
+                        "passed": True,
+                        "action": "validated",
+                    }
+                )
                 _save_reasoning_trace(spec, reasoning_traces)
                 return True, f"Success: {spec.title}"
 
@@ -415,13 +422,15 @@ Make MINIMAL surgical edits. Do NOT:
             for err in simulation_errors[:3]:
                 logger.warning(f"[{spec.number}]   - {err}")
 
-            reasoning_traces.append({
-                "iteration": iteration + 1,
-                "phase": "simulation",
-                "passed": False,
-                "errors": simulation_errors,
-                "action": "edit to fix",
-            })
+            reasoning_traces.append(
+                {
+                    "iteration": iteration + 1,
+                    "phase": "simulation",
+                    "passed": False,
+                    "errors": simulation_errors,
+                    "action": "edit to fix",
+                }
+            )
 
             # Use Edit to fix simulation errors - include full simulation context
             if iteration < max_iterations - 1:
@@ -431,7 +440,7 @@ Make MINIMAL surgical edits. Do NOT:
                 sim_context = ""
                 if full_result.simulation_results:
                     sr = full_result.simulation_results
-                    win_rates = "\n".join(f"  {k}: {v*100:.1f}%" for k, v in sr.strategy_win_rates.items())
+                    win_rates = "\n".join(f"  {k}: {v * 100:.1f}%" for k, v in sr.strategy_win_rates.items())
                     sim_context = f"""
 SIMULATION RESULTS (strategies are defined in validator.py):
 Win rates by strategy:
@@ -439,7 +448,7 @@ Win rates by strategy:
 
 Game statistics:
 - Avg game length: {sr.avg_game_length:.1f} turns
-- Mutual destruction rate: {sr.mutual_destruction_rate*100:.1f}%
+- Mutual destruction rate: {sr.mutual_destruction_rate * 100:.1f}%
 - VP std dev: {sr.vp_std_dev:.1f}
 
 Strategy behaviors:
@@ -569,9 +578,7 @@ async def generate_scenarios_sequential(
                 results.append((spec.number, True, f"Skipped (already valid): {spec.title}"))
                 continue
 
-        success, message = await generate_single_scenario(
-            spec, output_dir, max_iterations, games_per_test
-        )
+        success, message = await generate_single_scenario(spec, output_dir, max_iterations, games_per_test)
         results.append((spec.number, success, message))
 
     return results
@@ -617,9 +624,7 @@ async def generate_scenarios_parallel(
 
     async def limited_generate(spec: ScenarioSpec) -> tuple[int, bool, str]:
         async with semaphore:
-            success, message = await generate_single_scenario(
-                spec, output_dir, max_iterations, games_per_test
-            )
+            success, message = await generate_single_scenario(spec, output_dir, max_iterations, games_per_test)
             return spec.number, success, message
 
     # Run with limited concurrency
@@ -650,21 +655,23 @@ def run_playtest_for_scenario(
     """
     # Import here to avoid circular imports
     from scripts.run_playtest import (
-        run_pairing,
         STRATEGIES,
+        run_pairing,
     )
 
     strategy_names = list(STRATEGIES.keys())
     results = {}
-    all_wins = {name: 0 for name in strategy_names}
-    all_games = {name: 0 for name in strategy_names}
+    all_wins = dict.fromkeys(strategy_names, 0)
+    all_games = dict.fromkeys(strategy_names, 0)
 
     # Run all pairings
     for i, name_a in enumerate(strategy_names):
         for name_b in strategy_names[i:]:
             pairing_key = f"{name_a}:{name_b}"
             pairing_result = run_pairing(
-                name_a, name_b, games,
+                name_a,
+                name_b,
+                games,
                 base_seed=seed,
                 log_dir=None,
                 workers=4,
@@ -680,17 +687,14 @@ def run_playtest_for_scenario(
 
     # Calculate overall win rates
     overall_win_rates = {
-        name: all_wins[name] / all_games[name] if all_games[name] > 0 else 0
-        for name in strategy_names
+        name: all_wins[name] / all_games[name] if all_games[name] > 0 else 0 for name in strategy_names
     }
 
     return {
         "scenario": str(scenario_path),
         "pairings": results,
         "overall_win_rates": overall_win_rates,
-        "dominant_strategies": [
-            name for name, rate in overall_win_rates.items() if rate > 0.60
-        ],
+        "dominant_strategies": [name for name, rate in overall_win_rates.items() if rate > 0.60],
     }
 
 

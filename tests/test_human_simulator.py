@@ -11,8 +11,6 @@ Actual LLM testing is in test_real_llm_integration.py.
 See test_removal_log.md for details.
 """
 
-import pytest
-
 from brinksmanship.testing.human_simulator import (
     HumanPersona,
     HumanSimulator,

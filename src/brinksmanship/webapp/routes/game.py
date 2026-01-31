@@ -16,9 +16,7 @@ bp = Blueprint("game", __name__, url_prefix="/game")
 @login_required
 def play(game_id: str):
     """Main game page."""
-    game_record = GameRecord.query.filter_by(
-        game_id=game_id, user_id=current_user.id
-    ).first_or_404()
+    game_record = GameRecord.query.filter_by(game_id=game_id, user_id=current_user.id).first_or_404()
 
     if game_record.is_finished:
         return redirect(url_for("game.game_over", game_id=game_id))
@@ -39,9 +37,7 @@ def play(game_id: str):
 @login_required
 def submit_action(game_id: str):
     """Submit player action."""
-    game_record = GameRecord.query.filter_by(
-        game_id=game_id, user_id=current_user.id
-    ).first_or_404()
+    game_record = GameRecord.query.filter_by(game_id=game_id, user_id=current_user.id).first_or_404()
 
     if game_record.is_finished:
         return redirect(url_for("game.game_over", game_id=game_id))
@@ -101,9 +97,7 @@ def submit_action(game_id: str):
 @login_required
 def game_over(game_id: str):
     """Game over screen with multi-criteria scorecard."""
-    game_record = GameRecord.query.filter_by(
-        game_id=game_id, user_id=current_user.id
-    ).first_or_404()
+    game_record = GameRecord.query.filter_by(game_id=game_id, user_id=current_user.id).first_or_404()
 
     # Calculate scorecard metrics
     scorecard = _compute_scorecard(game_record)
@@ -147,10 +141,7 @@ def _compute_scorecard(game_record: GameRecord) -> dict:
 
     if settlement_reached:
         # Calculate surplus distributed (total captured surplus)
-        surplus_distributed = (
-            game_record.surplus_captured_player +
-            game_record.surplus_captured_opponent
-        )
+        surplus_distributed = game_record.surplus_captured_player + game_record.surplus_captured_opponent
         # Find who initiated settlement
         first_attempt = game_record.settlement_attempts.first()
         if first_attempt:
@@ -205,22 +196,19 @@ def get_trace(game_id: str):
     """Get full game trace as JSON."""
     from flask import jsonify
 
-    game_record = GameRecord.query.filter_by(
-        game_id=game_id, user_id=current_user.id
-    ).first_or_404()
+    game_record = GameRecord.query.filter_by(game_id=game_id, user_id=current_user.id).first_or_404()
 
     return jsonify(game_record.get_trace())
 
 
 # Settlement routes
 
+
 @bp.route("/<game_id>/settlement")
 @login_required
 def settlement_panel(game_id: str):
     """Get settlement panel HTML."""
-    game_record = GameRecord.query.filter_by(
-        game_id=game_id, user_id=current_user.id
-    ).first_or_404()
+    game_record = GameRecord.query.filter_by(game_id=game_id, user_id=current_user.id).first_or_404()
 
     if game_record.is_finished:
         return "", 204  # No content if game is over
@@ -248,9 +236,7 @@ def settlement_panel(game_id: str):
 @login_required
 def propose_settlement(game_id: str):
     """Player proposes settlement."""
-    game_record = GameRecord.query.filter_by(
-        game_id=game_id, user_id=current_user.id
-    ).first_or_404()
+    game_record = GameRecord.query.filter_by(game_id=game_id, user_id=current_user.id).first_or_404()
 
     if game_record.is_finished:
         return redirect(url_for("game.game_over", game_id=game_id))
@@ -326,9 +312,7 @@ def propose_settlement(game_id: str):
 @login_required
 def respond_to_settlement(game_id: str):
     """Player responds to opponent's settlement proposal."""
-    game_record = GameRecord.query.filter_by(
-        game_id=game_id, user_id=current_user.id
-    ).first_or_404()
+    game_record = GameRecord.query.filter_by(game_id=game_id, user_id=current_user.id).first_or_404()
 
     if game_record.is_finished:
         return redirect(url_for("game.game_over", game_id=game_id))

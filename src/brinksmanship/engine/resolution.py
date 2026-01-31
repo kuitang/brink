@@ -18,9 +18,8 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-from brinksmanship.models.actions import Action, ActionType, map_action_to_matrix_choice
+from brinksmanship.models.actions import Action, map_action_to_matrix_choice
 from brinksmanship.models.matrices import (
-    MatrixType,
     PayoffMatrix,
     StateDeltas,
 )
@@ -30,11 +29,8 @@ from brinksmanship.models.state import (
     clamp,
 )
 from brinksmanship.parameters import (
-    REJECTION_BASE_PENALTY,
-    REJECTION_ESCALATION,
     calculate_rejection_penalty,
 )
-
 
 # =============================================================================
 # Matrix Choice Enum
@@ -200,21 +196,15 @@ class SettlementResponse(BaseModel):
     """
 
     action: SettlementAction
-    counter_vp: int | None = Field(
-        default=None, ge=0, le=100, description="Counterproposal VP (if countering)"
-    )
+    counter_vp: int | None = Field(default=None, ge=0, le=100, description="Counterproposal VP (if countering)")
     counter_surplus_split_percent: int | None = Field(
         default=None,
         ge=0,
         le=100,
         description="Counterproposal surplus split percentage (if countering)",
     )
-    counter_argument: str | None = Field(
-        default=None, max_length=500, description="Counter-argument (if countering)"
-    )
-    rejection_reason: str | None = Field(
-        default=None, max_length=500, description="Explanation for rejection"
-    )
+    counter_argument: str | None = Field(default=None, max_length=500, description="Counter-argument (if countering)")
+    rejection_reason: str | None = Field(default=None, max_length=500, description="Explanation for rejection")
 
 
 @dataclass(frozen=True)
@@ -395,8 +385,7 @@ def resolve_reconnaissance(
                 opponent_learns_position=False,
                 risk_delta=0.0,
                 player_detected=False,
-                narrative="Your reconnaissance succeeded. You have learned your opponent's "
-                "exact strategic position.",
+                narrative="Your reconnaissance succeeded. You have learned your opponent's exact strategic position.",
             )
     else:  # MASK
         if opponent_choice == ReconnaissanceOpponentChoice.VIGILANT:
@@ -407,8 +396,7 @@ def resolve_reconnaissance(
                 opponent_learns_position=False,
                 risk_delta=0.0,
                 player_detected=False,
-                narrative="Both sides maintained operational security. "
-                "No intelligence was exchanged.",
+                narrative="Both sides maintained operational security. No intelligence was exchanged.",
             )
         else:  # PROJECT
             # Exposed: Opponent learns player's position
@@ -617,13 +605,11 @@ def handle_settlement_acceptance(
     if proposer == "A":
         surplus_a = proposer_surplus
         surplus_b = recipient_surplus
-        vp_a = proposal.offered_vp
-        vp_b = 100 - proposal.offered_vp
+        100 - proposal.offered_vp
     else:
         surplus_a = recipient_surplus
         surplus_b = proposer_surplus
-        vp_a = 100 - proposal.offered_vp
-        vp_b = proposal.offered_vp
+        100 - proposal.offered_vp
 
     # Create new state with surplus distributed
     new_state = state.model_copy(
@@ -840,12 +826,8 @@ def apply_state_deltas(
 
     # Create new state with updated values
     # Note: We use model_copy to preserve other fields like information state
-    new_player_a = state.player_a.model_copy(
-        update={"position": new_position_a, "resources": new_resources_a}
-    )
-    new_player_b = state.player_b.model_copy(
-        update={"position": new_position_b, "resources": new_resources_b}
-    )
+    new_player_a = state.player_a.model_copy(update={"position": new_position_a, "resources": new_resources_a})
+    new_player_b = state.player_b.model_copy(update={"position": new_position_b, "resources": new_resources_b})
 
     return state.model_copy(
         update={
@@ -1054,20 +1036,12 @@ def resolve_inspection_turn(
     # Apply position changes
     if player == "A":
         # Opponent is B
-        new_player_b.position = clamp(
-            new_player_b.position + result.opponent_position_delta, 0.0, 10.0
-        )
-        new_player_a.position = clamp(
-            new_player_a.position + result.player_position_delta, 0.0, 10.0
-        )
+        new_player_b.position = clamp(new_player_b.position + result.opponent_position_delta, 0.0, 10.0)
+        new_player_a.position = clamp(new_player_a.position + result.player_position_delta, 0.0, 10.0)
     else:
         # Opponent is A
-        new_player_a.position = clamp(
-            new_player_a.position + result.opponent_position_delta, 0.0, 10.0
-        )
-        new_player_b.position = clamp(
-            new_player_b.position + result.player_position_delta, 0.0, 10.0
-        )
+        new_player_a.position = clamp(new_player_a.position + result.opponent_position_delta, 0.0, 10.0)
+        new_player_b.position = clamp(new_player_b.position + result.player_position_delta, 0.0, 10.0)
 
     # Update information states
     if result.player_learns_resources:

@@ -7,7 +7,7 @@ See ENGINEERING_DESIGN.md Milestone 4.1 for specification.
 """
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, Literal
 
 from brinksmanship.models.actions import Action
@@ -68,7 +68,9 @@ class SettlementResponse:
                 raise ValueError(f"counter_vp must be 0-100, got {self.counter_vp}")
             if self.counter_surplus_split_percent is not None:
                 if not 0 <= self.counter_surplus_split_percent <= 100:
-                    raise ValueError(f"counter_surplus_split_percent must be 0-100, got {self.counter_surplus_split_percent}")
+                    raise ValueError(
+                        f"counter_surplus_split_percent must be 0-100, got {self.counter_surplus_split_percent}"
+                    )
 
 
 class Opponent(ABC):
@@ -90,12 +92,10 @@ class Opponent(ABC):
             name: Display name for the opponent
         """
         self.name = name
-        self._history: list[tuple[Action, Action, "ActionResult"]] = []
+        self._history: list[tuple[Action, Action, ActionResult]] = []
 
     @abstractmethod
-    async def choose_action(
-        self, state: GameState, available_actions: list[Action]
-    ) -> Action:
+    async def choose_action(self, state: GameState, available_actions: list[Action]) -> Action:
         """Choose strategic action for this turn.
 
         This method is async because LLM-based opponents (HistoricalPersona)
@@ -114,14 +114,14 @@ class Opponent(ABC):
     def receive_result(self, result: "ActionResult") -> None:
         """Process the result of a turn for learning/adaptation.
 
-        Default implementation stores history. Subclasses can override
+        Default implementation is a no-op. Subclasses can override
         to implement learning behavior.
 
         Args:
             result: The outcome of the turn
         """
-        # Default: just record history (subclasses may do more)
-        pass
+        # No-op in base class - subclasses may override for learning
+        _ = result  # Acknowledge result parameter
 
     @abstractmethod
     async def evaluate_settlement(

@@ -33,7 +33,6 @@ from brinksmanship.storage.sqlite_repo import (
     SQLiteScenarioRepository,
 )
 
-
 # ============================================================================
 # FileScenarioRepository Tests - Error Boundaries Only
 # ============================================================================
@@ -264,12 +263,12 @@ class TestGameRecordRepositoryIntegration:
 
     def test_user_filter(self, game_repo):
         """Both backends should filter games by user_id."""
-        for i in range(3):
+        for _i in range(3):
             game_repo.save_game(
                 str(uuid.uuid4()),
                 {"scenario_id": "s", "user_id": 1},
             )
-        for i in range(2):
+        for _i in range(2):
             game_repo.save_game(
                 str(uuid.uuid4()),
                 {"scenario_id": "s", "user_id": 2},

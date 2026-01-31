@@ -7,7 +7,7 @@ import json
 import sys
 import tempfile
 from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 
@@ -20,7 +20,7 @@ class TestPlayerFactory:
 
     def test_create_smart_player(self):
         """Smart player spec creates SmartRationalPlayer."""
-        from run_matchup import create_player, SmartRationalPlayer
+        from run_matchup import SmartRationalPlayer, create_player
 
         player = create_player("smart", is_player_a=True)
         assert isinstance(player, SmartRationalPlayer)
@@ -32,6 +32,7 @@ class TestPlayerFactory:
     def test_create_historical_player(self):
         """Historical player spec creates HistoricalPersona."""
         from run_matchup import create_player
+
         from brinksmanship.opponents.historical import HistoricalPersona
 
         player = create_player("historical:nixon", is_player_a=True)
@@ -149,7 +150,7 @@ class TestReportGeneration:
                 "player_b": "historical:khrushchev",
                 "games": [
                     {"winner": "A", "ending_type": "settlement", "turns": 7, "vp_a": 55, "vp_b": 45},
-                ]
+                ],
             }
             (results_dir / "test.json").write_text(json.dumps(result))
 
@@ -167,11 +168,9 @@ class TestReportGeneration:
                 "player_a": "historical:nixon",
                 "player_b": "historical:khrushchev",
                 "games": [
-                    {"winner": "A", "ending_type": "settlement", "turns": 7,
-                     "vp_a": 55, "vp_b": 45, "final_risk": 3.0},
-                    {"winner": "B", "ending_type": "max_turns", "turns": 14,
-                     "vp_a": 45, "vp_b": 55, "final_risk": 5.0},
-                ]
+                    {"winner": "A", "ending_type": "settlement", "turns": 7, "vp_a": 55, "vp_b": 45, "final_risk": 3.0},
+                    {"winner": "B", "ending_type": "max_turns", "turns": 14, "vp_a": 45, "vp_b": 55, "final_risk": 5.0},
+                ],
             }
         ]
 
@@ -202,14 +201,21 @@ class TestScenarioMapping:
 
     def test_all_mapped_personas_exist(self):
         """All personas in the mapping actually exist."""
+        # Get mapping from run_matchup
+
         from brinksmanship.opponents.historical import PERSONA_PROMPTS
 
-        # Get mapping from run_matchup
-        from run_matchup import create_player
-
         persona_names = [
-            "nixon", "khrushchev", "kissinger", "bismarck", "metternich",
-            "gates", "jobs", "theodora", "livia", "richelieu"
+            "nixon",
+            "khrushchev",
+            "kissinger",
+            "bismarck",
+            "metternich",
+            "gates",
+            "jobs",
+            "theodora",
+            "livia",
+            "richelieu",
         ]
 
         for persona in persona_names:
@@ -248,8 +254,6 @@ class TestWorkflowIntegration:
     @pytest.mark.asyncio
     async def test_run_matchup_mocked(self):
         """Run matchup with mocked LLM calls."""
-        from run_matchup import run_matchup, GameResult
-        from brinksmanship.models.actions import Action, ActionType
 
         # Mock generate_json to return deterministic action
         with patch("run_matchup.generate_json") as mock_generate:

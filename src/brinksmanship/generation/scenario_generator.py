@@ -268,9 +268,7 @@ def parse_matrix_parameters(
         "swerve_payoff": params_dict.get("swerve_payoff", defaults.swerve_payoff),
         "crash_payoff": params_dict.get("crash_payoff", defaults.crash_payoff),
         "coordination_bonus": params_dict.get("coordination_bonus", defaults.coordination_bonus),
-        "miscoordination_penalty": params_dict.get(
-            "miscoordination_penalty", defaults.miscoordination_penalty
-        ),
+        "miscoordination_penalty": params_dict.get("miscoordination_penalty", defaults.miscoordination_penalty),
         "preference_a": params_dict.get("preference_a", defaults.preference_a),
         "preference_b": params_dict.get("preference_b", defaults.preference_b),
         "stag_payoff": params_dict.get("stag_payoff", defaults.stag_payoff),
@@ -331,9 +329,7 @@ class ScenarioGenerator:
             A validated Scenario object with all matrices constructable.
         """
         # Randomize turn count if not specified (12-16 range)
-        num_turns = (
-            random.randint(12, 16) if num_turns is None else max(12, min(16, num_turns))
-        )
+        num_turns = random.randint(12, 16) if num_turns is None else max(12, min(16, num_turns))
 
         # Add error feedback to additional context if provided
         error_context = additional_context
@@ -541,9 +537,7 @@ class ScenarioGenerator:
         return TurnDefinition(
             turn=turn_num,
             act=act,
-            narrative_briefing=turn_data.get(
-                "narrative_briefing", f"Turn {turn_num} situation briefing."
-            ),
+            narrative_briefing=turn_data.get("narrative_briefing", f"Turn {turn_num} situation briefing."),
             matrix_type=matrix_type,
             matrix_parameters=scaled_params,
             actions=actions_data,

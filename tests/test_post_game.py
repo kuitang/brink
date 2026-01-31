@@ -11,17 +11,13 @@ _format_ending_type) were removed as they test simple string formatting.
 See test_removal_log.md for details.
 """
 
-import pytest
-
 from brinksmanship.coaching.bayesian_inference import OpponentType
 from brinksmanship.coaching.post_game import (
-    CoachingReport,
-    CriticalDecision,
     PostGameCoach,
     format_turn_history,
 )
-from brinksmanship.engine.game_engine import EndingType, TurnRecord, TurnPhase
-from brinksmanship.models.actions import Action, ActionType, ActionCategory
+from brinksmanship.engine.game_engine import TurnPhase, TurnRecord
+from brinksmanship.models.actions import Action, ActionCategory, ActionType
 from brinksmanship.models.matrices import MatrixType
 from brinksmanship.models.state import ActionResult, GameState
 
@@ -420,8 +416,7 @@ could have led to a better outcome.
             category=ActionCategory.STANDARD,
         )
         history = [
-            TurnRecord(turn=i, phase=TurnPhase.RESOLUTION, action_a=action, action_b=action)
-            for i in range(1, 11)
+            TurnRecord(turn=i, phase=TurnPhase.RESOLUTION, action_a=action, action_b=action) for i in range(1, 11)
         ]
 
         text = """

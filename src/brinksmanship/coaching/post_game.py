@@ -20,7 +20,6 @@ from brinksmanship.coaching.bayesian_inference import (
     BayesianInference,
     ObservedAction,
     OpponentType,
-    OpponentTypeDistribution,
 )
 from brinksmanship.engine.game_engine import EndingType, GameEnding, TurnRecord
 from brinksmanship.llm import generate_text
@@ -320,9 +319,7 @@ class PostGameCoach:
             CoachingReport with structured analysis and recommendations.
         """
         # Run Bayesian inference to get mathematically correct type inference
-        inference, inferred_type, type_probability = self.run_bayesian_inference(
-            history, player_is_a
-        )
+        inference, inferred_type, type_probability = self.run_bayesian_inference(history, player_is_a)
         inference_trace = inference.format_inference_trace()
 
         # Format the turn history for the prompt
@@ -330,8 +327,7 @@ class PostGameCoach:
 
         # Build the prompt (include Bayesian inference summary for LLM context)
         bayesian_summary = (
-            f"Bayesian analysis inferred opponent type: {inferred_type.value} "
-            f"(probability: {type_probability:.1%})"
+            f"Bayesian analysis inferred opponent type: {inferred_type.value} (probability: {type_probability:.1%})"
         )
 
         prompt = format_coaching_prompt(
@@ -473,10 +469,7 @@ class PostGameCoach:
             if pos != -1:
                 # Move past the header line
                 newline_pos = text.find("\n", pos)
-                if newline_pos != -1:
-                    start_pos = newline_pos + 1
-                else:
-                    start_pos = pos + len(marker)
+                start_pos = newline_pos + 1 if newline_pos != -1 else pos + len(marker)
                 break
 
         if start_pos == -1:

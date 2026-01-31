@@ -5,22 +5,17 @@ Run this to confirm Opus 4.5 and Sonnet 4.5 are accessible via the SDK.
 """
 
 import asyncio
-from claude_agent_sdk import query, ClaudeAgentOptions, AssistantMessage, TextBlock, ResultMessage
+
+from claude_agent_sdk import AssistantMessage, ClaudeAgentOptions, ResultMessage, TextBlock, query
 
 
 async def test_model(model_name: str) -> bool:
     """Test a model via Claude Agent SDK and return success/failure."""
     try:
-        options = ClaudeAgentOptions(
-            model=model_name,
-            max_turns=1
-        )
+        options = ClaudeAgentOptions(model=model_name, max_turns=1)
 
         response_text = ""
-        async for message in query(
-            prompt="Say 'Model test successful' and nothing else.",
-            options=options
-        ):
+        async for message in query(prompt="Say 'Model test successful' and nothing else.", options=options):
             if isinstance(message, AssistantMessage):
                 for block in message.content:
                     if isinstance(block, TextBlock):
@@ -29,18 +24,18 @@ async def test_model(model_name: str) -> bool:
                 print(f"  Model: {model_name}")
                 print(f"  Response: {response_text[:100]}")
                 print(f"  Cost: ${message.total_cost_usd:.4f}" if message.total_cost_usd else "  Cost: N/A")
-                print(f"  Status: SUCCESS")
+                print("  Status: SUCCESS")
                 return True
 
         print(f"  Model: {model_name}")
         print(f"  Response: {response_text[:100]}")
-        print(f"  Status: SUCCESS (no ResultMessage)")
+        print("  Status: SUCCESS (no ResultMessage)")
         return True
 
     except Exception as e:
         print(f"  Model: {model_name}")
         print(f"  Error: {e}")
-        print(f"  Status: FAILED")
+        print("  Status: FAILED")
         return False
 
 

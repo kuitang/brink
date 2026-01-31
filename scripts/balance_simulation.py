@@ -34,8 +34,8 @@ import sys
 from pathlib import Path
 
 from brinksmanship.testing.batch_runner import (
-    BatchRunner,
     DETERMINISTIC_OPPONENTS,
+    BatchRunner,
     print_results_summary,
 )
 
@@ -168,9 +168,10 @@ Examples:
             sys.exit(1)
 
         print(f"Running {len(pairings)} pairing(s)...")
-        from brinksmanship.testing.batch_runner import PairingStats, BatchResults
-        from datetime import datetime
         import time
+        from datetime import datetime
+
+        from brinksmanship.testing.batch_runner import BatchResults
 
         start_time = time.time()
         results = BatchResults(

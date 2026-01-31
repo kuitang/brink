@@ -60,9 +60,8 @@ async def generate_text(
             for block in message.content:
                 if isinstance(block, TextBlock):
                     response_text += block.text
-        elif isinstance(message, ResultMessage):
-            if message.result:
-                response_text = str(message.result)
+        elif isinstance(message, ResultMessage) and message.result:
+            response_text = str(message.result)
 
     return response_text
 
@@ -128,7 +127,7 @@ async def generate_json(
                     response_text += block.text
         elif isinstance(message, ResultMessage):
             # Structured output is populated in ResultMessage when schema is provided
-            if hasattr(message, 'structured_output') and message.structured_output:
+            if hasattr(message, "structured_output") and message.structured_output:
                 structured_output = message.structured_output
 
             elif message.result:
@@ -148,17 +147,17 @@ async def generate_json(
     # Try to extract JSON from markdown code blocks anywhere in the response
 
     # Pattern 1: Find ```json ... ``` block
-    json_block_match = re.search(r'```json\s*\n(.*?)\n```', text, re.DOTALL)
+    json_block_match = re.search(r"```json\s*\n(.*?)\n```", text, re.DOTALL)
     if json_block_match:
         text = json_block_match.group(1).strip()
     else:
         # Pattern 2: Find ``` ... ``` block (generic code block)
-        code_block_match = re.search(r'```\s*\n(.*?)\n```', text, re.DOTALL)
+        code_block_match = re.search(r"```\s*\n(.*?)\n```", text, re.DOTALL)
         if code_block_match:
             text = code_block_match.group(1).strip()
         else:
             # Pattern 3: Find JSON object directly (starts with { and ends with })
-            json_obj_match = re.search(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}', text, re.DOTALL)
+            json_obj_match = re.search(r"\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}", text, re.DOTALL)
             if json_obj_match:
                 text = json_obj_match.group(0).strip()
             # Otherwise, keep text as-is and let json.loads fail with clear error
@@ -254,9 +253,8 @@ async def agentic_query(
             for block in message.content:
                 if isinstance(block, TextBlock):
                     response_text += block.text
-        elif isinstance(message, ResultMessage):
-            if message.result:
-                response_text = str(message.result)
+        elif isinstance(message, ResultMessage) and message.result:
+            response_text = str(message.result)
 
     return response_text
 
@@ -297,6 +295,7 @@ async def generate_and_fix_json(
     """
     import json
     from pathlib import Path
+
     from claude_agent_sdk import ClaudeSDKClient
 
     # Ensure absolute path

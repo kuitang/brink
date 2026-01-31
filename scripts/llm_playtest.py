@@ -20,17 +20,13 @@ Note: LLM playtesting requires API keys and incurs costs. Estimate ~20 API calls
 import argparse
 import asyncio
 import json
-import random
-import time
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional
 
-from brinksmanship.engine.game_engine import EndingType, GameEngine
-from brinksmanship.opponents import get_opponent_by_type, list_opponent_types
+from brinksmanship.engine.game_engine import GameEngine
+from brinksmanship.opponents import get_opponent_by_type
 from brinksmanship.opponents.base import Opponent
-from brinksmanship.opponents.deterministic import TitForTat
 from brinksmanship.opponents.historical import PERSONA_DISPLAY_NAMES
 from brinksmanship.storage import get_scenario_repository
 
@@ -38,6 +34,7 @@ from brinksmanship.storage import get_scenario_repository
 @dataclass
 class GameMetrics:
     """Metrics collected from a single game."""
+
     scenario_id: str
     persona_name: str
     opponent_name: str
@@ -50,12 +47,13 @@ class GameMetrics:
     settlement_accepted: bool = False
     cooperation_final: float = 0.0
     risk_final: float = 0.0
-    error: Optional[str] = None
+    error: str | None = None
 
 
 @dataclass
 class PlaytestResults:
     """Aggregated results from a playtest batch."""
+
     timestamp: str
     total_games: int
     scenarios: list[str]
@@ -99,9 +97,9 @@ async def run_single_game(
     repo = get_scenario_repository()
     engine = GameEngine(scenario_id, repo)
 
-    if hasattr(persona, 'set_player_side'):
+    if hasattr(persona, "set_player_side"):
         persona.set_player_side(is_player_a=True)
-    if hasattr(opponent, 'set_player_side'):
+    if hasattr(opponent, "set_player_side"):
         opponent.set_player_side(is_player_a=False)
 
     settlement_proposed = False
@@ -114,14 +112,12 @@ async def run_single_game(
             # Check for settlement (turn > 4, stability > 2)
             if state.turn > 4 and state.stability > 2:
                 # Check if persona wants to propose
-                if hasattr(persona, 'propose_settlement'):
+                if hasattr(persona, "propose_settlement"):
                     proposal = await persona.propose_settlement(state)
                     if proposal:
                         settlement_proposed = True
-                        if hasattr(opponent, 'evaluate_settlement'):
-                            response = await opponent.evaluate_settlement(
-                                proposal, state, is_final_offer=False
-                            )
+                        if hasattr(opponent, "evaluate_settlement"):
+                            response = await opponent.evaluate_settlement(proposal, state, is_final_offer=False)
                             if response.action == "accept":
                                 settlement_accepted = True
                                 # End game via settlement
@@ -151,9 +147,9 @@ async def run_single_game(
 
             result = engine.submit_actions(action_a, action_b)
 
-            if hasattr(persona, 'receive_result') and result.action_result:
+            if hasattr(persona, "receive_result") and result.action_result:
                 persona.receive_result(result.action_result)
-            if hasattr(opponent, 'receive_result') and result.action_result:
+            if hasattr(opponent, "receive_result") and result.action_result:
                 opponent.receive_result(result.action_result)
 
             if result.ending:
@@ -238,7 +234,9 @@ async def run_playtest_batch(
                 if metric.error:
                     print(f"  Game {game_num + 1}: ERROR - {metric.error}")
                 else:
-                    print(f"  Game {game_num + 1}: {metric.winner} won ({metric.ending_type}, {metric.turns_played} turns)")
+                    print(
+                        f"  Game {game_num + 1}: {metric.winner} won ({metric.ending_type}, {metric.turns_played} turns)"
+                    )
 
     return results
 
@@ -266,7 +264,7 @@ def generate_markdown_report(results: PlaytestResults, output_path: Path) -> Non
     else:
         persona_wins = sum(1 for g in valid_games if g.winner == "persona")
         opponent_wins = sum(1 for g in valid_games if g.winner == "opponent")
-        ties = sum(1 for g in valid_games if g.winner == "tie")
+        sum(1 for g in valid_games if g.winner == "tie")
 
         settlements = sum(1 for g in valid_games if g.ending_type == "settlement")
         md = sum(1 for g in valid_games if g.ending_type == "mutual_destruction")
@@ -274,18 +272,20 @@ def generate_markdown_report(results: PlaytestResults, output_path: Path) -> Non
         avg_turns = sum(g.turns_played for g in valid_games) / len(valid_games)
         avg_vp_persona = sum(g.vp_persona for g in valid_games) / len(valid_games)
 
-        lines.extend([
-            f"| Metric | Value |",
-            f"|--------|-------|",
-            f"| Valid Games | {len(valid_games)} |",
-            f"| Persona Win Rate | {persona_wins / len(valid_games) * 100:.1f}% |",
-            f"| Opponent Win Rate | {opponent_wins / len(valid_games) * 100:.1f}% |",
-            f"| Settlement Rate | {settlements / len(valid_games) * 100:.1f}% |",
-            f"| Mutual Destruction Rate | {md / len(valid_games) * 100:.1f}% |",
-            f"| Avg Game Length | {avg_turns:.1f} turns |",
-            f"| Avg Persona VP | {avg_vp_persona:.1f} |",
-            "",
-        ])
+        lines.extend(
+            [
+                "| Metric | Value |",
+                "|--------|-------|",
+                f"| Valid Games | {len(valid_games)} |",
+                f"| Persona Win Rate | {persona_wins / len(valid_games) * 100:.1f}% |",
+                f"| Opponent Win Rate | {opponent_wins / len(valid_games) * 100:.1f}% |",
+                f"| Settlement Rate | {settlements / len(valid_games) * 100:.1f}% |",
+                f"| Mutual Destruction Rate | {md / len(valid_games) * 100:.1f}% |",
+                f"| Avg Game Length | {avg_turns:.1f} turns |",
+                f"| Avg Persona VP | {avg_vp_persona:.1f} |",
+                "",
+            ]
+        )
 
         # Per-persona breakdown
         lines.extend(["## Per-Persona Results", ""])
@@ -299,7 +299,9 @@ def generate_markdown_report(results: PlaytestResults, output_path: Path) -> Non
                 avg_vp = sum(g.vp_persona for g in persona_games) / len(persona_games)
                 settle_rate = sum(1 for g in persona_games if g.ending_type == "settlement") / len(persona_games)
                 display = PERSONA_DISPLAY_NAMES.get(persona, persona)
-                lines.append(f"| {display} | {len(persona_games)} | {wins / len(persona_games) * 100:.1f}% | {avg_vp:.1f} | {settle_rate * 100:.1f}% |")
+                lines.append(
+                    f"| {display} | {len(persona_games)} | {wins / len(persona_games) * 100:.1f}% | {avg_vp:.1f} | {settle_rate * 100:.1f}% |"
+                )
 
         lines.extend(["", "## Per-Scenario Results", ""])
         lines.append("| Scenario | Games | Persona Win Rate | Avg Turns | MD Rate |")
@@ -311,7 +313,9 @@ def generate_markdown_report(results: PlaytestResults, output_path: Path) -> Non
                 wins = sum(1 for g in scenario_games if g.winner == "persona")
                 avg_t = sum(g.turns_played for g in scenario_games) / len(scenario_games)
                 md_rate = sum(1 for g in scenario_games if g.ending_type == "mutual_destruction") / len(scenario_games)
-                lines.append(f"| {scenario} | {len(scenario_games)} | {wins / len(scenario_games) * 100:.1f}% | {avg_t:.1f} | {md_rate * 100:.1f}% |")
+                lines.append(
+                    f"| {scenario} | {len(scenario_games)} | {wins / len(scenario_games) * 100:.1f}% | {avg_t:.1f} | {md_rate * 100:.1f}% |"
+                )
 
     # Errors
     error_games = [g for g in results.games if g.error is not None]
@@ -353,7 +357,7 @@ def main():
         # Default to a few representative personas
         personas = ["nixon", "bismarck", "kissinger"]
 
-    print(f"LLM Playtest Configuration:")
+    print("LLM Playtest Configuration:")
     print(f"  Scenarios: {len(scenarios)}")
     print(f"  Personas: {len(personas)}")
     print(f"  Games per combo: {args.games}")
@@ -362,12 +366,14 @@ def main():
     print()
 
     # Run playtests
-    results = asyncio.run(run_playtest_batch(
-        scenarios=scenarios,
-        personas=personas,
-        games_per_combo=args.games,
-        deterministic_opponent=args.opponent,
-    ))
+    results = asyncio.run(
+        run_playtest_batch(
+            scenarios=scenarios,
+            personas=personas,
+            games_per_combo=args.games,
+            deterministic_opponent=args.opponent,
+        )
+    )
 
     # Generate report
     output_path = Path(args.output)

@@ -33,9 +33,7 @@ class TurnHistory(db.Model):
     # Timestamp
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    __table_args__ = (
-        db.UniqueConstraint('game_id', 'turn', name='unique_game_turn'),
-    )
+    __table_args__ = (db.UniqueConstraint("game_id", "turn", name="unique_game_turn"),)
 
 
 class SettlementAttempt(db.Model):
@@ -115,12 +113,18 @@ class GameRecord(db.Model):
     finished_at = db.Column(db.DateTime, nullable=True)
 
     # Relationship to turn history
-    turns = db.relationship('TurnHistory', backref='game', lazy='dynamic',
-                           order_by='TurnHistory.turn', cascade='all, delete-orphan')
+    turns = db.relationship(
+        "TurnHistory", backref="game", lazy="dynamic", order_by="TurnHistory.turn", cascade="all, delete-orphan"
+    )
 
     # Relationship to settlement attempts
-    settlement_attempts = db.relationship('SettlementAttempt', backref='game', lazy='dynamic',
-                                          order_by='SettlementAttempt.turn', cascade='all, delete-orphan')
+    settlement_attempts = db.relationship(
+        "SettlementAttempt",
+        backref="game",
+        lazy="dynamic",
+        order_by="SettlementAttempt.turn",
+        cascade="all, delete-orphan",
+    )
 
     @property
     def history(self) -> list[dict[str, Any]]:
@@ -249,7 +253,9 @@ class GameRecord(db.Model):
                 "type": self.ending_type,
                 "vp_player": self.final_vp_player,
                 "vp_opponent": self.final_vp_opponent,
-            } if self.is_finished else None,
+            }
+            if self.is_finished
+            else None,
         }
 
     @property

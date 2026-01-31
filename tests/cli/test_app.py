@@ -1,7 +1,8 @@
 """Tests for the CLI application."""
 
-import pytest
 from unittest.mock import MagicMock, patch
+
+import pytest
 
 from brinksmanship.cli.app import BrinksmanshipCLI, run_async
 
@@ -47,8 +48,8 @@ def mock_scenario_repo():
 @pytest.fixture
 def mock_opponent():
     """Mock opponent that doesn't require LLM calls."""
-    from brinksmanship.models.actions import Action, ActionType
-    from brinksmanship.opponents.base import Opponent, SettlementProposal, SettlementResponse
+    from brinksmanship.models.actions import ActionType
+    from brinksmanship.opponents.base import Opponent, SettlementResponse
 
     class MockOpponent(Opponent):
         async def choose_action(self, state, available_actions):
@@ -82,6 +83,7 @@ class TestBrinksmanshipCLI:
 
     def test_run_async_with_sync_value(self):
         """run_async should handle async functions."""
+
         async def async_add(x, y):
             return x + y
 
@@ -94,6 +96,7 @@ class TestAsyncHandling:
 
     def test_run_async_basic(self):
         """run_async should work with basic async functions."""
+
         async def simple_async():
             return 42
 
@@ -102,6 +105,7 @@ class TestAsyncHandling:
 
     def test_run_async_with_params(self):
         """run_async should work with async functions with parameters."""
+
         async def async_multiply(a, b):
             return a * b
 
@@ -136,7 +140,7 @@ class TestScorecardCalculations:
 
         # Create mock history with 5 consecutive CC outcomes
         mock_records = []
-        for i in range(5):
+        for _i in range(5):
             record = MagicMock()
             record.outcome = MagicMock()
             record.outcome.outcome_code = "CC"
@@ -216,9 +220,7 @@ class TestScorecardCalculations:
 
         # Mock trace logger with settlement attempt
         mock_trace = MagicMock()
-        mock_trace.trace.settlement_attempts = [
-            {"proposer": "human", "response": "accept"}
-        ]
+        mock_trace.trace.settlement_attempts = [{"proposer": "human", "response": "accept"}]
         cli.trace_logger = mock_trace
 
         result = cli._get_settlement_initiator()
@@ -229,9 +231,7 @@ class TestScorecardCalculations:
         cli = cli_with_mock_repo
 
         mock_trace = MagicMock()
-        mock_trace.trace.settlement_attempts = [
-            {"proposer": "opponent", "response": "accept"}
-        ]
+        mock_trace.trace.settlement_attempts = [{"proposer": "opponent", "response": "accept"}]
         cli.trace_logger = mock_trace
 
         result = cli._get_settlement_initiator()

@@ -10,7 +10,7 @@ See prompts.py for persona definitions (PERSONA_BISMARCK, PERSONA_NIXON, etc.).
 
 from typing import Any
 
-from brinksmanship.llm import generate_json, generate_text
+from brinksmanship.llm import generate_json
 from brinksmanship.models.actions import Action, ActionType
 from brinksmanship.models.state import ActionResult, GameState
 from brinksmanship.opponents.base import (
@@ -22,17 +22,12 @@ from brinksmanship.prompts import (
     ACTION_SELECTION_SCHEMA,
     HISTORICAL_PERSONA_SYSTEM_PROMPT,
     PERSONA_ACTION_SELECTION_PROMPT,
-    PERSONA_BISMARCK,
-    PERSONA_KHRUSHCHEV,
-    PERSONA_NIXON,
     PERSONA_SETTLEMENT_PROPOSAL_PROMPT,
-    SETTLEMENT_EVALUATION_PROMPT,
     SETTLEMENT_EVALUATION_SCHEMA,
     SETTLEMENT_EVALUATION_SYSTEM_PROMPT,
     SETTLEMENT_PROPOSAL_SCHEMA,
     format_settlement_evaluation_prompt,
 )
-
 
 # Mapping from persona name to prompt constant name in prompts.py
 PERSONA_PROMPTS: dict[str, str] = {
@@ -99,18 +94,13 @@ def _get_persona_description(persona_name: str) -> str:
 
     prompt_name = PERSONA_PROMPTS.get(persona_name.lower())
     if not prompt_name:
-        raise ValueError(
-            f"Unknown persona: {persona_name}. "
-            f"Valid personas: {list(PERSONA_PROMPTS.keys())}"
-        )
+        raise ValueError(f"Unknown persona: {persona_name}. Valid personas: {list(PERSONA_PROMPTS.keys())}")
 
     # Get the persona constant from the prompts module
     persona_desc = getattr(prompts_module, prompt_name, None)
     if persona_desc is None:
         # Fallback: return a generic description based on the name
-        display_name = PERSONA_DISPLAY_NAMES.get(
-            persona_name.lower(), persona_name.title()
-        )
+        display_name = PERSONA_DISPLAY_NAMES.get(persona_name.lower(), persona_name.title())
         return f"""You are {display_name}.
 
 Embody this historical figure's documented strategic patterns and worldview.
@@ -177,10 +167,7 @@ class HistoricalPersona(Opponent):
         normalized_name = persona_name.lower().replace("-", "_").replace(" ", "_")
 
         if normalized_name not in PERSONA_PROMPTS:
-            raise ValueError(
-                f"Unknown persona: {persona_name}. "
-                f"Valid personas: {list(PERSONA_PROMPTS.keys())}"
-            )
+            raise ValueError(f"Unknown persona: {persona_name}. Valid personas: {list(PERSONA_PROMPTS.keys())}")
 
         display_name = PERSONA_DISPLAY_NAMES.get(normalized_name, persona_name.title())
         super().__init__(name=display_name)
@@ -216,16 +203,11 @@ class HistoricalPersona(Opponent):
         Returns:
             Tuple of (estimated_position, uncertainty_radius)
         """
-        if self.is_player_a:
-            info_state = state.player_a.information
-        else:
-            info_state = state.player_b.information
+        info_state = state.player_a.information if self.is_player_a else state.player_b.information
 
         return info_state.get_position_estimate(state.turn)
 
-    async def choose_action(
-        self, state: GameState, available_actions: list[Action]
-    ) -> Action:
+    async def choose_action(self, state: GameState, available_actions: list[Action]) -> Action:
         """Choose an action using LLM with persona prompt.
 
         Args:
@@ -271,7 +253,7 @@ class HistoricalPersona(Opponent):
 
         # Parse response and find matching action
         selected_name = response.get("selected_action", "").strip()
-        reasoning = response.get("reasoning", "")
+        response.get("reasoning", "")
 
         # Find the matching action (case-insensitive)
         selected_action = None
@@ -437,10 +419,7 @@ class HistoricalPersona(Opponent):
         argument = response.get("argument", "")
 
         # Validate and clamp VP
-        if offered_vp is None:
-            offered_vp = fair_vp
-        else:
-            offered_vp = max(min_vp, min(max_vp, int(offered_vp)))
+        offered_vp = fair_vp if offered_vp is None else max(min_vp, min(max_vp, int(offered_vp)))
 
         return SettlementProposal(
             offered_vp=offered_vp,
@@ -469,10 +448,7 @@ class HistoricalPersona(Opponent):
         if not self.action_history:
             return {"turns_played": 0}
 
-        cooperative_count = sum(
-            1 for action, _ in self.action_history
-            if action.action_type == ActionType.COOPERATIVE
-        )
+        cooperative_count = sum(1 for action, _ in self.action_history if action.action_type == ActionType.COOPERATIVE)
         competitive_count = len(self.action_history) - cooperative_count
 
         return {

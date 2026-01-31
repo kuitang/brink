@@ -41,17 +41,17 @@ class EndingType(Enum):
 
     # Deterministic endings
     MUTUAL_DESTRUCTION = auto()  # Risk = 10
-    POSITION_LOSS_A = auto()     # Player A Position = 0
-    POSITION_LOSS_B = auto()     # Player B Position = 0
-    RESOURCE_LOSS_A = auto()     # Player A Resources = 0
-    RESOURCE_LOSS_B = auto()     # Player B Resources = 0
+    POSITION_LOSS_A = auto()  # Player A Position = 0
+    POSITION_LOSS_B = auto()  # Player B Position = 0
+    RESOURCE_LOSS_A = auto()  # Player A Resources = 0
+    RESOURCE_LOSS_B = auto()  # Player B Resources = 0
 
     # Probabilistic endings
     CRISIS_TERMINATION = auto()  # Random termination when Risk > 7, Turn >= 10
-    MAX_TURNS = auto()           # Natural ending at max_turns
+    MAX_TURNS = auto()  # Natural ending at max_turns
 
     # Negotiated ending
-    SETTLEMENT = auto()          # Players agreed on settlement
+    SETTLEMENT = auto()  # Players agreed on settlement
 
 
 @dataclass(frozen=True)
@@ -64,6 +64,7 @@ class GameEnding:
         vp_b: Victory points for player B
         description: Human-readable description of the ending
     """
+
     ending_type: EndingType
     vp_a: float
     vp_b: float
@@ -90,7 +91,9 @@ def check_mutual_destruction(state: GameState) -> GameEnding | None:
             ending_type=EndingType.MUTUAL_DESTRUCTION,
             vp_a=0.0,
             vp_b=0.0,
-            description="The crisis has spiraled out of control. Mutual destruction ensues. Both players receive 0 VP - all value is lost.",
+            description=(
+                "The crisis has spiraled out of control. Mutual destruction ensues. Both players receive 0 VP."
+            ),
         )
     return None
 
@@ -117,7 +120,9 @@ def check_position_loss(state: GameState) -> GameEnding | None:
             ending_type=EndingType.POSITION_LOSS_A,
             vp_a=10.0,
             vp_b=vp_b,
-            description=f"Player A's position has collapsed. Player A receives 10 VP, Player B receives {vp_b:.1f} VP (90 + {state.surplus_captured_b:.1f} captured surplus).",
+            description=(
+                f"Player A's position has collapsed. Player A receives 10 VP, Player B receives {vp_b:.1f} VP."
+            ),
         )
     if state.position_b <= 0.0:
         # Player B eliminated, Player A wins
@@ -127,7 +132,9 @@ def check_position_loss(state: GameState) -> GameEnding | None:
             ending_type=EndingType.POSITION_LOSS_B,
             vp_a=vp_a,
             vp_b=10.0,
-            description=f"Player B's position has collapsed. Player A receives {vp_a:.1f} VP (90 + {state.surplus_captured_a:.1f} captured surplus), Player B receives 10 VP.",
+            description=(
+                f"Player B's position has collapsed. Player A receives {vp_a:.1f} VP, Player B receives 10 VP."
+            ),
         )
     return None
 
@@ -152,7 +159,10 @@ def check_resource_loss(state: GameState) -> GameEnding | None:
             ending_type=EndingType.RESOURCE_LOSS_A,
             vp_a=15.0,
             vp_b=vp_b,
-            description=f"Player A has exhausted all resources. Player A receives 15 VP, Player B receives {vp_b:.1f} VP (85 + {state.surplus_captured_b:.1f} captured surplus).",
+            description=(
+                f"Player A has exhausted all resources. Player A receives 15 VP, "
+                f"Player B receives {vp_b:.1f} VP (85 + {state.surplus_captured_b:.1f} captured surplus)."
+            ),
         )
     if state.resources_b <= 0.0:
         # Player B loses, Player A wins
@@ -161,7 +171,10 @@ def check_resource_loss(state: GameState) -> GameEnding | None:
             ending_type=EndingType.RESOURCE_LOSS_B,
             vp_a=vp_a,
             vp_b=15.0,
-            description=f"Player B has exhausted all resources. Player A receives {vp_a:.1f} VP (85 + {state.surplus_captured_a:.1f} captured surplus), Player B receives 15 VP.",
+            description=(
+                f"Player B has exhausted all resources. Player A receives {vp_a:.1f} VP "
+                f"(85 + {state.surplus_captured_a:.1f} captured surplus), Player B receives 15 VP."
+            ),
         )
     return None
 
@@ -200,10 +213,7 @@ def get_crisis_termination_probability(risk_level: float, turn: int) -> float:
     return (risk_level - 7.0) * 0.08
 
 
-def check_crisis_termination(
-    state: GameState,
-    seed: int | None = None
-) -> GameEnding | None:
+def check_crisis_termination(state: GameState, seed: int | None = None) -> GameEnding | None:
     """Check for probabilistic crisis termination.
 
     From GAME_MANUAL.md:
@@ -239,7 +249,10 @@ def check_crisis_termination(
             ending_type=EndingType.CRISIS_TERMINATION,
             vp_a=vp_a,
             vp_b=vp_b,
-            description=f"The crisis has terminated unexpectedly at Risk Level {state.risk_level:.1f}. Final resolution determines outcome.",
+            description=(
+                f"The crisis has terminated unexpectedly at Risk Level {state.risk_level:.1f}. "
+                f"Final resolution determines outcome."
+            ),
         )
 
     return None
@@ -265,15 +278,15 @@ def check_max_turns(state: GameState, seed: int | None = None) -> GameEnding | N
             ending_type=EndingType.MAX_TURNS,
             vp_a=vp_a,
             vp_b=vp_b,
-            description=f"The game has reached its natural conclusion after {state.turn} turns. Final resolution determines outcome.",
+            description=(
+                f"The game has reached its natural conclusion after {state.turn} turns. "
+                f"Final resolution determines outcome."
+            ),
         )
     return None
 
 
-def check_all_endings(
-    state: GameState,
-    seed: int | None = None
-) -> GameEnding | None:
+def check_all_endings(state: GameState, seed: int | None = None) -> GameEnding | None:
     """Check all ending conditions in the correct order.
 
     The order of checks is important per GAME_MANUAL.md:

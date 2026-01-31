@@ -8,7 +8,16 @@ on-demand from the scenario and synced with stored state.
 import asyncio
 import inspect
 import random
-from typing import Any, Optional
+from typing import Any
+
+from brinksmanship.engine import GameEngine, create_game
+from brinksmanship.models.actions import Action, ActionCategory, ActionType, get_action_by_name
+from brinksmanship.opponents import Opponent, get_opponent_by_type
+from brinksmanship.opponents import list_opponent_types as _list_opponent_types
+from brinksmanship.opponents.base import SettlementProposal
+from brinksmanship.opponents.historical import PERSONA_DISPLAY_NAMES
+from brinksmanship.opponents.persona_generator import create_opponent_from_persona
+from brinksmanship.storage import get_scenario_repository
 
 
 def _run_opponent_method(method, *args, **kwargs):
@@ -20,14 +29,6 @@ def _run_opponent_method(method, *args, **kwargs):
     if inspect.iscoroutinefunction(method):
         return asyncio.run(method(*args, **kwargs))
     return method(*args, **kwargs)
-
-from brinksmanship.engine import GameEngine, create_game
-from brinksmanship.models.actions import Action, ActionCategory, ActionType, get_action_by_name
-from brinksmanship.opponents.base import SettlementProposal, SettlementResponse
-from brinksmanship.opponents import Opponent, get_opponent_by_type, list_opponent_types as _list_opponent_types
-from brinksmanship.opponents.historical import PERSONA_DISPLAY_NAMES
-from brinksmanship.opponents.persona_generator import create_opponent_from_persona
-from brinksmanship.storage import get_scenario_repository
 
 
 class RealGameEngine:
@@ -47,8 +48,8 @@ class RealGameEngine:
         scenario_id: str,
         opponent_type: str,
         user_id: int,
-        game_id: Optional[str] = None,
-        custom_persona: Optional[str] = None,
+        game_id: str | None = None,
+        custom_persona: str | None = None,
         player_is_a: bool = True,
     ) -> dict[str, Any]:
         """Create a new game with initial state.
@@ -177,19 +178,23 @@ class RealGameEngine:
         for category, types in types_by_category.items():
             for type_id in types:
                 display_name = PERSONA_DISPLAY_NAMES.get(type_id, type_id.replace("_", " ").title())
-                result.append({
-                    "id": type_id,
-                    "name": display_name,
-                    "category": category_map.get(category, category),
-                    "description": descriptions.get(type_id, ""),
-                })
+                result.append(
+                    {
+                        "id": type_id,
+                        "name": display_name,
+                        "category": category_map.get(category, category),
+                        "description": descriptions.get(type_id, ""),
+                    }
+                )
 
-        result.append({
-            "id": "custom",
-            "name": "Custom Persona",
-            "category": "custom",
-            "description": "Describe any figure for AI-powered gameplay.",
-        })
+        result.append(
+            {
+                "id": "custom",
+                "name": "Custom Persona",
+                "category": "custom",
+                "description": "Describe any figure for AI-powered gameplay.",
+            }
+        )
 
         return result
 
@@ -225,9 +230,7 @@ class RealGameEngine:
 
         # Get opponent's choice (async method, run in sync context)
         opponent_actions = engine.get_available_actions(opponent_side)
-        opponent_action = _run_opponent_method(
-            opponent.choose_action, engine.state, opponent_actions
-        )
+        opponent_action = _run_opponent_method(opponent.choose_action, engine.state, opponent_actions)
 
         # Submit actions in correct order (action_a, action_b)
         if player_is_a:
@@ -261,12 +264,14 @@ class RealGameEngine:
 
         # Maintain history in state dict (with narrative for display)
         history = list(state.get("history", []))
-        history.append({
-            "turn": state.get("turn", 1),
-            "player": player_symbol,
-            "opponent": opponent_symbol,
-            "narrative": result.narrative,
-        })
+        history.append(
+            {
+                "turn": state.get("turn", 1),
+                "player": player_symbol,
+                "opponent": opponent_symbol,
+                "narrative": result.narrative,
+            }
+        )
 
         new_state = {
             "game_id": state.get("game_id"),
@@ -402,7 +407,7 @@ class RealGameEngine:
             role_description=role_description,
         )
 
-    def _match_action(self, action_id: str, available: list[Action]) -> Optional[Action]:
+    def _match_action(self, action_id: str, available: list[Action]) -> Action | None:
         """Find action matching the ID."""
         action_id_lower = action_id.lower().replace("-", "").replace(" ", "_")
 
@@ -421,8 +426,9 @@ class RealGameEngine:
         cooperative_ids = {"hold", "deescalate", "concede", "propose"}
         is_cooperative = action_id.lower() in cooperative_ids
         for a in available:
-            if (is_cooperative and a.action_type == ActionType.COOPERATIVE) or \
-               (not is_cooperative and a.action_type == ActionType.COMPETITIVE):
+            if (is_cooperative and a.action_type == ActionType.COOPERATIVE) or (
+                not is_cooperative and a.action_type == ActionType.COMPETITIVE
+            ):
                 return a
 
         return None
@@ -442,7 +448,8 @@ class RealGameEngine:
         is_coop = a.action_type == ActionType.COOPERATIVE
         mechanics_hint = (
             self._COOPERATIVE_HINTS.get(a.category, self._DEFAULT_COOPERATIVE_HINT)
-            if is_coop else self._COMPETITIVE_HINT
+            if is_coop
+            else self._COMPETITIVE_HINT
         )
 
         return {
@@ -503,9 +510,7 @@ class RealGameEngine:
         proposal = SettlementProposal(offered_vp=offered_vp, argument=argument)
 
         # Get opponent response
-        response = _run_opponent_method(
-            opponent.evaluate_settlement, proposal, engine.state, False
-        )
+        response = _run_opponent_method(opponent.evaluate_settlement, proposal, engine.state, False)
 
         return {
             "action": response.action,
@@ -514,7 +519,7 @@ class RealGameEngine:
             "rejection_reason": response.rejection_reason,
         }
 
-    def check_opponent_settlement(self, state: dict[str, Any]) -> Optional[dict[str, Any]]:
+    def check_opponent_settlement(self, state: dict[str, Any]) -> dict[str, Any] | None:
         """Check if opponent wants to propose settlement.
 
         Returns proposal dict if opponent proposes, None otherwise.

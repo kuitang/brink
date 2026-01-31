@@ -17,7 +17,7 @@ set -euo pipefail
 
 # Default configuration
 GAMES_PER_MATCHUP=3
-PARALLEL_JOBS=4
+PARALLEL_JOBS=3  # Keep low to avoid OOM
 WORK_DIR="playtest_work"
 SCENARIOS=""
 
@@ -148,16 +148,36 @@ run_job() {
     fi
 }
 
-# Run jobs sequentially (safe default)
-run_jobs_sequential() {
+# Run jobs with controlled parallelism
+run_jobs_parallel() {
     local job_file="$WORK_DIR/jobs/all_jobs.txt"
+    local pending_file="$WORK_DIR/jobs/pending_jobs.txt"
 
+    # Filter to only pending jobs
+    > "$pending_file"
     while IFS= read -r line; do
         IFS='|' read -r scenario player_a player_b matchup_type <<< "$line"
         if ! is_job_complete "$scenario" "$matchup_type"; then
-            run_job "$line"
+            echo "$line" >> "$pending_file"
         fi
     done < "$job_file"
+
+    local pending_count
+    pending_count=$(wc -l < "$pending_file")
+
+    if [[ $pending_count -eq 0 ]]; then
+        echo "No pending jobs"
+        return 0
+    fi
+
+    echo "Running $pending_count jobs with parallelism=$PARALLEL_JOBS"
+
+    # Export function and variables for xargs subshells
+    export -f run_job is_job_complete
+    export WORK_DIR GAMES_PER_MATCHUP
+
+    # Use xargs for parallel execution with controlled concurrency
+    cat "$pending_file" | xargs -P "$PARALLEL_JOBS" -I {} bash -c 'run_job "$@"' _ {}
 }
 
 # Main execution
@@ -187,9 +207,9 @@ main() {
     if [[ $pending_jobs -eq 0 ]]; then
         echo "All jobs complete!"
     else
-        echo "Running $pending_jobs pending jobs..."
+        echo "Running $pending_jobs pending jobs with parallelism=$PARALLEL_JOBS..."
         echo ""
-        run_jobs_sequential
+        run_jobs_parallel
     fi
 
     echo ""

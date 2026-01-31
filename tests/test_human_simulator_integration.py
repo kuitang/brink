@@ -9,20 +9,17 @@ These tests verify the full flow of HumanSimulator including:
 The LLM calls are mocked to provide deterministic testing.
 """
 
-import pytest
-from unittest.mock import AsyncMock, patch, MagicMock
+from unittest.mock import patch
 
-from brinksmanship.models.state import GameState, PlayerState, InformationState
-from brinksmanship.models.actions import Action, ActionType, ActionCategory
+import pytest
+
+from brinksmanship.models.actions import Action, ActionCategory, ActionType
+from brinksmanship.models.state import GameState, InformationState, PlayerState
 from brinksmanship.opponents.base import SettlementProposal, SettlementResponse
 from brinksmanship.testing.human_simulator import (
-    HumanSimulator,
     HumanPersona,
-    ActionSelection,
-    MistakeCheck,
-    SettlementResponse as InternalSettlementResponse,
+    HumanSimulator,
 )
-
 
 # =============================================================================
 # Fixtures
@@ -191,9 +188,7 @@ class TestActionSelection:
     """Tests for action selection with mocked LLM."""
 
     @pytest.mark.asyncio
-    async def test_choose_action_cooperative_persona(
-        self, sample_persona, sample_game_state, sample_actions
-    ):
+    async def test_choose_action_cooperative_persona(self, sample_persona, sample_game_state, sample_actions):
         """Test that cooperative persona tends toward cooperative actions."""
         simulator = HumanSimulator(persona=sample_persona, is_player_a=True)
 
@@ -211,9 +206,7 @@ class TestActionSelection:
             assert action.action_type == ActionType.COOPERATIVE
 
     @pytest.mark.asyncio
-    async def test_choose_action_without_persona_raises(
-        self, sample_game_state, sample_actions
-    ):
+    async def test_choose_action_without_persona_raises(self, sample_game_state, sample_actions):
         """Test that choosing action without persona raises error."""
         simulator = HumanSimulator(is_player_a=True)
 
@@ -221,9 +214,7 @@ class TestActionSelection:
             await simulator.choose_action(sample_game_state, sample_actions)
 
     @pytest.mark.asyncio
-    async def test_choose_action_fallback_on_invalid_response(
-        self, sample_persona, sample_game_state, sample_actions
-    ):
+    async def test_choose_action_fallback_on_invalid_response(self, sample_persona, sample_game_state, sample_actions):
         """Test fallback when LLM returns invalid action name."""
         simulator = HumanSimulator(persona=sample_persona, is_player_a=True)
 
@@ -242,9 +233,7 @@ class TestActionSelection:
             assert action in sample_actions
 
     @pytest.mark.asyncio
-    async def test_choose_action_different_personas_vary(
-        self, sample_game_state, sample_actions
-    ):
+    async def test_choose_action_different_personas_vary(self, sample_game_state, sample_actions):
         """Test that different personas produce different action patterns."""
         cooperative_persona = HumanPersona(
             risk_tolerance="risk_averse",
@@ -297,9 +286,7 @@ class TestMistakeInjection:
     """Tests for mistake injection behavior."""
 
     @pytest.mark.asyncio
-    async def test_mistake_applied_when_triggered(
-        self, sample_game_state, sample_actions
-    ):
+    async def test_mistake_applied_when_triggered(self, sample_game_state, sample_actions):
         """Test that mistakes are applied when LLM says to make mistake."""
         # Novice, desperate persona = high mistake probability
         novice_persona = HumanPersona(
@@ -323,11 +310,10 @@ class TestMistakeInjection:
 
             # Use a fixed random seed to control the probability check
             import random
+
             random.seed(0)  # Makes random.random() < 0.60 (novice * desperate)
 
-            action = await simulator._choose_action_async(
-                sample_game_state, sample_actions
-            )
+            await simulator._choose_action_async(sample_game_state, sample_actions)
 
             # With impulsive mistake, should pick competitive action
             # Note: exact behavior depends on random, but test verifies the flow
@@ -342,9 +328,7 @@ class TestSettlementEvaluation:
     """Tests for settlement evaluation with mocked LLM."""
 
     @pytest.mark.asyncio
-    async def test_evaluate_settlement_accept(
-        self, sample_persona, sample_game_state
-    ):
+    async def test_evaluate_settlement_accept(self, sample_persona, sample_game_state):
         """Test accepting a settlement proposal."""
         simulator = HumanSimulator(persona=sample_persona, is_player_a=False)
 
@@ -356,17 +340,13 @@ class TestSettlementEvaluation:
         with patch("brinksmanship.testing.human_simulator.generate_json") as mock_gen:
             mock_gen.return_value = mock_settlement_response("accept")
 
-            response = await simulator.evaluate_settlement(
-                proposal, sample_game_state, is_final_offer=False
-            )
+            response = await simulator.evaluate_settlement(proposal, sample_game_state, is_final_offer=False)
 
             assert response.action == "accept"
             assert response.counter_vp is None
 
     @pytest.mark.asyncio
-    async def test_evaluate_settlement_counter(
-        self, sample_persona, sample_game_state
-    ):
+    async def test_evaluate_settlement_counter(self, sample_persona, sample_game_state):
         """Test countering a settlement proposal."""
         simulator = HumanSimulator(persona=sample_persona, is_player_a=False)
 
@@ -378,17 +358,13 @@ class TestSettlementEvaluation:
         with patch("brinksmanship.testing.human_simulator.generate_json") as mock_gen:
             mock_gen.return_value = mock_settlement_response("counter")
 
-            response = await simulator.evaluate_settlement(
-                proposal, sample_game_state, is_final_offer=False
-            )
+            response = await simulator.evaluate_settlement(proposal, sample_game_state, is_final_offer=False)
 
             assert response.action == "counter"
             assert response.counter_vp == 55
 
     @pytest.mark.asyncio
-    async def test_evaluate_settlement_reject(
-        self, sample_persona, sample_game_state
-    ):
+    async def test_evaluate_settlement_reject(self, sample_persona, sample_game_state):
         """Test rejecting a settlement proposal."""
         simulator = HumanSimulator(persona=sample_persona, is_player_a=False)
 
@@ -400,9 +376,7 @@ class TestSettlementEvaluation:
         with patch("brinksmanship.testing.human_simulator.generate_json") as mock_gen:
             mock_gen.return_value = mock_settlement_response("reject")
 
-            response = await simulator.evaluate_settlement(
-                proposal, sample_game_state, is_final_offer=True
-            )
+            response = await simulator.evaluate_settlement(proposal, sample_game_state, is_final_offer=True)
 
             assert response.action == "reject"
             assert response.rejection_reason == "Too low"
@@ -417,9 +391,7 @@ class TestSettlementProposal:
     """Tests for proposing settlements."""
 
     @pytest.mark.asyncio
-    async def test_propose_settlement_early_turn_returns_none(
-        self, sample_persona
-    ):
+    async def test_propose_settlement_early_turn_returns_none(self, sample_persona):
         """Test that settlement is not proposed in early turns."""
         early_state = GameState(
             player_a=PlayerState(position=5.0, resources=5.0),
@@ -437,9 +409,7 @@ class TestSettlementProposal:
         assert proposal is None
 
     @pytest.mark.asyncio
-    async def test_propose_settlement_low_stability_returns_none(
-        self, sample_persona
-    ):
+    async def test_propose_settlement_low_stability_returns_none(self, sample_persona):
         """Test that settlement is not proposed when stability is too low."""
         unstable_state = GameState(
             player_a=PlayerState(position=5.0, resources=5.0),
@@ -483,6 +453,7 @@ class TestSettlementProposal:
         # With high risk + risk_averse + stressed, probability is very high
         # Run multiple times to verify it can propose
         import random
+
         random.seed(42)
 
         proposals = []
@@ -520,6 +491,7 @@ class TestSettlementProposal:
         simulator = HumanSimulator(persona=desperate_persona, is_player_a=True)
 
         import random
+
         random.seed(0)  # Seed to ensure we hit the proposal path
 
         proposal = await simulator.propose_settlement(good_state)
@@ -544,6 +516,7 @@ class TestEmotionalStateUpdate:
         assert simulator.persona.emotional_state == "calm"
 
         import random
+
         random.seed(0)  # Seed to ensure state change
 
         # Multiple exploitations should eventually increase stress
@@ -568,6 +541,7 @@ class TestEmotionalStateUpdate:
         assert simulator.persona.emotional_state == "stressed"
 
         import random
+
         random.seed(42)
 
         # Multiple positive outcomes
@@ -590,6 +564,7 @@ class TestEmotionalStateUpdate:
         simulator = HumanSimulator(persona=stressed_persona, is_player_a=True)
 
         import random
+
         random.seed(123)
 
         # Many mutual cooperation outcomes

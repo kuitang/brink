@@ -20,7 +20,6 @@ See GAME_MANUAL.md for theme descriptions.
 from __future__ import annotations
 
 import asyncio
-import os
 import sys
 from pathlib import Path
 
@@ -94,12 +93,16 @@ async def capture_theme_screenshots(
             print(f"\nTheme: {theme}")
 
             # Set theme via cookie
-            await context.add_cookies([{
-                "name": "theme",
-                "value": theme,
-                "domain": "localhost",
-                "path": "/",
-            }])
+            await context.add_cookies(
+                [
+                    {
+                        "name": "theme",
+                        "value": theme,
+                        "domain": "localhost",
+                        "path": "/",
+                    }
+                ]
+            )
 
             for page_name, page_path in pages:
                 await page.goto(f"{base_url}{page_path}")
@@ -148,10 +151,12 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    asyncio.run(capture_theme_screenshots(
-        base_url=args.url,
-        output_dir=args.output,
-    ))
+    asyncio.run(
+        capture_theme_screenshots(
+            base_url=args.url,
+            output_dir=args.output,
+        )
+    )
 
 
 if __name__ == "__main__":

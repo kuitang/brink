@@ -14,23 +14,17 @@ Tests cover:
 Test helper: MockScenarioRepository provides a minimal scenario for testing.
 """
 
-from typing import Optional
-
 import pytest
 
 from brinksmanship.engine.game_engine import (
     EndingType,
-    GameEnding,
     GameEngine,
-    create_game,
 )
 from brinksmanship.models.actions import (
-    Action,
-    ActionType,
     DEESCALATE,
     ESCALATE,
-    HOLD_MAINTAIN,
     PROPOSE_SETTLEMENT,
+    Action,
 )
 from brinksmanship.parameters import (
     CAPTURE_RATE,
@@ -42,7 +36,6 @@ from brinksmanship.parameters import (
 )
 from brinksmanship.storage import ScenarioRepository
 
-
 # =============================================================================
 # Mock Scenario Repository
 # =============================================================================
@@ -51,19 +44,16 @@ from brinksmanship.storage import ScenarioRepository
 class MockScenarioRepository(ScenarioRepository):
     """Mock repository for testing."""
 
-    def __init__(self, scenarios: Optional[dict] = None):
+    def __init__(self, scenarios: dict | None = None):
         self._scenarios = scenarios or {}
 
     def list_scenarios(self) -> list[dict]:
-        return [
-            {"id": sid, "name": s.get("name", sid)}
-            for sid, s in self._scenarios.items()
-        ]
+        return [{"id": sid, "name": s.get("name", sid)} for sid, s in self._scenarios.items()]
 
-    def get_scenario(self, scenario_id: str) -> Optional[dict]:
+    def get_scenario(self, scenario_id: str) -> dict | None:
         return self._scenarios.get(scenario_id)
 
-    def get_scenario_by_name(self, name: str) -> Optional[dict]:
+    def get_scenario_by_name(self, name: str) -> dict | None:
         for scenario in self._scenarios.values():
             if scenario.get("name", "").lower() == name.lower():
                 return scenario
@@ -172,7 +162,7 @@ class TestCCCreatesSurplusWithStreakBonus:
         assert engine.state.cooperation_streak == 0
 
         # Play 5 CC turns
-        for turn in range(5):
+        for _turn in range(5):
             result = engine.submit_actions(cooperative_action, cooperative_action)
             assert result.success is True
 
@@ -205,9 +195,10 @@ class TestCCCreatesSurplusWithStreakBonus:
 
         # Each increment should be larger than the previous
         for i in range(1, len(surplus_increments)):
-            assert surplus_increments[i] > surplus_increments[i - 1], \
-                f"Surplus increment {i} ({surplus_increments[i]:.2f}) should be > " \
-                f"increment {i-1} ({surplus_increments[i-1]:.2f})"
+            assert surplus_increments[i] > surplus_increments[i - 1], (
+                f"Surplus increment {i} ({surplus_increments[i]:.2f}) should be > "
+                f"increment {i - 1} ({surplus_increments[i - 1]:.2f})"
+            )
 
     def test_cc_reduces_risk(self, engine, cooperative_action):
         """Verify CC outcomes reduce risk level.
@@ -240,9 +231,7 @@ class TestCCCreatesSurplusWithStreakBonus:
 class TestCDDCCapturesSurplus:
     """Test that defection against cooperation captures surplus correctly."""
 
-    def test_cd_b_captures_40_percent_of_surplus(
-        self, engine, cooperative_action, competitive_action
-    ):
+    def test_cd_b_captures_40_percent_of_surplus(self, engine, cooperative_action, competitive_action):
         """When A cooperates and B defects (CD), B captures 40% of surplus."""
         # Build surplus with 3 CC turns
         for _ in range(3):
@@ -264,9 +253,7 @@ class TestCDDCCapturesSurplus:
         expected_remaining = surplus_before_defection - expected_capture
         assert engine.state.cooperation_surplus == pytest.approx(expected_remaining)
 
-    def test_dc_a_captures_40_percent_of_surplus(
-        self, engine, cooperative_action, competitive_action
-    ):
+    def test_dc_a_captures_40_percent_of_surplus(self, engine, cooperative_action, competitive_action):
         """When A defects and B cooperates (DC), A captures 40% of surplus."""
         # Build surplus with 3 CC turns
         for _ in range(3):
@@ -288,9 +275,7 @@ class TestCDDCCapturesSurplus:
         expected_remaining = surplus_before_defection - expected_capture
         assert engine.state.cooperation_surplus == pytest.approx(expected_remaining)
 
-    def test_defection_resets_streak(
-        self, engine, cooperative_action, competitive_action
-    ):
+    def test_defection_resets_streak(self, engine, cooperative_action, competitive_action):
         """Verify that any defection resets the cooperation streak to 0."""
         # Build streak with 3 CC turns
         for _ in range(3):
@@ -310,9 +295,7 @@ class TestCDDCCapturesSurplus:
         engine.submit_actions(competitive_action, cooperative_action)
         assert engine.state.cooperation_streak == 0
 
-    def test_multiple_captures_accumulate(
-        self, engine, cooperative_action, competitive_action
-    ):
+    def test_multiple_captures_accumulate(self, engine, cooperative_action, competitive_action):
         """Verify that multiple captures accumulate in surplus_captured."""
         # Build surplus
         for _ in range(4):
@@ -346,9 +329,7 @@ class TestCDDCCapturesSurplus:
 class TestDDBurnsSurplus:
     """Test that mutual defection (DD) burns surplus without capturing."""
 
-    def test_dd_burns_20_percent_of_surplus(
-        self, engine, cooperative_action, competitive_action
-    ):
+    def test_dd_burns_20_percent_of_surplus(self, engine, cooperative_action, competitive_action):
         """DD outcome should destroy 20% of accumulated surplus."""
         # Build surplus with 4 CC turns
         for _ in range(4):
@@ -368,9 +349,7 @@ class TestDDBurnsSurplus:
         assert engine.state.surplus_captured_a == 0.0
         assert engine.state.surplus_captured_b == 0.0
 
-    def test_multiple_dd_compounds_burn(
-        self, engine, cooperative_action, competitive_action
-    ):
+    def test_multiple_dd_compounds_burn(self, engine, cooperative_action, competitive_action):
         """Multiple DD outcomes should compound surplus destruction."""
         # Build surplus
         for _ in range(5):
@@ -379,7 +358,7 @@ class TestDDBurnsSurplus:
         initial_surplus = engine.state.cooperation_surplus
 
         # 3 DD outcomes
-        for i in range(3):
+        for _i in range(3):
             engine.submit_actions(competitive_action, competitive_action)
 
         # After 3 DDs: surplus = initial * (1 - 0.2)^3 = initial * 0.512
@@ -433,9 +412,7 @@ class TestDDBurnsSurplus:
 class TestSettlementDistributesSurplus:
     """Test that settlement correctly distributes accumulated surplus."""
 
-    def test_both_propose_settlement_ends_game(
-        self, mock_repo, cooperative_action
-    ):
+    def test_both_propose_settlement_ends_game(self, mock_repo, cooperative_action):
         """When both players propose settlement, game ends with VP distribution."""
         engine = GameEngine(
             scenario_id="surplus-test",
@@ -464,9 +441,7 @@ class TestSettlementDistributesSurplus:
         # VP should sum to 100 for settlement
         assert ending.vp_a + ending.vp_b == pytest.approx(100.0)
 
-    def test_one_sided_settlement_does_not_end_game(
-        self, mock_repo, cooperative_action
-    ):
+    def test_one_sided_settlement_does_not_end_game(self, mock_repo, cooperative_action):
         """When only one player proposes settlement, game continues."""
         engine = GameEngine(
             scenario_id="surplus-test",
@@ -478,8 +453,6 @@ class TestSettlementDistributesSurplus:
         # Advance past turn 4
         for _ in range(5):
             engine.submit_actions(cooperative_action, cooperative_action)
-
-        surplus_before = engine.state.cooperation_surplus
 
         # Only A proposes settlement
         result = engine.submit_actions(PROPOSE_SETTLEMENT, cooperative_action)
@@ -508,9 +481,7 @@ class TestMutualDestructionGivesZeroZero:
     This test verifies the current implementation behavior.
     """
 
-    def test_risk_10_triggers_mutual_destruction(
-        self, mock_repo, cooperative_action, competitive_action
-    ):
+    def test_risk_10_triggers_mutual_destruction(self, mock_repo, cooperative_action, competitive_action):
         """When risk reaches 10, mutual destruction occurs."""
         engine = GameEngine(
             scenario_id="surplus-test",
@@ -542,9 +513,7 @@ class TestMutualDestructionGivesZeroZero:
         assert ending.vp_a == pytest.approx(0.0)
         assert ending.vp_b == pytest.approx(0.0)
 
-    def test_mutual_destruction_loses_all_surplus(
-        self, mock_repo, cooperative_action, competitive_action
-    ):
+    def test_mutual_destruction_loses_all_surplus(self, mock_repo, cooperative_action, competitive_action):
         """All accumulated surplus is lost on mutual destruction."""
         engine = GameEngine(
             scenario_id="surplus-test",
@@ -583,9 +552,7 @@ class TestMutualDestructionGivesZeroZero:
 class TestFinalVPIncludesCapturedSurplus:
     """Test that final VP calculation includes captured surplus."""
 
-    def test_captured_surplus_affects_final_vp(
-        self, mock_repo, cooperative_action, competitive_action
-    ):
+    def test_captured_surplus_affects_final_vp(self, mock_repo, cooperative_action, competitive_action):
         """Player with captured surplus should have advantage in final VP."""
         engine = GameEngine(
             scenario_id="surplus-test",
@@ -626,9 +593,7 @@ class TestFinalVPIncludesCapturedSurplus:
         # If the implementation is updated to include captured surplus,
         # this test should verify that.
 
-    def test_natural_ending_resolution(
-        self, mock_repo, cooperative_action
-    ):
+    def test_natural_ending_resolution(self, mock_repo, cooperative_action):
         """Natural ending uses position-based VP resolution."""
         engine = GameEngine(
             scenario_id="surplus-test",
@@ -657,9 +622,7 @@ class TestFinalVPIncludesCapturedSurplus:
 class TestFullGameSurplusMechanics:
     """Integration tests that play full scripted games."""
 
-    def test_cooperative_game_builds_maximum_surplus(
-        self, mock_repo, cooperative_action
-    ):
+    def test_cooperative_game_builds_maximum_surplus(self, mock_repo, cooperative_action):
         """A fully cooperative game should build maximum possible surplus."""
         engine = GameEngine(
             scenario_id="surplus-test",
@@ -675,16 +638,14 @@ class TestFullGameSurplusMechanics:
 
         # Verify surplus was built for all turns
         # Final surplus should match expected calculation
-        expected_surplus = calculate_expected_surplus_after_cc_turns(turns_played)
+        calculate_expected_surplus_after_cc_turns(turns_played)
 
         # Due to risk_level reaching certain levels affecting act multipliers,
         # the actual surplus may vary slightly, but should be close
         assert engine.state.cooperation_surplus > 0.0
         assert engine.state.cooperation_streak >= 10  # At least 10 consecutive CCs
 
-    def test_defection_pattern_game(
-        self, mock_repo, cooperative_action, competitive_action
-    ):
+    def test_defection_pattern_game(self, mock_repo, cooperative_action, competitive_action):
         """Test a game with alternating cooperation and defection patterns."""
         engine = GameEngine(
             scenario_id="surplus-test",
@@ -723,9 +684,7 @@ class TestFullGameSurplusMechanics:
         assert engine.state.surplus_captured_a > 0.0
         assert engine.state.surplus_captured_b > 0.0
 
-    def test_high_risk_game_with_dd(
-        self, mock_repo, cooperative_action, competitive_action
-    ):
+    def test_high_risk_game_with_dd(self, mock_repo, cooperative_action, competitive_action):
         """Test a game with multiple DD outcomes leading to high risk."""
         engine = GameEngine(
             scenario_id="surplus-test",
@@ -753,9 +712,7 @@ class TestFullGameSurplusMechanics:
             # Risk should be very high
             assert engine.state.risk_level >= 5.0
 
-    def test_settlement_after_building_surplus(
-        self, mock_repo, cooperative_action
-    ):
+    def test_settlement_after_building_surplus(self, mock_repo, cooperative_action):
         """Test settlement after building substantial surplus."""
         engine = GameEngine(
             scenario_id="surplus-test",
@@ -781,9 +738,7 @@ class TestFullGameSurplusMechanics:
         ending = engine.get_ending()
         assert ending.ending_type == EndingType.SETTLEMENT
 
-    def test_game_with_mixed_outcomes_tracks_all_mechanics(
-        self, mock_repo, cooperative_action, competitive_action
-    ):
+    def test_game_with_mixed_outcomes_tracks_all_mechanics(self, mock_repo, cooperative_action, competitive_action):
         """Comprehensive test tracking all surplus mechanics through a game."""
         engine = GameEngine(
             scenario_id="surplus-test",

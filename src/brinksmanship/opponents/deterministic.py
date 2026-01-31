@@ -104,9 +104,7 @@ class DeterministicOpponent(Opponent):
         # Fallback to any action
         return random.choice(available_actions)
 
-    async def choose_action(
-        self, state: GameState, available_actions: list[Action]
-    ) -> Action:
+    async def choose_action(self, state: GameState, available_actions: list[Action]) -> Action:
         """Choose action - must be overridden by subclasses.
 
         This is async for interface consistency, even though deterministic
@@ -187,9 +185,7 @@ class NashCalculator(DeterministicOpponent):
         """Initialize NashCalculator opponent."""
         super().__init__(name="Nash Calculator")
 
-    async def choose_action(
-        self, state: GameState, available_actions: list[Action]
-    ) -> Action:
+    async def choose_action(self, state: GameState, available_actions: list[Action]) -> Action:
         """Choose action based on Nash equilibrium reasoning.
 
         In most 2x2 games encountered:
@@ -216,28 +212,20 @@ class NashCalculator(DeterministicOpponent):
         elif state.risk_level >= 6:
             # Elevated risk: 60% chance to de-escalate
             if random.random() < 0.6:
-                return self._select_random_from_type(
-                    available_actions, ActionType.COOPERATIVE
-                )
+                return self._select_random_from_type(available_actions, ActionType.COOPERATIVE)
 
         # Standard Nash reasoning: defection is typically dominant or risk-dominant
         # Position advantage reinforces this
         if my_position >= opponent_position:
             # Ahead or even: press advantage with competitive action
-            return self._select_random_from_type(
-                available_actions, ActionType.COMPETITIVE
-            )
+            return self._select_random_from_type(available_actions, ActionType.COMPETITIVE)
         else:
             # Behind: still defect (Nash), but less aggressively
             # 60% competitive, 40% cooperative (hedge)
             if random.random() < 0.6:
-                return self._select_random_from_type(
-                    available_actions, ActionType.COMPETITIVE
-                )
+                return self._select_random_from_type(available_actions, ActionType.COMPETITIVE)
             else:
-                return self._select_random_from_type(
-                    available_actions, ActionType.COOPERATIVE
-                )
+                return self._select_random_from_type(available_actions, ActionType.COOPERATIVE)
 
     async def propose_settlement(self, state: GameState) -> SettlementProposal | None:
         """Propose settlement when position advantage is clear or risk is high."""
@@ -288,9 +276,7 @@ class SecuritySeeker(DeterministicOpponent):
         """Initialize SecuritySeeker opponent."""
         super().__init__(name="Security Seeker")
 
-    async def choose_action(
-        self, state: GameState, available_actions: list[Action]
-    ) -> Action:
+    async def choose_action(self, state: GameState, available_actions: list[Action]) -> Action:
         """Choose action based on spiral model reasoning.
 
         - Default: cooperative
@@ -308,27 +294,19 @@ class SecuritySeeker(DeterministicOpponent):
 
         # High risk: always try to de-escalate
         if state.risk_level >= 7:
-            return self._select_random_from_type(
-                available_actions, ActionType.COOPERATIVE
-            )
+            return self._select_random_from_type(available_actions, ActionType.COOPERATIVE)
 
         # Respond to opponent's last action
         if opponent_prev == ActionType.COMPETITIVE:
             # Defensive escalation - but not always
             # 60% respond competitively, 40% try to break the spiral
             if random.random() < 0.6:
-                return self._select_random_from_type(
-                    available_actions, ActionType.COMPETITIVE
-                )
+                return self._select_random_from_type(available_actions, ActionType.COMPETITIVE)
             else:
-                return self._select_random_from_type(
-                    available_actions, ActionType.COOPERATIVE
-                )
+                return self._select_random_from_type(available_actions, ActionType.COOPERATIVE)
         else:
             # Opponent cooperated or first turn: cooperate
-            return self._select_random_from_type(
-                available_actions, ActionType.COOPERATIVE
-            )
+            return self._select_random_from_type(available_actions, ActionType.COOPERATIVE)
 
     async def propose_settlement(self, state: GameState) -> SettlementProposal | None:
         """Propose settlement proactively to ensure stability."""
@@ -373,9 +351,7 @@ class Opportunist(DeterministicOpponent):
         """Initialize Opportunist opponent."""
         super().__init__(name="Opportunist")
 
-    async def choose_action(
-        self, state: GameState, available_actions: list[Action]
-    ) -> Action:
+    async def choose_action(self, state: GameState, available_actions: list[Action]) -> Action:
         """Choose action based on deterrence model reasoning.
 
         - Probe for weakness: defect when ahead or opponent seems weak
@@ -394,45 +370,31 @@ class Opportunist(DeterministicOpponent):
         # Risk-aware: even opportunists fear mutual destruction
         if state.risk_level >= 7:
             # Very high risk: survival mode
-            return self._select_random_from_type(
-                available_actions, ActionType.COOPERATIVE
-            )
+            return self._select_random_from_type(available_actions, ActionType.COOPERATIVE)
         elif state.risk_level >= 5:
             # Elevated risk: 40% chance to de-escalate
             if random.random() < 0.4:
-                return self._select_random_from_type(
-                    available_actions, ActionType.COOPERATIVE
-                )
+                return self._select_random_from_type(available_actions, ActionType.COOPERATIVE)
 
         # Check if we're ahead
         position_advantage = my_position - opponent_position
 
         if position_advantage >= 1.0:
             # Clearly ahead: press the advantage
-            return self._select_random_from_type(
-                available_actions, ActionType.COMPETITIVE
-            )
+            return self._select_random_from_type(available_actions, ActionType.COMPETITIVE)
         elif position_advantage <= -1.5:
             # Significantly behind: tactical cooperation to regroup
             if random.random() < 0.6:
-                return self._select_random_from_type(
-                    available_actions, ActionType.COOPERATIVE
-                )
+                return self._select_random_from_type(available_actions, ActionType.COOPERATIVE)
             else:
-                return self._select_random_from_type(
-                    available_actions, ActionType.COMPETITIVE
-                )
+                return self._select_random_from_type(available_actions, ActionType.COMPETITIVE)
         else:
             # Roughly even: probe for weakness
             # 60% competitive, 40% cooperative (feel out opponent)
             if random.random() < 0.6:
-                return self._select_random_from_type(
-                    available_actions, ActionType.COMPETITIVE
-                )
+                return self._select_random_from_type(available_actions, ActionType.COMPETITIVE)
             else:
-                return self._select_random_from_type(
-                    available_actions, ActionType.COOPERATIVE
-                )
+                return self._select_random_from_type(available_actions, ActionType.COOPERATIVE)
 
     async def propose_settlement(self, state: GameState) -> SettlementProposal | None:
         """Propose settlement when dominant, or at high risk to preserve gains."""
@@ -478,9 +440,7 @@ class Erratic(DeterministicOpponent):
         """Initialize Erratic opponent."""
         super().__init__(name="Erratic")
 
-    async def choose_action(
-        self, state: GameState, available_actions: list[Action]
-    ) -> Action:
+    async def choose_action(self, state: GameState, available_actions: list[Action]) -> Action:
         """Choose action randomly with competitive bias.
 
         ~40% cooperative, 60% competitive - but erratic actors also
@@ -497,19 +457,13 @@ class Erratic(DeterministicOpponent):
         if state.risk_level >= 8:
             # 70% chance to cooperate at extreme risk
             if random.random() < 0.7:
-                return self._select_random_from_type(
-                    available_actions, ActionType.COOPERATIVE
-                )
+                return self._select_random_from_type(available_actions, ActionType.COOPERATIVE)
 
         # Normal erratic behavior: 40% cooperative, 60% competitive
         if random.random() < 0.4:
-            return self._select_random_from_type(
-                available_actions, ActionType.COOPERATIVE
-            )
+            return self._select_random_from_type(available_actions, ActionType.COOPERATIVE)
         else:
-            return self._select_random_from_type(
-                available_actions, ActionType.COMPETITIVE
-            )
+            return self._select_random_from_type(available_actions, ActionType.COMPETITIVE)
 
     async def evaluate_settlement(
         self,
@@ -584,9 +538,7 @@ class TitForTat(DeterministicOpponent):
         """Initialize TitForTat opponent."""
         super().__init__(name="Tit for Tat")
 
-    async def choose_action(
-        self, state: GameState, available_actions: list[Action]
-    ) -> Action:
+    async def choose_action(self, state: GameState, available_actions: list[Action]) -> Action:
         """Choose action using Tit-for-Tat strategy.
 
         - First turn: cooperate
@@ -603,19 +555,13 @@ class TitForTat(DeterministicOpponent):
 
         # First turn or opponent hasn't acted: cooperate
         if opponent_prev is None:
-            return self._select_random_from_type(
-                available_actions, ActionType.COOPERATIVE
-            )
+            return self._select_random_from_type(available_actions, ActionType.COOPERATIVE)
 
         # Mirror opponent's last action
         if opponent_prev == ActionType.COOPERATIVE:
-            return self._select_random_from_type(
-                available_actions, ActionType.COOPERATIVE
-            )
+            return self._select_random_from_type(available_actions, ActionType.COOPERATIVE)
         else:
-            return self._select_random_from_type(
-                available_actions, ActionType.COMPETITIVE
-            )
+            return self._select_random_from_type(available_actions, ActionType.COMPETITIVE)
 
     async def evaluate_settlement(
         self,
@@ -632,9 +578,7 @@ class TitForTat(DeterministicOpponent):
         adjusted_threshold = self.settlement_threshold - coop_bonus
 
         my_vp = 100 - proposal.offered_vp
-        fair_vp = self.get_position_fair_vp(
-            state, self._is_player_a if self._is_player_a is not None else False
-        )
+        fair_vp = self.get_position_fair_vp(state, self._is_player_a if self._is_player_a is not None else False)
         vp_diff = my_vp - fair_vp
 
         # Risk and turn bonuses from parent
@@ -710,18 +654,13 @@ class GrimTrigger(DeterministicOpponent):
             result: The outcome of the turn
         """
         # Determine which action was opponent's
-        if self._is_player_a:
-            opponent_action = result.action_b
-        else:
-            opponent_action = result.action_a
+        opponent_action = result.action_b if self._is_player_a else result.action_a
 
         # Check for betrayal
         if opponent_action == ActionType.COMPETITIVE:
             self._triggered = True
 
-    async def choose_action(
-        self, state: GameState, available_actions: list[Action]
-    ) -> Action:
+    async def choose_action(self, state: GameState, available_actions: list[Action]) -> Action:
         """Choose action using Grim Trigger strategy.
 
         - If never triggered: cooperate
@@ -744,18 +683,12 @@ class GrimTrigger(DeterministicOpponent):
             if state.risk_level >= 8:
                 # Survival instinct: 70% de-escalate at extreme risk
                 if random.random() < 0.7:
-                    return self._select_random_from_type(
-                        available_actions, ActionType.COOPERATIVE
-                    )
+                    return self._select_random_from_type(available_actions, ActionType.COOPERATIVE)
             # Otherwise, defect (punishment mode)
-            return self._select_random_from_type(
-                available_actions, ActionType.COMPETITIVE
-            )
+            return self._select_random_from_type(available_actions, ActionType.COMPETITIVE)
         else:
             # Trust not broken: cooperate
-            return self._select_random_from_type(
-                available_actions, ActionType.COOPERATIVE
-            )
+            return self._select_random_from_type(available_actions, ActionType.COOPERATIVE)
 
     async def evaluate_settlement(
         self,
@@ -776,10 +709,7 @@ class GrimTrigger(DeterministicOpponent):
 
         return SettlementResponse(
             action="reject",
-            rejection_reason=(
-                "You betrayed my trust. There will be no negotiation. "
-                "No settlement. Only consequences."
-            ),
+            rejection_reason=("You betrayed my trust. There will be no negotiation. No settlement. Only consequences."),
         )
 
     async def propose_settlement(self, state: GameState) -> SettlementProposal | None:

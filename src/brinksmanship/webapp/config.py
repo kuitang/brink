@@ -12,9 +12,7 @@ class Config:
     # Database - instance folder is at project root
     PROJECT_ROOT = Path(__file__).parent.parent.parent.parent
     INSTANCE_PATH = PROJECT_ROOT / "instance"
-    SQLALCHEMY_DATABASE_URI = os.environ.get(
-        "DATABASE_URL", f"sqlite:///{INSTANCE_PATH}/brinksmanship.db"
-    )
+    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL", f"sqlite:///{INSTANCE_PATH}/brinksmanship.db")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Scenarios

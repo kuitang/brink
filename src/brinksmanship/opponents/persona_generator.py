@@ -36,7 +36,7 @@ from brinksmanship.prompts import (
 )
 
 if TYPE_CHECKING:
-    from brinksmanship.models.state import ActionResult
+    pass
 
 logger = logging.getLogger(__name__)
 
@@ -176,9 +176,7 @@ class PersonaGenerator:
         research_context = await self._research_figure(figure_name)
 
         # 3. Generate researched persona
-        researched_persona = await self._generate_researched_persona(
-            figure_name, research_context
-        )
+        researched_persona = await self._generate_researched_persona(figure_name, research_context)
 
         if not evaluate_quality:
             result = PersonaGenerationResult(
@@ -191,9 +189,7 @@ class PersonaGenerator:
             return result
 
         # 4. Evaluate which persona is better
-        evaluation = await self._evaluate_personas(
-            figure_name, baseline_persona, researched_persona
-        )
+        evaluation = await self._evaluate_personas(figure_name, baseline_persona, researched_persona)
 
         # Choose the recommended persona
         recommendation = evaluation.get("recommendation", "use_researched")
@@ -201,16 +197,10 @@ class PersonaGenerator:
 
         if recommendation == "use_baseline":
             chosen_persona = baseline_persona
-            logger.info(
-                f"Web search did not add significant value for {figure_name}. "
-                f"Using baseline persona."
-            )
+            logger.info(f"Web search did not add significant value for {figure_name}. Using baseline persona.")
         else:
             chosen_persona = researched_persona
-            logger.info(
-                f"Web search added value for {figure_name}: "
-                f"{evaluation.get('new_specific_details', [])}"
-            )
+            logger.info(f"Web search added value for {figure_name}: {evaluation.get('new_specific_details', [])}")
 
         result = PersonaGenerationResult(
             persona=chosen_persona,
@@ -264,9 +254,7 @@ class PersonaGenerator:
 
         return research
 
-    async def _generate_researched_persona(
-        self, figure_name: str, research_context: str
-    ) -> PersonaDefinition:
+    async def _generate_researched_persona(self, figure_name: str, research_context: str) -> PersonaDefinition:
         """Generate a persona using research context.
 
         Args:
@@ -353,7 +341,7 @@ class PersonaGenerator:
         Returns:
             List of figure names that have been cached.
         """
-        return [key.split(":")[0] for key in self._cache.keys()]
+        return [key.split(":")[0] for key in self._cache]
 
 
 class GeneratedPersona(Opponent):
@@ -402,16 +390,11 @@ class GeneratedPersona(Opponent):
 
     def _get_opponent_estimate(self, state: GameState) -> tuple[float, float]:
         """Get estimate of opponent's position with uncertainty."""
-        if self.is_player_a:
-            info_state = state.player_a.information
-        else:
-            info_state = state.player_b.information
+        info_state = state.player_a.information if self.is_player_a else state.player_b.information
 
         return info_state.get_position_estimate(state.turn)
 
-    async def choose_action(
-        self, state: GameState, available_actions: list[Action]
-    ) -> Action:
+    async def choose_action(self, state: GameState, available_actions: list[Action]) -> Action:
         """Choose an action using LLM with generated persona prompt."""
         # Get state from this persona's perspective
         my_position, my_resources, my_last_type = self._get_my_state(state)
@@ -469,8 +452,7 @@ class GeneratedPersona(Opponent):
         if selected_action is None:
             selected_action = available_actions[0]
             logger.warning(
-                f"{self.name} selected unknown action '{selected_name}', "
-                f"falling back to {selected_action.name}"
+                f"{self.name} selected unknown action '{selected_name}', falling back to {selected_action.name}"
             )
 
         self.action_history.append((selected_action, state))
@@ -577,10 +559,7 @@ class GeneratedPersona(Opponent):
         offered_vp = response.get("offered_vp")
         argument = response.get("argument", "")
 
-        if offered_vp is None:
-            offered_vp = fair_vp
-        else:
-            offered_vp = max(min_vp, min(max_vp, int(offered_vp)))
+        offered_vp = fair_vp if offered_vp is None else max(min_vp, min(max_vp, int(offered_vp)))
 
         return SettlementProposal(
             offered_vp=offered_vp,
@@ -646,17 +625,11 @@ def _build_persona_prompt(persona_def: PersonaDefinition) -> str:
     Returns:
         Formatted persona prompt for LLM.
     """
-    quotes_section = "\n".join(
-        f'- "{quote}"' for quote in persona_def.characteristic_quotes
-    )
+    quotes_section = "\n".join(f'- "{quote}"' for quote in persona_def.characteristic_quotes)
 
-    patterns_section = "\n".join(
-        f"- {pattern}" for pattern in persona_def.strategic_patterns
-    )
+    patterns_section = "\n".join(f"- {pattern}" for pattern in persona_def.strategic_patterns)
 
-    triggers_section = "\n".join(
-        f"- {trigger}" for trigger in persona_def.decision_triggers
-    )
+    triggers_section = "\n".join(f"- {trigger}" for trigger in persona_def.decision_triggers)
 
     return f"""You are {persona_def.figure_name}.
 
@@ -670,8 +643,8 @@ NEGOTIATION STYLE:
 {persona_def.negotiation_style}
 
 RISK PROFILE:
-- Risk Tolerance: {persona_def.risk_profile.get('risk_tolerance', 'calculated')}
-- Planning Horizon: {persona_def.risk_profile.get('planning_horizon', 'medium_term')}
+- Risk Tolerance: {persona_def.risk_profile.get("risk_tolerance", "calculated")}
+- Planning Horizon: {persona_def.risk_profile.get("planning_horizon", "medium_term")}
 
 CHARACTERISTIC QUOTES:
 {quotes_section}

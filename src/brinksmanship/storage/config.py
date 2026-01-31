@@ -6,7 +6,6 @@ to create appropriate repository instances based on configuration.
 
 import os
 from enum import Enum
-from typing import Union
 
 from .file_repo import FileGameRecordRepository, FileScenarioRepository
 from .repository import GameRecordRepository, ScenarioRepository

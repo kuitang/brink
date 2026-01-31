@@ -1,29 +1,20 @@
 #!/bin/bash
-# Local CI script - runs all automated tests
-# Usage: ./scripts/ci.sh
+# Local CI script - mirrors GitHub Actions CI workflow
+# Run this before pushing to catch errors early
 
-set -e
+set -euo pipefail
 
-echo "========================================"
-echo "BRINKSMANSHIP CI"
-echo "========================================"
+echo "=== Local CI ==="
 echo ""
 
-# Ensure dependencies
-echo "→ Syncing dependencies..."
-uv sync --extra dev --extra webapp --quiet
-
-# Run all tests
+echo "1. Lint with ruff..."
+uv run ruff check .
+echo "   PASSED"
 echo ""
-echo "→ Running all tests..."
-uv run pytest -v --tb=short
 
-# Run balance simulation
+echo "2. Run tests..."
+uv run pytest tests/ -v --ignore=tests/test_real_llm_integration.py
+echo "   PASSED"
 echo ""
-echo "→ Running balance simulation..."
-uv run python scripts/balance_simulation.py --games 50 --seed 42
 
-echo ""
-echo "========================================"
-echo "CI PASSED"
-echo "========================================"
+echo "=== All CI checks passed ==="

@@ -32,7 +32,6 @@ from brinksmanship.opponents.base import Opponent, SettlementProposal, Settlemen
 from brinksmanship.opponents.historical import HistoricalPersona
 from brinksmanship.storage import get_scenario_repository
 
-
 # =============================================================================
 # SMART RATIONAL PLAYER
 # =============================================================================
@@ -83,9 +82,7 @@ class SmartRationalPlayer(Opponent):
             return state.position_a, state.resources_a, state.previous_type_a
         return state.position_b, state.resources_b, state.previous_type_b
 
-    async def choose_action(
-        self, state: GameState, available_actions: list[Action]
-    ) -> Action:
+    async def choose_action(self, state: GameState, available_actions: list[Action]) -> Action:
         my_pos, my_res, my_last = self._get_player_state(state)
         opp_last = state.previous_type_b if self._is_player_a else state.previous_type_a
         info = state.player_a.information if self._is_player_a else state.player_b.information
@@ -111,7 +108,7 @@ class SmartRationalPlayer(Opponent):
 
         response = await generate_json(
             prompt=prompt,
-            system_prompt="You're playing a strategy game. Pick an action. Return JSON: {\"action\": \"exact action name\", \"reason\": \"brief\"}",
+            system_prompt='You\'re playing a strategy game. Pick an action. Return JSON: {"action": "exact action name", "reason": "brief"}',
             schema=SMART_RATIONAL_ACTION_SCHEMA,
         )
 
@@ -167,6 +164,7 @@ class SmartRationalPlayer(Opponent):
 # PLAYER FACTORY
 # =============================================================================
 
+
 def create_player(player_spec: str, is_player_a: bool) -> Opponent:
     """Create a player from a spec like 'historical:nixon' or 'smart'."""
     if player_spec == "smart":
@@ -180,6 +178,7 @@ def create_player(player_spec: str, is_player_a: bool) -> Opponent:
 # =============================================================================
 # GAME RUNNER
 # =============================================================================
+
 
 @dataclass
 class GameResult:

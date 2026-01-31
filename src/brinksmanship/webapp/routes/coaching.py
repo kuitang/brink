@@ -2,7 +2,7 @@
 
 import asyncio
 
-from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask import Blueprint, flash, redirect, render_template, url_for
 from flask_login import current_user, login_required
 
 from ..models.game_record import GameRecord
@@ -19,9 +19,7 @@ def view(game_id: str):
     Shows loading indicator initially, then uses htmx to fetch the
     actual coaching report which may take 10-30 seconds to generate.
     """
-    game_record = GameRecord.query.filter_by(
-        game_id=game_id, user_id=current_user.id
-    ).first_or_404()
+    game_record = GameRecord.query.filter_by(game_id=game_id, user_id=current_user.id).first_or_404()
 
     if not game_record.is_finished:
         flash("Coaching analysis is only available for completed games.", "warning")
@@ -43,9 +41,7 @@ def generate(game_id: str):
     This endpoint is called via htmx hx-get with hx-trigger="load"
     to fetch the coaching analysis asynchronously after page load.
     """
-    game_record = GameRecord.query.filter_by(
-        game_id=game_id, user_id=current_user.id
-    ).first_or_404()
+    game_record = GameRecord.query.filter_by(game_id=game_id, user_id=current_user.id).first_or_404()
 
     if not game_record.is_finished:
         return render_template(

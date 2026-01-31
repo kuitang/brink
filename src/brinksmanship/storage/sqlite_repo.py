@@ -5,16 +5,15 @@ suitable for the webapp. Uses SQLAlchemy for database operations.
 """
 
 import json
-import uuid
-from datetime import datetime
-from pathlib import Path
-from typing import Optional
-
-from .repository import GameRecordRepository, ScenarioRepository
 
 # SQLite storage using standard library sqlite3
 # This avoids the SQLAlchemy dependency while still providing database storage
 import sqlite3
+import uuid
+from datetime import datetime
+from pathlib import Path
+
+from .repository import GameRecordRepository, ScenarioRepository
 
 
 def dict_factory(cursor: sqlite3.Cursor, row: tuple) -> dict:
@@ -73,7 +72,7 @@ class SQLiteScenarioRepository(ScenarioRepository):
         conn.close()
         return rows
 
-    def get_scenario(self, scenario_id: str) -> Optional[dict]:
+    def get_scenario(self, scenario_id: str) -> dict | None:
         """Load complete scenario by ID."""
         conn = self._get_connection()
         cursor = conn.cursor()
@@ -88,14 +87,11 @@ class SQLiteScenarioRepository(ScenarioRepository):
         data["id"] = scenario_id
         return data
 
-    def get_scenario_by_name(self, name: str) -> Optional[dict]:
+    def get_scenario_by_name(self, name: str) -> dict | None:
         """Load scenario by name (case-insensitive search)."""
         conn = self._get_connection()
         cursor = conn.cursor()
-        cursor.execute(
-            "SELECT id, data FROM scenarios WHERE LOWER(name) = LOWER(?)",
-            (name,)
-        )
+        cursor.execute("SELECT id, data FROM scenarios WHERE LOWER(name) = LOWER(?)", (name,))
         row = cursor.fetchone()
         conn.close()
 
@@ -120,7 +116,8 @@ class SQLiteScenarioRepository(ScenarioRepository):
         cursor = conn.cursor()
 
         # Upsert scenario
-        cursor.execute("""
+        cursor.execute(
+            """
             INSERT INTO scenarios (id, name, setting, max_turns, data, created_at, updated_at)
             VALUES (?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(id) DO UPDATE SET
@@ -129,15 +126,17 @@ class SQLiteScenarioRepository(ScenarioRepository):
                 max_turns = excluded.max_turns,
                 data = excluded.data,
                 updated_at = excluded.updated_at
-        """, (
-            scenario_id,
-            name,
-            scenario.get("setting", ""),
-            scenario.get("max_turns", 14),
-            json.dumps(scenario),
-            now,
-            now,
-        ))
+        """,
+            (
+                scenario_id,
+                name,
+                scenario.get("setting", ""),
+                scenario.get("max_turns", 14),
+                json.dumps(scenario),
+                now,
+                now,
+            ),
+        )
 
         conn.commit()
         conn.close()
@@ -205,7 +204,8 @@ class SQLiteGameRecordRepository(GameRecordRepository):
         conn = self._get_connection()
         cursor = conn.cursor()
 
-        cursor.execute("""
+        cursor.execute(
+            """
             INSERT INTO games (id, scenario_id, user_id, status, turn, data, created_at, updated_at)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(id) DO UPDATE SET
@@ -213,21 +213,23 @@ class SQLiteGameRecordRepository(GameRecordRepository):
                 turn = excluded.turn,
                 data = excluded.data,
                 updated_at = excluded.updated_at
-        """, (
-            game_id,
-            state.get("scenario_id", ""),
-            state.get("user_id"),
-            state.get("status", "in_progress"),
-            state.get("turn", 1),
-            json.dumps(state),
-            state.get("created_at", now),
-            now,
-        ))
+        """,
+            (
+                game_id,
+                state.get("scenario_id", ""),
+                state.get("user_id"),
+                state.get("status", "in_progress"),
+                state.get("turn", 1),
+                json.dumps(state),
+                state.get("created_at", now),
+                now,
+            ),
+        )
 
         conn.commit()
         conn.close()
 
-    def load_game(self, game_id: str) -> Optional[dict]:
+    def load_game(self, game_id: str) -> dict | None:
         """Load game state by ID."""
         conn = self._get_connection()
         cursor = conn.cursor()
@@ -240,18 +242,21 @@ class SQLiteGameRecordRepository(GameRecordRepository):
 
         return json.loads(row["data"])
 
-    def list_games(self, user_id: Optional[int] = None) -> list[dict]:
+    def list_games(self, user_id: int | None = None) -> list[dict]:
         """List games, optionally filtered by user."""
         conn = self._get_connection()
         cursor = conn.cursor()
 
         if user_id is not None:
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT id, scenario_id, user_id, status, turn, updated_at
                 FROM games
                 WHERE user_id = ?
                 ORDER BY updated_at DESC
-            """, (user_id,))
+            """,
+                (user_id,),
+            )
         else:
             cursor.execute("""
                 SELECT id, scenario_id, user_id, status, turn, updated_at
@@ -273,7 +278,7 @@ class SQLiteGameRecordRepository(GameRecordRepository):
         conn.close()
         return deleted
 
-    def create_game(self, scenario_id: str, user_id: Optional[int] = None) -> str:
+    def create_game(self, scenario_id: str, user_id: int | None = None) -> str:
         """Create a new game and return its ID.
 
         Args:

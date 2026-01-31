@@ -17,8 +17,6 @@ See test_removal_log.md for details on removed tests.
 
 import pytest
 
-from brinksmanship.models.matrices import MatrixType
-from brinksmanship.models.state import GameState
 from brinksmanship.engine.state_deltas import (
     DELTA_TEMPLATES,
     OutcomeBounds,
@@ -33,17 +31,17 @@ from brinksmanship.engine.state_deltas import (
     validate_delta_outcome,
     validate_near_zero_sum,
 )
+from brinksmanship.models.matrices import MatrixType
+from brinksmanship.models.state import GameState
 from brinksmanship.parameters import (
     CAPTURE_RATE,
     CC_RISK_REDUCTION,
     DD_BURN_RATE,
     DD_RISK_INCREASE,
     EXPLOIT_POSITION_GAIN,
-    EXPLOIT_RISK_INCREASE,
     SURPLUS_BASE,
     SURPLUS_STREAK_BONUS,
 )
-
 
 # =============================================================================
 # StateDeltaOutcome Dataclass Tests
@@ -176,17 +174,13 @@ class TestStrictZeroSumConstraint:
 
     def test_exactly_zero_sum_is_valid(self) -> None:
         """Test that perfectly zero-sum position changes are valid."""
-        delta = StateDeltaOutcome(
-            pos_a=1.0, pos_b=-1.0, res_cost_a=0.0, res_cost_b=0.0, risk_delta=0.0
-        )
+        delta = StateDeltaOutcome(pos_a=1.0, pos_b=-1.0, res_cost_a=0.0, res_cost_b=0.0, risk_delta=0.0)
         assert validate_near_zero_sum(delta) is True
         assert delta.pos_a + delta.pos_b == pytest.approx(0.0)
 
     def test_symmetric_zero_is_valid(self) -> None:
         """Test that symmetric zero (both 0) is valid."""
-        delta = StateDeltaOutcome(
-            pos_a=0.0, pos_b=0.0, res_cost_a=0.0, res_cost_b=0.0, risk_delta=0.0
-        )
+        delta = StateDeltaOutcome(pos_a=0.0, pos_b=0.0, res_cost_a=0.0, res_cost_b=0.0, risk_delta=0.0)
         assert validate_near_zero_sum(delta) is True
 
     def test_all_templates_are_strictly_zero_sum(self) -> None:
@@ -217,9 +211,7 @@ class TestDeltaTemplates:
         assert len(DELTA_TEMPLATES) == 14
 
         for matrix_type in MatrixType:
-            assert (
-                matrix_type in DELTA_TEMPLATES
-            ), f"Missing template for {matrix_type}"
+            assert matrix_type in DELTA_TEMPLATES, f"Missing template for {matrix_type}"
 
     def test_each_template_has_four_outcomes(self) -> None:
         """Test that each template has CC, CD, DC, DD outcomes."""
@@ -235,7 +227,7 @@ class TestDeltaTemplates:
 
     def test_all_outcomes_have_required_bounds(self) -> None:
         """Test that all outcome bounds have the required fields."""
-        for matrix_type, template in DELTA_TEMPLATES.items():
+        for _matrix_type, template in DELTA_TEMPLATES.items():
             for outcome_name in ["cc", "cd", "dc", "dd"]:
                 outcome = getattr(template, outcome_name)
                 assert isinstance(outcome.pos_a, OutcomeBounds)
@@ -252,9 +244,7 @@ class TestDeltaTemplates:
 
                 # Check bounds
                 is_valid = validate_delta_outcome(delta)
-                assert (
-                    is_valid
-                ), f"{matrix_type} {outcome} midpoint fails bounds: {delta}"
+                assert is_valid, f"{matrix_type} {outcome} midpoint fails bounds: {delta}"
 
     def test_asymmetric_outcomes_are_zero_sum(self) -> None:
         """Test that asymmetric outcomes (CD, DC) are zero-sum.
@@ -266,13 +256,12 @@ class TestDeltaTemplates:
                 delta = get_delta_for_outcome(matrix_type, outcome)
                 pos_sum = delta.pos_a + delta.pos_b
                 assert abs(pos_sum) < 0.01, (
-                    f"{matrix_type} {outcome} not zero-sum: "
-                    f"pos_a={delta.pos_a}, pos_b={delta.pos_b}, sum={pos_sum}"
+                    f"{matrix_type} {outcome} not zero-sum: pos_a={delta.pos_a}, pos_b={delta.pos_b}, sum={pos_sum}"
                 )
 
     def test_outcome_bounds_are_well_formed(self) -> None:
         """Test that all OutcomeBounds have min <= max."""
-        for matrix_type, template in DELTA_TEMPLATES.items():
+        for _matrix_type, template in DELTA_TEMPLATES.items():
             for outcome_name in ["cc", "cd", "dc", "dd"]:
                 outcome = getattr(template, outcome_name)
                 assert outcome.pos_a.min_val <= outcome.pos_a.max_val
@@ -327,9 +316,7 @@ class TestActScaling:
 
     def test_act_i_scales_down(self) -> None:
         """Test Act I (0.7) scales values down correctly."""
-        base_delta = StateDeltaOutcome(
-            pos_a=1.0, pos_b=-1.0, res_cost_a=0.5, res_cost_b=0.3, risk_delta=1.0
-        )
+        base_delta = StateDeltaOutcome(pos_a=1.0, pos_b=-1.0, res_cost_a=0.5, res_cost_b=0.3, risk_delta=1.0)
 
         scaled = apply_act_scaling(base_delta, 0.7)
 
@@ -341,9 +328,7 @@ class TestActScaling:
 
     def test_act_ii_no_change(self) -> None:
         """Test Act II (1.0) leaves values unchanged."""
-        base_delta = StateDeltaOutcome(
-            pos_a=1.0, pos_b=-1.0, res_cost_a=0.5, res_cost_b=0.3, risk_delta=1.0
-        )
+        base_delta = StateDeltaOutcome(pos_a=1.0, pos_b=-1.0, res_cost_a=0.5, res_cost_b=0.3, risk_delta=1.0)
 
         scaled = apply_act_scaling(base_delta, 1.0)
 
@@ -355,9 +340,7 @@ class TestActScaling:
 
     def test_act_iii_scales_up(self) -> None:
         """Test Act III (1.3) scales values up correctly."""
-        base_delta = StateDeltaOutcome(
-            pos_a=1.0, pos_b=-1.0, res_cost_a=0.5, res_cost_b=0.3, risk_delta=1.0
-        )
+        base_delta = StateDeltaOutcome(pos_a=1.0, pos_b=-1.0, res_cost_a=0.5, res_cost_b=0.3, risk_delta=1.0)
 
         scaled = apply_act_scaling(base_delta, 1.3)
 
@@ -370,24 +353,18 @@ class TestActScaling:
     def test_get_scaled_delta_for_outcome(self) -> None:
         """Test get_scaled_delta_for_outcome convenience function."""
         # Act I
-        delta_act1 = get_scaled_delta_for_outcome(
-            MatrixType.PRISONERS_DILEMMA, "CC", turn=2
-        )
+        delta_act1 = get_scaled_delta_for_outcome(MatrixType.PRISONERS_DILEMMA, "CC", turn=2)
         base_delta = get_delta_for_outcome(MatrixType.PRISONERS_DILEMMA, "CC")
         expected_act1 = apply_act_scaling(base_delta, 0.7)
         assert delta_act1.pos_a == pytest.approx(expected_act1.pos_a)
 
         # Act II
-        delta_act2 = get_scaled_delta_for_outcome(
-            MatrixType.PRISONERS_DILEMMA, "CC", turn=6
-        )
+        delta_act2 = get_scaled_delta_for_outcome(MatrixType.PRISONERS_DILEMMA, "CC", turn=6)
         expected_act2 = apply_act_scaling(base_delta, 1.0)
         assert delta_act2.pos_a == pytest.approx(expected_act2.pos_a)
 
         # Act III
-        delta_act3 = get_scaled_delta_for_outcome(
-            MatrixType.PRISONERS_DILEMMA, "CC", turn=10
-        )
+        delta_act3 = get_scaled_delta_for_outcome(MatrixType.PRISONERS_DILEMMA, "CC", turn=10)
         expected_act3 = apply_act_scaling(base_delta, 1.3)
         assert delta_act3.pos_a == pytest.approx(expected_act3.pos_a)
 
@@ -523,7 +500,7 @@ class TestSurplusMechanics:
         assert state.surplus_captured_b == 0.0
 
         # 3 CC outcomes build surplus
-        for i in range(3):
+        for _i in range(3):
             state = apply_surplus_effects(state, "CC")
 
         # Verify surplus built with streak bonus
@@ -551,9 +528,7 @@ class TestSurplusMechanics:
         # Verify capture
         expected_captured = surplus_before_defection * CAPTURE_RATE
         assert state.surplus_captured_b == pytest.approx(expected_captured, rel=0.01)
-        assert state.cooperation_surplus == pytest.approx(
-            surplus_before_defection - expected_captured, rel=0.01
-        )
+        assert state.cooperation_surplus == pytest.approx(surplus_before_defection - expected_captured, rel=0.01)
         assert state.cooperation_streak == 0
 
         # Position should have shifted

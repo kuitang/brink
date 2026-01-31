@@ -16,7 +16,6 @@ import pytest
 
 from brinksmanship.engine.endings import (
     EndingType,
-    GameEnding,
     check_all_endings,
     check_crisis_termination,
     check_max_turns,
@@ -205,7 +204,7 @@ class TestPositionLoss:
             pos_a=0.0,
             pos_b=5.0,
             surplus_captured_a=20.0,  # Loser's surplus - lost
-            surplus_captured_b=5.0,   # Winner's surplus
+            surplus_captured_b=5.0,  # Winner's surplus
         )
         ending = check_position_loss(state)
 
@@ -296,7 +295,7 @@ class TestResourceLoss:
             res_a=5.0,
             res_b=0.0,
             surplus_captured_a=12.0,  # Winner's surplus
-            surplus_captured_b=8.0,   # Loser's surplus - lost
+            surplus_captured_b=8.0,  # Loser's surplus - lost
         )
         ending = check_resource_loss(state)
 
@@ -310,7 +309,7 @@ class TestResourceLoss:
             res_a=0.0,
             res_b=5.0,
             surplus_captured_a=25.0,  # Loser's surplus - lost
-            surplus_captured_b=3.0,   # Winner's surplus
+            surplus_captured_b=3.0,  # Winner's surplus
         )
         ending = check_resource_loss(state)
 
@@ -377,12 +376,12 @@ class TestCrisisTerminationProbability:
     def test_formula_from_manual(self):
         """Verify the formula: P = (Risk - 7) * 0.08 for various values."""
         test_cases = [
-            (7.0, 0.0),    # Risk 7: 0%
-            (7.5, 0.04),   # Risk 7.5: 4%
-            (8.0, 0.08),   # Risk 8: 8%
-            (8.5, 0.12),   # Risk 8.5: 12%
-            (9.0, 0.16),   # Risk 9: 16%
-            (9.5, 0.20),   # Risk 9.5: 20%
+            (7.0, 0.0),  # Risk 7: 0%
+            (7.5, 0.04),  # Risk 7.5: 4%
+            (8.0, 0.08),  # Risk 8: 8%
+            (8.5, 0.12),  # Risk 8.5: 12%
+            (9.0, 0.16),  # Risk 9: 16%
+            (9.5, 0.20),  # Risk 9.5: 20%
         ]
         for risk, expected_prob in test_cases:
             prob = get_crisis_termination_probability(risk, turn=10)
@@ -480,7 +479,7 @@ class TestCrisisTermination:
 
         # Allow 2% tolerance for statistical variation
         assert abs(actual_rate - expected_rate) < 0.02, (
-            f"Expected ~{expected_rate*100}% termination rate, got {actual_rate*100:.1f}%"
+            f"Expected ~{expected_rate * 100}% termination rate, got {actual_rate * 100:.1f}%"
         )
 
 
@@ -553,7 +552,7 @@ class TestMaxTurns:
             ending_before_max = check_max_turns(state_before_max)
 
             assert ending_at_max is not None, f"Turn {max_turns} should trigger at max {max_turns}"
-            assert ending_before_max is None, f"Turn {max_turns-1} should not trigger at max {max_turns}"
+            assert ending_before_max is None, f"Turn {max_turns - 1} should not trigger at max {max_turns}"
 
 
 class TestCheckAllEndings:

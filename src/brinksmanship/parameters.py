@@ -408,6 +408,7 @@ Values:
 # DERIVED CONSTANTS (Computed from parameters)
 # =============================================================================
 
+
 def calculate_surplus_for_streak(streak: int) -> float:
     """Calculate surplus generated for a given cooperation streak level.
 

@@ -11,7 +11,7 @@ import json
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 
 @dataclass
@@ -63,9 +63,9 @@ class GameTrace:
     opponent_type: str
     human_player: str  # "A" or "B"
     start_time: str
-    end_time: Optional[str] = None
+    end_time: str | None = None
     turns: list[TurnRecord] = field(default_factory=list)
-    ending: Optional[dict[str, Any]] = None
+    ending: dict[str, Any] | None = None
     settlement_attempts: list[dict[str, Any]] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
@@ -91,7 +91,7 @@ class TraceLogger:
         scenario_id: str,
         opponent_type: str,
         human_player: str = "A",
-        output_dir: Optional[Path] = None,
+        output_dir: Path | None = None,
     ):
         """Initialize trace logger.
 
@@ -115,7 +115,7 @@ class TraceLogger:
             start_time=datetime.now().isoformat(),
         )
 
-        self._current_state_before: Optional[StateSnapshot] = None
+        self._current_state_before: StateSnapshot | None = None
         self._output_file = self.output_dir / f"{game_id}.json"
 
     def capture_state(self, state) -> StateSnapshot:
@@ -221,7 +221,7 @@ class TraceLogger:
         offered_vp: int,
         argument: str,
         response: str,
-        counter_vp: Optional[int] = None,
+        counter_vp: int | None = None,
     ) -> None:
         """Record a settlement attempt.
 
@@ -232,15 +232,17 @@ class TraceLogger:
             response: "accept", "reject", or "counter"
             counter_vp: Counter-proposal VP if applicable
         """
-        self.trace.settlement_attempts.append({
-            "turn": len(self.trace.turns) + 1,
-            "proposer": proposer,
-            "offered_vp": offered_vp,
-            "argument": argument,
-            "response": response,
-            "counter_vp": counter_vp,
-            "timestamp": datetime.now().isoformat(),
-        })
+        self.trace.settlement_attempts.append(
+            {
+                "turn": len(self.trace.turns) + 1,
+                "proposer": proposer,
+                "offered_vp": offered_vp,
+                "argument": argument,
+                "response": response,
+                "counter_vp": counter_vp,
+                "timestamp": datetime.now().isoformat(),
+            }
+        )
         self.save()
 
     def record_ending(

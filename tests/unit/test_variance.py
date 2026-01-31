@@ -419,6 +419,7 @@ class TestFinalResolution:
 
         # Calculate standard deviation of results
         import statistics
+
         std_low = statistics.stdev(results_low)
         std_high = statistics.stdev(results_high)
 
@@ -472,10 +473,10 @@ class TestVarianceScenariosFromManual:
         """Verify all four reference scenarios."""
         scenarios = [
             # (risk, coop, stab, turn, expected_approx)
-            (3, 7, 8, 1, 10),   # Peaceful early game
-            (5, 5, 5, 5, 19),   # Neutral mid-game
-            (7, 3, 6, 9, 27),   # Tense late game
-            (9, 1, 2, 9, 37),   # Chaotic crisis
+            (3, 7, 8, 1, 10),  # Peaceful early game
+            (5, 5, 5, 5, 19),  # Neutral mid-game
+            (7, 3, 6, 9, 27),  # Tense late game
+            (9, 1, 2, 9, 37),  # Chaotic crisis
         ]
 
         for risk, coop, stab, turn, expected in scenarios:
@@ -491,8 +492,7 @@ class TestVarianceScenariosFromManual:
 
             # Allow +/- 5 tolerance since the manual gives approximate values
             assert abs(sigma - expected) < 8, (
-                f"Scenario (risk={risk}, coop={coop}, stab={stab}, turn={turn}): "
-                f"expected ~{expected}, got {sigma:.2f}"
+                f"Scenario (risk={risk}, coop={coop}, stab={stab}, turn={turn}): expected ~{expected}, got {sigma:.2f}"
             )
 
 
@@ -551,9 +551,9 @@ class TestVPWithCapturedSurplus:
             surplus_captured_b=5.0,
             cooperation_surplus=20.0,  # This should be LOST
             stability=10.0,  # High stability for minimal variance
-            coop=10.0,       # High coop for minimal variance
-            risk=0.0,        # Low risk for minimal variance
-            turn=1,          # Act I for minimal variance
+            coop=10.0,  # High coop for minimal variance
+            risk=0.0,  # Low risk for minimal variance
+            turn=1,  # Act I for minimal variance
         )
 
         # Verify captured surplus is included by checking average over multiple seeds

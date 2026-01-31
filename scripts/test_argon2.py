@@ -3,6 +3,7 @@
 
 Run with: uv run python scripts/test_argon2.py
 """
+
 import time
 
 
@@ -12,6 +13,7 @@ def main():
     try:
         from argon2 import PasswordHasher, Type
         from argon2.exceptions import VerifyMismatchError
+
         print("  [OK] Import successful")
     except ImportError as e:
         print(f"  [FAIL] Import failed: {e}")
@@ -28,12 +30,14 @@ def main():
     print(f"  salt_len:     {ph.salt_len} bytes (expected: 16)")
     print(f"  type:         {ph.type} (expected: Type.ID)")
 
-    if (ph.time_cost == 3 and
-        ph.memory_cost == 65536 and
-        ph.parallelism == 4 and
-        ph.hash_len == 32 and
-        ph.salt_len == 16 and
-        ph.type == Type.ID):
+    if (
+        ph.time_cost == 3
+        and ph.memory_cost == 65536
+        and ph.parallelism == 4
+        and ph.hash_len == 32
+        and ph.salt_len == 16
+        and ph.type == Type.ID
+    ):
         print("  [OK] All defaults match RFC 9106 LOW_MEMORY profile")
     else:
         print("  [WARN] Defaults don't match expected values")

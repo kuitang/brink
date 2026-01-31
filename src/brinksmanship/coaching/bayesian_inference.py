@@ -16,7 +16,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Literal
 
 from brinksmanship.models.actions import ActionType
 
@@ -193,7 +192,7 @@ class BayesianInference:
             {
                 "turn": observation.turn,
                 "opponent_action": observation.opponent_action.value,
-                "likelihoods": {t.value: l for t, l in likelihoods.items()},
+                "likelihoods": {t.value: lh for t, lh in likelihoods.items()},
                 "posteriors": {t.value: p for t, p in posteriors.items()},
             }
         )
@@ -234,56 +233,38 @@ class BayesianInference:
         # TitForTat: Cooperate first, then mirror opponent's previous action
         if turn == 1 or prev_action is None:
             # First turn: TitForTat cooperates
-            likelihoods[OpponentType.TIT_FOR_TAT] = (
-                0.95 if is_cooperative else self.EPSILON
-            )
+            likelihoods[OpponentType.TIT_FOR_TAT] = 0.95 if is_cooperative else self.EPSILON
         else:
             # Mirror previous action
             if prev_action == ActionType.COOPERATIVE:
-                likelihoods[OpponentType.TIT_FOR_TAT] = (
-                    0.95 if is_cooperative else self.EPSILON
-                )
+                likelihoods[OpponentType.TIT_FOR_TAT] = 0.95 if is_cooperative else self.EPSILON
             else:
-                likelihoods[OpponentType.TIT_FOR_TAT] = (
-                    0.95 if is_competitive else self.EPSILON
-                )
+                likelihoods[OpponentType.TIT_FOR_TAT] = 0.95 if is_competitive else self.EPSILON
 
         # GrimTrigger: Cooperate until betrayed, then defect forever
         if was_betrayed:
             # After betrayal: always defect
-            likelihoods[OpponentType.GRIM_TRIGGER] = (
-                0.98 if is_competitive else self.EPSILON
-            )
+            likelihoods[OpponentType.GRIM_TRIGGER] = 0.98 if is_competitive else self.EPSILON
         else:
             # Before betrayal: always cooperate
-            likelihoods[OpponentType.GRIM_TRIGGER] = (
-                0.95 if is_cooperative else self.EPSILON
-            )
+            likelihoods[OpponentType.GRIM_TRIGGER] = 0.95 if is_cooperative else self.EPSILON
 
         # Opportunist: Defect when ahead, cooperate when behind
         if pos_diff < -0.5:
             # Opponent is ahead (positive for them, negative for player)
-            likelihoods[OpponentType.OPPORTUNIST] = (
-                0.85 if is_competitive else 0.15
-            )
+            likelihoods[OpponentType.OPPORTUNIST] = 0.85 if is_competitive else 0.15
         elif pos_diff > 0.5:
             # Opponent is behind
-            likelihoods[OpponentType.OPPORTUNIST] = (
-                0.85 if is_cooperative else 0.15
-            )
+            likelihoods[OpponentType.OPPORTUNIST] = 0.85 if is_cooperative else 0.15
         else:
             # Roughly equal
             likelihoods[OpponentType.OPPORTUNIST] = 0.5
 
         # AlwaysCooperate: Always cooperate
-        likelihoods[OpponentType.ALWAYS_COOPERATE] = (
-            0.98 if is_cooperative else self.EPSILON
-        )
+        likelihoods[OpponentType.ALWAYS_COOPERATE] = 0.98 if is_cooperative else self.EPSILON
 
         # AlwaysDefect: Always defect
-        likelihoods[OpponentType.ALWAYS_DEFECT] = (
-            0.98 if is_competitive else self.EPSILON
-        )
+        likelihoods[OpponentType.ALWAYS_DEFECT] = 0.98 if is_competitive else self.EPSILON
 
         # Random: 50-50
         likelihoods[OpponentType.RANDOM] = 0.5

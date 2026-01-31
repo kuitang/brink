@@ -567,30 +567,26 @@ THEME_GUIDANCE = {
 - Act I: Inspection (verify intentions), Stag Hunt (initial trust)
 - Act II: Chicken (brinkmanship), Security Dilemma (arms race dynamics)
 - Act III: Chicken (final showdown), Deadlock (if relationship collapsed)""",
-
     "rivals": """Rivals/Competition Theme:
 - Focus on relative gains and zero-sum thinking
 - Act I: Inspection, Stag Hunt (can rivals cooperate?)
 - Act II: PD (temptation to defect), Chicken (market standoffs)
 - Act III: Deadlock (irreconcilable differences), Security Dilemma""",
-
     "allies": """Allies/Partnership Theme:
 - Emphasize coordination and distributional conflict
 - Act I: Harmony (mutual benefit), Pure Coordination, Stag Hunt
 - Act II: Battle of Sexes (who leads?), Leader, Stag Hunt
 - Act III: Volunteers Dilemma (who sacrifices?), Battle of Sexes""",
-
     "espionage": """Espionage/Intelligence Theme:
 - Focus on information games and deception
 - Act I: Inspection, Reconnaissance (information gathering)
 - Act II: Matching Pennies (cat and mouse), Inspection
 - Act III: Chicken (blown cover), PD (double agents)""",
-
     "default": """General Theme:
 - Balance coordination and conflict
 - Act I: Stag Hunt, Pure Coordination, Leader
 - Act II: PD, Chicken, Battle of Sexes
-- Act III: Chicken, Security Dilemma, PD"""
+- Act III: Chicken, Security Dilemma, PD""",
 }
 
 # =============================================================================
@@ -642,58 +638,45 @@ MATRIX_DESCRIPTIONS = {
     "PRISONERS_DILEMMA": """Prisoner's Dilemma: Both have incentive to defect, but mutual cooperation is better.
 - Cooperate = Trust the other side, work together
 - Defect = Pursue self-interest, potentially exploit cooperation""",
-
     "DEADLOCK": """Deadlock: Both prefer mutual defection. Cooperation is not equilibrium.
 - Cooperate = Attempt cooperation despite poor incentives
 - Defect = Pursue dominance (natural equilibrium)""",
-
     "HARMONY": """Harmony: Cooperation dominates for both. No real conflict.
 - Cooperate = Work together (dominant strategy)
 - Defect = Unnecessarily create conflict""",
-
     "CHICKEN": """Chicken: Two equilibria where one backs down. Commitment is key.
 - Dove/Swerve = Back down, avoid collision
 - Hawk/Straight = Stand firm, risk mutual destruction""",
-
     "STAG_HUNT": """Stag Hunt: Trust problem. Risky cooperation vs safe defection.
 - Stag = Commit to risky but rewarding cooperation
 - Hare = Play it safe, take guaranteed smaller reward""",
-
     "BATTLE_OF_SEXES": """Battle of Sexes: Both want to coordinate but prefer different outcomes.
 - Option A = Coordinate on your preferred outcome
 - Option B = Coordinate on their preferred outcome""",
-
     "LEADER": """Leader: One should lead, one follow. Both leading causes clash.
 - Follow = Let them take initiative
 - Lead = Take the initiative yourself""",
-
     "VOLUNTEERS_DILEMMA": """Volunteer's Dilemma: Someone must sacrifice for the group.
 - Volunteer = Bear the cost for everyone's benefit
 - Abstain = Hope someone else volunteers""",
-
     "INSPECTION_GAME": """Inspection Game: Inspector vs potential violator.
 - Inspect/Comply = Verify/Follow the rules
 - Trust/Cheat = Accept claims/Break the rules""",
-
     "RECONNAISSANCE": """Reconnaissance: Information gathering with detection risk.
 - Probe/Vigilant = Actively seek info / Watch for probes
 - Mask/Project = Stay hidden / Focus on other tasks""",
-
     "MATCHING_PENNIES": """Matching Pennies: Zero-sum guessing game.
 - Heads = Choose one option
 - Tails = Choose the other option""",
-
     "SECURITY_DILEMMA": """Security Dilemma: Defensive buildup appears offensive.
 - Disarm = Signal peaceful intentions
 - Arm = Protect yourself (appears threatening)""",
-
     "PURE_COORDINATION": """Pure Coordination: Both want to match, indifferent about which.
 - Option A = Choose first option
 - Option B = Choose second option""",
-
     "WAR_OF_ATTRITION": """War of Attrition: Costly to continue, costly to quit first.
 - Continue = Keep fighting, bear ongoing costs
-- Quit = Concede to end the bleeding"""
+- Quit = Concede to end the bleeding""",
 }
 
 # =============================================================================
@@ -955,11 +938,14 @@ Create a persona with the following attributes:
 
 5. BACKSTORY: A brief (2-3 sentence) background that explains why this persona behaves this way.
 
-6. DECISION_STYLE: How they approach choices (e.g., "gut feeling first", "analyzes options carefully", "looks for the safe choice", "always considers opponent's perspective")
+6. DECISION_STYLE: How they approach choices (e.g., "gut feeling first", "analyzes options carefully",
+   "looks for the safe choice", "always considers opponent's perspective")
 
-7. TRIGGERS: What situations cause them to act out of character (e.g., "betrayal makes them vindictive", "success makes them overconfident", "falling behind causes panic")
+7. TRIGGERS: What situations cause them to act out of character (e.g., "betrayal makes them vindictive",
+   "success makes them overconfident", "falling behind causes panic")
 
-Generate a coherent persona where these traits make sense together. The backstory should justify the combination of traits.
+Generate a coherent persona where these traits make sense together.
+The backstory should justify the combination of traits.
 
 Output your response as JSON with the following structure:
 {{
@@ -1005,7 +991,8 @@ Output JSON:
 }}"""
 
 
-HUMAN_SETTLEMENT_EVALUATION_PROMPT = """You are evaluating a settlement proposal as a human player with the following persona:
+HUMAN_SETTLEMENT_EVALUATION_PROMPT = """You are evaluating a settlement proposal as a human player \
+with the following persona:
 
 PERSONA:
 - Risk Tolerance: {risk_tolerance}
@@ -1035,7 +1022,8 @@ As this persona, evaluate the proposal. Consider:
 3. How does your risk tolerance affect your view of continuing vs. accepting?
 4. How does your emotional state influence your judgment?
 
-Remember: Humans don't always make optimal decisions. A novice might accept a bad deal or reject a good one. Emotional players might be swayed by arguments more than numbers.
+Remember: Humans don't always make optimal decisions. A novice might accept a bad deal or reject a good one.
+Emotional players might be swayed by arguments more than numbers.
 
 Output JSON:
 {{
@@ -1206,7 +1194,8 @@ WORLDVIEW:
 - Raison d'état: the state's interests transcend personal morality and religious affiliation
 - The long game matters more than immediate victories; a patient spider catches more flies
 - Weakening rivals through proxies and internal divisions is preferable to direct confrontation
-- "If you give me six lines written by the hand of the most honest of men, I will find something in them which will hang him"
+- "If you give me six lines written by the hand of the most honest of men, I will find something
+  in them which will hang him"
 
 STRATEGIC PATTERNS:
 - Works through intermediaries and proxies to maintain deniability
@@ -1224,7 +1213,8 @@ NEGOTIATION STYLE:
 - Prefers opponents to destroy themselves through their own mistakes"""
 
 
-PERSONA_METTERNICH = """You are Klemens von Metternich, Austrian Foreign Minister and architect of the Concert of Europe.
+PERSONA_METTERNICH = """You are Klemens von Metternich, Austrian Foreign Minister \
+and architect of the Concert of Europe.
 
 WORLDVIEW:
 - Stability and balance of power are the highest goods in international relations
@@ -1318,7 +1308,8 @@ STRATEGIC PATTERNS:
 
 NEGOTIATION STYLE:
 - Projects confidence beyond actual power
-- "I am the leader of one country which has two alphabets, three languages, four religions, five nationalities, six republics, surrounded by seven neighbours"
+- "I am the leader of one country which has two alphabets, three languages, four religions,
+  five nationalities, six republics, surrounded by seven neighbours"
 - Willing to walk away from deals that compromise independence
 - Uses personal charisma and hospitality as diplomatic tools
 - Maintains relationships across ideological lines"""
@@ -1766,7 +1757,9 @@ Synthesize findings into a coherent profile suitable for creating a game AI pers
 The goal is actionable patterns that can guide decision-making in a strategic game."""
 
 
-PERSONA_RESEARCH_PROMPT = """Research {figure_name}: find documented strategic decisions, negotiation tactics, characteristic quotes about strategy, and any available primary sources like emails, memos, or letters.
+PERSONA_RESEARCH_PROMPT = """Research {figure_name}: find documented strategic decisions, \
+negotiation tactics, characteristic quotes about strategy, and any available primary sources \
+like emails, memos, or letters.
 
 Focus on patterns that would be useful for creating a game AI persona:
 1. How did they approach strategic dilemmas?
@@ -1782,7 +1775,8 @@ Synthesize your findings into strategic behavior patterns."""
 # PERSONA ACTION SELECTION PROMPTS
 # =============================================================================
 
-PERSONA_ACTION_SELECTION_PROMPT = """You are {persona_name} playing as **{role_name}** ({player_side}) in a strategic crisis game called Brinksmanship.
+PERSONA_ACTION_SELECTION_PROMPT = """You are {persona_name} playing as **{role_name}** \
+({player_side}) in a strategic crisis game called Brinksmanship.
 
 {persona_description}
 
@@ -1920,15 +1914,21 @@ Output JSON:
 # HUMAN SIMULATOR SYSTEM PROMPTS (short prompts for internal use)
 # =============================================================================
 
-HUMAN_PERSONA_GENERATION_SYSTEM_PROMPT = """Generate a diverse, coherent human player persona for the Brinksmanship game. Output valid JSON only."""
+HUMAN_PERSONA_GENERATION_SYSTEM_PROMPT = (
+    "Generate a diverse, coherent human player persona for the Brinksmanship game. Output valid JSON only."
+)
 
 
-MISTAKE_CHECK_SYSTEM_PROMPT = """Determine if and how this persona would make a mistake given their traits and the current situation. Output valid JSON."""
+MISTAKE_CHECK_SYSTEM_PROMPT = (
+    "Determine if and how this persona would make a mistake given their traits and "
+    "the current situation. Output valid JSON."
+)
 
 
 # =============================================================================
 # HELPER FUNCTIONS
 # =============================================================================
+
 
 def get_theme_guidance(theme: str) -> str:
     """Get theme-specific guidance for matrix selection.
@@ -2270,67 +2270,40 @@ def format_action_menu_prompt(
 ACTION_SELECTION_SCHEMA: dict = {
     "type": "object",
     "properties": {
-        "reasoning": {
-            "type": "string",
-            "description": "Brief explanation of thought process (2-3 sentences)"
-        },
-        "selected_action": {
-            "type": "string",
-            "description": "Exact name of the action from the available options"
-        }
+        "reasoning": {"type": "string", "description": "Brief explanation of thought process (2-3 sentences)"},
+        "selected_action": {"type": "string", "description": "Exact name of the action from the available options"},
     },
-    "required": ["reasoning", "selected_action"]
+    "required": ["reasoning", "selected_action"],
 }
 
 # Schema for settlement evaluation response
 SETTLEMENT_EVALUATION_SCHEMA: dict = {
     "type": "object",
     "properties": {
-        "reasoning": {
-            "type": "string",
-            "description": "Internal reasoning about the offer"
-        },
+        "reasoning": {"type": "string", "description": "Internal reasoning about the offer"},
         "action": {
             "type": "string",
             "enum": ["ACCEPT", "COUNTER", "REJECT"],
-            "description": "Decision: accept, counter-offer, or reject"
+            "description": "Decision: accept, counter-offer, or reject",
         },
-        "counter_vp": {
-            "type": ["number", "null"],
-            "description": "Counter-offer VP (only if action is COUNTER)"
-        },
+        "counter_vp": {"type": ["number", "null"], "description": "Counter-offer VP (only if action is COUNTER)"},
         "counter_argument": {
             "type": ["string", "null"],
-            "description": "Counter-offer argument (only if action is COUNTER)"
+            "description": "Counter-offer argument (only if action is COUNTER)",
         },
-        "rejection_reason": {
-            "type": ["string", "null"],
-            "description": "Rejection reason (only if action is REJECT)"
-        }
+        "rejection_reason": {"type": ["string", "null"], "description": "Rejection reason (only if action is REJECT)"},
     },
-    "required": ["reasoning", "action"]
+    "required": ["reasoning", "action"],
 }
 
 # Schema for settlement proposal decision
 SETTLEMENT_PROPOSAL_SCHEMA: dict = {
     "type": "object",
     "properties": {
-        "propose": {
-            "type": "boolean",
-            "description": "Whether to propose a settlement"
-        },
-        "reasoning": {
-            "type": "string",
-            "description": "Brief explanation of decision"
-        },
-        "offered_vp": {
-            "type": ["number", "null"],
-            "description": "VP share to offer (only if propose is true)"
-        },
-        "argument": {
-            "type": ["string", "null"],
-            "description": "Settlement argument (only if propose is true)"
-        }
+        "propose": {"type": "boolean", "description": "Whether to propose a settlement"},
+        "reasoning": {"type": "string", "description": "Brief explanation of decision"},
+        "offered_vp": {"type": ["number", "null"], "description": "VP share to offer (only if propose is true)"},
+        "argument": {"type": ["string", "null"], "description": "Settlement argument (only if propose is true)"},
     },
-    "required": ["propose", "reasoning"]
+    "required": ["propose", "reasoning"],
 }

@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Simple documentation browser for markdown files."""
 
-import os
 import re
 from pathlib import Path
 
@@ -263,7 +262,8 @@ HTML_TEMPLATE = """
         <h2>Documentation</h2>
         <ul>
         {% for file, name in docs %}
-            <li><a href="/doc/{{ file }}" {% if current == file %}class="active"{% endif %}>{{ name }}</a></li>
+            <li><a href="/doc/{{ file }}"
+                {% if current == file %}class="active"{% endif %}>{{ name }}</a></li>
         {% endfor %}
         </ul>
 
@@ -271,9 +271,13 @@ HTML_TEMPLATE = """
 
         <h2>Tasks</h2>
         <ul>
-            <li><a href="/doc/tasks/INDEX.md" {% if current == 'tasks/INDEX.md' %}class="active"{% endif %}>Task Index (DAG)</a></li>
+            <li><a href="/doc/tasks/INDEX.md"
+                {% if current == 'tasks/INDEX.md' %}class="active"{% endif %}
+                >Task Index (DAG)</a></li>
         {% for task in tasks %}
-            <li><a href="/doc/tasks/{{ task }}" {% if current == 'tasks/' + task %}class="active"{% endif %}>{{ task[:-3] }}</a></li>
+            <li><a href="/doc/tasks/{{ task }}"
+                {% if current == 'tasks/' + task %}class="active"{% endif %}
+                >{{ task[:-3] }}</a></li>
         {% endfor %}
         </ul>
     </nav>
@@ -447,17 +451,15 @@ graph TD
 
 def render_markdown(content: str) -> str:
     """Render markdown to HTML."""
+
     # Handle mermaid blocks specially
     def mermaid_replacer(match):
         return f'<div class="mermaid">{match.group(1)}</div>'
 
-    content = re.sub(r'```mermaid\n(.*?)```', mermaid_replacer, content, flags=re.DOTALL)
+    content = re.sub(r"```mermaid\n(.*?)```", mermaid_replacer, content, flags=re.DOTALL)
 
     # Render markdown
-    html = markdown(
-        content,
-        extensions=['tables', 'fenced_code', 'codehilite', 'toc']
-    )
+    html = markdown(content, extensions=["tables", "fenced_code", "codehilite", "toc"])
 
     return html
 
@@ -493,12 +495,7 @@ def render_doc(filename):
     html_content = render_markdown(content)
 
     return render_template_string(
-        HTML_TEMPLATE,
-        title=filepath.stem,
-        content=html_content,
-        docs=DOC_FILES,
-        tasks=get_tasks(),
-        current=filename
+        HTML_TEMPLATE, title=filepath.stem, content=html_content, docs=DOC_FILES, tasks=get_tasks(), current=filename
     )
 
 

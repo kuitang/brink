@@ -14,8 +14,8 @@ def seed_db():
 
     Also ensures all models are imported so their tables are created.
     """
+    from .models.game_record import GameRecord, SettlementAttempt, TurnHistory  # noqa: F401
     from .models.user import User
-    from .models.game_record import GameRecord, TurnHistory, SettlementAttempt  # noqa: F401
 
     # Create default test user
     if not User.query.filter_by(username="test1234").first():

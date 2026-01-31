@@ -22,17 +22,14 @@ See GAME_MANUAL.md Appendix C for parameter documentation.
 from __future__ import annotations
 
 import argparse
-import statistics
 import sys
 import time
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from datetime import datetime
 from itertools import product
-from typing import Optional
 
 # Import for type hints only - actual imports happen in worker
-from brinksmanship import parameters
 
 
 @dataclass
@@ -71,11 +68,11 @@ class SweepResult:
 
         # Check 3: Settlement rate 30-70%
         if not (0.30 <= self.settlement_rate <= 0.70):
-            self.failed_checks.append(f"Settle {self.settlement_rate*100:.0f}% (need 30-70%)")
+            self.failed_checks.append(f"Settle {self.settlement_rate * 100:.0f}% (need 30-70%)")
 
         # Check 4: Mutual destruction rate <20%
         if self.mutual_destruction_rate >= 0.20:
-            self.failed_checks.append(f"MD {self.mutual_destruction_rate*100:.0f}% (need <20%)")
+            self.failed_checks.append(f"MD {self.mutual_destruction_rate * 100:.0f}% (need <20%)")
 
         # Check 5: Average game length 10-16 turns
         if not (10 <= self.avg_game_length <= 16):
@@ -101,11 +98,11 @@ def _run_sweep_combination(args: tuple) -> dict:
     Returns:
         Dict with sweep results
     """
-    (scenario_id, capture_rate, rejection_penalty, dd_risk,
-     num_games, seed, max_workers) = args
+    (scenario_id, capture_rate, rejection_penalty, dd_risk, num_games, seed, max_workers) = args
 
     # Monkey-patch the parameters module
     from brinksmanship import parameters as params
+
     original_capture = params.CAPTURE_RATE
     original_rejection = params.REJECTION_BASE_PENALTY
     original_dd = params.DD_RISK_INCREASE
@@ -117,10 +114,11 @@ def _run_sweep_combination(args: tuple) -> dict:
 
         # Run the simulation with patched parameters
         from collections import defaultdict
+
         from brinksmanship.testing.batch_runner import (
-            BatchRunner,
             DETERMINISTIC_OPPONENTS,
             BatchResults,
+            BatchRunner,
         )
 
         runner = BatchRunner(scenario_id=scenario_id)
@@ -206,7 +204,7 @@ def run_parameter_sweep(
     rejection_penalties: list[float] = None,
     dd_risks: list[float] = None,
     num_games: int = 100,
-    seed: Optional[int] = None,
+    seed: int | None = None,
     max_workers: int = 4,
     quiet: bool = False,
 ) -> list[SweepResult]:
@@ -248,10 +246,7 @@ def run_parameter_sweep(
     all_args = []
     for idx, (capture, rejection, dd) in enumerate(combinations):
         combo_seed = (seed + idx * 1000) if seed is not None else None
-        all_args.append((
-            scenario_id, capture, rejection, dd,
-            num_games, combo_seed, max_workers
-        ))
+        all_args.append((scenario_id, capture, rejection, dd, num_games, combo_seed, max_workers))
 
     # Run combinations in parallel
     results: list[SweepResult] = []
@@ -296,13 +291,12 @@ def print_sweep_results(results: list[SweepResult]) -> None:
     print("=" * 95)
 
     # Sort by pass/fail, then by total value
-    results_sorted = sorted(
-        results,
-        key=lambda r: (not r.passes_all, -r.avg_total_value)
-    )
+    results_sorted = sorted(results, key=lambda r: (not r.passes_all, -r.avg_total_value))
 
     # Print header
-    print(f"{'Params':<25} | {'Total':>6} | {'Settle':>7} | {'MD':>6} | {'Var':>6} | {'Len':>5} | {'Status':>6} | {'Details'}")
+    print(
+        f"{'Params':<25} | {'Total':>6} | {'Settle':>7} | {'MD':>6} | {'Var':>6} | {'Len':>5} | {'Status':>6} | {'Details'}"
+    )
     print("-" * 95)
 
     # Track passing combinations
@@ -320,8 +314,8 @@ def print_sweep_results(results: list[SweepResult]) -> None:
         print(
             f"{result.param_str:<25} | "
             f"{result.avg_total_value:>6.1f} | "
-            f"{result.settlement_rate*100:>6.1f}% | "
-            f"{result.mutual_destruction_rate*100:>5.1f}% | "
+            f"{result.settlement_rate * 100:>6.1f}% | "
+            f"{result.mutual_destruction_rate * 100:>5.1f}% | "
             f"{result.vp_std_dev:>6.1f} | "
             f"{result.avg_game_length:>5.1f} | "
             f"{status:>6} | "
@@ -348,10 +342,10 @@ def print_sweep_results(results: list[SweepResult]) -> None:
         print(f"  REJECTION_BASE_PENALTY = {best.rejection_base_penalty}")
         print(f"  DD_RISK_INCREASE = {best.dd_risk_increase}")
         print()
-        print(f"  Expected metrics:")
+        print("  Expected metrics:")
         print(f"    - Total Value: {best.avg_total_value:.1f}")
-        print(f"    - Settlement Rate: {best.settlement_rate*100:.1f}%")
-        print(f"    - Mutual Destruction: {best.mutual_destruction_rate*100:.1f}%")
+        print(f"    - Settlement Rate: {best.settlement_rate * 100:.1f}%")
+        print(f"    - Mutual Destruction: {best.mutual_destruction_rate * 100:.1f}%")
         print(f"    - VP Variance: {best.vp_std_dev:.1f}")
         print(f"    - Game Length: {best.avg_game_length:.1f} turns")
     else:

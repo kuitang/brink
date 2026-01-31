@@ -30,7 +30,6 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 from brinksmanship.generation.validator import (
     ScenarioValidator,
     ValidationResult,
-    ValidationSeverity,
 )
 
 
@@ -91,14 +90,14 @@ def print_validation_report(result: ValidationResult) -> None:
         sim = result.simulation_results
         print(f"  Games played: {sim.games_played}")
         print(f"  Average game length: {sim.avg_game_length:.1f} turns")
-        print(f"  Elimination rate: {sim.elimination_rate*100:.1f}%")
-        print(f"  Mutual destruction rate: {sim.mutual_destruction_rate*100:.1f}%")
-        print(f"  Crisis termination rate: {sim.crisis_termination_rate*100:.1f}%")
+        print(f"  Elimination rate: {sim.elimination_rate * 100:.1f}%")
+        print(f"  Mutual destruction rate: {sim.mutual_destruction_rate * 100:.1f}%")
+        print(f"  Crisis termination rate: {sim.crisis_termination_rate * 100:.1f}%")
         print(f"  VP std dev: {sim.vp_std_dev:.1f}")
 
         print("\n  Strategy Win Rates:")
         for strategy, rate in sorted(sim.strategy_win_rates.items()):
-            print(f"    {strategy}: {rate*100:.1f}%")
+            print(f"    {strategy}: {rate * 100:.1f}%")
 
     # Summary
     critical = result.get_critical_issues()

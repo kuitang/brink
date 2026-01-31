@@ -23,10 +23,7 @@ def index():
             "Run <code>uv run python scripts/generate_manual.py</code> to generate.</p>"
         )
 
-    if toc_path.exists():
-        toc_content = toc_path.read_text()
-    else:
-        toc_content = ""
+    toc_content = toc_path.read_text() if toc_path.exists() else ""
 
     return render_template(
         "pages/manual.html",

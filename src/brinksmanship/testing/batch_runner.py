@@ -10,7 +10,6 @@ Uses the unified GameRunner with actual opponent implementations.
 
 from __future__ import annotations
 
-import asyncio
 import json
 import statistics
 import time
@@ -19,7 +18,6 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 from brinksmanship.opponents.base import Opponent, get_opponent_by_type, list_opponent_types
 from brinksmanship.opponents.deterministic import (
@@ -31,9 +29,7 @@ from brinksmanship.opponents.deterministic import (
     SecuritySeeker,
     TitForTat,
 )
-from brinksmanship.storage import get_scenario_repository
 from brinksmanship.testing.game_runner import GameResult, run_game_sync
-
 
 # Registry of all deterministic opponents (for fast, non-LLM simulation)
 DETERMINISTIC_OPPONENTS: dict[str, type[DeterministicOpponent]] = {
@@ -378,7 +374,7 @@ class BatchRunner:
         opponent_a_name: str,
         opponent_b_name: str,
         num_games: int = 100,
-        seed: Optional[int] = None,
+        seed: int | None = None,
         max_workers: int = 4,
     ) -> PairingStats:
         """Run games between two opponent types.
@@ -432,11 +428,11 @@ class BatchRunner:
 
     def run_all_pairings(
         self,
-        opponent_names: Optional[list[str]] = None,
+        opponent_names: list[str] | None = None,
         num_games: int = 100,
-        seed: Optional[int] = None,
+        seed: int | None = None,
         max_workers: int = 4,
-        output_dir: Optional[str] = None,
+        output_dir: str | None = None,
     ) -> BatchResults:
         """Run all unique pairings of opponents.
 
@@ -548,10 +544,7 @@ def print_results_summary(results: BatchResults) -> None:
     print(f"  Crisis: {crisis_rate:.1f}%")
 
     # Mutual destruction check (must be <20%, target 10-18%)
-    if md_rate < 20:
-        md_check = "OK" if 10 <= md_rate <= 18 else "OK (<20%)"
-    else:
-        md_check = "FAIL (>20%)"
+    md_check = ("OK" if 10 <= md_rate <= 18 else "OK (<20%)") if md_rate < 20 else "FAIL (>20%)"
     print(f"  Mutual Destruction: {md_rate:.1f}% (target: 10-18%, must be <20%) [{md_check}]")
     print(f"  Elimination: {elim_rate:.1f}%")
 
@@ -620,13 +613,7 @@ def print_results_summary(results: BatchResults) -> None:
         if is_dominant:
             dominant_strategies.append((name, avg_total, avg_share))
 
-        print(
-            f"{name:<20} "
-            f"{avg_total:>9.1f} "
-            f"{avg_share * 100:>9.1f}% "
-            f"{win_rate * 100:>9.1f}% "
-            f"{status:>12}"
-        )
+        print(f"{name:<20} {avg_total:>9.1f} {avg_share * 100:>9.1f}% {win_rate * 100:>9.1f}% {status:>12}")
 
     # Dominance Check Summary
     print("\n" + "-" * 80)

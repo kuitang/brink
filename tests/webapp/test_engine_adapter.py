@@ -2,8 +2,8 @@
 
 import json
 import os
+
 import pytest
-import tempfile
 
 from brinksmanship.webapp.services.engine_adapter import RealGameEngine
 
@@ -32,10 +32,7 @@ def test_scenario_file():
     }
 
     # Create in scenarios directory
-    scenarios_dir = os.path.join(
-        os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
-        "scenarios"
-    )
+    scenarios_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "scenarios")
     os.makedirs(scenarios_dir, exist_ok=True)
 
     filepath = os.path.join(scenarios_dir, "test-crisis.json")

@@ -23,8 +23,6 @@ REMOVED TESTS (see test_removal_log.md for rationale):
 - TestEdgeCases: Kept only test_shared_sigma_extreme_values
 """
 
-import json
-
 import pytest
 
 from brinksmanship.models.actions import ActionType
@@ -34,7 +32,6 @@ from brinksmanship.models.state import (
     InformationState,
     PlayerState,
     apply_action_result,
-    clamp,
     update_cooperation_score,
     update_stability,
 )

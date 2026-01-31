@@ -21,11 +21,10 @@ Usage:
     python scripts/run_all_simulations.py --only balance,crisis,stability
 """
 
+import argparse
 import subprocess
 import sys
-import argparse
 from pathlib import Path
-
 
 SIMULATIONS = {
     "balance": {
@@ -138,25 +137,11 @@ Examples:
   python scripts/run_all_simulations.py                    # Run all
   python scripts/run_all_simulations.py --only balance     # Run one
   python scripts/run_all_simulations.py --only crisis,stability  # Run subset
-        """
+        """,
     )
-    parser.add_argument(
-        "--only",
-        type=str,
-        default=None,
-        help="Comma-separated list of simulations to run"
-    )
-    parser.add_argument(
-        "--seed",
-        type=int,
-        default=42,
-        help="Random seed for reproducibility (default: 42)"
-    )
-    parser.add_argument(
-        "--verbose", "-v",
-        action="store_true",
-        help="Show full output from each simulation"
-    )
+    parser.add_argument("--only", type=str, default=None, help="Comma-separated list of simulations to run")
+    parser.add_argument("--seed", type=int, default=42, help="Random seed for reproducibility (default: 42)")
+    parser.add_argument("--verbose", "-v", action="store_true", help="Show full output from each simulation")
     args = parser.parse_args()
 
     # Determine which simulations to run
@@ -181,19 +166,14 @@ Examples:
 
     for name in sim_names:
         sim_info = SIMULATIONS[name]
-        print(f"\n{'='*80}")
+        print(f"\n{'=' * 80}")
         print(f"RUNNING: {name} - {sim_info['description']}")
         print("=" * 80)
 
         # Add seed to args if supported
         sim_args = sim_info["args"] + ["--seed", str(args.seed)]
 
-        success, output = run_simulation(
-            name,
-            sim_info["script"],
-            sim_args,
-            scripts_dir
-        )
+        success, output = run_simulation(name, sim_info["script"], sim_args, scripts_dir)
 
         results[name] = (success, output)
 

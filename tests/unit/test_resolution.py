@@ -22,54 +22,44 @@ import pytest
 from pydantic import ValidationError
 
 from brinksmanship.engine.resolution import (
+    MAX_SETTLEMENT_EXCHANGES,
+    InspectionChoice,
+    InspectionOpponentChoice,
     MatrixChoice,
     ReconnaissanceChoice,
     ReconnaissanceOpponentChoice,
-    ReconnaissanceResult,
-    InspectionChoice,
-    InspectionOpponentChoice,
-    InspectionResult,
-    SettlementProposal,
     SettlementAction,
+    SettlementProposal,
     SettlementResponse,
-    SettlementConstraints,
-    SettlementResult,
-    MAX_SETTLEMENT_EXCHANGES,
-    resolve_matrix_game,
-    resolve_reconnaissance,
-    resolve_inspection,
+    _calculate_cooperation_delta,
+    apply_state_deltas,
     calculate_settlement_constraints,
-    validate_settlement_proposal,
+    determine_settlement_roles,
+    get_act_multiplier,
+    handle_failed_settlement,
     handle_settlement_acceptance,
     handle_settlement_rejection,
     process_settlement_response,
-    get_act_multiplier,
-    apply_state_deltas,
-    apply_action_result_deltas,
-    resolve_simultaneous_actions,
-    resolve_reconnaissance_turn,
+    resolve_inspection,
     resolve_inspection_turn,
-    handle_failed_settlement,
-    determine_settlement_roles,
-    _calculate_cooperation_delta,
-)
-from brinksmanship.parameters import (
-    REJECTION_BASE_PENALTY,
-    REJECTION_ESCALATION,
-    calculate_rejection_penalty,
+    resolve_matrix_game,
+    resolve_reconnaissance,
+    resolve_reconnaissance_turn,
+    resolve_simultaneous_actions,
+    validate_settlement_proposal,
 )
 from brinksmanship.models.actions import Action, ActionType
 from brinksmanship.models.matrices import (
     MatrixType,
-    MatrixParameters,
     PayoffMatrix,
     StateDeltas,
-    OutcomePayoffs,
     build_matrix,
     get_default_params_for_type,
 )
 from brinksmanship.models.state import GameState, PlayerState
-
+from brinksmanship.parameters import (
+    calculate_rejection_penalty,
+)
 
 # =============================================================================
 # Reconnaissance Game Tests (GAME_MANUAL.md Section 3.6.1)
@@ -381,9 +371,7 @@ class TestSettlementProposal:
 
     def test_valid_proposal_structure(self) -> None:
         """Test creating a valid settlement proposal."""
-        proposal = SettlementProposal(
-            offered_vp=55, argument="A fair split based on our current positions."
-        )
+        proposal = SettlementProposal(offered_vp=55, argument="A fair split based on our current positions.")
         assert proposal.offered_vp == 55
         assert proposal.argument == "A fair split based on our current positions."
 
@@ -413,9 +401,7 @@ class TestSettlementProposal:
             player_b=PlayerState(position=5.0, resources=5.0),
             cooperation_score=5.0,
         )
-        proposal = SettlementProposal(
-            offered_vp=50, argument="Equal split for equal positions."
-        )
+        proposal = SettlementProposal(offered_vp=50, argument="Equal split for equal positions.")
 
         is_valid, error = validate_settlement_proposal(proposal, state, "A")
         assert is_valid is True
@@ -530,22 +516,16 @@ class TestSettlementSurplusSplit:
 
     def test_proposal_surplus_split_defaults_to_50(self) -> None:
         """Test that surplus split defaults to 50% if not specified."""
-        proposal = SettlementProposal(
-            offered_vp=50, argument="Even split."
-        )
+        proposal = SettlementProposal(offered_vp=50, argument="Even split.")
         assert proposal.surplus_split_percent == 50
 
     def test_proposal_surplus_split_range_validation(self) -> None:
         """Test that surplus split must be in [0, 100]."""
         with pytest.raises(ValidationError):
-            SettlementProposal(
-                offered_vp=50, surplus_split_percent=-1, argument="Invalid"
-            )
+            SettlementProposal(offered_vp=50, surplus_split_percent=-1, argument="Invalid")
 
         with pytest.raises(ValidationError):
-            SettlementProposal(
-                offered_vp=50, surplus_split_percent=101, argument="Invalid"
-            )
+            SettlementProposal(offered_vp=50, surplus_split_percent=101, argument="Invalid")
 
 
 # =============================================================================
@@ -757,7 +737,7 @@ class TestSettlementDistribution:
 
         # New surplus should be added to existing
         assert new_state.surplus_captured_a == pytest.approx(10.0)  # 5.0 + 5.0
-        assert new_state.surplus_captured_b == pytest.approx(8.0)   # 3.0 + 5.0
+        assert new_state.surplus_captured_b == pytest.approx(8.0)  # 3.0 + 5.0
 
     def test_settlement_vp_split(self) -> None:
         """Test that VP split is correctly recorded."""
@@ -802,14 +782,10 @@ class TestProcessSettlementResponse:
 
     def test_process_accept_response(self, game_state: GameState) -> None:
         """Test processing an accept response."""
-        proposal = SettlementProposal(
-            offered_vp=55, surplus_split_percent=60, argument="Good deal."
-        )
+        proposal = SettlementProposal(offered_vp=55, surplus_split_percent=60, argument="Good deal.")
         response = SettlementResponse(action=SettlementAction.ACCEPT)
 
-        new_state, result = process_settlement_response(
-            game_state, "A", proposal, response, exchange_number=1
-        )
+        new_state, result = process_settlement_response(game_state, "A", proposal, response, exchange_number=1)
 
         assert result.accepted is True
         assert result.negotiation_ended is True
@@ -817,16 +793,10 @@ class TestProcessSettlementResponse:
 
     def test_process_reject_response(self, game_state: GameState) -> None:
         """Test processing a reject response."""
-        proposal = SettlementProposal(
-            offered_vp=55, surplus_split_percent=60, argument="Take it."
-        )
-        response = SettlementResponse(
-            action=SettlementAction.REJECT, rejection_reason="Too greedy."
-        )
+        proposal = SettlementProposal(offered_vp=55, surplus_split_percent=60, argument="Take it.")
+        response = SettlementResponse(action=SettlementAction.REJECT, rejection_reason="Too greedy.")
 
-        new_state, result = process_settlement_response(
-            game_state, "A", proposal, response, exchange_number=1
-        )
+        new_state, result = process_settlement_response(game_state, "A", proposal, response, exchange_number=1)
 
         assert result.accepted is False
         assert result.risk_penalty == pytest.approx(1.5)
@@ -834,9 +804,7 @@ class TestProcessSettlementResponse:
 
     def test_process_counter_response(self, game_state: GameState) -> None:
         """Test processing a counter response."""
-        proposal = SettlementProposal(
-            offered_vp=55, surplus_split_percent=60, argument="My offer."
-        )
+        proposal = SettlementProposal(offered_vp=55, surplus_split_percent=60, argument="My offer.")
         response = SettlementResponse(
             action=SettlementAction.COUNTER,
             counter_vp=45,
@@ -844,9 +812,7 @@ class TestProcessSettlementResponse:
             counter_argument="I counter.",
         )
 
-        new_state, result = process_settlement_response(
-            game_state, "A", proposal, response, exchange_number=1
-        )
+        new_state, result = process_settlement_response(game_state, "A", proposal, response, exchange_number=1)
 
         # Counter doesn't change state, just creates a new proposal
         assert result.accepted is False
@@ -881,76 +847,56 @@ class TestMatrixGameResolution:
         params = get_default_params_for_type(MatrixType.PRISONERS_DILEMMA)
         return build_matrix(MatrixType.PRISONERS_DILEMMA, params)
 
-    def test_correct_outcome_lookup_cc(
-        self, game_state: GameState, prisoners_dilemma_matrix: PayoffMatrix
-    ) -> None:
+    def test_correct_outcome_lookup_cc(self, game_state: GameState, prisoners_dilemma_matrix: PayoffMatrix) -> None:
         """Test CC outcome lookup."""
         action_a = Action(name="Cooperate", action_type=ActionType.COOPERATIVE)
         action_b = Action(name="Cooperate", action_type=ActionType.COOPERATIVE)
 
-        result = resolve_matrix_game(
-            game_state, action_a, action_b, prisoners_dilemma_matrix
-        )
+        result = resolve_matrix_game(game_state, action_a, action_b, prisoners_dilemma_matrix)
 
         assert result.outcome_code == "CC"
         assert result.action_a == ActionType.COOPERATIVE
         assert result.action_b == ActionType.COOPERATIVE
 
-    def test_correct_outcome_lookup_cd(
-        self, game_state: GameState, prisoners_dilemma_matrix: PayoffMatrix
-    ) -> None:
+    def test_correct_outcome_lookup_cd(self, game_state: GameState, prisoners_dilemma_matrix: PayoffMatrix) -> None:
         """Test CD outcome lookup."""
         action_a = Action(name="Cooperate", action_type=ActionType.COOPERATIVE)
         action_b = Action(name="Defect", action_type=ActionType.COMPETITIVE)
 
-        result = resolve_matrix_game(
-            game_state, action_a, action_b, prisoners_dilemma_matrix
-        )
+        result = resolve_matrix_game(game_state, action_a, action_b, prisoners_dilemma_matrix)
 
         assert result.outcome_code == "CD"
         assert result.action_a == ActionType.COOPERATIVE
         assert result.action_b == ActionType.COMPETITIVE
 
-    def test_correct_outcome_lookup_dc(
-        self, game_state: GameState, prisoners_dilemma_matrix: PayoffMatrix
-    ) -> None:
+    def test_correct_outcome_lookup_dc(self, game_state: GameState, prisoners_dilemma_matrix: PayoffMatrix) -> None:
         """Test DC outcome lookup."""
         action_a = Action(name="Defect", action_type=ActionType.COMPETITIVE)
         action_b = Action(name="Cooperate", action_type=ActionType.COOPERATIVE)
 
-        result = resolve_matrix_game(
-            game_state, action_a, action_b, prisoners_dilemma_matrix
-        )
+        result = resolve_matrix_game(game_state, action_a, action_b, prisoners_dilemma_matrix)
 
         assert result.outcome_code == "DC"
         assert result.action_a == ActionType.COMPETITIVE
         assert result.action_b == ActionType.COOPERATIVE
 
-    def test_correct_outcome_lookup_dd(
-        self, game_state: GameState, prisoners_dilemma_matrix: PayoffMatrix
-    ) -> None:
+    def test_correct_outcome_lookup_dd(self, game_state: GameState, prisoners_dilemma_matrix: PayoffMatrix) -> None:
         """Test DD outcome lookup."""
         action_a = Action(name="Defect", action_type=ActionType.COMPETITIVE)
         action_b = Action(name="Defect", action_type=ActionType.COMPETITIVE)
 
-        result = resolve_matrix_game(
-            game_state, action_a, action_b, prisoners_dilemma_matrix
-        )
+        result = resolve_matrix_game(game_state, action_a, action_b, prisoners_dilemma_matrix)
 
         assert result.outcome_code == "DD"
         assert result.action_a == ActionType.COMPETITIVE
         assert result.action_b == ActionType.COMPETITIVE
 
-    def test_state_deltas_applied(
-        self, game_state: GameState, prisoners_dilemma_matrix: PayoffMatrix
-    ) -> None:
+    def test_state_deltas_applied(self, game_state: GameState, prisoners_dilemma_matrix: PayoffMatrix) -> None:
         """Test that state deltas are included in result."""
         action_a = Action(name="Cooperate", action_type=ActionType.COOPERATIVE)
         action_b = Action(name="Cooperate", action_type=ActionType.COOPERATIVE)
 
-        result = resolve_matrix_game(
-            game_state, action_a, action_b, prisoners_dilemma_matrix
-        )
+        result = resolve_matrix_game(game_state, action_a, action_b, prisoners_dilemma_matrix)
 
         # Result should contain deltas from the CC outcome
         # We just verify they are present and have reasonable values
@@ -958,20 +904,12 @@ class TestMatrixGameResolution:
         assert hasattr(result, "position_delta_b")
         assert hasattr(result, "risk_delta")
 
-    def test_resource_cost_from_action(
-        self, game_state: GameState, prisoners_dilemma_matrix: PayoffMatrix
-    ) -> None:
+    def test_resource_cost_from_action(self, game_state: GameState, prisoners_dilemma_matrix: PayoffMatrix) -> None:
         """Test that action resource costs are included."""
-        action_a = Action(
-            name="Expensive", action_type=ActionType.COOPERATIVE, resource_cost=0.5
-        )
-        action_b = Action(
-            name="Free", action_type=ActionType.COOPERATIVE, resource_cost=0.0
-        )
+        action_a = Action(name="Expensive", action_type=ActionType.COOPERATIVE, resource_cost=0.5)
+        action_b = Action(name="Free", action_type=ActionType.COOPERATIVE, resource_cost=0.0)
 
-        result = resolve_matrix_game(
-            game_state, action_a, action_b, prisoners_dilemma_matrix
-        )
+        result = resolve_matrix_game(game_state, action_a, action_b, prisoners_dilemma_matrix)
 
         # Resource cost should include action cost plus any matrix delta
         assert result.resource_cost_a >= 0.5
@@ -1054,9 +992,7 @@ class TestApplyStateDeltas:
 
     def test_position_changes_scaled_by_multiplier(self, base_state: GameState) -> None:
         """Test that position changes are scaled by act multiplier."""
-        deltas = StateDeltas(
-            pos_a=1.0, pos_b=-1.0, res_cost_a=0.0, res_cost_b=0.0, risk_delta=0.0
-        )
+        deltas = StateDeltas(pos_a=1.0, pos_b=-1.0, res_cost_a=0.0, res_cost_b=0.0, risk_delta=0.0)
 
         # Act II (turn 5), multiplier 1.0
         new_state = apply_state_deltas(base_state, deltas)
@@ -1065,9 +1001,7 @@ class TestApplyStateDeltas:
 
     def test_resource_costs_not_scaled(self, base_state: GameState) -> None:
         """Test that resource costs are NOT scaled by act multiplier."""
-        deltas = StateDeltas(
-            pos_a=0.0, pos_b=0.0, res_cost_a=0.5, res_cost_b=0.3, risk_delta=0.0
-        )
+        deltas = StateDeltas(pos_a=0.0, pos_b=0.0, res_cost_a=0.5, res_cost_b=0.3, risk_delta=0.0)
 
         new_state = apply_state_deltas(base_state, deltas)
         assert new_state.resources_a == 4.5  # 5.0 - 0.5 (not scaled)
@@ -1075,9 +1009,7 @@ class TestApplyStateDeltas:
 
     def test_risk_changes_scaled_by_multiplier(self, base_state: GameState) -> None:
         """Test that risk changes are scaled by act multiplier."""
-        deltas = StateDeltas(
-            pos_a=0.0, pos_b=0.0, res_cost_a=0.0, res_cost_b=0.0, risk_delta=1.0
-        )
+        deltas = StateDeltas(pos_a=0.0, pos_b=0.0, res_cost_a=0.0, res_cost_b=0.0, risk_delta=1.0)
 
         new_state = apply_state_deltas(base_state, deltas)
         assert new_state.risk_level == 3.0  # 2.0 + 1.0 * 1.0
@@ -1085,9 +1017,7 @@ class TestApplyStateDeltas:
     def test_values_clamped_to_bounds(self, base_state: GameState) -> None:
         """Test that values are clamped to valid ranges."""
         # Try to push position above 10
-        high_deltas = StateDeltas(
-            pos_a=1.5, pos_b=-1.5, res_cost_a=0.0, res_cost_b=0.0, risk_delta=0.0
-        )
+        high_deltas = StateDeltas(pos_a=1.5, pos_b=-1.5, res_cost_a=0.0, res_cost_b=0.0, risk_delta=0.0)
         # Start from position 9
         base_state.player_a.position = 9.0
         new_state = apply_state_deltas(base_state, high_deltas, act_multiplier=1.3)
@@ -1095,9 +1025,7 @@ class TestApplyStateDeltas:
 
     def test_explicit_act_multiplier_override(self, base_state: GameState) -> None:
         """Test that explicit act_multiplier overrides calculation."""
-        deltas = StateDeltas(
-            pos_a=1.0, pos_b=-1.0, res_cost_a=0.0, res_cost_b=0.0, risk_delta=0.0
-        )
+        deltas = StateDeltas(pos_a=1.0, pos_b=-1.0, res_cost_a=0.0, res_cost_b=0.0, risk_delta=0.0)
 
         # Turn 5 would normally be multiplier 1.0, but override to 0.5
         new_state = apply_state_deltas(base_state, deltas, act_multiplier=0.5)
@@ -1134,9 +1062,7 @@ class TestResolveSimultaneousActions:
             get_default_params_for_type(MatrixType.PRISONERS_DILEMMA),
         )
 
-        new_state, result = resolve_simultaneous_actions(
-            game_state, action_a, action_b, matrix
-        )
+        new_state, result = resolve_simultaneous_actions(game_state, action_a, action_b, matrix)
 
         assert isinstance(new_state, GameState)
         assert hasattr(result, "outcome_code")
@@ -1150,9 +1076,7 @@ class TestResolveSimultaneousActions:
             get_default_params_for_type(MatrixType.PRISONERS_DILEMMA),
         )
 
-        new_state, _ = resolve_simultaneous_actions(
-            game_state, action_a, action_b, matrix
-        )
+        new_state, _ = resolve_simultaneous_actions(game_state, action_a, action_b, matrix)
 
         assert new_state.turn == game_state.turn + 1
 
@@ -1419,9 +1343,7 @@ class TestResolutionIntegration:
         )
 
         # Resolve
-        new_state, result = resolve_simultaneous_actions(
-            state, action_a, action_b, matrix
-        )
+        new_state, result = resolve_simultaneous_actions(state, action_a, action_b, matrix)
 
         # Verify outcome
         assert result.outcome_code == "CC"

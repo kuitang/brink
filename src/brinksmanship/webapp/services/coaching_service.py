@@ -5,7 +5,7 @@ which analyzes completed games and provides structured coaching feedback.
 """
 
 from brinksmanship.coaching import CoachingReport, PostGameCoach
-from brinksmanship.engine.game_engine import EndingType, GameEnding, TurnRecord, TurnPhase
+from brinksmanship.engine.game_engine import EndingType, GameEnding, TurnPhase, TurnRecord
 from brinksmanship.models.actions import Action, ActionType
 from brinksmanship.models.state import GameState
 

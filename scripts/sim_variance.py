@@ -31,6 +31,7 @@ from dataclasses import dataclass
 @dataclass
 class VarianceParams:
     """Parameters for computing variance."""
+
     risk_level: float
     cooperation_score: float
     stability: float
@@ -82,28 +83,28 @@ def final_resolution(pos_a: float, pos_b: float, shared_sigma: float) -> tuple[f
 # Parameters tuned to produce the target sigma ranges
 SCENARIOS = {
     "peaceful_early": VarianceParams(
-        risk_level=2,        # low risk
+        risk_level=2,  # low risk
         cooperation_score=10,  # moderate-high cooperation (scale 0-50)
-        stability=8,         # high stability
-        act=1,               # early game
+        stability=8,  # high stability
+        act=1,  # early game
     ),
     "neutral_mid": VarianceParams(
-        risk_level=5,        # moderate risk
-        cooperation_score=5,   # moderate cooperation
-        stability=5,         # moderate stability
-        act=2,               # mid game
+        risk_level=5,  # moderate risk
+        cooperation_score=5,  # moderate cooperation
+        stability=5,  # moderate stability
+        act=2,  # mid game
     ),
     "tense_late": VarianceParams(
-        risk_level=7,        # high risk
-        cooperation_score=5,   # low cooperation
-        stability=3,         # low stability
-        act=3,               # late game
+        risk_level=7,  # high risk
+        cooperation_score=5,  # low cooperation
+        stability=3,  # low stability
+        act=3,  # late game
     ),
     "crisis": VarianceParams(
-        risk_level=9,        # extreme risk
-        cooperation_score=2,   # very low cooperation
-        stability=2,         # very low stability
-        act=3,               # late game
+        risk_level=9,  # extreme risk
+        cooperation_score=2,  # very low cooperation
+        stability=2,  # very low stability
+        act=3,  # late game
     ),
 }
 
@@ -204,11 +205,11 @@ def run_position_bias_test(num_trials: int = 10000):
     sigma = compute_shared_sigma(params)
 
     test_cases = [
-        (5.0, 5.0, 50.0),    # Equal positions -> 50/50
-        (7.0, 3.0, 70.0),    # A ahead -> ~70% EV
-        (3.0, 7.0, 30.0),    # B ahead -> ~30% EV for A
-        (8.0, 2.0, 80.0),    # A very ahead -> ~80% EV
-        (2.0, 8.0, 20.0),    # B very ahead -> ~20% EV for A
+        (5.0, 5.0, 50.0),  # Equal positions -> 50/50
+        (7.0, 3.0, 70.0),  # A ahead -> ~70% EV
+        (3.0, 7.0, 30.0),  # B ahead -> ~30% EV for A
+        (8.0, 2.0, 80.0),  # A very ahead -> ~80% EV
+        (2.0, 8.0, 20.0),  # B very ahead -> ~20% EV for A
     ]
 
     print(f"Using σ = {sigma:.2f} (neutral_mid scenario)")
@@ -284,10 +285,8 @@ def run_clamping_analysis(num_trials: int = 10000):
 def main():
     """Run all variance and resolution simulations."""
     parser = argparse.ArgumentParser(description="Run variance/resolution simulation")
-    parser.add_argument("--trials", type=int, default=10000,
-                        help="Number of trials per test (default: 10000)")
-    parser.add_argument("--seed", type=int, default=None,
-                        help="Random seed for reproducibility")
+    parser.add_argument("--trials", type=int, default=10000, help="Number of trials per test (default: 10000)")
+    parser.add_argument("--seed", type=int, default=None, help="Random seed for reproducibility")
     args = parser.parse_args()
 
     if args.seed is not None:

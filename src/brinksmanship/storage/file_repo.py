@@ -9,7 +9,6 @@ import re
 import uuid
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 from .repository import GameRecordRepository, ScenarioRepository
 
@@ -68,15 +67,17 @@ class FileScenarioRepository(ScenarioRepository):
         for path in self.scenarios_path.glob("*.json"):
             with open(path, encoding="utf-8") as f:
                 data = json.load(f)
-                scenarios.append({
-                    "id": path.stem,
-                    "name": data.get("name", data.get("title", path.stem)),
-                    "setting": data.get("setting", ""),
-                    "max_turns": data.get("max_turns", 14),
-                })
+                scenarios.append(
+                    {
+                        "id": path.stem,
+                        "name": data.get("name", data.get("title", path.stem)),
+                        "setting": data.get("setting", ""),
+                        "max_turns": data.get("max_turns", 14),
+                    }
+                )
         return sorted(scenarios, key=lambda x: x["name"])
 
-    def get_scenario(self, scenario_id: str) -> Optional[dict]:
+    def get_scenario(self, scenario_id: str) -> dict | None:
         """Load complete scenario by ID."""
         path = self._get_scenario_path(scenario_id)
         if not path.exists():
@@ -86,7 +87,7 @@ class FileScenarioRepository(ScenarioRepository):
             data["id"] = scenario_id
             return data
 
-    def get_scenario_by_name(self, name: str) -> Optional[dict]:
+    def get_scenario_by_name(self, name: str) -> dict | None:
         """Load scenario by name (case-insensitive search)."""
         name_lower = name.lower()
         for path in self.scenarios_path.glob("*.json"):
@@ -162,7 +163,7 @@ class FileGameRecordRepository(GameRecordRepository):
         with open(path, "w", encoding="utf-8") as f:
             json.dump(state_with_meta, f, indent=2)
 
-    def load_game(self, game_id: str) -> Optional[dict]:
+    def load_game(self, game_id: str) -> dict | None:
         """Load game state by ID."""
         path = self._get_game_path(game_id)
         if not path.exists():
@@ -170,7 +171,7 @@ class FileGameRecordRepository(GameRecordRepository):
         with open(path, encoding="utf-8") as f:
             return json.load(f)
 
-    def list_games(self, user_id: Optional[int] = None) -> list[dict]:
+    def list_games(self, user_id: int | None = None) -> list[dict]:
         """List games, optionally filtered by user."""
         games = []
         for path in self.games_path.glob("*.json"):
@@ -181,14 +182,16 @@ class FileGameRecordRepository(GameRecordRepository):
                 if user_id is not None and data.get("user_id") != user_id:
                     continue
 
-                games.append({
-                    "id": data.get("id", path.stem),
-                    "scenario_id": data.get("scenario_id", ""),
-                    "status": data.get("status", "in_progress"),
-                    "turn": data.get("turn", 1),
-                    "updated_at": data.get("updated_at", ""),
-                    "user_id": data.get("user_id"),
-                })
+                games.append(
+                    {
+                        "id": data.get("id", path.stem),
+                        "scenario_id": data.get("scenario_id", ""),
+                        "status": data.get("status", "in_progress"),
+                        "turn": data.get("turn", 1),
+                        "updated_at": data.get("updated_at", ""),
+                        "user_id": data.get("user_id"),
+                    }
+                )
         return sorted(games, key=lambda x: x.get("updated_at", ""), reverse=True)
 
     def delete_game(self, game_id: str) -> bool:
@@ -199,7 +202,7 @@ class FileGameRecordRepository(GameRecordRepository):
             return True
         return False
 
-    def create_game(self, scenario_id: str, user_id: Optional[int] = None) -> str:
+    def create_game(self, scenario_id: str, user_id: int | None = None) -> str:
         """Create a new game and return its ID.
 
         Args:

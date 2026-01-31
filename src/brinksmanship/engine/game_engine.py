@@ -20,8 +20,9 @@ from __future__ import annotations
 import random
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import TYPE_CHECKING, Literal, Optional
+from typing import TYPE_CHECKING, Literal
 
+from brinksmanship.engine.state_deltas import apply_surplus_effects
 from brinksmanship.models.actions import (
     Action,
     ActionCategory,
@@ -30,7 +31,6 @@ from brinksmanship.models.actions import (
     get_action_menu,
     validate_action_availability,
 )
-from brinksmanship.engine.state_deltas import apply_surplus_effects
 from brinksmanship.models.matrices import (
     MatrixParameters,
     MatrixType,
@@ -45,8 +45,6 @@ from brinksmanship.models.state import (
     PlayerState,
     apply_action_result,
     clamp,
-    update_cooperation_score,
-    update_stability,
 )
 
 if TYPE_CHECKING:
@@ -137,13 +135,13 @@ class TurnRecord:
 
     turn: int
     phase: TurnPhase
-    action_a: Optional[Action] = None
-    action_b: Optional[Action] = None
-    outcome: Optional[ActionResult] = None
-    state_before: Optional[GameState] = None
-    state_after: Optional[GameState] = None
+    action_a: Action | None = None
+    action_b: Action | None = None
+    outcome: ActionResult | None = None
+    state_before: GameState | None = None
+    state_after: GameState | None = None
     narrative: str = ""
-    matrix_type: Optional[MatrixType] = None
+    matrix_type: MatrixType | None = None
 
 
 @dataclass
@@ -161,10 +159,10 @@ class TurnResult:
     """
 
     success: bool
-    action_result: Optional[ActionResult] = None
-    ending: Optional[GameEnding] = None
+    action_result: ActionResult | None = None
+    ending: GameEnding | None = None
     narrative: str = ""
-    error: Optional[str] = None
+    error: str | None = None
 
 
 @dataclass
@@ -232,9 +230,9 @@ class TurnConfiguration:
     matrix_type: MatrixType
     matrix_params: MatrixParameters
     scenario_actions: list[ScenarioAction] = field(default_factory=list)
-    outcome_narratives: Optional[dict[str, str]] = None
-    branches: Optional[dict[str, str]] = None
-    default_next: Optional[str] = None
+    outcome_narratives: dict[str, str] | None = None
+    branches: dict[str, str] | None = None
+    default_next: str | None = None
     settlement_available: bool = True
     settlement_failed_narrative: str = "Negotiations failed. The crisis continues."
 
@@ -266,8 +264,8 @@ class GameEngine:
         self,
         scenario_id: str,
         scenario_repo: ScenarioRepository,
-        max_turns: Optional[int] = None,
-        random_seed: Optional[int] = None,
+        max_turns: int | None = None,
+        random_seed: int | None = None,
     ) -> None:
         """Initialize the game engine with a scenario.
 
@@ -306,11 +304,11 @@ class GameEngine:
 
         # History and ending
         self.history: list[TurnRecord] = []
-        self.ending: Optional[GameEnding] = None
+        self.ending: GameEnding | None = None
 
         # Pending actions (collected during DECISION phase)
-        self._pending_action_a: Optional[Action] = None
-        self._pending_action_b: Optional[Action] = None
+        self._pending_action_a: Action | None = None
+        self._pending_action_b: Action | None = None
 
         # Record initial state
         self._record_turn_start()
@@ -416,12 +414,14 @@ class GameEngine:
             else:
                 action_type = action_type_str
 
-            scenario_actions.append(ScenarioAction(
-                action_id=action_data.get("action_id", "hold"),
-                narrative_description=action_data.get("narrative_description", ""),
-                action_type=action_type,
-                resource_cost=float(action_data.get("resource_cost", 0.0)),
-            ))
+            scenario_actions.append(
+                ScenarioAction(
+                    action_id=action_data.get("action_id", "hold"),
+                    narrative_description=action_data.get("narrative_description", ""),
+                    action_type=action_type,
+                    resource_cost=float(action_data.get("resource_cost", 0.0)),
+                )
+            )
 
         return TurnConfiguration(
             turn=turn_num,
@@ -572,10 +572,7 @@ class GameEngine:
         # Check if settlement is available per scenario
         if not config.settlement_available:
             # Remove settlement from special actions
-            menu.special_actions = [
-                a for a in menu.special_actions
-                if a.category != ActionCategory.SETTLEMENT
-            ]
+            menu.special_actions = [a for a in menu.special_actions if a.category != ActionCategory.SETTLEMENT]
 
         return menu.all_actions()
 
@@ -628,10 +625,7 @@ class GameEngine:
 
         # Check if settlement is available per scenario
         if not config.settlement_available:
-            menu.special_actions = [
-                a for a in menu.special_actions
-                if a.category != ActionCategory.SETTLEMENT
-            ]
+            menu.special_actions = [a for a in menu.special_actions if a.category != ActionCategory.SETTLEMENT]
             menu.can_propose_settlement = False
 
         return menu
@@ -777,7 +771,7 @@ class GameEngine:
         """
         return self.ending is not None
 
-    def get_ending(self) -> Optional[GameEnding]:
+    def get_ending(self) -> GameEnding | None:
         """Get the game ending if game is over.
 
         Returns:
@@ -821,16 +815,13 @@ class GameEngine:
         config = self._get_current_config()
 
         # Check for special action categories
-        if (action_a.category == ActionCategory.SETTLEMENT or
-                action_b.category == ActionCategory.SETTLEMENT):
+        if action_a.category == ActionCategory.SETTLEMENT or action_b.category == ActionCategory.SETTLEMENT:
             return self._resolve_settlement(action_a, action_b)
 
-        if (action_a.category == ActionCategory.RECONNAISSANCE or
-                action_b.category == ActionCategory.RECONNAISSANCE):
+        if action_a.category == ActionCategory.RECONNAISSANCE or action_b.category == ActionCategory.RECONNAISSANCE:
             return self._resolve_reconnaissance(action_a, action_b)
 
-        if (action_a.category == ActionCategory.INSPECTION or
-                action_b.category == ActionCategory.INSPECTION):
+        if action_a.category == ActionCategory.INSPECTION or action_b.category == ActionCategory.INSPECTION:
             return self._resolve_inspection(action_a, action_b)
 
         # Standard matrix resolution
@@ -902,8 +893,14 @@ class GameEngine:
         # Both players implicitly choose in the recon game
         # Map their strategic action types to recon choices
         # Cooperative -> Mask (defensive), Competitive -> Probe (aggressive)
-        choice_a = "Probe" if action_a.action_type == ActionType.COMPETITIVE or action_a.category == ActionCategory.RECONNAISSANCE else "Mask"
-        choice_b = "Probe" if action_b.action_type == ActionType.COMPETITIVE or action_b.category == ActionCategory.RECONNAISSANCE else "Mask"
+        is_probe_a = (
+            action_a.action_type == ActionType.COMPETITIVE or action_a.category == ActionCategory.RECONNAISSANCE
+        )
+        is_probe_b = (
+            action_b.action_type == ActionType.COMPETITIVE or action_b.category == ActionCategory.RECONNAISSANCE
+        )
+        choice_a = "Probe" if is_probe_a else "Mask"
+        choice_b = "Probe" if is_probe_b else "Mask"
 
         # For recon, if you initiated you're probing
         if initiator == "A":
@@ -925,34 +922,28 @@ class GameEngine:
                 narrative = "Your reconnaissance attempt was detected. Risk increases."
             elif choice_a == "Probe" and choice_b == "Project":
                 # Success - A learns B's position
-                self.state.player_a.information.update_position(
-                    self.state.position_b, self.state.turn
+                self.state.player_a.information.update_position(self.state.position_b, self.state.turn)
+                narrative = (
+                    f"Reconnaissance successful. You learned your opponent's position: {self.state.position_b:.1f}"
                 )
-                narrative = f"Reconnaissance successful. You learned your opponent's position: {self.state.position_b:.1f}"
             elif choice_a == "Mask" and choice_b == "Vigilant":
                 # Stalemate
                 narrative = "Your cautious approach yielded no information."
             else:  # Mask + Project
                 # Exposed - B learns A's position
-                self.state.player_b.information.update_position(
-                    self.state.position_a, self.state.turn
-                )
+                self.state.player_b.information.update_position(self.state.position_a, self.state.turn)
                 narrative = "Your position was exposed to your opponent."
         else:  # initiator == "B"
             if choice_b == "Probe" and choice_a == "Vigilant":
                 risk_delta = 0.5
                 narrative = "Opponent's reconnaissance was detected. Risk increases."
             elif choice_b == "Probe" and choice_a == "Project":
-                self.state.player_b.information.update_position(
-                    self.state.position_a, self.state.turn
-                )
+                self.state.player_b.information.update_position(self.state.position_a, self.state.turn)
                 narrative = "Opponent gained intelligence on your position."
             elif choice_b == "Mask" and choice_a == "Vigilant":
                 narrative = "Stalemate in intelligence gathering."
             else:
-                self.state.player_a.information.update_position(
-                    self.state.position_b, self.state.turn
-                )
+                self.state.player_a.information.update_position(self.state.position_b, self.state.turn)
                 narrative = "Your counterintelligence revealed opponent's position."
 
         # Resource cost for initiator
@@ -1005,27 +996,26 @@ class GameEngine:
         if initiator == "A":
             if opponent_choice == "Comply":
                 # Verified - A learns B's resources
-                self.state.player_a.information.update_resources(
-                    self.state.resources_b, self.state.turn
-                )
+                self.state.player_a.information.update_resources(self.state.resources_b, self.state.turn)
                 narrative = f"Inspection verified. Opponent resources: {self.state.resources_b:.1f}"
             else:  # Cheat -> Caught
-                self.state.player_a.information.update_resources(
-                    self.state.resources_b, self.state.turn
-                )
+                self.state.player_a.information.update_resources(self.state.resources_b, self.state.turn)
                 pos_delta_b = -0.5
                 risk_delta = 1.0
-                narrative = f"Inspection caught opponent cheating! Their resources: {self.state.resources_b:.1f}. They lose position and risk increases."
+                narrative = (
+                    f"Inspection caught opponent cheating! "
+                    f"Their resources: {self.state.resources_b:.1f}. "
+                    f"They lose position and risk increases."
+                )
         else:  # initiator == "B"
             if opponent_choice == "Comply":
-                self.state.player_b.information.update_resources(
-                    self.state.resources_a, self.state.turn
+                self.state.player_b.information.update_resources(self.state.resources_a, self.state.turn)
+                narrative = (
+                    f"Opponent's inspection verified your compliance. "
+                    f"Your resources revealed: {self.state.resources_a:.1f}"
                 )
-                narrative = f"Opponent's inspection verified your compliance. Your resources revealed: {self.state.resources_a:.1f}"
             else:  # Cheat -> Caught
-                self.state.player_b.information.update_resources(
-                    self.state.resources_a, self.state.turn
-                )
+                self.state.player_b.information.update_resources(self.state.resources_a, self.state.turn)
                 pos_delta_a = -0.5
                 risk_delta = 1.0
                 narrative = "You were caught cheating during inspection! Position and risk affected."
@@ -1063,18 +1053,12 @@ class GameEngine:
         """
         config = self._get_current_config()
 
-        both_settle = (
-            action_a.category == ActionCategory.SETTLEMENT and
-            action_b.category == ActionCategory.SETTLEMENT
-        )
+        both_settle = action_a.category == ActionCategory.SETTLEMENT and action_b.category == ActionCategory.SETTLEMENT
 
         if both_settle:
             # Both want to settle - calculate fair split based on positions
             total_pos = self.state.position_a + self.state.position_b
-            if total_pos > 0:
-                vp_a = (self.state.position_a / total_pos) * 100
-            else:
-                vp_a = 50.0
+            vp_a = self.state.position_a / total_pos * 100 if total_pos > 0 else 50.0
             vp_b = 100.0 - vp_a
 
             # Apply cooperation bonus
@@ -1120,8 +1104,12 @@ class GameEngine:
         """Generate default outcome narrative."""
         narratives = {
             "CC": f"Both sides chose cooperation. {matrix.row_labels[0]} met {matrix.col_labels[0]}.",
-            "CD": f"You cooperated while your opponent competed. {matrix.row_labels[0]} against {matrix.col_labels[1]}.",
-            "DC": f"You competed while your opponent cooperated. {matrix.row_labels[1]} against {matrix.col_labels[0]}.",
+            "CD": (
+                f"You cooperated while your opponent competed. {matrix.row_labels[0]} against {matrix.col_labels[1]}."
+            ),
+            "DC": (
+                f"You competed while your opponent cooperated. {matrix.row_labels[1]} against {matrix.col_labels[0]}."
+            ),
             "DD": f"Both sides chose competition. {matrix.row_labels[1]} met {matrix.col_labels[1]}.",
         }
         return narratives.get(outcome_code, "The turn resolves.")
@@ -1159,7 +1147,7 @@ class GameEngine:
     # Ending Checks
     # =========================================================================
 
-    def _check_deterministic_endings(self) -> Optional[GameEnding]:
+    def _check_deterministic_endings(self) -> GameEnding | None:
         """Check for deterministic game endings.
 
         From GAME_MANUAL.md Section 4.5:
@@ -1217,7 +1205,7 @@ class GameEngine:
 
         return None
 
-    def _check_crisis_termination(self) -> Optional[GameEnding]:
+    def _check_crisis_termination(self) -> GameEnding | None:
         """Check for probabilistic crisis termination.
 
         From GAME_MANUAL.md Section 4.6:
@@ -1247,7 +1235,7 @@ class GameEngine:
 
         return None
 
-    def _check_natural_ending(self) -> Optional[GameEnding]:
+    def _check_natural_ending(self) -> GameEnding | None:
         """Check for natural game ending at max turns."""
         # Note: state.turn has already been incremented by apply_action_result
         # So we check if we've completed the max turn
@@ -1274,10 +1262,7 @@ class GameEngine:
         """
         # Expected values from position
         total_pos = self.state.position_a + self.state.position_b
-        if total_pos == 0:
-            ev_a = 50.0
-        else:
-            ev_a = (self.state.position_a / total_pos) * 100
+        ev_a = 50.0 if total_pos == 0 else self.state.position_a / total_pos * 100
         ev_b = 100.0 - ev_a
 
         # Calculate shared variance (use state's computed property)
@@ -1339,8 +1324,8 @@ class GameEngine:
 def create_game(
     scenario_id: str,
     scenario_repo: ScenarioRepository,
-    max_turns: Optional[int] = None,
-    random_seed: Optional[int] = None,
+    max_turns: int | None = None,
+    random_seed: int | None = None,
 ) -> GameEngine:
     """Create a new game with the specified scenario.
 

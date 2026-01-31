@@ -13,7 +13,7 @@ from pathlib import Path
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from claude_agent_sdk import ClaudeSDKClient, ClaudeAgentOptions, AssistantMessage, TextBlock
+from claude_agent_sdk import AssistantMessage, ClaudeAgentOptions, ClaudeSDKClient, TextBlock
 
 
 async def test_game_manual_reading():
@@ -24,7 +24,7 @@ async def test_game_manual_reading():
 
     # Read actual content to verify
     with open(game_manual_path) as f:
-        actual_content = f.read()
+        f.read()
 
     # Set up options with Read tool and project settings (CLAUDE.md)
     options = ClaudeAgentOptions(

@@ -20,8 +20,6 @@ Note: Redundant tests removed per test_removal_log.md:
   test_multiple_updates_posteriors_sum_to_one)
 """
 
-import pytest
-
 from brinksmanship.coaching.bayesian_inference import (
     BayesianInference,
     ObservedAction,
@@ -29,7 +27,6 @@ from brinksmanship.coaching.bayesian_inference import (
     OpponentTypeDistribution,
 )
 from brinksmanship.models.actions import ActionType
-
 
 # =============================================================================
 # OpponentTypeDistribution Tests

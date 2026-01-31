@@ -296,7 +296,7 @@ def main():
 
     # Dry run - show configuration
     if args.dry_run:
-        print(f"Would generate scenario with:")
+        print("Would generate scenario with:")
         print(f"  Title: {args.title}")
         print(f"  Theme: {args.theme}")
         print(f"  Setting: {setting}")
@@ -327,6 +327,7 @@ def main():
         logger.error(f"Generation failed: {e}")
         if not args.quiet:
             import traceback
+
             traceback.print_exc()
         return 1
 

@@ -6,13 +6,14 @@ All tests should use dynamic element searches (wait_for_selector, expect).
 
 import pytest
 import pytest_asyncio
-from playwright.async_api import async_playwright, Page, Browser
+from playwright.async_api import Browser, Page, async_playwright
 
 
 @pytest.fixture(scope="session")
 def event_loop_policy():
     """Use default event loop policy."""
     import asyncio
+
     return asyncio.DefaultEventLoopPolicy()
 
 

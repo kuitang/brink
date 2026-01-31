@@ -4,8 +4,9 @@ Since the CLI now uses simple-term-menu, the testing approach changes from
 Textual's Pilot-based testing to simpler unit tests.
 """
 
-import pytest
 from unittest.mock import MagicMock, patch
+
+import pytest
 
 
 @pytest.fixture
@@ -82,6 +83,7 @@ class TestCLIGameFlow:
 
                 # Manually initialize game components
                 from brinksmanship.engine.game_engine import create_game
+
                 cli.game = create_game("test-scenario", mock_scenario_repo)
                 cli.opponent = mock_opponent
                 cli.human_is_player_a = True
@@ -118,9 +120,7 @@ class TestCLIGameFlow:
                 # Get opponent action
                 state = cli.game.get_current_state()
                 opponent_actions = cli.game.get_available_actions("B")
-                opponent_action = run_async(
-                    cli.opponent.choose_action(state, opponent_actions)
-                )
+                opponent_action = run_async(cli.opponent.choose_action(state, opponent_actions))
 
                 # Submit actions
                 result = cli.game.submit_actions(actions[0], opponent_action)

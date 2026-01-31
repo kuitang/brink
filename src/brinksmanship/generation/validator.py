@@ -37,11 +37,12 @@ except ImportError:
 # Import matrix building - for scenario-specific simulation
 try:
     from brinksmanship.models.matrices import (
-        MatrixType,
         MatrixParameters,
+        MatrixType,
         PayoffMatrix,
         build_matrix,
     )
+
     MATRICES_AVAILABLE = True
 except ImportError:
     MATRICES_AVAILABLE = False
@@ -173,15 +174,11 @@ class ValidationResult:
 
     def get_critical_issues(self) -> list[ValidationIssue]:
         """Get only critical issues."""
-        return [
-            i for i in self.get_all_issues() if i.severity == ValidationSeverity.CRITICAL
-        ]
+        return [i for i in self.get_all_issues() if i.severity == ValidationSeverity.CRITICAL]
 
     def get_major_issues(self) -> list[ValidationIssue]:
         """Get only major issues."""
-        return [
-            i for i in self.get_all_issues() if i.severity == ValidationSeverity.MAJOR
-        ]
+        return [i for i in self.get_all_issues() if i.severity == ValidationSeverity.MAJOR]
 
     def to_dict(self) -> dict:
         """Convert to dictionary for JSON serialization."""
@@ -274,10 +271,20 @@ def check_game_variety(scenario: dict | Scenario) -> CheckResult:
     if len(matrix_types) < THRESHOLDS["min_game_types"]:
         # All available matrix types
         all_types = {
-            "PRISONERS_DILEMMA", "CHICKEN", "STAG_HUNT", "HARMONY",
-            "BATTLE_OF_SEXES", "DEADLOCK", "MATCHING_PENNIES",
-            "SECURITY_DILEMMA", "TRUST_GAME", "PURE_COORDINATION",
-            "ASYMMETRIC_ADVANTAGE", "EXPLOITATION", "INSPECTION_GAME", "RECONNAISSANCE"
+            "PRISONERS_DILEMMA",
+            "CHICKEN",
+            "STAG_HUNT",
+            "HARMONY",
+            "BATTLE_OF_SEXES",
+            "DEADLOCK",
+            "MATCHING_PENNIES",
+            "SECURITY_DILEMMA",
+            "TRUST_GAME",
+            "PURE_COORDINATION",
+            "ASYMMETRIC_ADVANTAGE",
+            "EXPLOITATION",
+            "INSPECTION_GAME",
+            "RECONNAISSANCE",
         }
         found_types_upper = {str(t).upper() for t in matrix_types}
         missing_types = all_types - found_types_upper
@@ -330,7 +337,7 @@ def check_intelligence_games(scenario: dict | Scenario) -> CheckResult:
     intelligence_types = {"inspection_game", "reconnaissance", "matching_pennies"}
     intelligence_turns: list[int] = []
     early_phase_intel = 0  # turns 1-6
-    mid_phase_intel = 0    # turns 5+
+    mid_phase_intel = 0  # turns 5+
 
     def check_turn(turn_data: dict) -> None:
         nonlocal early_phase_intel, mid_phase_intel
@@ -490,28 +497,20 @@ def check_branching_validity(scenario: dict | Scenario) -> CheckResult:
                 target = getattr(turn.branches, outcome)
                 # None means "use default_next" - not an error
                 if target is not None and target not in valid_ids:
-                    missing_targets.append(
-                        {"source": f"turn_{turn.turn}", "outcome": outcome, "target": target}
-                    )
+                    missing_targets.append({"source": f"turn_{turn.turn}", "outcome": outcome, "target": target})
             # None is valid for last turn (no next turn) or when all branches are specified
             if turn.default_next is not None and turn.default_next not in valid_ids:
-                missing_default_next.append(
-                    {"source": f"turn_{turn.turn}", "default_next": turn.default_next}
-                )
+                missing_default_next.append({"source": f"turn_{turn.turn}", "default_next": turn.default_next})
 
         for branch_id, branch_turn in scenario.branches.items():
             for outcome in ["CC", "CD", "DC", "DD"]:
                 target = getattr(branch_turn.branches, outcome)
                 # None means "use default_next" - not an error
                 if target is not None and target not in valid_ids:
-                    missing_targets.append(
-                        {"source": branch_id, "outcome": outcome, "target": target}
-                    )
+                    missing_targets.append({"source": branch_id, "outcome": outcome, "target": target})
             # None is valid for terminal branches
             if branch_turn.default_next is not None and branch_turn.default_next not in valid_ids:
-                missing_default_next.append(
-                    {"source": branch_id, "default_next": branch_turn.default_next}
-                )
+                missing_default_next.append({"source": branch_id, "default_next": branch_turn.default_next})
     else:
         # Dict format
         for turn in scenario.get("turns", []):
@@ -525,30 +524,22 @@ def check_branching_validity(scenario: dict | Scenario) -> CheckResult:
             for outcome in ["CC", "CD", "DC", "DD"]:
                 target = branches.get(outcome)
                 if target and target not in valid_ids:
-                    missing_targets.append(
-                        {"source": turn_id, "outcome": outcome, "target": target}
-                    )
+                    missing_targets.append({"source": turn_id, "outcome": outcome, "target": target})
             default_next = turn.get("default_next")
             # None is valid for last turn (no next turn) or when all branches are specified
             if default_next is not None and default_next not in valid_ids:
-                missing_default_next.append(
-                    {"source": turn_id, "default_next": default_next}
-                )
+                missing_default_next.append({"source": turn_id, "default_next": default_next})
 
         for branch_id, branch_turn in scenario.get("branches", {}).items():
             branches = branch_turn.get("branches", {})
             for outcome in ["CC", "CD", "DC", "DD"]:
                 target = branches.get(outcome)
                 if target and target not in valid_ids:
-                    missing_targets.append(
-                        {"source": branch_id, "outcome": outcome, "target": target}
-                    )
+                    missing_targets.append({"source": branch_id, "outcome": outcome, "target": target})
             default_next = branch_turn.get("default_next")
             # None is valid for terminal branches
             if default_next is not None and default_next not in valid_ids:
-                missing_default_next.append(
-                    {"source": branch_id, "default_next": default_next}
-                )
+                missing_default_next.append({"source": branch_id, "default_next": default_next})
 
     result.metrics["valid_turn_ids"] = sorted(valid_ids)
     result.metrics["missing_targets_count"] = len(missing_targets)
@@ -709,9 +700,7 @@ class SimGameResult:
     vp_b: float = 50.0
 
 
-def _apply_sim_outcome(
-    state: SimGameState, action_a: SimAction, action_b: SimAction
-) -> None:
+def _apply_sim_outcome(state: SimGameState, action_a: SimAction, action_b: SimAction) -> None:
     """Apply outcome based on actions.
 
     CRITICAL: All payoffs must be SYMMETRIC. No "hand of god" asymmetry.
@@ -832,29 +821,21 @@ def _calculate_final_vp(state: SimGameState) -> tuple[float, float]:
 
 
 # Strategy implementations for simulation
-def _tit_for_tat(
-    state: SimGameState, my_history: list, opp_history: list, player: str
-) -> SimAction:
+def _tit_for_tat(state: SimGameState, my_history: list, opp_history: list, player: str) -> SimAction:
     if not opp_history:
         return SimAction.COOPERATE
     return opp_history[-1]
 
 
-def _always_defect(
-    state: SimGameState, my_history: list, opp_history: list, player: str
-) -> SimAction:
+def _always_defect(state: SimGameState, my_history: list, opp_history: list, player: str) -> SimAction:
     return SimAction.DEFECT
 
 
-def _always_cooperate(
-    state: SimGameState, my_history: list, opp_history: list, player: str
-) -> SimAction:
+def _always_cooperate(state: SimGameState, my_history: list, opp_history: list, player: str) -> SimAction:
     return SimAction.COOPERATE
 
 
-def _opportunist(
-    state: SimGameState, my_history: list, opp_history: list, player: str
-) -> SimAction:
+def _opportunist(state: SimGameState, my_history: list, opp_history: list, player: str) -> SimAction:
     if player == "A":
         my_pos = state.player_a.position
         opp_pos = state.player_b.position
@@ -881,9 +862,7 @@ def _opportunist(
             return SimAction.DEFECT
 
 
-def _nash(
-    state: SimGameState, my_history: list, opp_history: list, player: str
-) -> SimAction:
+def _nash(state: SimGameState, my_history: list, opp_history: list, player: str) -> SimAction:
     """Nash equilibrium strategy for stage game PD.
 
     In the stage game PD, defection is the dominant strategy (Nash equilibrium).
@@ -910,9 +889,7 @@ SIM_STRATEGIES = {
 # =============================================================================
 
 
-def _get_scenario_turn(
-    scenario: dict, turn_id: str, turn_number: int
-) -> dict | None:
+def _get_scenario_turn(scenario: dict, turn_id: str, turn_number: int) -> dict | None:
     """Get a turn from either main turns array or branches dict."""
     # Check main turns array
     for turn in scenario.get("turns", []):
@@ -1034,9 +1011,7 @@ def _apply_matrix_outcome(
     return outcome_code
 
 
-def _run_scenario_sim_game(
-    scenario: dict, strategy_a_name: str, strategy_b_name: str
-) -> SimGameResult:
+def _run_scenario_sim_game(scenario: dict, strategy_a_name: str, strategy_b_name: str) -> SimGameResult:
     """Run a single simulated game using the actual scenario's turns and matrices."""
     strategy_a = SIM_STRATEGIES[strategy_a_name]
     strategy_b = SIM_STRATEGIES[strategy_b_name]
@@ -1224,9 +1199,7 @@ def run_balance_simulation(
     total_turns = 0
     strategy_wins: dict[str, int] = dict.fromkeys(strategy_names, 0)
     strategy_games: dict[str, int] = dict.fromkeys(strategy_names, 0)
-    head_to_head: dict[str, dict[str, float]] = {
-        name: {} for name in strategy_names
-    }
+    head_to_head: dict[str, dict[str, float]] = {name: {} for name in strategy_names}
 
     ending_counts = {
         "elimination": 0,
@@ -1336,9 +1309,7 @@ def check_dominant_strategy(sim_results: BalanceSimulationResults) -> CheckResul
 
     if dominant_strategies:
         # Build detailed fix instructions
-        dom_details = ", ".join(
-            f"{d['strategy']}={d['win_rate']*100:.0f}%" for d in dominant_strategies
-        )
+        dom_details = ", ".join(f"{d['strategy']}={d['win_rate'] * 100:.0f}%" for d in dominant_strategies)
         # Explain how strategies work
         strategy_behaviors = {
             "TitForTat": "cooperates first, then mirrors opponent",
@@ -1350,12 +1321,14 @@ def check_dominant_strategy(sim_results: BalanceSimulationResults) -> CheckResul
         fix_hints = []
         for d in dominant_strategies:
             strat = d["strategy"]
-            behavior = strategy_behaviors.get(strat, "unknown behavior")
+            strategy_behaviors.get(strat, "unknown behavior")
             if d["win_rate"] > 0.65:
                 if strat in ["AlwaysDefect", "GrimTrigger"]:
                     fix_hints.append(f"- {strat} dominates: REDUCE defection payoffs or INCREASE cooperation rewards")
                 elif strat in ["AlwaysCooperate", "TitForTat"]:
-                    fix_hints.append(f"- {strat} dominates: INCREASE competition payoffs or add more CHICKEN/PRISONERS_DILEMMA games")
+                    fix_hints.append(
+                        f"- {strat} dominates: INCREASE competition payoffs or add more CHICKEN/PRISONERS_DILEMMA games"
+                    )
                 else:
                     fix_hints.append(f"- {strat} dominates: adjust payoff balance")
 
@@ -1364,7 +1337,7 @@ def check_dominant_strategy(sim_results: BalanceSimulationResults) -> CheckResul
         result.add_issue(
             ValidationSeverity.CRITICAL,
             f"Dominant strategy detected: {dom_details}. "
-            f"These strategies exceed {THRESHOLDS['dominant_strategy']*100:.0f}% win rate.\n"
+            f"These strategies exceed {THRESHOLDS['dominant_strategy'] * 100:.0f}% win rate.\n"
             f"FIX GUIDANCE:\n{fix_guidance}\n"
             f"Edit turns with high-impact matrix_types (CHICKEN, PRISONERS_DILEMMA) and reduce their 'scale' value.",
             details={"dominant_strategies": dominant_strategies, "all_win_rates": sim_results.strategy_win_rates},
@@ -1375,15 +1348,13 @@ def check_dominant_strategy(sim_results: BalanceSimulationResults) -> CheckResul
     if sim_results.vp_std_dev < THRESHOLDS["variance_min"]:
         result.add_issue(
             ValidationSeverity.MAJOR,
-            f"Variance too low: {sim_results.vp_std_dev:.1f} "
-            f"(expected >= {THRESHOLDS['variance_min']})",
+            f"Variance too low: {sim_results.vp_std_dev:.1f} (expected >= {THRESHOLDS['variance_min']})",
             details={"vp_std_dev": sim_results.vp_std_dev},
         )
     if sim_results.vp_std_dev > THRESHOLDS["variance_max"]:
         result.add_issue(
             ValidationSeverity.MAJOR,
-            f"Variance too high: {sim_results.vp_std_dev:.1f} "
-            f"(expected <= {THRESHOLDS['variance_max']})",
+            f"Variance too high: {sim_results.vp_std_dev:.1f} (expected <= {THRESHOLDS['variance_max']})",
             details={"vp_std_dev": sim_results.vp_std_dev},
         )
 
@@ -1525,6 +1496,7 @@ class ScenarioValidator:
                 scenario = load_scenario(str(scenario_path))
             else:
                 import json
+
                 with open(scenario_path) as f:
                     scenario = json.load(f)
 
@@ -1564,9 +1536,7 @@ class ScenarioValidator:
                 loop = asyncio.new_event_loop()
                 asyncio.set_event_loop(loop)
 
-            result.narrative = loop.run_until_complete(
-                check_narrative_consistency(scenario)
-            )
+            result.narrative = loop.run_until_complete(check_narrative_consistency(scenario))
 
         # Determine overall pass/fail
         for check in [

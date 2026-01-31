@@ -6,7 +6,7 @@ for the authoritative action classification.
 """
 
 from enum import Enum
-from typing import Literal, Optional
+from typing import Literal
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -440,7 +440,7 @@ def validate_action_availability(
     turn: int,
     stability: float,
     player_resources: float,
-) -> tuple[bool, Optional[str]]:
+) -> tuple[bool, str | None]:
     """Validate whether an action can be taken given game state.
 
     Args:
@@ -467,7 +467,7 @@ def validate_action_availability(
     return True, None
 
 
-def get_action_by_name(name: str) -> Optional[Action]:
+def get_action_by_name(name: str) -> Action | None:
     """Look up a standard action by name (case-insensitive).
 
     Args:
@@ -478,11 +478,15 @@ def get_action_by_name(name: str) -> Optional[Action]:
     """
     name_lower = name.lower().strip()
 
-    all_standard = ALL_COOPERATIVE_ACTIONS + ALL_COMPETITIVE_ACTIONS + [
-        PROPOSE_SETTLEMENT,
-        RECONNAISSANCE,
-        INSPECTION,
-    ]
+    all_standard = (
+        ALL_COOPERATIVE_ACTIONS
+        + ALL_COMPETITIVE_ACTIONS
+        + [
+            PROPOSE_SETTLEMENT,
+            RECONNAISSANCE,
+            INSPECTION,
+        ]
+    )
 
     for action in all_standard:
         if action.name.lower() == name_lower:
@@ -529,9 +533,7 @@ def format_action_for_display(action: Action, index: int) -> str:
 
     if action.category == ActionCategory.SETTLEMENT:
         special_str = " [SETTLEMENT - replaces action]"
-    elif action.category == ActionCategory.RECONNAISSANCE:
-        special_str = " [INFO GAME - replaces turn]"
-    elif action.category == ActionCategory.INSPECTION:
+    elif action.category == ActionCategory.RECONNAISSANCE or action.category == ActionCategory.INSPECTION:
         special_str = " [INFO GAME - replaces turn]"
     elif action.category == ActionCategory.COSTLY_SIGNALING:
         special_str = " [SIGNAL - no turn cost]"

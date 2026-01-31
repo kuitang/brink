@@ -14,17 +14,16 @@ The tests exercise the same code paths as the CLI:
 5. Repeat for multiple turns
 """
 
-import asyncio
-import pytest
 import logging
 
+import pytest
+
+from brinksmanship.cli.app import run_opponent_method
 from brinksmanship.engine import create_game
 from brinksmanship.models.actions import ActionType
 from brinksmanship.opponents import get_opponent_by_type
 from brinksmanship.opponents.deterministic import NashCalculator, TitForTat
-from brinksmanship.opponents.historical import HistoricalPersona
 from brinksmanship.storage import get_scenario_repository
-from brinksmanship.cli.app import run_opponent_method
 
 # Enable logging to see what's happening
 logging.basicConfig(level=logging.INFO)
@@ -134,7 +133,7 @@ class TestRealLLMFullGameFlow:
         game = cuban_missile_game
         opponent = TitForTat()
 
-        for turn in range(3):
+        for _turn in range(3):
             state = game.get_current_state()
             logger.info(f"Turn {state.turn}: Risk={state.risk_level:.1f}")
 
@@ -144,14 +143,11 @@ class TestRealLLMFullGameFlow:
 
             # Player always cooperates
             player_action = next(
-                (a for a in player_actions if a.action_type == ActionType.COOPERATIVE),
-                player_actions[0]
+                (a for a in player_actions if a.action_type == ActionType.COOPERATIVE), player_actions[0]
             )
 
             # Opponent chooses (TitForTat doesn't need LLM for action)
-            opponent_action = run_opponent_method(
-                opponent.choose_action, state, opponent_actions
-            )
+            opponent_action = run_opponent_method(opponent.choose_action, state, opponent_actions)
 
             logger.info(f"Player: {player_action.name}, Opponent: {opponent_action.name}")
 
@@ -183,7 +179,7 @@ class TestRealLLMFullGameFlow:
             role_description=role_description,
         )
 
-        for turn in range(3):
+        for _turn in range(3):
             state = game.get_current_state()
             logger.info(f"Turn {state.turn}: Risk={state.risk_level:.1f}")
 
@@ -193,15 +189,12 @@ class TestRealLLMFullGameFlow:
 
             # Player always cooperates
             player_action = next(
-                (a for a in player_actions if a.action_type == ActionType.COOPERATIVE),
-                player_actions[0]
+                (a for a in player_actions if a.action_type == ActionType.COOPERATIVE), player_actions[0]
             )
 
             # Opponent chooses (this calls the real LLM!)
             logger.info("Calling LLM for Khrushchev's action...")
-            opponent_action = run_opponent_method(
-                opponent.choose_action, state, opponent_actions
-            )
+            opponent_action = run_opponent_method(opponent.choose_action, state, opponent_actions)
 
             logger.info(f"Player: {player_action.name}, Opponent: {opponent_action.name}")
 
@@ -233,15 +226,10 @@ class TestRealLLMSettlementEvaluation:
         state.turn = 5
         state.stability = 5.0
 
-        proposal = SettlementProposal(
-            offered_vp=50,
-            argument="A fair 50-50 split to end this crisis peacefully."
-        )
+        proposal = SettlementProposal(offered_vp=50, argument="A fair 50-50 split to end this crisis peacefully.")
 
         logger.info("Evaluating settlement proposal...")
-        response = run_opponent_method(
-            opponent.evaluate_settlement, proposal, state, False
-        )
+        response = run_opponent_method(opponent.evaluate_settlement, proposal, state, False)
 
         assert response is not None
         assert response.action in ["accept", "counter", "reject"]
@@ -262,14 +250,11 @@ class TestRealLLMSettlementEvaluation:
         state.stability = 5.0
 
         proposal = SettlementProposal(
-            offered_vp=55,
-            argument="We propose removing the missiles in exchange for a US non-invasion pledge."
+            offered_vp=55, argument="We propose removing the missiles in exchange for a US non-invasion pledge."
         )
 
         logger.info("Khrushchev evaluating settlement proposal...")
-        response = run_opponent_method(
-            opponent.evaluate_settlement, proposal, state, False
-        )
+        response = run_opponent_method(opponent.evaluate_settlement, proposal, state, False)
 
         assert response is not None
         assert response.action in ["accept", "counter", "reject"]

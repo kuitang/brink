@@ -20,13 +20,13 @@ Test Scenarios:
 
 import argparse
 import random
-import statistics
 from dataclasses import dataclass
 
 
 @dataclass
 class SettlementParams:
     """Parameters for computing settlement offers."""
+
     my_position: float
     opp_position: float
     cooperation_score: float
@@ -134,8 +134,10 @@ def run_offer_range_verification():
     for name, params in SCENARIOS.items():
         suggested, min_offer, max_offer = compute_settlement_offer_range(params)
 
-        print(f"{name:<20} {params.my_position:>8.1f} {params.opp_position:>8.1f} "
-              f"{params.cooperation_score:>6.1f} {suggested:>10.1f} {min_offer:>8.1f} {max_offer:>8.1f}")
+        print(
+            f"{name:<20} {params.my_position:>8.1f} {params.opp_position:>8.1f} "
+            f"{params.cooperation_score:>6.1f} {suggested:>10.1f} {min_offer:>8.1f} {max_offer:>8.1f}"
+        )
 
     print("-" * 68)
     print()
@@ -267,13 +269,13 @@ def run_strategic_offer_analysis():
 
         # Analyze offers
         print(f"  {'Offer (I keep)':>16} {'Opp Gets':>12} {'Opp Accept %':>14} {'My EV':>10}")
-        print(f"  " + "-" * 52)
+        print("  " + "-" * 52)
 
         for my_share in range(int(min_offer), int(max_offer) + 1, 5):
             opp_gets = 100 - my_share
             accept_prob = compute_acceptance_probability(opp_gets, opp_fair_value)
             expected_value = my_share * accept_prob
-            print(f"  {my_share:>16.0f} {opp_gets:>12.0f} {accept_prob*100:>13.1f}% {expected_value:>10.1f}")
+            print(f"  {my_share:>16.0f} {opp_gets:>12.0f} {accept_prob * 100:>13.1f}% {expected_value:>10.1f}")
 
         print()
 
@@ -343,10 +345,8 @@ def run_edge_case_tests():
 def main():
     """Run all settlement simulations."""
     parser = argparse.ArgumentParser(description="Run settlement protocol simulation")
-    parser.add_argument("--trials", type=int, default=10000,
-                        help="Number of trials per test (default: 10000)")
-    parser.add_argument("--seed", type=int, default=None,
-                        help="Random seed for reproducibility")
+    parser.add_argument("--trials", type=int, default=10000, help="Number of trials per test (default: 10000)")
+    parser.add_argument("--seed", type=int, default=None, help="Random seed for reproducibility")
     args = parser.parse_args()
 
     if args.seed is not None:

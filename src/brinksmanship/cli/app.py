@@ -17,20 +17,19 @@ import asyncio
 import os
 import readline  # noqa: F401 - enables input() history
 import sys
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from simple_term_menu import TerminalMenu
 
+from brinksmanship.cli.trace import TraceLogger
 from brinksmanship.engine.game_engine import (
     EndingType,
     GameEnding,
     GameEngine,
-    TurnResult,
     create_game,
 )
 from brinksmanship.models.actions import (
     Action,
-    ActionCategory,
     ActionType,
 )
 from brinksmanship.models.state import GameState
@@ -42,7 +41,6 @@ from brinksmanship.opponents.base import (
     list_opponent_types,
 )
 from brinksmanship.storage import get_scenario_repository
-from brinksmanship.cli.trace import TraceLogger
 
 if TYPE_CHECKING:
     pass
@@ -75,13 +73,13 @@ class BrinksmanshipCLI:
 
     def __init__(self):
         self.repo = get_scenario_repository()
-        self.game: Optional[GameEngine] = None
-        self.opponent: Optional[Opponent] = None
+        self.game: GameEngine | None = None
+        self.opponent: Opponent | None = None
         self.human_is_player_a: bool = True
         self.human_player: str = "A"
         self.opponent_player: str = "B"
         self.turn_history: list[str] = []
-        self.trace_logger: Optional[TraceLogger] = None
+        self.trace_logger: TraceLogger | None = None
 
     def run(self) -> None:
         """Run the main menu loop."""
@@ -306,10 +304,10 @@ class BrinksmanshipCLI:
         else:
             print("  Awaiting first action...")
 
-    def get_player_action(self) -> Optional[Action | str]:
+    def get_player_action(self) -> Action | str | None:
         """Get the player's action choice."""
         available_actions = self.game.get_available_actions(self.human_player)
-        state = self.game.get_current_state()
+        self.game.get_current_state()
 
         print_section("AVAILABLE ACTIONS")
 
@@ -322,10 +320,7 @@ class BrinksmanshipCLI:
         can_settle = menu.can_propose_settlement
 
         for i, action in enumerate(available_actions):
-            if action.action_type == ActionType.COOPERATIVE:
-                marker = "[C]"
-            else:
-                marker = "[D]"
+            marker = "[C]" if action.action_type == ActionType.COOPERATIVE else "[D]"
 
             cost_str = f" (Cost: {action.resource_cost:.1f}R)" if action.resource_cost > 0 else ""
             options.append(f"{marker} {action.name}{cost_str}")
@@ -367,9 +362,7 @@ class BrinksmanshipCLI:
         opponent_actions = self.game.get_available_actions(self.opponent_player)
 
         # Get opponent's action (async)
-        opponent_action = run_async(
-            self.opponent.choose_action(state, opponent_actions)
-        )
+        opponent_action = run_async(self.opponent.choose_action(state, opponent_actions))
 
         # Validate opponent action
         if opponent_action not in opponent_actions:
@@ -412,14 +405,13 @@ class BrinksmanshipCLI:
                 input("\nPress Enter to continue...")
 
             # Check for game ending
-            if result.ending:
-                if self.trace_logger:
-                    self.trace_logger.record_ending(
-                        ending_type=result.ending.ending_type.value,
-                        vp_a=result.ending.vp_a,
-                        vp_b=result.ending.vp_b,
-                        description=result.ending.description,
-                    )
+            if result.ending and self.trace_logger:
+                self.trace_logger.record_ending(
+                    ending_type=result.ending.ending_type.value,
+                    vp_a=result.ending.vp_a,
+                    vp_b=result.ending.vp_b,
+                    description=result.ending.description,
+                )
         else:
             print(f"Error: {result.error}")
             input("Press Enter to continue...")
@@ -445,10 +437,7 @@ class BrinksmanshipCLI:
 
         position_diff = my_position - opp_position
         total_pos = state.position_a + state.position_b
-        if total_pos > 0:
-            suggested = int((my_position / total_pos) * 100)
-        else:
-            suggested = 50
+        suggested = int(my_position / total_pos * 100) if total_pos > 0 else 50
 
         coop_bonus = int((state.cooperation_score - 5) * 2)
         suggested = max(20, min(80, suggested + coop_bonus))
@@ -471,10 +460,7 @@ class BrinksmanshipCLI:
         while True:
             try:
                 vp_str = input(f"Enter your VP offer (valid range {min_vp}-{max_vp}) [{suggested}]: ").strip()
-                if not vp_str:
-                    offered_vp = suggested
-                else:
-                    offered_vp = int(vp_str)
+                offered_vp = suggested if not vp_str else int(vp_str)
 
                 if not (min_vp <= offered_vp <= max_vp):
                     print(f"VP must be between {min_vp} and {max_vp}")
@@ -488,10 +474,7 @@ class BrinksmanshipCLI:
         while True:
             try:
                 surplus_str = input("Enter your surplus share % (you get this much) [50]: ").strip()
-                if not surplus_str:
-                    surplus_split = 50
-                else:
-                    surplus_split = int(surplus_str)
+                surplus_split = 50 if not surplus_str else int(surplus_str)
 
                 if not (0 <= surplus_split <= 100):
                     print("Surplus share must be between 0 and 100")
@@ -508,15 +491,13 @@ class BrinksmanshipCLI:
         proposal = SettlementProposal(
             offered_vp=offered_vp,
             surplus_split_percent=surplus_split,
-            argument=argument if argument else "Settlement proposed."
+            argument=argument if argument else "Settlement proposed.",
         )
 
         print("\nSubmitting proposal...")
 
         # Get opponent response (async)
-        response = run_async(
-            self.opponent.evaluate_settlement(proposal, state, False)
-        )
+        response = run_async(self.opponent.evaluate_settlement(proposal, state, False))
 
         # Record in trace
         if self.trace_logger:
@@ -547,8 +528,8 @@ class BrinksmanshipCLI:
             state: Current game state
             exchange_number: Which exchange this is (1, 2, or 3)
         """
-        from brinksmanship.parameters import calculate_rejection_penalty, REJECTION_BASE_PENALTY
         from brinksmanship.engine.resolution import MAX_SETTLEMENT_EXCHANGES
+        from brinksmanship.parameters import calculate_rejection_penalty
 
         if response.action == "accept":
             # Settlement accepted - distribute surplus
@@ -583,7 +564,7 @@ class BrinksmanshipCLI:
             print("\n" + "=" * 50)
             print("SETTLEMENT ACCEPTED!")
             print("=" * 50)
-            print(f"\nVP Split:")
+            print("\nVP Split:")
             print(f"  You: {offered_vp} VP")
             print(f"  Opponent: {100 - offered_vp} VP")
             print(f"\nSurplus Distribution (Pool: {surplus_pool:.1f} VP):")
@@ -593,7 +574,7 @@ class BrinksmanshipCLI:
 
         elif response.action == "counter":
             # Get counter surplus split if available
-            counter_surplus = getattr(response, 'counter_surplus_split_percent', 50) or 50
+            counter_surplus = getattr(response, "counter_surplus_split_percent", 50) or 50
 
             print("\n" + "-" * 50)
             print("Opponent Response: COUNTER")
@@ -601,7 +582,7 @@ class BrinksmanshipCLI:
             print(f"  Counter VP: {response.counter_vp}")
             print(f"  Counter Surplus Split: {counter_surplus}%")
             if response.counter_argument:
-                print(f"  Argument: \"{response.counter_argument}\"")
+                print(f'  Argument: "{response.counter_argument}"')
             print()
 
             # Ask if player accepts counter
@@ -647,7 +628,7 @@ class BrinksmanshipCLI:
                 print("\n" + "=" * 50)
                 print("COUNTER-OFFER ACCEPTED!")
                 print("=" * 50)
-                print(f"\nVP Split:")
+                print("\nVP Split:")
                 print(f"  You: {your_vp} VP")
                 print(f"  Opponent: {their_vp} VP")
                 print(f"\nSurplus Distribution (Pool: {surplus_pool:.1f} VP):")
@@ -659,7 +640,7 @@ class BrinksmanshipCLI:
                 risk_penalty = calculate_rejection_penalty(exchange_number)
                 remaining = MAX_SETTLEMENT_EXCHANGES - exchange_number
 
-                print(f"\nSettlement rejected.")
+                print("\nSettlement rejected.")
                 print(f"Risk penalty: +{risk_penalty:.2f}")
 
                 if remaining > 0:
@@ -683,7 +664,7 @@ class BrinksmanshipCLI:
             print("Opponent Response: REJECT")
             print("-" * 50)
             if response.rejection_reason:
-                print(f"  Reason: \"{response.rejection_reason}\"")
+                print(f'  Reason: "{response.rejection_reason}"')
             print(f"\nRisk penalty: +{risk_penalty:.2f}")
 
             if remaining > 0:
@@ -843,15 +824,15 @@ class BrinksmanshipCLI:
 
             # Human's streak
             if self.human_is_player_a:
-                human_cooperated = outcome_code.startswith("C")
+                outcome_code.startswith("C")
             else:
-                human_cooperated = outcome_code.endswith("C")
+                outcome_code.endswith("C")
 
             # Opponent's streak
             if self.human_is_player_a:
-                opp_cooperated = outcome_code.endswith("C")
+                outcome_code.endswith("C")
             else:
-                opp_cooperated = outcome_code.startswith("C")
+                outcome_code.startswith("C")
 
             # Update streaks - streak increases on CC outcome
             if outcome_code == "CC":
@@ -940,10 +921,7 @@ class BrinksmanshipCLI:
         # Overall assessment
         print_section("Overall Assessment")
         if ending:
-            if self.human_is_player_a:
-                your_vp = ending.vp_a
-            else:
-                your_vp = ending.vp_b
+            your_vp = ending.vp_a if self.human_is_player_a else ending.vp_b
 
             if your_vp > 60:
                 print("Strong Victory - You achieved a decisive advantage.")
@@ -970,8 +948,8 @@ class BrinksmanshipCLI:
         total = len(history)
 
         if total > 0:
-            print(f"Mutual cooperation rate: {coop_count}/{total} ({100*coop_count/total:.0f}%)")
-            print(f"Mutual competition rate: {comp_count}/{total} ({100*comp_count/total:.0f}%)")
+            print(f"Mutual cooperation rate: {coop_count}/{total} ({100 * coop_count / total:.0f}%)")
+            print(f"Mutual competition rate: {comp_count}/{total} ({100 * comp_count / total:.0f}%)")
 
         # Recommendations
         print_section("Recommendations")

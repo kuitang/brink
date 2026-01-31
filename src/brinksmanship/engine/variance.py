@@ -183,10 +183,7 @@ def calculate_shared_sigma(state: GameState) -> float:
     return base_sigma * chaos_factor * instability_factor * act_multiplier
 
 
-def final_resolution(
-    state: GameState,
-    seed: int | None = None
-) -> tuple[float, float]:
+def final_resolution(state: GameState, seed: int | None = None) -> tuple[float, float]:
     """Calculate final Victory Points for both players.
 
     This implements the Final Resolution algorithm from GAME_MANUAL.md Section 6.3.

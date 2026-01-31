@@ -36,44 +36,32 @@ import pytest
 from pydantic import ValidationError
 
 from brinksmanship.models.actions import (
-    # Enums
-    ActionType,
-    ActionCategory,
-    # Dataclass
-    Action,
-    # Standard Actions - Cooperative
-    DEESCALATE,
-    HOLD_MAINTAIN,
-    PROPOSE_SETTLEMENT,
-    BACK_CHANNEL,
-    CONCEDE,
-    WITHDRAW,
-    # Standard Actions - Competitive
-    ESCALATE,
-    AGGRESSIVE_PRESSURE,
-    ISSUE_ULTIMATUM,
-    SHOW_OF_FORCE,
-    DEMAND,
-    ADVANCE,
-    # Special Actions
-    RECONNAISSANCE,
-    INSPECTION,
-    create_costly_signaling_action,
+    ALL_COMPETITIVE_ACTIONS,
     # Action Collections
     ALL_COOPERATIVE_ACTIONS,
-    ALL_COMPETITIVE_ACTIONS,
+    DEESCALATE,
+    ESCALATE,
+    HOLD_MAINTAIN,
+    INSPECTION,
+    PROPOSE_SETTLEMENT,
+    # Special Actions
+    RECONNAISSANCE,
+    Action,
+    ActionCategory,
     # ActionMenu
     ActionMenu,
+    # Enums
+    ActionType,
+    can_propose_settlement,
+    create_costly_signaling_action,
+    format_action_for_display,
+    get_action_by_name,
     get_action_menu,
     get_risk_tier,
     # Helper functions
     validate_action_affordability,
     validate_action_availability,
-    can_propose_settlement,
-    get_action_by_name,
-    format_action_for_display,
 )
-
 
 # =============================================================================
 # ActionType Enum Tests
@@ -372,7 +360,11 @@ class TestGetActionMenu:
         """Test menu composition varies by risk level."""
         # Low risk: 4 coop, 2 competitive
         low_menu = get_action_menu(
-            risk_level=2, turn=3, stability=5.0, player_position=5.0, player_resources=5.0,
+            risk_level=2,
+            turn=3,
+            stability=5.0,
+            player_position=5.0,
+            player_resources=5.0,
         )
         coop_low = [a for a in low_menu.standard_actions if a.action_type == ActionType.COOPERATIVE]
         comp_low = [a for a in low_menu.standard_actions if a.action_type == ActionType.COMPETITIVE]
@@ -381,7 +373,11 @@ class TestGetActionMenu:
 
         # High risk: 2 coop, 4 competitive
         high_menu = get_action_menu(
-            risk_level=8, turn=3, stability=5.0, player_position=5.0, player_resources=5.0,
+            risk_level=8,
+            turn=3,
+            stability=5.0,
+            player_position=5.0,
+            player_resources=5.0,
         )
         coop_high = [a for a in high_menu.standard_actions if a.action_type == ActionType.COOPERATIVE]
         comp_high = [a for a in high_menu.standard_actions if a.action_type == ActionType.COMPETITIVE]
@@ -392,19 +388,31 @@ class TestGetActionMenu:
         """Test settlement availability conditions."""
         # Available after turn 4 with stability > 2
         menu = get_action_menu(
-            risk_level=5, turn=5, stability=5.0, player_position=5.0, player_resources=5.0,
+            risk_level=5,
+            turn=5,
+            stability=5.0,
+            player_position=5.0,
+            player_resources=5.0,
         )
         assert menu.can_propose_settlement is True
 
         # Not available on turn 4 or earlier
         menu = get_action_menu(
-            risk_level=5, turn=4, stability=5.0, player_position=5.0, player_resources=5.0,
+            risk_level=5,
+            turn=4,
+            stability=5.0,
+            player_position=5.0,
+            player_resources=5.0,
         )
         assert menu.can_propose_settlement is False
 
         # Not available with low stability
         menu = get_action_menu(
-            risk_level=5, turn=6, stability=2.0, player_position=5.0, player_resources=5.0,
+            risk_level=5,
+            turn=6,
+            stability=2.0,
+            player_position=5.0,
+            player_resources=5.0,
         )
         assert menu.can_propose_settlement is False
 
@@ -412,14 +420,22 @@ class TestGetActionMenu:
         """Test reconnaissance is included/excluded based on resources."""
         # Included when affordable
         menu = get_action_menu(
-            risk_level=5, turn=3, stability=5.0, player_position=5.0, player_resources=1.0,
+            risk_level=5,
+            turn=3,
+            stability=5.0,
+            player_position=5.0,
+            player_resources=1.0,
         )
         recon = [a for a in menu.special_actions if a.category == ActionCategory.RECONNAISSANCE]
         assert len(recon) == 1
 
         # Excluded when not affordable
         menu = get_action_menu(
-            risk_level=5, turn=3, stability=5.0, player_position=5.0, player_resources=0.4,
+            risk_level=5,
+            turn=3,
+            stability=5.0,
+            player_position=5.0,
+            player_resources=0.4,
         )
         recon = [a for a in menu.special_actions if a.category == ActionCategory.RECONNAISSANCE]
         assert len(recon) == 0
@@ -450,26 +466,38 @@ class TestValidateActionAvailability:
         """Test action availability conditions."""
         # Standard action always available
         is_valid, error = validate_action_availability(
-            DEESCALATE, turn=1, stability=5.0, player_resources=0.0,
+            DEESCALATE,
+            turn=1,
+            stability=5.0,
+            player_resources=0.0,
         )
         assert is_valid is True
 
         # Action unavailable due to resources
         is_valid, error = validate_action_availability(
-            RECONNAISSANCE, turn=5, stability=5.0, player_resources=0.3,
+            RECONNAISSANCE,
+            turn=5,
+            stability=5.0,
+            player_resources=0.3,
         )
         assert is_valid is False
         assert "Insufficient resources" in error
 
         # Settlement unavailable before turn 5
         is_valid, error = validate_action_availability(
-            PROPOSE_SETTLEMENT, turn=4, stability=5.0, player_resources=5.0,
+            PROPOSE_SETTLEMENT,
+            turn=4,
+            stability=5.0,
+            player_resources=5.0,
         )
         assert is_valid is False
 
         # Settlement available with proper conditions
         is_valid, error = validate_action_availability(
-            PROPOSE_SETTLEMENT, turn=5, stability=3.0, player_resources=5.0,
+            PROPOSE_SETTLEMENT,
+            turn=5,
+            stability=3.0,
+            player_resources=5.0,
         )
         assert is_valid is True
 
@@ -502,8 +530,17 @@ class TestGetActionByName:
     def test_find_all_standard_actions(self):
         """Test finding all standard actions by name."""
         action_names = [
-            "De-escalate", "Hold / Maintain", "Back Channel", "Concede", "Withdraw",
-            "Escalate", "Aggressive Pressure", "Issue Ultimatum", "Show of Force", "Demand", "Advance",
+            "De-escalate",
+            "Hold / Maintain",
+            "Back Channel",
+            "Concede",
+            "Withdraw",
+            "Escalate",
+            "Aggressive Pressure",
+            "Issue Ultimatum",
+            "Show of Force",
+            "Demand",
+            "Advance",
         ]
         for name in action_names:
             assert get_action_by_name(name) is not None, f"Could not find action: {name}"
@@ -548,22 +585,32 @@ class TestEdgeCases:
 
     def test_all_actions_have_descriptions(self):
         """Test all standard actions have non-empty descriptions."""
-        all_actions = ALL_COOPERATIVE_ACTIONS + ALL_COMPETITIVE_ACTIONS + [
-            PROPOSE_SETTLEMENT, RECONNAISSANCE, INSPECTION,
-        ]
+        all_actions = (
+            ALL_COOPERATIVE_ACTIONS
+            + ALL_COMPETITIVE_ACTIONS
+            + [
+                PROPOSE_SETTLEMENT,
+                RECONNAISSANCE,
+                INSPECTION,
+            ]
+        )
         for action in all_actions:
             assert action.description != "", f"{action.name} has no description"
 
     def test_action_collections_are_distinct(self):
         """Test cooperative and competitive collections don't overlap."""
-        coop_set = set(a.name for a in ALL_COOPERATIVE_ACTIONS)
-        comp_set = set(a.name for a in ALL_COMPETITIVE_ACTIONS)
+        coop_set = {a.name for a in ALL_COOPERATIVE_ACTIONS}
+        comp_set = {a.name for a in ALL_COMPETITIVE_ACTIONS}
         assert coop_set.isdisjoint(comp_set)
 
     def test_action_menu_with_max_resources(self):
         """Test action menu when player has maximum resources."""
         menu = get_action_menu(
-            risk_level=5, turn=6, stability=5.0, player_position=5.0, player_resources=10.0,
+            risk_level=5,
+            turn=6,
+            stability=5.0,
+            player_position=5.0,
+            player_resources=10.0,
         )
         # All special actions should be available
         categories = {a.category for a in menu.special_actions}

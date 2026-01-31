@@ -34,7 +34,6 @@ Exit codes:
 
 import argparse
 import asyncio
-import json
 import logging
 import re
 import sys
@@ -44,12 +43,11 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from brinksmanship.generation.scenario_generator import ScenarioGenerator
+from brinksmanship.generation.schemas import Scenario, save_scenario
 from brinksmanship.generation.validator import (
     ScenarioValidator,
     ValidationResult,
-    ValidationSeverity,
 )
-from brinksmanship.generation.schemas import Scenario, save_scenario
 
 logging.basicConfig(
     level=logging.INFO,
@@ -135,9 +133,7 @@ def analyze_validation_failures(result: ValidationResult) -> list[str]:
     if result.act_structure and not result.act_structure.passed:
         violations = result.act_structure.metrics.get("violations", [])
         if violations:
-            suggestions.append(
-                f"Fix act structure violations: {len(violations)} turns have incorrect act numbers"
-            )
+            suggestions.append(f"Fix act structure violations: {len(violations)} turns have incorrect act numbers")
 
     # Check branching
     if result.branching and not result.branching.passed:
@@ -148,13 +144,9 @@ def analyze_validation_failures(result: ValidationResult) -> list[str]:
     if result.balance and not result.balance.passed:
         for issue in result.balance.issues:
             if "Dominant strategy" in issue.message:
-                suggestions.append(
-                    "Adjust matrix parameters to reduce dominant strategy advantage"
-                )
+                suggestions.append("Adjust matrix parameters to reduce dominant strategy advantage")
             elif "Variance too" in issue.message:
-                suggestions.append(
-                    "Adjust game parameters to bring variance into expected range"
-                )
+                suggestions.append("Adjust game parameters to bring variance into expected range")
 
     return suggestions
 
@@ -256,15 +248,11 @@ def print_validation_summary(result: ValidationResult) -> None:
         print(f"\n  Simulation ({sim.games_played} games):")
         print(f"    Avg length: {sim.avg_game_length:.1f} turns")
         print(f"    VP std dev: {sim.vp_std_dev:.1f}")
-        print(f"    Elimination rate: {sim.elimination_rate*100:.1f}%")
-        print(f"    Mutual destruction: {sim.mutual_destruction_rate*100:.1f}%")
+        print(f"    Elimination rate: {sim.elimination_rate * 100:.1f}%")
+        print(f"    Mutual destruction: {sim.mutual_destruction_rate * 100:.1f}%")
 
         # Check for dominant strategies
-        dominant = [
-            (name, rate)
-            for name, rate in sim.strategy_win_rates.items()
-            if rate > 0.60
-        ]
+        dominant = [(name, rate) for name, rate in sim.strategy_win_rates.items() if rate > 0.60]
         if dominant:
             print(f"    WARNING: Dominant strategies: {dominant}")
 
@@ -293,9 +281,9 @@ async def generate_and_validate(
     scenario = None
 
     for iteration in range(max_iterations):
-        logger.info(f"\n{'='*60}")
+        logger.info(f"\n{'=' * 60}")
         logger.info(f"Iteration {iteration + 1}/{max_iterations}")
-        logger.info(f"{'='*60}")
+        logger.info(f"{'=' * 60}")
 
         # Generate or regenerate scenario
         if scenario is None or iteration > 0:
@@ -308,6 +296,7 @@ async def generate_and_validate(
                 logger.error(f"Generation failed: {e}")
                 if verbose:
                     import traceback
+
                     traceback.print_exc()
                 continue
 

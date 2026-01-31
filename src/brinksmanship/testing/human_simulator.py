@@ -17,11 +17,14 @@ from brinksmanship.models import (
     Action,
     ActionType,
     GameState,
-    get_action_menu,
 )
 from brinksmanship.opponents.base import (
     Opponent,
+)
+from brinksmanship.opponents.base import (
     SettlementProposal as BaseSettlementProposal,
+)
+from brinksmanship.opponents.base import (
     SettlementResponse as BaseSettlementResponse,
 )
 from brinksmanship.prompts import (
@@ -55,25 +58,12 @@ class HumanPersona(BaseModel):
     risk_tolerance: Literal["risk_averse", "neutral", "risk_seeking"] = Field(
         description="How the player approaches risky situations"
     )
-    sophistication: Literal["novice", "intermediate", "expert"] = Field(
-        description="Strategic understanding level"
-    )
-    emotional_state: Literal["calm", "stressed", "desperate"] = Field(
-        description="Current psychological state"
-    )
-    personality: Literal["cooperative", "competitive", "erratic"] = Field(
-        description="General interaction style"
-    )
-    backstory: str = Field(
-        description="Brief background explaining this persona's traits"
-    )
-    decision_style: str = Field(
-        description="How they approach choices"
-    )
-    triggers: list[str] = Field(
-        default_factory=list,
-        description="Situations that cause out-of-character behavior"
-    )
+    sophistication: Literal["novice", "intermediate", "expert"] = Field(description="Strategic understanding level")
+    emotional_state: Literal["calm", "stressed", "desperate"] = Field(description="Current psychological state")
+    personality: Literal["cooperative", "competitive", "erratic"] = Field(description="General interaction style")
+    backstory: str = Field(description="Brief background explaining this persona's traits")
+    decision_style: str = Field(description="How they approach choices")
+    triggers: list[str] = Field(default_factory=list, description="Situations that cause out-of-character behavior")
 
     def get_mistake_probability(self) -> float:
         """Calculate base mistake probability based on sophistication.
@@ -235,9 +225,7 @@ class HumanSimulator(Opponent):
         self._turn_history = []
         return self.persona
 
-    def _format_opponent_intelligence(
-        self, state: GameState, is_player_a: bool
-    ) -> str:
+    def _format_opponent_intelligence(self, state: GameState, is_player_a: bool) -> str:
         """Format opponent intelligence for the prompt.
 
         Args:
@@ -266,7 +254,7 @@ class HumanSimulator(Opponent):
                 f"(intelligence from turn {info.known_position_turn}, uncertainty +/-{pos_unc:.1f})"
             )
         else:
-            lines.append(f"- Opponent position: Unknown (no intelligence gathered)")
+            lines.append("- Opponent position: Unknown (no intelligence gathered)")
 
         lines.append(f"- Opponent's last action: {opponent_prev.value if opponent_prev else 'None'}")
 
@@ -420,14 +408,10 @@ class HumanSimulator(Opponent):
         # If still no match, check for mistakes and possibly override
         if selected_action is None:
             # LLM gave invalid action, apply mistake logic to pick something
-            selected_action = await self._apply_mistake_fallback(
-                state, available_actions, is_player_a
-            )
+            selected_action = await self._apply_mistake_fallback(state, available_actions, is_player_a)
         else:
             # Check if we should override with a "mistake"
-            selected_action = await self._maybe_apply_mistake(
-                state, available_actions, selected_action, is_player_a
-            )
+            selected_action = await self._maybe_apply_mistake(state, available_actions, selected_action, is_player_a)
 
         return selected_action
 
@@ -461,10 +445,7 @@ class HumanSimulator(Opponent):
             return chosen_action  # No mistake
 
         # Get player position and opponent's last action
-        if is_player_a:
-            player_position = state.position_a
-        else:
-            player_position = state.position_b
+        player_position = state.position_a if is_player_a else state.position_b
 
         # Get opponent's previous action type
         opponent_previous_type = "unknown"
@@ -503,9 +484,7 @@ class HumanSimulator(Opponent):
             return chosen_action
 
         # Apply the mistake
-        return self._apply_mistake_type(
-            mistake.mistake_type, available_actions, chosen_action
-        )
+        return self._apply_mistake_type(mistake.mistake_type, available_actions, chosen_action)
 
     def _apply_mistake_type(
         self,
@@ -523,12 +502,8 @@ class HumanSimulator(Opponent):
         Returns:
             The mistake action
         """
-        cooperative_actions = [
-            a for a in available_actions if a.action_type == ActionType.COOPERATIVE
-        ]
-        competitive_actions = [
-            a for a in available_actions if a.action_type == ActionType.COMPETITIVE
-        ]
+        cooperative_actions = [a for a in available_actions if a.action_type == ActionType.COOPERATIVE]
+        competitive_actions = [a for a in available_actions if a.action_type == ActionType.COMPETITIVE]
 
         if mistake_type == "impulsive":
             # Pick the most aggressive available action
@@ -537,9 +512,7 @@ class HumanSimulator(Opponent):
 
         elif mistake_type == "overcautious":
             # Pick the safest available action (cooperative, low cost)
-            safe_actions = [
-                a for a in cooperative_actions if a.resource_cost == 0
-            ]
+            safe_actions = [a for a in cooperative_actions if a.resource_cost == 0]
             if safe_actions:
                 return random.choice(safe_actions)
             elif cooperative_actions:
@@ -553,8 +526,7 @@ class HumanSimulator(Opponent):
         elif mistake_type == "overconfident":
             # Take a risky action even when it's not warranted
             risky_actions = [
-                a for a in available_actions
-                if a.action_type == ActionType.COMPETITIVE or a.resource_cost > 0
+                a for a in available_actions if a.action_type == ActionType.COMPETITIVE or a.resource_cost > 0
             ]
             if risky_actions:
                 return random.choice(risky_actions)
@@ -582,14 +554,10 @@ class HumanSimulator(Opponent):
         """
         # Use persona biases to select
         coop_bias = self.persona.get_cooperation_bias()
-        risk_bias = self.persona.get_risk_preference_bias()
+        self.persona.get_risk_preference_bias()
 
-        cooperative_actions = [
-            a for a in available_actions if a.action_type == ActionType.COOPERATIVE
-        ]
-        competitive_actions = [
-            a for a in available_actions if a.action_type == ActionType.COMPETITIVE
-        ]
+        cooperative_actions = [a for a in available_actions if a.action_type == ActionType.COOPERATIVE]
+        competitive_actions = [a for a in available_actions if a.action_type == ActionType.COMPETITIVE]
 
         # Decide cooperative vs competitive
         if self.persona.personality == "erratic":
@@ -668,10 +636,7 @@ class HumanSimulator(Opponent):
 
         # Calculate "fair" VP based on positions
         total_pos = player_position + opp_est
-        if total_pos > 0:
-            fair_vp = int((player_position / total_pos) * 100)
-        else:
-            fair_vp = 50
+        fair_vp = int(player_position / total_pos * 100) if total_pos > 0 else 50
 
         vp_difference = your_vp - fair_vp
 
@@ -738,10 +703,7 @@ class HumanSimulator(Opponent):
 
         # Calculate position-based VP
         total_pos = player_position + opp_est
-        if total_pos > 0:
-            base_vp = (player_position / total_pos) * 100
-        else:
-            base_vp = 50
+        base_vp = player_position / total_pos * 100 if total_pos > 0 else 50
 
         # Decide based on persona
         # Risk-averse players more likely to settle
@@ -791,20 +753,17 @@ class HumanSimulator(Opponent):
         if self.persona.personality == "cooperative":
             argument = (
                 f"We've both invested significantly in this crisis. "
-                f"A {offered_vp}-{100-offered_vp} split reflects our relative positions "
+                f"A {offered_vp}-{100 - offered_vp} split reflects our relative positions "
                 f"while avoiding the risks of continued brinkmanship."
             )
         elif self.persona.personality == "competitive":
             argument = (
-                f"My position warrants a {offered_vp}-{100-offered_vp} split. "
+                f"My position warrants a {offered_vp}-{100 - offered_vp} split. "
                 f"Continued resistance will only cost us both more. "
                 f"Accept this reasonable offer while it's still on the table."
             )
         else:
-            argument = (
-                f"I propose {offered_vp}-{100-offered_vp}. "
-                f"The current situation is unstable. Let's end this."
-            )
+            argument = f"I propose {offered_vp}-{100 - offered_vp}. The current situation is unstable. Let's end this."
 
         return BaseSettlementProposal(offered_vp=offered_vp, argument=argument)
 

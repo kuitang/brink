@@ -9,9 +9,7 @@ from ..models.game_record import GameRecord
 from ..models.user import User
 
 
-def get_leaderboard(
-    scenario_id: str, opponent_type: str, limit: int = 50
-) -> list[dict[str, Any]]:
+def get_leaderboard(scenario_id: str, opponent_type: str, limit: int = 50) -> list[dict[str, Any]]:
     """Get ranked leaderboard for a scenario/opponent pair.
 
     Ranking: VP descending, then finished_at ascending (earlier wins ties).
@@ -30,7 +28,7 @@ def get_leaderboard(
         .filter(
             GameRecord.scenario_id == scenario_id,
             GameRecord.opponent_type == opponent_type,
-            GameRecord.is_finished == True,
+            GameRecord.is_finished,
             GameRecord.final_vp_player.isnot(None),
         )
         .order_by(
@@ -65,7 +63,7 @@ def get_available_leaderboards() -> list[dict[str, Any]]:
             func.count(GameRecord.id).label("game_count"),
         )
         .filter(
-            GameRecord.is_finished == True,
+            GameRecord.is_finished,
             GameRecord.final_vp_player.isnot(None),
         )
         .group_by(GameRecord.scenario_id, GameRecord.scenario_name, GameRecord.opponent_type)

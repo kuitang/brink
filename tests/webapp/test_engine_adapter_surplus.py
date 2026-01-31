@@ -1,6 +1,7 @@
 """Tests for surplus field synchronization in engine adapter."""
 
 import pytest
+
 from brinksmanship.webapp.services.engine_adapter import RealGameEngine
 
 
@@ -65,9 +66,7 @@ def test_surplus_accumulates_across_turns(engine: RealGameEngine) -> None:
     assert state.get("cooperation_surplus", 0.0) == 0.0
 
     actions = engine.get_available_actions(state)
-    coop_action = next(
-        (a for a in actions if a.get("type") == "cooperative"), None
-    )
+    coop_action = next((a for a in actions if a.get("type") == "cooperative"), None)
 
     if not coop_action:
         return
@@ -75,9 +74,7 @@ def test_surplus_accumulates_across_turns(engine: RealGameEngine) -> None:
     new_state = engine.submit_action(state, coop_action["id"])
 
     actions2 = engine.get_available_actions(new_state)
-    coop_action2 = next(
-        (a for a in actions2 if a.get("type") == "cooperative"), None
-    )
+    coop_action2 = next((a for a in actions2 if a.get("type") == "cooperative"), None)
 
     if not coop_action2:
         return

@@ -300,10 +300,7 @@ class PrisonersDilemmaConstructor:
         """Validate T > R > P > S constraint."""
         t, r, p, s = params.temptation, params.reward, params.punishment, params.sucker
         if not (t > r > p > s):
-            raise ValueError(
-                f"Prisoner's Dilemma requires T > R > P > S, "
-                f"got T={t}, R={r}, P={p}, S={s}"
-            )
+            raise ValueError(f"Prisoner's Dilemma requires T > R > P > S, got T={t}, R={r}, P={p}, S={s}")
 
     @staticmethod
     def build(params: MatrixParameters) -> PayoffMatrix:
@@ -338,9 +335,7 @@ class DeadlockConstructor:
         """Validate T > P > R > S constraint."""
         t, r, p, s = params.temptation, params.reward, params.punishment, params.sucker
         if not (t > p > r > s):
-            raise ValueError(
-                f"Deadlock requires T > P > R > S, " f"got T={t}, P={p}, R={r}, S={s}"
-            )
+            raise ValueError(f"Deadlock requires T > P > R > S, got T={t}, P={p}, R={r}, S={s}")
 
     @staticmethod
     def build(params: MatrixParameters) -> PayoffMatrix:
@@ -374,9 +369,7 @@ class HarmonyConstructor:
         """Validate R > T > S > P constraint."""
         t, r, p, s = params.temptation, params.reward, params.punishment, params.sucker
         if not (r > t > s > p):
-            raise ValueError(
-                f"Harmony requires R > T > S > P, " f"got R={r}, T={t}, S={s}, P={p}"
-            )
+            raise ValueError(f"Harmony requires R > T > S > P, got R={r}, T={t}, S={s}, P={p}")
 
     @staticmethod
     def build(params: MatrixParameters) -> PayoffMatrix:
@@ -417,9 +410,7 @@ class ChickenConstructor:
         s = params.swerve_payoff
         p = params.crash_payoff
         if not (t > r > s > p):
-            raise ValueError(
-                f"Chicken requires T > R > S > P, " f"got T={t}, R={r}, S={s}, P={p}"
-            )
+            raise ValueError(f"Chicken requires T > R > S > P, got T={t}, R={r}, S={s}, P={p}")
 
     @staticmethod
     def build(params: MatrixParameters) -> PayoffMatrix:
@@ -461,9 +452,7 @@ class VolunteersDilemmaConstructor:
         f = params.reward + params.free_ride_bonus  # Free-ride payoff
         d = -params.disaster_penalty  # Disaster payoff
         if not (f > w > d):
-            raise ValueError(
-                f"Volunteer's Dilemma requires F > W > D, " f"got F={f}, W={w}, D={d}"
-            )
+            raise ValueError(f"Volunteer's Dilemma requires F > W > D, got F={f}, W={w}, D={d}")
 
     @staticmethod
     def build(params: MatrixParameters) -> PayoffMatrix:
@@ -508,10 +497,7 @@ class WarOfAttritionConstructor:
         # Quit while other continues: sucker
         t, r, p, s = params.temptation, params.reward, params.punishment, params.sucker
         if not (t > r and r > p and t > s):
-            raise ValueError(
-                f"War of Attrition requires T > R > P and T > S, "
-                f"got T={t}, R={r}, P={p}, S={s}"
-            )
+            raise ValueError(f"War of Attrition requires T > R > P and T > S, got T={t}, R={r}, P={p}, S={s}")
 
     @staticmethod
     def build(params: MatrixParameters) -> PayoffMatrix:
@@ -546,10 +532,7 @@ class PureCoordinationConstructor:
         match = params.coordination_bonus
         mismatch = params.miscoordination_penalty
         if not (match > mismatch):
-            raise ValueError(
-                f"Pure Coordination requires Match > Mismatch, "
-                f"got Match={match}, Mismatch={mismatch}"
-            )
+            raise ValueError(f"Pure Coordination requires Match > Mismatch, got Match={match}, Mismatch={mismatch}")
 
     @staticmethod
     def build(params: MatrixParameters) -> PayoffMatrix:
@@ -562,12 +545,8 @@ class PureCoordinationConstructor:
         return PayoffMatrix(
             matrix_type=MatrixType.PURE_COORDINATION,
             cc=OutcomePayoffs(match, match, _make_deltas(params, match, match, -0.3)),  # (A,A) eq
-            cd=OutcomePayoffs(
-                mismatch, mismatch, _make_deltas(params, mismatch, mismatch, 0.3)
-            ),
-            dc=OutcomePayoffs(
-                mismatch, mismatch, _make_deltas(params, mismatch, mismatch, 0.3)
-            ),
+            cd=OutcomePayoffs(mismatch, mismatch, _make_deltas(params, mismatch, mismatch, 0.3)),
+            dc=OutcomePayoffs(mismatch, mismatch, _make_deltas(params, mismatch, mismatch, 0.3)),
             dd=OutcomePayoffs(match, match, _make_deltas(params, match, match, -0.3)),  # (B,B) eq
             row_labels=("A", "B"),
             col_labels=("A", "B"),
@@ -595,9 +574,7 @@ class StagHuntConstructor:
         p = params.hare_safe
         s = params.stag_fail
         if not (r > t > p > s):
-            raise ValueError(
-                f"Stag Hunt requires R > T > P > S, " f"got R={r}, T={t}, P={p}, S={s}"
-            )
+            raise ValueError(f"Stag Hunt requires R > T > P > S, got R={r}, T={t}, P={p}, S={s}")
 
     @staticmethod
     def build(params: MatrixParameters) -> PayoffMatrix:
@@ -639,14 +616,9 @@ class BattleOfSexesConstructor:
         pref_a = params.preference_a
         pref_b = params.preference_b
         if not (coord > miscoord):
-            raise ValueError(
-                f"BoS requires Coord > Miscoord, " f"got Coord={coord}, Miscoord={miscoord}"
-            )
+            raise ValueError(f"BoS requires Coord > Miscoord, got Coord={coord}, Miscoord={miscoord}")
         if not (pref_a > 1.0 and pref_b > 1.0):
-            raise ValueError(
-                f"BoS requires preference multipliers > 1.0, "
-                f"got pref_a={pref_a}, pref_b={pref_b}"
-            )
+            raise ValueError(f"BoS requires preference multipliers > 1.0, got pref_a={pref_a}, pref_b={pref_b}")
 
     @staticmethod
     def build(params: MatrixParameters) -> PayoffMatrix:
@@ -666,18 +638,10 @@ class BattleOfSexesConstructor:
 
         return PayoffMatrix(
             matrix_type=MatrixType.BATTLE_OF_SEXES,
-            cc=OutcomePayoffs(
-                aa_row, aa_col, _make_deltas(params, aa_row, aa_col, -0.3)
-            ),  # (A,A) eq
-            cd=OutcomePayoffs(
-                miscoord, miscoord, _make_deltas(params, miscoord, miscoord, 0.5)
-            ),
-            dc=OutcomePayoffs(
-                miscoord, miscoord, _make_deltas(params, miscoord, miscoord, 0.5)
-            ),
-            dd=OutcomePayoffs(
-                bb_row, bb_col, _make_deltas(params, bb_row, bb_col, -0.3)
-            ),  # (B,B) eq
+            cc=OutcomePayoffs(aa_row, aa_col, _make_deltas(params, aa_row, aa_col, -0.3)),  # (A,A) eq
+            cd=OutcomePayoffs(miscoord, miscoord, _make_deltas(params, miscoord, miscoord, 0.5)),
+            dc=OutcomePayoffs(miscoord, miscoord, _make_deltas(params, miscoord, miscoord, 0.5)),
+            dd=OutcomePayoffs(bb_row, bb_col, _make_deltas(params, bb_row, bb_col, -0.3)),  # (B,B) eq
             row_labels=("Opera", "Football"),
             col_labels=("Opera", "Football"),
         )
@@ -707,9 +671,7 @@ class LeaderConstructor:
         b = params.sucker  # Both follow (stuck)
         c = params.punishment  # Both lead (clash)
         if not (g > h > b > c):
-            raise ValueError(
-                f"Leader requires G > H > B > C, " f"got G={g}, H={h}, B={b}, C={c}"
-            )
+            raise ValueError(f"Leader requires G > H > B > C, got G={g}, H={h}, B={b}, C={c}")
 
     @staticmethod
     def build(params: MatrixParameters) -> PayoffMatrix:
@@ -757,12 +719,8 @@ class MatchingPenniesConstructor:
         return PayoffMatrix(
             matrix_type=MatrixType.MATCHING_PENNIES,
             cc=OutcomePayoffs(win, lose, _make_deltas(params, win, lose, 0.0)),  # Match (row wins)
-            cd=OutcomePayoffs(
-                lose, win, _make_deltas(params, lose, win, 0.0)
-            ),  # Mismatch (col wins)
-            dc=OutcomePayoffs(
-                lose, win, _make_deltas(params, lose, win, 0.0)
-            ),  # Mismatch (col wins)
+            cd=OutcomePayoffs(lose, win, _make_deltas(params, lose, win, 0.0)),  # Mismatch (col wins)
+            dc=OutcomePayoffs(lose, win, _make_deltas(params, lose, win, 0.0)),  # Mismatch (col wins)
             dd=OutcomePayoffs(win, lose, _make_deltas(params, win, lose, 0.0)),  # Match (row wins)
             row_labels=("Heads", "Tails"),
             col_labels=("Heads", "Tails"),
@@ -792,14 +750,9 @@ class InspectionGameConstructor:
         gain = params.cheat_gain
         penalty = params.caught_penalty
         if not (loss > cost):
-            raise ValueError(
-                f"Inspection Game requires Loss > Cost, " f"got Loss={loss}, Cost={cost}"
-            )
+            raise ValueError(f"Inspection Game requires Loss > Cost, got Loss={loss}, Cost={cost}")
         if not (gain > 0 and penalty > gain):
-            raise ValueError(
-                f"Inspection Game requires Penalty > Gain > 0, "
-                f"got Penalty={penalty}, Gain={gain}"
-            )
+            raise ValueError(f"Inspection Game requires Penalty > Gain > 0, got Penalty={penalty}, Gain={gain}")
 
     @staticmethod
     def build(params: MatrixParameters) -> PayoffMatrix:
@@ -867,9 +820,7 @@ class ReconnaissanceConstructor:
 
         return PayoffMatrix(
             matrix_type=MatrixType.RECONNAISSANCE,
-            cc=OutcomePayoffs(
-                -scale, scale, StateDeltas(0.0, 0.0, 0.0, 0.0, 0.5)
-            ),  # Detected
+            cc=OutcomePayoffs(-scale, scale, StateDeltas(0.0, 0.0, 0.0, 0.0, 0.5)),  # Detected
             cd=OutcomePayoffs(scale, -scale, StateDeltas(0.0, 0.0, 0.0, 0.0, 0.0)),  # Success
             dc=OutcomePayoffs(0, 0, StateDeltas(0.0, 0.0, 0.0, 0.0, 0.0)),  # Stalemate
             dd=OutcomePayoffs(-scale, scale, StateDeltas(0.0, 0.0, 0.0, 0.0, 0.0)),  # Exposed
@@ -947,43 +898,25 @@ def get_default_params_for_type(matrix_type: MatrixType) -> MatrixParameters:
     Useful for testing and scenario generation.
     """
     defaults = {
-        MatrixType.PRISONERS_DILEMMA: MatrixParameters(
-            temptation=1.5, reward=1.0, punishment=0.3, sucker=0.0
-        ),
-        MatrixType.DEADLOCK: MatrixParameters(
-            temptation=1.5, punishment=1.0, reward=0.5, sucker=0.0
-        ),
-        MatrixType.HARMONY: MatrixParameters(
-            reward=1.5, temptation=1.0, sucker=0.5, punishment=0.0
-        ),
-        MatrixType.CHICKEN: MatrixParameters(
-            temptation=1.5, reward=1.0, swerve_payoff=0.5, crash_payoff=-1.0
-        ),
+        MatrixType.PRISONERS_DILEMMA: MatrixParameters(temptation=1.5, reward=1.0, punishment=0.3, sucker=0.0),
+        MatrixType.DEADLOCK: MatrixParameters(temptation=1.5, punishment=1.0, reward=0.5, sucker=0.0),
+        MatrixType.HARMONY: MatrixParameters(reward=1.5, temptation=1.0, sucker=0.5, punishment=0.0),
+        MatrixType.CHICKEN: MatrixParameters(temptation=1.5, reward=1.0, swerve_payoff=0.5, crash_payoff=-1.0),
         MatrixType.VOLUNTEERS_DILEMMA: MatrixParameters(
             reward=1.0, volunteer_cost=0.3, free_ride_bonus=0.5, disaster_penalty=1.0
         ),
-        MatrixType.WAR_OF_ATTRITION: MatrixParameters(
-            temptation=1.5, reward=1.0, punishment=0.3, sucker=0.0
-        ),
-        MatrixType.PURE_COORDINATION: MatrixParameters(
-            coordination_bonus=1.0, miscoordination_penalty=0.0
-        ),
-        MatrixType.STAG_HUNT: MatrixParameters(
-            stag_payoff=2.0, hare_temptation=1.5, hare_safe=1.0, stag_fail=0.0
-        ),
+        MatrixType.WAR_OF_ATTRITION: MatrixParameters(temptation=1.5, reward=1.0, punishment=0.3, sucker=0.0),
+        MatrixType.PURE_COORDINATION: MatrixParameters(coordination_bonus=1.0, miscoordination_penalty=0.0),
+        MatrixType.STAG_HUNT: MatrixParameters(stag_payoff=2.0, hare_temptation=1.5, hare_safe=1.0, stag_fail=0.0),
         MatrixType.BATTLE_OF_SEXES: MatrixParameters(
             coordination_bonus=1.0, miscoordination_penalty=0.0, preference_a=1.5, preference_b=1.3
         ),
-        MatrixType.LEADER: MatrixParameters(
-            temptation=2.0, reward=1.5, sucker=0.5, punishment=0.0
-        ),
+        MatrixType.LEADER: MatrixParameters(temptation=2.0, reward=1.5, sucker=0.5, punishment=0.0),
         MatrixType.MATCHING_PENNIES: MatrixParameters(scale=1.0),
         MatrixType.INSPECTION_GAME: MatrixParameters(
             inspection_cost=0.3, cheat_gain=0.5, caught_penalty=1.0, loss_if_exploited=0.7
         ),
         MatrixType.RECONNAISSANCE: MatrixParameters(scale=1.0),
-        MatrixType.SECURITY_DILEMMA: MatrixParameters(
-            temptation=1.5, reward=1.0, punishment=0.3, sucker=0.0
-        ),
+        MatrixType.SECURITY_DILEMMA: MatrixParameters(temptation=1.5, reward=1.0, punishment=0.3, sucker=0.0),
     }
     return defaults.get(matrix_type, MatrixParameters())

@@ -70,9 +70,7 @@ def generate():
 
         if not theme and not custom_prompt:
             flash("Please select a theme or enter a custom prompt.", "error")
-            return render_template(
-                "pages/generate_scenario.html", themes=GENERATION_THEMES
-            )
+            return render_template("pages/generate_scenario.html", themes=GENERATION_THEMES)
 
         # TODO: Integrate with scenario generator when available
         flash(

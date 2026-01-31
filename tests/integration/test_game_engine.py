@@ -19,9 +19,6 @@ Removed tests (see test_removal_log.md):
 - TestInformationStateUpdates: test_successful_recon/inspection_updates (weak assertions)
 """
 
-from typing import Optional
-from unittest.mock import MagicMock
-
 import pytest
 
 from brinksmanship.engine.game_engine import (
@@ -29,25 +26,18 @@ from brinksmanship.engine.game_engine import (
     GameEnding,
     GameEngine,
     TurnPhase,
-    TurnRecord,
-    TurnResult,
     create_game,
 )
 from brinksmanship.models.actions import (
+    DEESCALATE,
+    ESCALATE,
+    PROPOSE_SETTLEMENT,
+    RECONNAISSANCE,
     Action,
     ActionCategory,
     ActionType,
-    DEESCALATE,
-    ESCALATE,
-    HOLD_MAINTAIN,
-    PROPOSE_SETTLEMENT,
-    RECONNAISSANCE,
-    INSPECTION,
 )
-from brinksmanship.models.matrices import MatrixType
-from brinksmanship.models.state import GameState, PlayerState
 from brinksmanship.storage import ScenarioRepository
-
 
 # =============================================================================
 # Mock Scenario Repository
@@ -57,19 +47,16 @@ from brinksmanship.storage import ScenarioRepository
 class MockScenarioRepository(ScenarioRepository):
     """Mock repository for testing."""
 
-    def __init__(self, scenarios: Optional[dict] = None):
+    def __init__(self, scenarios: dict | None = None):
         self._scenarios = scenarios or {}
 
     def list_scenarios(self) -> list[dict]:
-        return [
-            {"id": sid, "name": s.get("name", sid)}
-            for sid, s in self._scenarios.items()
-        ]
+        return [{"id": sid, "name": s.get("name", sid)} for sid, s in self._scenarios.items()]
 
-    def get_scenario(self, scenario_id: str) -> Optional[dict]:
+    def get_scenario(self, scenario_id: str) -> dict | None:
         return self._scenarios.get(scenario_id)
 
-    def get_scenario_by_name(self, name: str) -> Optional[dict]:
+    def get_scenario_by_name(self, name: str) -> dict | None:
         for scenario in self._scenarios.values():
             if scenario.get("name", "").lower() == name.lower():
                 return scenario
@@ -355,8 +342,7 @@ class TestActionValidation:
         # Low risk (0-3) - more cooperative options
         actions = engine.get_available_actions("A")
         cooperative_count = sum(
-            1 for a in actions
-            if a.action_type == ActionType.COOPERATIVE and a.category == ActionCategory.STANDARD
+            1 for a in actions if a.action_type == ActionType.COOPERATIVE and a.category == ActionCategory.STANDARD
         )
         # Low risk tier has 4 cooperative actions
         assert cooperative_count >= 3

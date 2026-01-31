@@ -1,6 +1,5 @@
 """Tests for authentication routes."""
 
-from brinksmanship.webapp.extensions import db
 from brinksmanship.webapp.models import User
 
 

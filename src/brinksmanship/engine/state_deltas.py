@@ -58,9 +58,7 @@ class OutcomeBounds:
 
     def __post_init__(self) -> None:
         if self.min_val > self.max_val:
-            raise ValueError(
-                f"min_val ({self.min_val}) cannot exceed max_val ({self.max_val})"
-            )
+            raise ValueError(f"min_val ({self.min_val}) cannot exceed max_val ({self.max_val})")
 
     def midpoint(self) -> float:
         """Return the midpoint of the bounds range."""
@@ -202,18 +200,10 @@ PD_DELTA_TEMPLATE = StateDeltaTemplate(
 # STRICTLY ZERO-SUM: Risk differentiates outcomes
 DEADLOCK_DELTA_TEMPLATE = StateDeltaTemplate(
     matrix_type=MatrixType.DEADLOCK,
-    cc=_outcome_bounds(
-        pos_a=(0.0, 0.0), pos_b=(0.0, 0.0), risk=(0.2, 0.5)
-    ),  # Neither wants this - risk increases
-    cd=_outcome_bounds(
-        pos_a=(-0.8, -0.6), pos_b=(0.6, 0.8), risk=(0.3, 0.7)
-    ),  # ZERO-SUM: A=-0.7, B=+0.7
-    dc=_outcome_bounds(
-        pos_a=(0.6, 0.8), pos_b=(-0.8, -0.6), risk=(0.3, 0.7)
-    ),  # ZERO-SUM: A=+0.7, B=-0.7
-    dd=_outcome_bounds(
-        pos_a=(0.0, 0.0), pos_b=(0.0, 0.0), risk=(-0.5, -0.2)
-    ),  # Preferred by both - risk decreases
+    cc=_outcome_bounds(pos_a=(0.0, 0.0), pos_b=(0.0, 0.0), risk=(0.2, 0.5)),  # Neither wants this - risk increases
+    cd=_outcome_bounds(pos_a=(-0.8, -0.6), pos_b=(0.6, 0.8), risk=(0.3, 0.7)),  # ZERO-SUM: A=-0.7, B=+0.7
+    dc=_outcome_bounds(pos_a=(0.6, 0.8), pos_b=(-0.8, -0.6), risk=(0.3, 0.7)),  # ZERO-SUM: A=+0.7, B=-0.7
+    dd=_outcome_bounds(pos_a=(0.0, 0.0), pos_b=(0.0, 0.0), risk=(-0.5, -0.2)),  # Preferred by both - risk decreases
 )
 
 # Harmony (R > T > S > P)
@@ -222,18 +212,10 @@ DEADLOCK_DELTA_TEMPLATE = StateDeltaTemplate(
 # For row player A: R=CC > T=DC > S=CD > P=DD
 HARMONY_DELTA_TEMPLATE = StateDeltaTemplate(
     matrix_type=MatrixType.HARMONY,
-    cc=_outcome_bounds(
-        pos_a=(0.0, 0.0), pos_b=(0.0, 0.0), risk=(-0.8, -0.5)
-    ),  # R: Best outcome - big risk decrease
-    cd=_outcome_bounds(
-        pos_a=(-0.4, -0.2), pos_b=(0.2, 0.4), risk=(-0.2, 0.2)
-    ),  # S: ZERO-SUM A=-0.3, B=+0.3
-    dc=_outcome_bounds(
-        pos_a=(0.2, 0.4), pos_b=(-0.4, -0.2), risk=(-0.2, 0.2)
-    ),  # T: ZERO-SUM A=+0.3, B=-0.3
-    dd=_outcome_bounds(
-        pos_a=(0.0, 0.0), pos_b=(0.0, 0.0), risk=(0.8, 1.2)
-    ),  # P: Worst - big risk increase
+    cc=_outcome_bounds(pos_a=(0.0, 0.0), pos_b=(0.0, 0.0), risk=(-0.8, -0.5)),  # R: Best outcome - big risk decrease
+    cd=_outcome_bounds(pos_a=(-0.4, -0.2), pos_b=(0.2, 0.4), risk=(-0.2, 0.2)),  # S: ZERO-SUM A=-0.3, B=+0.3
+    dc=_outcome_bounds(pos_a=(0.2, 0.4), pos_b=(-0.4, -0.2), risk=(-0.2, 0.2)),  # T: ZERO-SUM A=+0.3, B=-0.3
+    dd=_outcome_bounds(pos_a=(0.0, 0.0), pos_b=(0.0, 0.0), risk=(0.8, 1.2)),  # P: Worst - big risk increase
 )
 
 # Chicken (T > R > S > P)
@@ -251,12 +233,8 @@ CHICKEN_DELTA_TEMPLATE = StateDeltaTemplate(
     cc=_outcome_bounds(
         pos_a=(0.0, 0.0), pos_b=(0.0, 0.0), risk=(-0.8, -0.3)
     ),  # Both swerve: No position change, risk decreases
-    cd=_outcome_bounds(
-        pos_a=(-0.6, -0.4), pos_b=(0.4, 0.6), risk=(0.3, 0.8)
-    ),  # Row swerves: ZERO-SUM A=-0.5, B=+0.5
-    dc=_outcome_bounds(
-        pos_a=(0.4, 0.6), pos_b=(-0.6, -0.4), risk=(0.3, 0.8)
-    ),  # Col swerves: ZERO-SUM A=+0.5, B=-0.5
+    cd=_outcome_bounds(pos_a=(-0.6, -0.4), pos_b=(0.4, 0.6), risk=(0.3, 0.8)),  # Row swerves: ZERO-SUM A=-0.5, B=+0.5
+    dc=_outcome_bounds(pos_a=(0.4, 0.6), pos_b=(-0.6, -0.4), risk=(0.3, 0.8)),  # Col swerves: ZERO-SUM A=+0.5, B=-0.5
     dd=_outcome_bounds(
         pos_a=(0.0, 0.0),
         pos_b=(0.0, 0.0),
@@ -269,9 +247,7 @@ CHICKEN_DELTA_TEMPLATE = StateDeltaTemplate(
 # STRICTLY ZERO-SUM: Free-rider gains what volunteer loses
 VOLUNTEERS_DILEMMA_DELTA_TEMPLATE = StateDeltaTemplate(
     matrix_type=MatrixType.VOLUNTEERS_DILEMMA,
-    cc=_outcome_bounds(
-        pos_a=(0.0, 0.0), pos_b=(0.0, 0.0), risk=(-0.5, -0.2)
-    ),  # Both volunteer - wasteful but safe
+    cc=_outcome_bounds(pos_a=(0.0, 0.0), pos_b=(0.0, 0.0), risk=(-0.5, -0.2)),  # Both volunteer - wasteful but safe
     cd=_outcome_bounds(
         pos_a=(-0.5, -0.3), pos_b=(0.3, 0.5), risk=(-0.4, -0.1)
     ),  # ZERO-SUM: A volunteers (-0.4), B free-rides (+0.4)
@@ -288,9 +264,7 @@ VOLUNTEERS_DILEMMA_DELTA_TEMPLATE = StateDeltaTemplate(
 # STRICTLY ZERO-SUM: Winner gains what loser loses
 WAR_OF_ATTRITION_DELTA_TEMPLATE = StateDeltaTemplate(
     matrix_type=MatrixType.WAR_OF_ATTRITION,
-    cc=_outcome_bounds(
-        pos_a=(0.0, 0.0), pos_b=(0.0, 0.0), risk=(0.8, 1.2)
-    ),  # Both continue - costly, risk increases
+    cc=_outcome_bounds(pos_a=(0.0, 0.0), pos_b=(0.0, 0.0), risk=(0.8, 1.2)),  # Both continue - costly, risk increases
     cd=_outcome_bounds(
         pos_a=(0.6, 0.8), pos_b=(-0.8, -0.6), risk=(-0.3, 0.0)
     ),  # ZERO-SUM: A wins (+0.7), B loses (-0.7)
@@ -307,18 +281,10 @@ WAR_OF_ATTRITION_DELTA_TEMPLATE = StateDeltaTemplate(
 # STRICTLY ZERO-SUM: No position changes - only risk matters
 PURE_COORDINATION_DELTA_TEMPLATE = StateDeltaTemplate(
     matrix_type=MatrixType.PURE_COORDINATION,
-    cc=_outcome_bounds(
-        pos_a=(0.0, 0.0), pos_b=(0.0, 0.0), risk=(-0.5, -0.2)
-    ),  # Match on A - risk decreases
-    cd=_outcome_bounds(
-        pos_a=(0.0, 0.0), pos_b=(0.0, 0.0), risk=(0.3, 0.6)
-    ),  # Mismatch - risk increases
-    dc=_outcome_bounds(
-        pos_a=(0.0, 0.0), pos_b=(0.0, 0.0), risk=(0.3, 0.6)
-    ),  # Mismatch - risk increases
-    dd=_outcome_bounds(
-        pos_a=(0.0, 0.0), pos_b=(0.0, 0.0), risk=(-0.5, -0.2)
-    ),  # Match on B - risk decreases
+    cc=_outcome_bounds(pos_a=(0.0, 0.0), pos_b=(0.0, 0.0), risk=(-0.5, -0.2)),  # Match on A - risk decreases
+    cd=_outcome_bounds(pos_a=(0.0, 0.0), pos_b=(0.0, 0.0), risk=(0.3, 0.6)),  # Mismatch - risk increases
+    dc=_outcome_bounds(pos_a=(0.0, 0.0), pos_b=(0.0, 0.0), risk=(0.3, 0.6)),  # Mismatch - risk increases
+    dd=_outcome_bounds(pos_a=(0.0, 0.0), pos_b=(0.0, 0.0), risk=(-0.5, -0.2)),  # Match on B - risk decreases
 )
 
 # Stag Hunt (R > T > P > S)
@@ -328,9 +294,7 @@ PURE_COORDINATION_DELTA_TEMPLATE = StateDeltaTemplate(
 # STRICTLY ZERO-SUM: Opportunist gains at failed cooperator's expense
 STAG_HUNT_DELTA_TEMPLATE = StateDeltaTemplate(
     matrix_type=MatrixType.STAG_HUNT,
-    cc=_outcome_bounds(
-        pos_a=(0.0, 0.0), pos_b=(0.0, 0.0), risk=(-0.8, -0.5)
-    ),  # Stag-Stag: best - big risk decrease
+    cc=_outcome_bounds(pos_a=(0.0, 0.0), pos_b=(0.0, 0.0), risk=(-0.8, -0.5)),  # Stag-Stag: best - big risk decrease
     cd=_outcome_bounds(
         pos_a=(-0.6, -0.4), pos_b=(0.4, 0.6), risk=(0.2, 0.5)
     ),  # ZERO-SUM: A fails (-0.5), B opportunist (+0.5)
@@ -365,36 +329,24 @@ BATTLE_OF_SEXES_DELTA_TEMPLATE = StateDeltaTemplate(
 # STRICTLY ZERO-SUM: Leader gains slight advantage over follower
 LEADER_DELTA_TEMPLATE = StateDeltaTemplate(
     matrix_type=MatrixType.LEADER,
-    cc=_outcome_bounds(
-        pos_a=(0.0, 0.0), pos_b=(0.0, 0.0), risk=(0.3, 0.6)
-    ),  # Both follow (stuck) - risk increases
+    cc=_outcome_bounds(pos_a=(0.0, 0.0), pos_b=(0.0, 0.0), risk=(0.3, 0.6)),  # Both follow (stuck) - risk increases
     cd=_outcome_bounds(
         pos_a=(-0.2, 0.0), pos_b=(0.0, 0.2), risk=(-0.4, -0.1)
     ),  # ZERO-SUM: Col leads (+0.1), A follows (-0.1)
     dc=_outcome_bounds(
         pos_a=(0.0, 0.2), pos_b=(-0.2, 0.0), risk=(-0.4, -0.1)
     ),  # ZERO-SUM: Row leads (+0.1), B follows (-0.1)
-    dd=_outcome_bounds(
-        pos_a=(0.0, 0.0), pos_b=(0.0, 0.0), risk=(0.8, 1.2)
-    ),  # Both lead (clash) - big risk spike
+    dd=_outcome_bounds(pos_a=(0.0, 0.0), pos_b=(0.0, 0.0), risk=(0.8, 1.2)),  # Both lead (clash) - big risk spike
 )
 
 # Matching Pennies (Zero-sum)
 # One player's gain is exactly the other's loss
 MATCHING_PENNIES_DELTA_TEMPLATE = StateDeltaTemplate(
     matrix_type=MatrixType.MATCHING_PENNIES,
-    cc=_outcome_bounds(
-        pos_a=(0.3, 0.7), pos_b=(-0.7, -0.3), risk=(-0.2, 0.2)
-    ),  # Row wins
-    cd=_outcome_bounds(
-        pos_a=(-0.7, -0.3), pos_b=(0.3, 0.7), risk=(-0.2, 0.2)
-    ),  # Col wins
-    dc=_outcome_bounds(
-        pos_a=(-0.7, -0.3), pos_b=(0.3, 0.7), risk=(-0.2, 0.2)
-    ),  # Col wins
-    dd=_outcome_bounds(
-        pos_a=(0.3, 0.7), pos_b=(-0.7, -0.3), risk=(-0.2, 0.2)
-    ),  # Row wins
+    cc=_outcome_bounds(pos_a=(0.3, 0.7), pos_b=(-0.7, -0.3), risk=(-0.2, 0.2)),  # Row wins
+    cd=_outcome_bounds(pos_a=(-0.7, -0.3), pos_b=(0.3, 0.7), risk=(-0.2, 0.2)),  # Col wins
+    dc=_outcome_bounds(pos_a=(-0.7, -0.3), pos_b=(0.3, 0.7), risk=(-0.2, 0.2)),  # Col wins
+    dd=_outcome_bounds(pos_a=(0.3, 0.7), pos_b=(-0.7, -0.3), risk=(-0.2, 0.2)),  # Row wins
 )
 
 # Inspection Game (Inspector vs potential cheater)
@@ -419,18 +371,10 @@ INSPECTION_GAME_DELTA_TEMPLATE = StateDeltaTemplate(
 # Special handling per GAME_MANUAL.md Section 3.6.1
 RECONNAISSANCE_DELTA_TEMPLATE = StateDeltaTemplate(
     matrix_type=MatrixType.RECONNAISSANCE,
-    cc=_outcome_bounds(
-        pos_a=(-0.2, 0.0), pos_b=(0.0, 0.2), risk=(0.3, 0.7)
-    ),  # Detected
-    cd=_outcome_bounds(
-        pos_a=(0.0, 0.2), pos_b=(-0.2, 0.0), risk=(-0.1, 0.1)
-    ),  # Success
-    dc=_outcome_bounds(
-        pos_a=(0.0, 0.0), pos_b=(0.0, 0.0), risk=(-0.1, 0.1)
-    ),  # Stalemate
-    dd=_outcome_bounds(
-        pos_a=(-0.2, 0.0), pos_b=(0.0, 0.2), risk=(-0.1, 0.1)
-    ),  # Exposed
+    cc=_outcome_bounds(pos_a=(-0.2, 0.0), pos_b=(0.0, 0.2), risk=(0.3, 0.7)),  # Detected
+    cd=_outcome_bounds(pos_a=(0.0, 0.2), pos_b=(-0.2, 0.0), risk=(-0.1, 0.1)),  # Success
+    dc=_outcome_bounds(pos_a=(0.0, 0.0), pos_b=(0.0, 0.0), risk=(-0.1, 0.1)),  # Stalemate
+    dd=_outcome_bounds(pos_a=(-0.2, 0.0), pos_b=(0.0, 0.2), risk=(-0.1, 0.1)),  # Exposed
 )
 
 # Security Dilemma (Same structure as PD with defensive interpretation)
@@ -443,12 +387,8 @@ SECURITY_DILEMMA_DELTA_TEMPLATE = StateDeltaTemplate(
     cc=_outcome_bounds(
         pos_a=(0.0, 0.0), pos_b=(0.0, 0.0), risk=(-0.6, -0.4)
     ),  # R: Mutual disarm, no position change, risk -0.5
-    cd=_outcome_bounds(
-        pos_a=(-0.8, -0.6), pos_b=(0.6, 0.8), risk=(0.6, 1.0)
-    ),  # ZERO-SUM: A=-0.7, B=+0.7, risk +0.8
-    dc=_outcome_bounds(
-        pos_a=(0.6, 0.8), pos_b=(-0.8, -0.6), risk=(0.6, 1.0)
-    ),  # ZERO-SUM: A=+0.7, B=-0.7, risk +0.8
+    cd=_outcome_bounds(pos_a=(-0.8, -0.6), pos_b=(0.6, 0.8), risk=(0.6, 1.0)),  # ZERO-SUM: A=-0.7, B=+0.7, risk +0.8
+    dc=_outcome_bounds(pos_a=(0.6, 0.8), pos_b=(-0.8, -0.6), risk=(0.6, 1.0)),  # ZERO-SUM: A=+0.7, B=-0.7, risk +0.8
     dd=_outcome_bounds(
         pos_a=(0.0, 0.0),
         pos_b=(0.0, 0.0),
@@ -536,19 +476,13 @@ def validate_delta_full(delta: StateDeltaOutcome) -> tuple[bool, list[str]]:
 
     # Check resource cost bounds
     if not (res_min <= delta.res_cost_a <= res_max):
-        errors.append(
-            f"res_cost_a={delta.res_cost_a} outside bounds [{res_min}, {res_max}]"
-        )
+        errors.append(f"res_cost_a={delta.res_cost_a} outside bounds [{res_min}, {res_max}]")
     if not (res_min <= delta.res_cost_b <= res_max):
-        errors.append(
-            f"res_cost_b={delta.res_cost_b} outside bounds [{res_min}, {res_max}]"
-        )
+        errors.append(f"res_cost_b={delta.res_cost_b} outside bounds [{res_min}, {res_max}]")
 
     # Check risk bounds
     if not (risk_min <= delta.risk_delta <= risk_max):
-        errors.append(
-            f"risk_delta={delta.risk_delta} outside bounds [{risk_min}, {risk_max}]"
-        )
+        errors.append(f"risk_delta={delta.risk_delta} outside bounds [{risk_min}, {risk_max}]")
 
     # Check near-zero-sum
     position_sum = abs(delta.pos_a + delta.pos_b)
@@ -595,9 +529,7 @@ def get_act_multiplier(turn: int) -> float:
     return ACT_MULTIPLIERS[act]
 
 
-def apply_act_scaling(
-    delta: StateDeltaOutcome, act_multiplier: float
-) -> StateDeltaOutcome:
+def apply_act_scaling(delta: StateDeltaOutcome, act_multiplier: float) -> StateDeltaOutcome:
     """Apply act scaling to a delta outcome.
 
     Scales position, resource cost, and risk changes by the act multiplier.
@@ -705,9 +637,7 @@ def get_scaled_delta_for_outcome(
 # be better than mutual cooperation (R), etc.
 
 
-def _get_player_delta_value(
-    delta: StateDeltaOutcome, player: str, metric: str = "position"
-) -> float:
+def _get_player_delta_value(delta: StateDeltaOutcome, player: str, metric: str = "position") -> float:
     """Get the relevant delta value for a player.
 
     For ordinal comparison, we typically use position change as the

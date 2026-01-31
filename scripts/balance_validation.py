@@ -26,16 +26,12 @@ import json
 import sys
 import time
 from dataclasses import dataclass, field
-from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 from brinksmanship.storage import get_scenario_repository
 from brinksmanship.testing.batch_runner import (
-    BatchRunner,
     BatchResults,
-    DETERMINISTIC_OPPONENTS,
-    print_results_summary,
+    BatchRunner,
 )
 
 
@@ -65,56 +61,34 @@ class ValidationResult:
                 max_winrate_pairing = f"{pairing_key} (B)"
 
         win_rate_pass = max_winrate <= 0.60
-        self.checks.append((
-            "No strategy >60% win rate",
-            win_rate_pass,
-            f"Max: {max_winrate*100:.1f}% ({max_winrate_pairing})"
-        ))
+        self.checks.append(
+            ("No strategy >60% win rate", win_rate_pass, f"Max: {max_winrate * 100:.1f}% ({max_winrate_pairing})")
+        )
 
         # Check 2: Mutual destruction rate in acceptable range (target: 10-20%, must be <25%)
         md_rate = agg.get("mutual_destruction_rate", 0)
         md_pass = md_rate < 0.25
-        self.checks.append((
-            "Mutual destruction <25%",
-            md_pass,
-            f"{md_rate*100:.1f}%"
-        ))
+        self.checks.append(("Mutual destruction <25%", md_pass, f"{md_rate * 100:.1f}%"))
 
         # Check 3: Settlement rate in acceptable range (30-70%)
         settle_rate = agg.get("settlement_rate", 0)
         settle_pass = 0.30 <= settle_rate <= 0.70
-        self.checks.append((
-            "Settlement rate 30-70%",
-            settle_pass,
-            f"{settle_rate*100:.1f}%"
-        ))
+        self.checks.append(("Settlement rate 30-70%", settle_pass, f"{settle_rate * 100:.1f}%"))
 
         # Check 4: Positive-sum outcomes (total VP > 100 in cooperative games)
         avg_total = agg.get("avg_total_value", 0)
         total_pass = avg_total >= 80  # Allow some destruction loss
-        self.checks.append((
-            "Positive-sum outcomes (>80 avg)",
-            total_pass,
-            f"{avg_total:.1f}"
-        ))
+        self.checks.append(("Positive-sum outcomes (>80 avg)", total_pass, f"{avg_total:.1f}"))
 
         # Check 5: Game length reasonable (8-16 turns)
         avg_turns = agg.get("avg_turns", 0)
         turns_pass = 8 <= avg_turns <= 16
-        self.checks.append((
-            "Game length 8-16 turns",
-            turns_pass,
-            f"{avg_turns:.1f}"
-        ))
+        self.checks.append(("Game length 8-16 turns", turns_pass, f"{avg_turns:.1f}"))
 
         # Check 6: VP variance in range (10-40)
         vp_std = agg.get("vp_std_dev", 0)
         var_pass = 10 <= vp_std <= 40
-        self.checks.append((
-            "VP variance 10-40",
-            var_pass,
-            f"{vp_std:.1f}"
-        ))
+        self.checks.append(("VP variance 10-40", var_pass, f"{vp_std:.1f}"))
 
         # Overall pass
         self.passed = all(c[1] for c in self.checks)
@@ -128,11 +102,11 @@ def get_all_scenarios() -> list[str]:
 
 
 def run_balance_validation(
-    scenario_ids: Optional[list[str]] = None,
+    scenario_ids: list[str] | None = None,
     num_games: int = 100,
-    seed: Optional[int] = None,
+    seed: int | None = None,
     max_workers: int = 4,
-    output_dir: Optional[str] = None,
+    output_dir: str | None = None,
     quiet: bool = False,
 ) -> list[ValidationResult]:
     """Run balance validation on specified scenarios.
@@ -155,7 +129,7 @@ def run_balance_validation(
 
     for idx, scenario_id in enumerate(scenario_ids):
         if not quiet:
-            print(f"\n[{idx+1}/{len(scenario_ids)}] Validating: {scenario_id}")
+            print(f"\n[{idx + 1}/{len(scenario_ids)}] Validating: {scenario_id}")
             print("-" * 60)
 
         # Run batch simulation for this scenario
@@ -193,15 +167,16 @@ def run_balance_validation(
         for validation in validation_results:
             results_file = output_path / f"{validation.scenario_id}_validation.json"
             with open(results_file, "w") as f:
-                json.dump({
-                    "scenario_id": validation.scenario_id,
-                    "passed": validation.passed,
-                    "checks": [
-                        {"name": c[0], "passed": c[1], "detail": c[2]}
-                        for c in validation.checks
-                    ],
-                    "aggregate": validation.results.aggregate,
-                }, f, indent=2)
+                json.dump(
+                    {
+                        "scenario_id": validation.scenario_id,
+                        "passed": validation.passed,
+                        "checks": [{"name": c[0], "passed": c[1], "detail": c[2]} for c in validation.checks],
+                        "aggregate": validation.results.aggregate,
+                    },
+                    f,
+                    indent=2,
+                )
 
         if not quiet:
             print(f"\nDetailed results saved to: {output_dir}")
@@ -232,8 +207,8 @@ def print_validation_summary(results: list[ValidationResult]) -> None:
         status = "PASS" if result.passed else "FAIL"
         print(
             f"{result.scenario_id:<30} | "
-            f"{agg.get('mutual_destruction_rate', 0)*100:>5.1f}% | "
-            f"{agg.get('settlement_rate', 0)*100:>7.1f}% | "
+            f"{agg.get('mutual_destruction_rate', 0) * 100:>5.1f}% | "
+            f"{agg.get('settlement_rate', 0) * 100:>7.1f}% | "
             f"{agg.get('avg_total_value', 0):>6.1f} | "
             f"{agg.get('avg_turns', 0):>6.1f} | "
             f"{status:>6}"

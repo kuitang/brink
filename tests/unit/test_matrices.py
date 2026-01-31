@@ -21,7 +21,6 @@ REMOVED TESTS (see test_removal_log.md for rationale):
 """
 
 import random
-from typing import Any
 
 import pytest
 from pydantic import ValidationError
@@ -50,7 +49,6 @@ from brinksmanship.models.matrices import (
     build_matrix,
     get_default_params_for_type,
 )
-
 
 # =============================================================================
 # MatrixType Enum Tests
@@ -130,47 +128,35 @@ class TestStateDeltas:
 
     def test_zero_sum_position_changes(self) -> None:
         """Test that perfectly zero-sum position changes are valid."""
-        deltas = StateDeltas(
-            pos_a=1.0, pos_b=-1.0, res_cost_a=0.0, res_cost_b=0.0, risk_delta=0.0
-        )
+        deltas = StateDeltas(pos_a=1.0, pos_b=-1.0, res_cost_a=0.0, res_cost_b=0.0, risk_delta=0.0)
         assert deltas.pos_a + deltas.pos_b == pytest.approx(0.0)
 
     def test_near_zero_sum_constraint(self) -> None:
         """Test that position changes must be near-zero-sum (|pos_a + pos_b| <= 0.5)."""
         # Valid: within tolerance
-        deltas = StateDeltas(
-            pos_a=0.3, pos_b=0.2, res_cost_a=0.0, res_cost_b=0.0, risk_delta=0.0
-        )
+        deltas = StateDeltas(pos_a=0.3, pos_b=0.2, res_cost_a=0.0, res_cost_b=0.0, risk_delta=0.0)
         assert abs(deltas.pos_a + deltas.pos_b) <= 0.5
 
         # Invalid: exceeds tolerance
         with pytest.raises(ValueError) as exc_info:
-            StateDeltas(
-                pos_a=1.0, pos_b=1.0, res_cost_a=0.0, res_cost_b=0.0, risk_delta=0.0
-            )
+            StateDeltas(pos_a=1.0, pos_b=1.0, res_cost_a=0.0, res_cost_b=0.0, risk_delta=0.0)
         assert "near-zero-sum" in str(exc_info.value)
 
     def test_bounds_validation(self) -> None:
         """Test all bounds are validated correctly."""
         # Position out of bounds
         with pytest.raises(ValueError) as exc_info:
-            StateDeltas(
-                pos_a=2.0, pos_b=-2.0, res_cost_a=0.0, res_cost_b=0.0, risk_delta=0.0
-            )
+            StateDeltas(pos_a=2.0, pos_b=-2.0, res_cost_a=0.0, res_cost_b=0.0, risk_delta=0.0)
         assert "pos_a must be in [-1.5, 1.5]" in str(exc_info.value)
 
         # Resource cost out of bounds
         with pytest.raises(ValueError) as exc_info:
-            StateDeltas(
-                pos_a=0.0, pos_b=0.0, res_cost_a=-0.1, res_cost_b=0.0, risk_delta=0.0
-            )
+            StateDeltas(pos_a=0.0, pos_b=0.0, res_cost_a=-0.1, res_cost_b=0.0, risk_delta=0.0)
         assert "res_cost_a must be in [0, 1.0]" in str(exc_info.value)
 
         # Risk delta out of bounds
         with pytest.raises(ValueError) as exc_info:
-            StateDeltas(
-                pos_a=0.0, pos_b=0.0, res_cost_a=0.0, res_cost_b=0.0, risk_delta=2.5
-            )
+            StateDeltas(pos_a=0.0, pos_b=0.0, res_cost_a=0.0, res_cost_b=0.0, risk_delta=2.5)
         assert "risk_delta must be in [-1.0, 2.0]" in str(exc_info.value)
 
 
@@ -184,9 +170,7 @@ class TestPayoffMatrix:
 
     def _make_deltas(self) -> StateDeltas:
         """Helper to create valid StateDeltas."""
-        return StateDeltas(
-            pos_a=0.0, pos_b=0.0, res_cost_a=0.0, res_cost_b=0.0, risk_delta=0.0
-        )
+        return StateDeltas(pos_a=0.0, pos_b=0.0, res_cost_a=0.0, res_cost_b=0.0, risk_delta=0.0)
 
     def test_get_outcome(self) -> None:
         """Test get_outcome method."""
@@ -281,9 +265,7 @@ def generate_random_stag_hunt_params() -> MatrixParameters:
     t = random.uniform(p + 0.1, p + 1.0)  # hare_temptation
     r = random.uniform(t + 0.1, t + 1.0)  # stag_payoff
 
-    return MatrixParameters(
-        stag_payoff=r, hare_temptation=t, hare_safe=p, stag_fail=s
-    )
+    return MatrixParameters(stag_payoff=r, hare_temptation=t, hare_safe=p, stag_fail=s)
 
 
 def generate_random_volunteers_params() -> MatrixParameters:
@@ -383,16 +365,12 @@ class TestPrisonersDilemmaConstructor:
     ) -> None:
         """Test that T > R > P > S constraint is enforced."""
         # Valid params
-        valid_params = MatrixParameters(
-            temptation=5.0, reward=3.0, punishment=1.0, sucker=0.0
-        )
+        valid_params = MatrixParameters(temptation=5.0, reward=3.0, punishment=1.0, sucker=0.0)
         PrisonersDilemmaConstructor.validate_params(valid_params)  # Should not raise
 
         # Invalid: T not > R
         with pytest.raises(ValueError) as exc_info:
-            invalid_params = MatrixParameters(
-                temptation=3.0, reward=3.0, punishment=1.0, sucker=0.0
-            )
+            invalid_params = MatrixParameters(temptation=3.0, reward=3.0, punishment=1.0, sucker=0.0)
             PrisonersDilemmaConstructor.validate_params(invalid_params)
         assert "T > R > P > S" in str(exc_info.value)
 
@@ -419,15 +397,11 @@ class TestDeadlockConstructor:
         self,
     ) -> None:
         """Test that T > P > R > S constraint is enforced."""
-        valid_params = MatrixParameters(
-            temptation=4.0, punishment=3.0, reward=2.0, sucker=1.0
-        )
+        valid_params = MatrixParameters(temptation=4.0, punishment=3.0, reward=2.0, sucker=1.0)
         DeadlockConstructor.validate_params(valid_params)
 
         with pytest.raises(ValueError) as exc_info:
-            invalid_params = MatrixParameters(
-                temptation=4.0, punishment=2.0, reward=3.0, sucker=1.0
-            )
+            invalid_params = MatrixParameters(temptation=4.0, punishment=2.0, reward=3.0, sucker=1.0)
             DeadlockConstructor.validate_params(invalid_params)
         assert "T > P > R > S" in str(exc_info.value)
 
@@ -452,15 +426,11 @@ class TestHarmonyConstructor:
         self,
     ) -> None:
         """Test that R > T > S > P constraint is enforced."""
-        valid_params = MatrixParameters(
-            reward=4.0, temptation=3.0, sucker=2.0, punishment=1.0
-        )
+        valid_params = MatrixParameters(reward=4.0, temptation=3.0, sucker=2.0, punishment=1.0)
         HarmonyConstructor.validate_params(valid_params)
 
         with pytest.raises(ValueError) as exc_info:
-            invalid_params = MatrixParameters(
-                reward=3.0, temptation=4.0, sucker=2.0, punishment=1.0
-            )
+            invalid_params = MatrixParameters(reward=3.0, temptation=4.0, sucker=2.0, punishment=1.0)
             HarmonyConstructor.validate_params(invalid_params)
         assert "R > T > S > P" in str(exc_info.value)
 
@@ -485,15 +455,11 @@ class TestChickenConstructor:
         self,
     ) -> None:
         """Test that T > R > S > P constraint is enforced."""
-        valid_params = MatrixParameters(
-            temptation=4.0, reward=3.0, swerve_payoff=2.0, crash_payoff=1.0
-        )
+        valid_params = MatrixParameters(temptation=4.0, reward=3.0, swerve_payoff=2.0, crash_payoff=1.0)
         ChickenConstructor.validate_params(valid_params)
 
         with pytest.raises(ValueError) as exc_info:
-            invalid_params = MatrixParameters(
-                temptation=4.0, reward=3.0, swerve_payoff=0.5, crash_payoff=1.0
-            )
+            invalid_params = MatrixParameters(temptation=4.0, reward=3.0, swerve_payoff=0.5, crash_payoff=1.0)
             ChickenConstructor.validate_params(invalid_params)
         assert "T > R > S > P" in str(exc_info.value)
 
@@ -518,15 +484,11 @@ class TestStagHuntConstructor:
         self,
     ) -> None:
         """Test that R > T > P > S constraint is enforced."""
-        valid_params = MatrixParameters(
-            stag_payoff=4.0, hare_temptation=3.0, hare_safe=2.0, stag_fail=1.0
-        )
+        valid_params = MatrixParameters(stag_payoff=4.0, hare_temptation=3.0, hare_safe=2.0, stag_fail=1.0)
         StagHuntConstructor.validate_params(valid_params)
 
         with pytest.raises(ValueError) as exc_info:
-            invalid_params = MatrixParameters(
-                stag_payoff=3.0, hare_temptation=4.0, hare_safe=2.0, stag_fail=1.0
-            )
+            invalid_params = MatrixParameters(stag_payoff=3.0, hare_temptation=4.0, hare_safe=2.0, stag_fail=1.0)
             StagHuntConstructor.validate_params(invalid_params)
         assert "R > T > P > S" in str(exc_info.value)
 
@@ -550,17 +512,13 @@ class TestVolunteersDilemmaConstructor:
     def test_ordinal_constraint_f_greater_than_w_greater_than_d(self) -> None:
         """Test that F > W > D constraint is enforced."""
         # F = reward + free_ride_bonus, W = reward - volunteer_cost, D = -disaster_penalty
-        valid_params = MatrixParameters(
-            reward=2.0, volunteer_cost=0.3, free_ride_bonus=0.5, disaster_penalty=1.0
-        )
+        valid_params = MatrixParameters(reward=2.0, volunteer_cost=0.3, free_ride_bonus=0.5, disaster_penalty=1.0)
         # F = 2.5, W = 1.7, D = -1.0 => F > W > D
         VolunteersDilemmaConstructor.validate_params(valid_params)
 
         with pytest.raises(ValueError) as exc_info:
             # Make W < D by having high cost
-            invalid_params = MatrixParameters(
-                reward=0.5, volunteer_cost=2.0, free_ride_bonus=0.5, disaster_penalty=0.1
-            )
+            invalid_params = MatrixParameters(reward=0.5, volunteer_cost=2.0, free_ride_bonus=0.5, disaster_penalty=0.1)
             # F = 1.0, W = -1.5, D = -0.1 => W < D
             VolunteersDilemmaConstructor.validate_params(invalid_params)
         assert "F > W > D" in str(exc_info.value)
@@ -584,15 +542,11 @@ class TestWarOfAttritionConstructor:
 
     def test_ordinal_constraint(self) -> None:
         """Test that T > R > P and T > S constraint is enforced."""
-        valid_params = MatrixParameters(
-            temptation=4.0, reward=3.0, punishment=2.0, sucker=1.0
-        )
+        valid_params = MatrixParameters(temptation=4.0, reward=3.0, punishment=2.0, sucker=1.0)
         WarOfAttritionConstructor.validate_params(valid_params)
 
         with pytest.raises(ValueError) as exc_info:
-            invalid_params = MatrixParameters(
-                temptation=2.0, reward=3.0, punishment=1.0, sucker=0.0
-            )
+            invalid_params = MatrixParameters(temptation=2.0, reward=3.0, punishment=1.0, sucker=0.0)
             WarOfAttritionConstructor.validate_params(invalid_params)
         assert "T > R > P and T > S" in str(exc_info.value)
 
@@ -615,15 +569,11 @@ class TestPureCoordinationConstructor:
 
     def test_ordinal_constraint_match_greater_than_mismatch(self) -> None:
         """Test that Match > Mismatch constraint is enforced."""
-        valid_params = MatrixParameters(
-            coordination_bonus=2.0, miscoordination_penalty=0.0
-        )
+        valid_params = MatrixParameters(coordination_bonus=2.0, miscoordination_penalty=0.0)
         PureCoordinationConstructor.validate_params(valid_params)
 
         with pytest.raises(ValueError) as exc_info:
-            invalid_params = MatrixParameters(
-                coordination_bonus=1.0, miscoordination_penalty=2.0
-            )
+            invalid_params = MatrixParameters(coordination_bonus=1.0, miscoordination_penalty=2.0)
             PureCoordinationConstructor.validate_params(invalid_params)
         assert "Match > Mismatch" in str(exc_info.value)
 
@@ -689,15 +639,11 @@ class TestLeaderConstructor:
     ) -> None:
         """Test that G > H > B > C constraint is enforced."""
         # G=temptation, H=reward, B=sucker, C=punishment
-        valid_params = MatrixParameters(
-            temptation=4.0, reward=3.0, sucker=2.0, punishment=1.0
-        )
+        valid_params = MatrixParameters(temptation=4.0, reward=3.0, sucker=2.0, punishment=1.0)
         LeaderConstructor.validate_params(valid_params)
 
         with pytest.raises(ValueError) as exc_info:
-            invalid_params = MatrixParameters(
-                temptation=4.0, reward=2.0, sucker=3.0, punishment=1.0
-            )
+            invalid_params = MatrixParameters(temptation=4.0, reward=2.0, sucker=3.0, punishment=1.0)
             LeaderConstructor.validate_params(invalid_params)
         assert "G > H > B > C" in str(exc_info.value)
 
@@ -816,15 +762,11 @@ class TestSecurityDilemmaConstructor:
 
     def test_ordinal_constraint_same_as_pd(self) -> None:
         """Test that T > R > P > S constraint is enforced (same as PD)."""
-        valid_params = MatrixParameters(
-            temptation=5.0, reward=3.0, punishment=1.0, sucker=0.0
-        )
+        valid_params = MatrixParameters(temptation=5.0, reward=3.0, punishment=1.0, sucker=0.0)
         SecurityDilemmaConstructor.validate_params(valid_params)
 
         with pytest.raises(ValueError) as exc_info:
-            invalid_params = MatrixParameters(
-                temptation=3.0, reward=5.0, punishment=1.0, sucker=0.0
-            )
+            invalid_params = MatrixParameters(temptation=3.0, reward=5.0, punishment=1.0, sucker=0.0)
             SecurityDilemmaConstructor.validate_params(invalid_params)
         assert "T > R > P > S" in str(exc_info.value)
 
@@ -853,12 +795,8 @@ class TestConstructorsRegistry:
     def test_all_constructors_implement_protocol(self) -> None:
         """Test that all constructors have build and validate_params methods."""
         for matrix_type, constructor in CONSTRUCTORS.items():
-            assert hasattr(
-                constructor, "build"
-            ), f"{matrix_type} constructor missing build()"
-            assert hasattr(
-                constructor, "validate_params"
-            ), f"{matrix_type} constructor missing validate_params()"
+            assert hasattr(constructor, "build"), f"{matrix_type} constructor missing build()"
+            assert hasattr(constructor, "validate_params"), f"{matrix_type} constructor missing validate_params()"
 
 
 # =============================================================================
@@ -880,9 +818,7 @@ class TestBuildMatrixFunction:
     def test_build_matrix_propagates_validation_errors(self) -> None:
         """Test that build_matrix propagates validation errors from constructors."""
         # Invalid PD params
-        invalid_params = MatrixParameters(
-            temptation=1.0, reward=2.0, punishment=0.5, sucker=0.0
-        )
+        invalid_params = MatrixParameters(temptation=1.0, reward=2.0, punishment=0.5, sucker=0.0)
         with pytest.raises(ValueError) as exc_info:
             build_matrix(MatrixType.PRISONERS_DILEMMA, invalid_params)
         assert "T > R > P > S" in str(exc_info.value)
@@ -943,6 +879,4 @@ class TestMatrixProperties:
 
             for outcome in [matrix.cc, matrix.cd, matrix.dc, matrix.dd]:
                 total = outcome.payoff_a + outcome.payoff_b
-                assert total == pytest.approx(
-                    0.0
-                ), f"{matrix_type}: {outcome} is not zero-sum"
+                assert total == pytest.approx(0.0), f"{matrix_type}: {outcome} is not zero-sum"

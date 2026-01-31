@@ -76,59 +76,71 @@ def generate_report(results: list[dict], output_path: Path) -> None:
     stats = _calculate_stats(valid_games)
 
     # Overall summary
-    lines.extend([
-        "## Overall Summary",
-        "",
-        f"**Total Games:** {len(all_games)}",
-        f"**Valid Games:** {len(valid_games)}",
-        f"**Errors:** {len(all_games) - len(valid_games)}",
-        "",
-    ])
+    lines.extend(
+        [
+            "## Overall Summary",
+            "",
+            f"**Total Games:** {len(all_games)}",
+            f"**Valid Games:** {len(valid_games)}",
+            f"**Errors:** {len(all_games) - len(valid_games)}",
+            "",
+        ]
+    )
 
     if valid_games:
-        lines.extend([
-            "| Metric | Value |",
-            "|--------|-------|",
-            f"| Settlement Rate | {_format_percent(stats['settlements'], stats['count'])} |",
-            f"| Mutual Destruction Rate | {_format_percent(stats['md'], stats['count'])} |",
-            f"| Player A Win Rate | {_format_percent(stats['a_wins'], stats['count'])} |",
-            f"| Player B Win Rate | {_format_percent(stats['b_wins'], stats['count'])} |",
-            f"| Average Game Length | {stats['avg_turns']:.1f} turns |",
-            f"| Average Final Risk | {stats['avg_risk']:.2f} |",
-            "",
-        ])
+        lines.extend(
+            [
+                "| Metric | Value |",
+                "|--------|-------|",
+                f"| Settlement Rate | {_format_percent(stats['settlements'], stats['count'])} |",
+                f"| Mutual Destruction Rate | {_format_percent(stats['md'], stats['count'])} |",
+                f"| Player A Win Rate | {_format_percent(stats['a_wins'], stats['count'])} |",
+                f"| Player B Win Rate | {_format_percent(stats['b_wins'], stats['count'])} |",
+                f"| Average Game Length | {stats['avg_turns']:.1f} turns |",
+                f"| Average Final Risk | {stats['avg_risk']:.2f} |",
+                "",
+            ]
+        )
 
         # By matchup type
         lines.extend(["## Results by Matchup Type", ""])
 
         historical_games = [
-            g for g in valid_games
+            g
+            for g in valid_games
             if "smart" not in g.get("matchup_player_a", "") and "smart" not in g.get("matchup_player_b", "")
         ]
         smart_games = [g for g in valid_games if g not in historical_games]
 
-        for matchup_name, games in [("Historical vs Historical", historical_games), ("Smart vs Historical", smart_games)]:
+        for matchup_name, games in [
+            ("Historical vs Historical", historical_games),
+            ("Smart vs Historical", smart_games),
+        ]:
             if not games:
                 continue
             game_stats = _calculate_stats(games)
-            lines.extend([
-                f"### {matchup_name}",
-                "",
-                "| Metric | Value |",
-                "|--------|-------|",
-                f"| Games | {game_stats['count']} |",
-                f"| Settlement Rate | {_format_percent(game_stats['settlements'], game_stats['count'])} |",
-                f"| MD Rate | {_format_percent(game_stats['md'], game_stats['count'])} |",
-                "",
-            ])
+            lines.extend(
+                [
+                    f"### {matchup_name}",
+                    "",
+                    "| Metric | Value |",
+                    "|--------|-------|",
+                    f"| Games | {game_stats['count']} |",
+                    f"| Settlement Rate | {_format_percent(game_stats['settlements'], game_stats['count'])} |",
+                    f"| MD Rate | {_format_percent(game_stats['md'], game_stats['count'])} |",
+                    "",
+                ]
+            )
 
         # By scenario
-        lines.extend([
-            "## Results by Scenario",
-            "",
-            "| Scenario | Games | Settlement | MD | A Wins | B Wins |",
-            "|----------|-------|------------|-----|--------|--------|",
-        ])
+        lines.extend(
+            [
+                "## Results by Scenario",
+                "",
+                "| Scenario | Games | Settlement | MD | A Wins | B Wins |",
+                "|----------|-------|------------|-----|--------|--------|",
+            ]
+        )
 
         by_scenario = defaultdict(list)
         for g in valid_games:
@@ -145,12 +157,14 @@ def generate_report(results: list[dict], output_path: Path) -> None:
         lines.append("")
 
         # Detailed results table
-        lines.extend([
-            "## Detailed Matchup Results",
-            "",
-            "| Scenario | Player A | Player B | Games | A Wins | B Wins | Settlement | MD |",
-            "|----------|----------|----------|-------|--------|--------|------------|-----|",
-        ])
+        lines.extend(
+            [
+                "## Detailed Matchup Results",
+                "",
+                "| Scenario | Player A | Player B | Games | A Wins | B Wins | Settlement | MD |",
+                "|----------|----------|----------|-------|--------|--------|------------|-----|",
+            ]
+        )
 
         for result in results:
             games = [g for g in result.get("games", []) if g.get("error") is None]

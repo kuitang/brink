@@ -7,7 +7,6 @@ which backend is active.
 """
 
 from abc import ABC, abstractmethod
-from typing import Optional
 
 
 class ScenarioRepository(ABC):
@@ -23,7 +22,7 @@ class ScenarioRepository(ABC):
         pass
 
     @abstractmethod
-    def get_scenario(self, scenario_id: str) -> Optional[dict]:
+    def get_scenario(self, scenario_id: str) -> dict | None:
         """Load complete scenario by ID.
 
         Args:
@@ -35,7 +34,7 @@ class ScenarioRepository(ABC):
         pass
 
     @abstractmethod
-    def get_scenario_by_name(self, name: str) -> Optional[dict]:
+    def get_scenario_by_name(self, name: str) -> dict | None:
         """Load scenario by name (case-insensitive search).
 
         Args:
@@ -92,7 +91,7 @@ class GameRecordRepository(ABC):
         pass
 
     @abstractmethod
-    def load_game(self, game_id: str) -> Optional[dict]:
+    def load_game(self, game_id: str) -> dict | None:
         """Load game state by ID.
 
         Args:
@@ -104,7 +103,7 @@ class GameRecordRepository(ABC):
         pass
 
     @abstractmethod
-    def list_games(self, user_id: Optional[int] = None) -> list[dict]:
+    def list_games(self, user_id: int | None = None) -> list[dict]:
         """List games, optionally filtered by user.
 
         Args:

@@ -36,6 +36,7 @@ class ActionType(Enum):
 @dataclass
 class StabilityTracker:
     """Tracks stability over turns for a pair of players."""
+
     stability: float = 5.0
     history: list = None
 
@@ -70,7 +71,7 @@ def count_switches(
     prev_action_a: ActionType | None,
     prev_action_b: ActionType | None,
     curr_action_a: ActionType,
-    curr_action_b: ActionType
+    curr_action_b: ActionType,
 ) -> int:
     """Count how many players switched their action type."""
     switches = 0
@@ -82,9 +83,7 @@ def count_switches(
 
 
 def simulate_trajectory(
-    actions_a: list[ActionType],
-    actions_b: list[ActionType],
-    initial_stability: float = 5.0
+    actions_a: list[ActionType], actions_b: list[ActionType], initial_stability: float = 5.0
 ) -> list[float]:
     """Simulate stability trajectory for a given sequence of actions.
 
@@ -101,7 +100,7 @@ def simulate_trajectory(
     prev_a = None
     prev_b = None
 
-    for turn_idx, (action_a, action_b) in enumerate(zip(actions_a, actions_b)):
+    for turn_idx, (action_a, action_b) in enumerate(zip(actions_a, actions_b, strict=False)):
         # Turn 1 has no previous action, so no stability update
         if turn_idx > 0:
             switches = count_switches(prev_a, prev_b, action_a, action_b)
@@ -240,7 +239,7 @@ def print_trajectory_table(name: str, history: list[float]):
         if i == 0:
             header += f"{'Start':>8}"
         else:
-            header += f"{'T' + str(i+1):>8}"
+            header += f"{'T' + str(i + 1):>8}"
     print(header)
 
     # Values row
@@ -349,18 +348,10 @@ def print_all_results(manual_results: dict, additional_results: dict):
 
 def main():
     """Run the stability update simulation."""
-    parser = argparse.ArgumentParser(
-        description="Simulate stability update mechanic"
-    )
-    parser.add_argument(
-        "--verbose", "-v", action="store_true",
-        help="Print detailed turn-by-turn analysis"
-    )
-    parser.add_argument(
-        "--seed", type=int, default=42,
-        help="Random seed (unused, for compatibility)"
-    )
-    args = parser.parse_args()
+    parser = argparse.ArgumentParser(description="Simulate stability update mechanic")
+    parser.add_argument("--verbose", "-v", action="store_true", help="Print detailed turn-by-turn analysis")
+    parser.add_argument("--seed", type=int, default=42, help="Random seed (unused, for compatibility)")
+    parser.parse_args()
 
     print("Running stability update simulation...")
 

@@ -97,19 +97,10 @@ class TurnAction(BaseModel):
         "'reconnaissance', 'inspection', 'settlement')"
     )
     narrative_description: str = Field(
-        min_length=1,
-        max_length=200,
-        description="Context-specific description of this action for this turn"
+        min_length=1, max_length=200, description="Context-specific description of this action for this turn"
     )
-    action_type: ActionType = Field(
-        description="Whether this action is cooperative or competitive"
-    )
-    resource_cost: float = Field(
-        default=0.0,
-        ge=0.0,
-        le=10.0,
-        description="Resource cost to take this action"
-    )
+    action_type: ActionType = Field(description="Whether this action is cooperative or competitive")
+    resource_cost: float = Field(default=0.0, ge=0.0, le=10.0, description="Resource cost to take this action")
 
     def to_matrix_choice(self) -> Literal["C", "D"]:
         """Map action type to matrix game choice."""
@@ -135,15 +126,10 @@ class TurnDefinition(BaseModel):
     act: int = Field(ge=1, le=3, description="Act number (1, 2, or 3)")
 
     # Narrative content
-    narrative_briefing: str = Field(
-        min_length=1,
-        description="Situation briefing for players"
-    )
+    narrative_briefing: str = Field(min_length=1, description="Situation briefing for players")
 
     # Matrix specification (type + parameters, NOT raw payoffs)
-    matrix_type: MatrixType = Field(
-        description="Game theory matrix type for this turn"
-    )
+    matrix_type: MatrixType = Field(description="Game theory matrix type for this turn")
     matrix_parameters: MatrixParameters = Field(
         default_factory=MatrixParameters,
         description="Parameters for matrix construction",
@@ -156,13 +142,11 @@ class TurnDefinition(BaseModel):
         default_factory=list,
         max_length=6,
         description="Available actions this turn with context-specific narrative descriptions. "
-        "If empty, generic actions based on Risk Level will be used."
+        "If empty, generic actions based on Risk Level will be used.",
     )
 
     # Outcome narratives
-    outcome_narratives: OutcomeNarratives = Field(
-        description="Narrative descriptions for each outcome"
-    )
+    outcome_narratives: OutcomeNarratives = Field(description="Narrative descriptions for each outcome")
 
     # Branching logic
     branches: BranchTargets = Field(
@@ -257,9 +241,7 @@ class TurnDefinition(BaseModel):
             ValueError: If parameters violate the game type's constraints.
         """
         if self._cached_matrix is None:
-            self._cached_matrix = build_matrix(
-                self.matrix_type, self.matrix_parameters
-            )
+            self._cached_matrix = build_matrix(self.matrix_type, self.matrix_parameters)
         return self._cached_matrix
 
     def get_outcome_narrative(self, outcome_code: OutcomeCode) -> str:
@@ -319,40 +301,19 @@ class Scenario(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     # Metadata
-    scenario_id: str = Field(
-        min_length=1,
-        description="Unique identifier for the scenario"
-    )
-    title: str = Field(
-        min_length=1,
-        description="Human-readable title"
-    )
-    setting: str = Field(
-        min_length=1,
-        description="Theme/setting description"
-    )
-    theme: ThemeType = Field(
-        default="default",
-        description="Visual theme for the scenario UI"
-    )
+    scenario_id: str = Field(min_length=1, description="Unique identifier for the scenario")
+    title: str = Field(min_length=1, description="Human-readable title")
+    setting: str = Field(min_length=1, description="Theme/setting description")
+    theme: ThemeType = Field(default="default", description="Visual theme for the scenario UI")
 
     # Game length (hidden from players during play)
-    max_turns: int = Field(
-        ge=12, le=16,
-        description="Maximum turn count (hidden from players)"
-    )
+    max_turns: int = Field(ge=12, le=16, description="Maximum turn count (hidden from players)")
 
     # Main turn sequence
-    turns: list[TurnDefinition] = Field(
-        min_length=1,
-        description="Initial turn sequence (before branching)"
-    )
+    turns: list[TurnDefinition] = Field(min_length=1, description="Initial turn sequence (before branching)")
 
     # Branch definitions (keyed by branch ID)
-    branches: dict[str, TurnDefinition] = Field(
-        default_factory=dict,
-        description="Branch targets by ID"
-    )
+    branches: dict[str, TurnDefinition] = Field(default_factory=dict, description="Branch targets by ID")
 
     @model_validator(mode="after")
     def validate_turn_sequence(self) -> "Scenario":
@@ -361,8 +322,7 @@ class Scenario(BaseModel):
             expected_turn = i + 1
             if turn.turn != expected_turn:
                 raise ValueError(
-                    f"Turn sequence mismatch: expected turn {expected_turn} "
-                    f"at index {i}, got turn {turn.turn}"
+                    f"Turn sequence mismatch: expected turn {expected_turn} at index {i}, got turn {turn.turn}"
                 )
         return self
 
@@ -384,19 +344,13 @@ class Scenario(BaseModel):
         errors: list[str] = []
 
         for turn in self.turns:
-            self._validate_turn_branch_targets(
-                turn, f"Turn {turn.turn}", all_turn_ids, errors
-            )
+            self._validate_turn_branch_targets(turn, f"Turn {turn.turn}", all_turn_ids, errors)
 
         for branch_id, branch_turn in self.branches.items():
-            self._validate_turn_branch_targets(
-                branch_turn, f"Branch '{branch_id}'", all_turn_ids, errors
-            )
+            self._validate_turn_branch_targets(branch_turn, f"Branch '{branch_id}'", all_turn_ids, errors)
 
         if errors:
-            raise ValueError(
-                "Invalid branch targets:\n  " + "\n  ".join(errors)
-            )
+            raise ValueError("Invalid branch targets:\n  " + "\n  ".join(errors))
 
         return self
 
@@ -413,15 +367,13 @@ class Scenario(BaseModel):
             target = turn.branches.get_branch(outcome)  # type: ignore[arg-type]
             if target is not None and target not in valid_ids:
                 errors.append(
-                    f"{turn_name} {outcome} branch target '{target}' not found. "
-                    f"Valid targets: {sorted(valid_ids)}"
+                    f"{turn_name} {outcome} branch target '{target}' not found. Valid targets: {sorted(valid_ids)}"
                 )
 
         # Check default_next
         if turn.default_next is not None and turn.default_next not in valid_ids:
             errors.append(
-                f"{turn_name} default_next '{turn.default_next}' not found. "
-                f"Valid targets: {sorted(valid_ids)}"
+                f"{turn_name} default_next '{turn.default_next}' not found. Valid targets: {sorted(valid_ids)}"
             )
 
     @model_validator(mode="after")
