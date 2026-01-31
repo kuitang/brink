@@ -275,3 +275,10 @@ Note: NEVER commit the actual token to git.
 ### Deterministic Opponents
 
 - **Deterministic opponents need deterministic settlement** - Don't use LLM-based `evaluate_settlement()` for deterministic opponents. Implement rule-based evaluation using game state metrics.
+
+### Bash Commands
+
+- **Ruff: always use --fix** - Run `ruff check --fix .` not just `ruff check .` to auto-correct issues.
+- **Capture stderr** - Always add `2>&1` when piping output: `command 2>&1 | tail -50`
+- **Limit output** - Use `| tail -50` or `| head -100` to avoid truncation issues.
+- **Skip problematic tests** - Use `--ignore` flag: `uv run pytest --ignore=tests/broken_test.py`
