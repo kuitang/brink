@@ -1,0 +1,2169 @@
+{
+  "scenario_id": "medici_banking_dynasty_001",
+  "title": "Medici Banking Dynasty",
+  "theme": "renaissance",
+  "setting": "Medici banking dynasty. 15th century Florence, papal politics, rival families.\nThe Medici face challenges to their banking empire and political influence. Rival families\nseek to undermine them, while the Pope's favor could make or break their fortunes.\nNavigate the treacherous waters of Renaissance politics and finance.",
+  "max_turns": 14,
+  "turns": [
+    {
+      "turn": 1,
+      "act": 1,
+      "narrative_briefing": "The Papal Legate arrives in Florence bearing news of a new crusade. Both families seek the lucrative contract to finance the venture. The choice of banker will signal the Pope's favor\u2014and reshape the balance of power in the city. How will you approach this opening gambit?",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "joint_proposal",
+          "narrative_description": "Propose a joint banking consortium with the Pazzi to share the papal contract, presenting a united Florentine front",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "diplomatic_approach",
+          "narrative_description": "Make quiet overtures through intermediaries, suggesting mutual accommodation on the crusade financing",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "exclusive_bid",
+          "narrative_description": "Leverage your existing papal debts to secure an exclusive contract, shutting out rival houses",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "undercut_rivals",
+          "narrative_description": "Offer the Pope dramatically better terms than rivals could match, even at short-term loss",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both families agree to share the contract. The Legate is pleased by Florentine unity, and the arrangement proves profitable for all. A fragile understanding begins to form.",
+        "CD": "Your cooperative gesture is met with aggressive undercutting. The rival house secures more favorable terms while you appear weak. Whispers spread through the merchant quarter.",
+        "DC": "Your aggressive play succeeds\u2014you secure the contract while your rival's conciliatory approach makes them look desperate. Their reputation suffers in the banking houses of Europe.",
+        "DD": "Both houses bid so aggressively that neither can profit. The Legate departs disgusted, awarding the contract to Sienese bankers instead. Florence's prestige is diminished."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_2",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    {
+      "turn": 2,
+      "act": 1,
+      "narrative_briefing": "The Signoria is choosing new members. Both families have candidates, and the balance of the city council hangs in the question. Secret meetings are being held throughout the city. Will you seek accommodation or pursue total victory?",
+      "matrix_type": "reconnaissance",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "split_seats",
+          "narrative_description": "Negotiate a quiet arrangement to split the contested seats, ensuring both families have representation",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "honor_arrangement",
+          "narrative_description": "Support your rival's candidate for one seat in exchange for their support on another, building goodwill",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "bribe_electors",
+          "narrative_description": "Deploy your gold to ensure all contested seats go to Medici allies, regardless of prior understandings",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "expose_corruption",
+          "narrative_description": "Reveal your rival's electoral machinations to the public, damaging their standing regardless of the outcome",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both families honor the arrangement. The Signoria reflects a careful balance of interests. The people of Florence breathe easier, sensing that their leading families can coexist.",
+        "CD": "Your honorable conduct is rewarded with betrayal. Your rival's aggressive tactics secure them dominance on the council while your supporters question your judgment.",
+        "DC": "Your ruthless campaign succeeds completely. You dominate the new Signoria while your rival's good-faith efforts make them look foolish. Power consolidates in your hands.",
+        "DD": "The election becomes a battlefield of gold and accusations. Both families are publicly humiliated as their corruption is laid bare. The common people grow restless with both houses."
+      },
+      "branches": {
+        "CC": "turn_3_diplomatic",
+        "CD": "turn_3_diplomatic",
+        "DC": "turn_3_tense",
+        "DD": "turn_3_tense"
+      },
+      "default_next": "turn_3",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    {
+      "turn": 3,
+      "act": 1,
+      "narrative_briefing": "A Venetian delegation arrives seeking banking partners for their Eastern trade ventures. The profits could be immense\u2014but so could the losses if the Ottomans prove hostile. Each house must decide whether to pursue this opportunity alone or share both risk and reward.",
+      "matrix_type": "leader",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 2.0,
+        "reward": 1.5,
+        "punishment": 0.0,
+        "sucker": 0.5,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "follow_lead",
+          "narrative_description": "Signal willingness to partner with whichever house the Venetians prefer, deferring to their judgment",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "propose_consortium",
+          "narrative_description": "Suggest to your rival that you jointly approach the Venetians, sharing the enormous venture",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "seize_initiative",
+          "narrative_description": "Move quickly to secure exclusive terms with the Venetians before your rival can organize",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "poison_negotiations",
+          "narrative_description": "Spread rumors about your rival's financial instability to the Venetian delegation",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Neither house claims leadership, creating confusion. The Venetians negotiate with both tentatively, leading to a workable but suboptimal arrangement for everyone.",
+        "CD": "Your deference allows your rival to seize the initiative. They claim the lion's share of the Venetian partnership while you receive only table scraps.",
+        "DC": "Your bold move impresses the Venetians. You secure the primary partnership while your rival's hesitation makes them appear indecisive and weak.",
+        "DD": "Both houses' aggressive maneuvering disgusts the Venetians, who return home empty-handed. The Eastern trade opportunity is lost to all Florentine houses."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_4",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    {
+      "turn": 4,
+      "act": 1,
+      "narrative_briefing": "Rumors swirl that the Pope's health is failing. His successor could be friendly to either house\u2014or hostile to both. Both families have cardinals in their debt, but intelligence about the papal court is fragmentary at best. How much can you trust what you think you know?",
+      "matrix_type": "inspection_game",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "trust_reports",
+          "narrative_description": "Accept your existing intelligence about the rival's activities at face value and act accordingly",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "share_intelligence",
+          "narrative_description": "Propose a mutual exchange of information about the papal succession with your rival house",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "infiltrate_networks",
+          "narrative_description": "Send agents to verify your rival's claims and discover their true activities in Rome",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "spread_disinformation",
+          "narrative_description": "Feed false intelligence through channels you know your rival monitors, testing their credulity",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both houses operate on incomplete but honest information. Neither gains an advantage, but neither wastes resources on espionage. A certain gentility prevails.",
+        "CD": "Your trusting approach is exploited. Your rival's agents penetrate your networks while you remain ignorant of their true intentions. You are operating blind.",
+        "DC": "Your verification efforts pay off\u2014you discover your rival's true plans while they remain deceived by your planted information. Knowledge is power.",
+        "DD": "Both houses' spy networks collide and compromise each other. Agents are exposed, informants flee, and both families' intelligence capabilities are damaged for months."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_5",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    {
+      "turn": 5,
+      "act": 2,
+      "narrative_briefing": "The Pope has died. The College of Cardinals gathers in Rome, and both houses have invested heavily in different candidates. This is the moment that will define the next decade of Florentine politics. The stakes could not be higher.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "accept_compromise",
+          "narrative_description": "Signal willingness to accept a compromise candidate acceptable to both houses",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "back_channel",
+          "narrative_description": "Open secret negotiations through a trusted intermediary to coordinate your houses' votes",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "all_out_push",
+          "narrative_description": "Deploy every resource and call in every debt to ensure your candidate wins, regardless of cost",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "threaten_cardinals",
+          "narrative_description": "Make clear to wavering cardinals that opposing your candidate will have severe financial consequences",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both houses agree on a compromise Pope\u2014not ideal for either, but acceptable to both. The new pontiff owes his throne to Florentine unity, and both houses profit.",
+        "CD": "Your willingness to compromise is seen as weakness. Your rival's aggressive campaign succeeds, and their candidate becomes Pope. Your influence in Rome collapses.",
+        "DC": "Your aggressive campaign overwhelms your rival's conciliatory approach. Your candidate takes the throne, and your rival's investment in the conclave is wasted entirely.",
+        "DD": "Both houses' maximum pressure creates scandal. Cardinals denounce Florentine corruption, and the conclave elects a reformist Pope hostile to all Italian bankers. The papal accounts are moved to German houses."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": "turn_6_crisis"
+      },
+      "default_next": "turn_6",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Your diplomatic overture is rebuffed. The conclave approaches and neither house will compromise. The rivalry intensifies."
+    },
+    {
+      "turn": 6,
+      "act": 2,
+      "narrative_briefing": "With the papal succession resolved, attention returns to Florence. A merchant guild demands payment of old debts from both houses simultaneously\u2014debts that cannot both be paid without severe strain. Each house must decide whether to prioritize their own payment or seek accommodation.",
+      "matrix_type": "battle_of_sexes",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.5,
+        "preference_b": 1.3,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "pay_full",
+          "narrative_description": "Honor your debts in full immediately, demonstrating financial strength and reliability",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "negotiate_terms",
+          "narrative_description": "Work with the guild and your rival to arrange staggered payments that all parties can manage",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "demand_priority",
+          "narrative_description": "Insist the guild accept payment from you first, forcing your rival into a disadvantageous position",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "buy_guild_masters",
+          "narrative_description": "Bribe key guild members to prioritize your house's payment schedule over your rival's",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both houses coordinate their payments smoothly. The guild is satisfied, and both families' credit remains strong. A practical accommodation is reached.",
+        "CD": "Your cooperative approach meets ruthless competition. The guild prioritizes your rival's interests, and your payments are deferred at punishing terms.",
+        "DC": "Your aggressive tactics secure priority treatment. Your rival scrambles to meet their obligations, and their reputation among merchants suffers.",
+        "DD": "Both houses' maneuvering creates chaos in the guild. Neither receives favorable terms, and Florentine banking's reputation for reliability is damaged across Europe."
+      },
+      "branches": {
+        "CC": "turn_7_progress",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_7_escalation"
+      },
+      "default_next": "turn_7",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The guild matter remains unresolved. Both houses circle each other warily as financial pressures mount."
+    },
+    {
+      "turn": 7,
+      "act": 2,
+      "narrative_briefing": "A prominent Florentine artist seeks patronage for a major commission. The prestige of sponsoring such work would elevate either house's cultural standing immensely. But the artist plays both sides, seeking the highest bidder.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "joint_patronage",
+          "narrative_description": "Propose sharing patronage of the masterwork, with both houses' names immortalized together",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "generous_offer",
+          "narrative_description": "Make a fair offer and trust that quality will be recognized without aggressive bidding",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "outbid_rival",
+          "narrative_description": "Offer whatever it takes to secure exclusive patronage, denying your rival any cultural prestige",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "slander_rival",
+          "narrative_description": "Whisper to the artist that your rival's patronage would taint the work with association to scandal",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both houses agree to joint patronage. The resulting masterpiece celebrates Florentine unity, and both families' names will live through the ages together.",
+        "CD": "Your willingness to share is exploited. Your rival secures exclusive patronage and uses the commission to celebrate their family's glory while diminishing yours.",
+        "DC": "Your aggressive campaign wins the artist's loyalty. The commission glorifies your house alone, and your rival is shut out of this cultural moment entirely.",
+        "DD": "Both houses' cutthroat bidding disgusts the artist, who departs for Milan. Florence loses a potential masterwork to the Sforza, and both houses are blamed."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_8",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The patronage dispute reveals deeper tensions. Neither house will yield, and the artist grows impatient."
+    },
+    {
+      "turn": 8,
+      "act": 2,
+      "narrative_briefing": "Plague rumors reach Florence. The city's response will determine whether commerce continues or collapses. Both houses have ships at sea and contracts that depend on open trade. Panic could destroy everything you've built.",
+      "matrix_type": "security_dilemma",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "coordinate_response",
+          "narrative_description": "Work with your rival to present a unified, calm response that maintains confidence in Florentine trade",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "share_resources",
+          "narrative_description": "Offer to share medical resources and intelligence about plague movements with your rival house",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "hoard_supplies",
+          "narrative_description": "Secretly buy up medical supplies and safe passage routes, preparing to profit from your rival's distress",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "spread_panic",
+          "narrative_description": "Leak exaggerated plague reports to damage your rival's trade routes while protecting your own",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both houses coordinate the plague response magnificently. Trade continues, panic is averted, and Florence weathers the crisis while rival cities suffer. Both families are hailed as saviors.",
+        "CD": "Your cooperative efforts are undermined by your rival's hoarding and panic-mongering. Your trade suffers while they profit from the chaos they helped create.",
+        "DC": "Your aggressive preparations pay off. While your rival struggles with the crisis, you've secured supplies and routes that give you enormous advantage in the aftermath.",
+        "DD": "Both houses' selfish maneuvering creates genuine panic. Trade collapses, plague spreads, and Florence suffers months of chaos. Both families lose fortunes and standing."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_9",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Even plague cannot bring the houses together. The rivalry continues as Florence suffers."
+    },
+    {
+      "turn": 9,
+      "act": 3,
+      "narrative_briefing": "The plague has passed, but its aftermath reshapes Florence. Many noble families are weakened or extinct. Their properties, debts, and alliances are suddenly available\u2014a once-in-a-generation opportunity to reshape the city's power structure.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "respect_claims",
+          "narrative_description": "Acknowledge your rival's legitimate interests in certain properties and focus on uncontested opportunities",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "formal_division",
+          "narrative_description": "Propose a formal agreement dividing the opportunities fairly between both houses",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "aggressive_acquisition",
+          "narrative_description": "Move fast to acquire everything possible, claiming properties your rival also seeks",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "legal_warfare",
+          "narrative_description": "Challenge your rival's claims in court, tying up their acquisitions in expensive litigation",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both houses expand their holdings substantially while respecting each other's claims. The post-plague Florence sees both families strengthened but balanced.",
+        "CD": "Your restraint allows your rival to sweep up the best properties. You gain little while they consolidate an commanding position in post-plague Florence.",
+        "DC": "Your aggressive moves secure the lion's share of available opportunities. Your rival's caution costs them dearly, and you emerge from the plague far stronger.",
+        "DD": "Both houses' aggressive claims collide disastrously. Litigation consumes fortunes, properties remain in limbo, and outside investors from Venice and Milan sweep in to claim what Florentines cannot agree upon. Foreign influence grows."
+      },
+      "branches": {
+        "CC": "turn_10_accommodation",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_10_vendetta"
+      },
+      "default_next": "turn_10",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The scramble for post-plague spoils continues. Neither house will yield their claims."
+    },
+    {
+      "turn": 10,
+      "act": 3,
+      "narrative_briefing": "The new Pope has announced a grand project requiring vast financing. Both houses have submitted proposals, but the papal court hints that only one will be chosen\u2014unless the Florentine bankers can present a unified offer. The decision will come within days.",
+      "matrix_type": "prisoners_dilemma",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "unified_bid",
+          "narrative_description": "Work with your rival to present a single, overwhelming Florentine proposal that guarantees the contract",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "honor_terms",
+          "narrative_description": "Maintain the agreed-upon terms with your rival, trusting they will do the same",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "undercut_secretly",
+          "narrative_description": "While pretending to cooperate, secretly offer the Pope better terms to secure the contract exclusively",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "sabotage_rival",
+          "narrative_description": "Reveal damaging information about your rival to papal advisors, destroying their credibility",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The unified Florentine bid impresses the Pope enormously. The contract is enormous, the profits shared fairly, and both houses cement their position as Europe's premier bankers.",
+        "CD": "Your good faith is betrayed at the worst moment. Your rival's secret dealing secures them the contract while your cooperation makes you look naive. A devastating blow.",
+        "DC": "Your calculated betrayal succeeds perfectly. The Pope awards you the exclusive contract while your rival's earnest cooperation leaves them with nothing. Your dominance is secured.",
+        "DD": "Both houses' treachery is exposed to the papal court. The Pope, disgusted by Florentine duplicity, awards the contract to Venetian bankers. Both houses suffer crippling loss of prestige and profit."
+      },
+      "branches": {
+        "CC": "turn_11_partnership",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_11_warfare"
+      },
+      "default_next": "turn_11",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The papal contract slips away as neither house can agree on terms. Rome grows impatient with Florentine bickering."
+    },
+    {
+      "turn": 11,
+      "act": 3,
+      "narrative_briefing": "Word reaches Florence that mercenary captains are offering their services. In these uncertain times, hired soldiers could protect\u2014or threaten\u2014either house. The question of military force, long taboo among Florentine bankers, cannot be avoided.",
+      "matrix_type": "security_dilemma",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "reject_mercenaries",
+          "narrative_description": "Publicly refuse to hire mercenaries and call on your rival to join you in keeping Florence peaceful",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "defensive_only",
+          "narrative_description": "Hire only enough guards for defensive purposes and make your limited intentions clear",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "hire_condottieri",
+          "narrative_description": "Engage a major mercenary captain, preparing for whatever may come",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "preemptive_strike",
+          "narrative_description": "Position your forces to threaten your rival's key properties and personnel",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both houses reject the mercenary path. Florence remains a city of commerce, not war. The rivalry continues through banks and influence, not blades.",
+        "CD": "Your peaceful stance leaves you vulnerable. Your rival's hired soldiers give them leverage you cannot match. Threats, implied and explicit, begin to shape every negotiation.",
+        "DC": "Your military preparations give you enormous advantage. Your rival's pacifism makes them vulnerable, and your mercenaries' presence ensures favorable terms in every dealing.",
+        "DD": "Both houses arm for war. Florence, the city of art and commerce, becomes an armed camp. The great families prepare for blood, and the common people flee or hide."
+      },
+      "branches": {
+        "CC": "turn_12_peace",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_12_war"
+      },
+      "default_next": "turn_12",
+      "settlement_available": true,
+      "settlement_failed_narrative": "As mercenaries gather, the chance for peaceful resolution fades. Both houses prepare for the worst."
+    },
+    {
+      "turn": 12,
+      "act": 3,
+      "narrative_briefing": "The Archbishop of Florence has called both families to the cathedral for a feast of reconciliation. It could be genuine\u2014or a trap. The city holds its breath. What happens in the Duomo will determine Florence's future for a generation.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "genuine_reconciliation",
+          "narrative_description": "Attend with open heart and genuine intent to reconcile, bringing tokens of peace",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "guarded_attendance",
+          "narrative_description": "Attend but with trusted guards nearby, ready to respond to treachery while hoping for peace",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "spring_trap",
+          "narrative_description": "Use the gathering to strike at your rival when they are vulnerable and their guard is down",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "refuse_attendance",
+          "narrative_description": "Refuse to attend and use your rival's presence in the cathedral as opportunity to move against their interests elsewhere",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both families embrace in the Duomo. The Archbishop's blessing seals a genuine peace. Florence celebrates, and both houses enter a new era of cooperative prosperity.",
+        "CD": "Your genuine reconciliation is met with treachery. In the holy cathedral, your rival's assassins strike. The betrayal shocks all Italy, but you are left weakened or worse.",
+        "DC": "Your treachery in the cathedral succeeds horrifyingly. Your rival's peace offering made them vulnerable, and your strike devastates them. But the crime in holy ground haunts you.",
+        "DD": "Both houses came to the cathedral prepared for violence. The resulting bloodbath desecrates the Duomo and plunges Florence into civil war. The city that created the Renaissance tears itself apart."
+      },
+      "branches": {
+        "CC": "turn_13_golden",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_13_ruin"
+      },
+      "default_next": "turn_13",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The reconciliation feast ends in bitter accusations. The Archbishop weeps as the houses depart in hatred."
+    },
+    {
+      "turn": 13,
+      "act": 3,
+      "narrative_briefing": "The crisis reaches its climax. Foreign powers\u2014Milan, Venice, the Pope\u2014watch Florence's internal conflict with hungry eyes. Whatever happens between the houses now will shape whether Florence remains independent or becomes a puppet of outside forces.",
+      "matrix_type": "volunteers_dilemma",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "sacrifice_position",
+          "narrative_description": "Make significant concessions to preserve Florentine independence, even at cost to your house",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "joint_defense",
+          "narrative_description": "Propose a united front against foreign interference, putting Florence above family rivalry",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "invite_intervention",
+          "narrative_description": "Secretly invite foreign support against your rival, accepting outside influence as the price of victory",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "exploit_weakness",
+          "narrative_description": "Use the external pressure to extract maximum concessions from your weakened rival",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both houses sacrifice for Florence. United, the city repels foreign influence and maintains its independence. The families are diminished but Florence endures.",
+        "CD": "Your sacrifice for Florence is exploited by your rival. They maintain their position while you bear the cost of independence. Your house is weakened but Florence survives.",
+        "DC": "Your rival's sacrifice enables your triumph. They bear the cost while you reap the benefits. Your house dominates a weakened but independent Florence.",
+        "DD": "Neither house will sacrifice. Foreign powers recognize the opportunity and intervene. Florence loses its independence as Milan or the Pope install their own regime. Both families are swept aside by outside forces."
+      },
+      "branches": {
+        "CC": "turn_14_legacy",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_14_collapse"
+      },
+      "default_next": "turn_14",
+      "settlement_available": true,
+      "settlement_failed_narrative": "As foreign armies approach, the houses continue their feud. Florence's fate hangs by a thread."
+    },
+    {
+      "turn": 14,
+      "act": 3,
+      "narrative_briefing": "The final reckoning approaches. Years of rivalry, cooperation, betrayal, and accommodation have led to this moment. The future of Florence\u2014and both great houses\u2014will be determined by one last choice. History awaits your decision.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "final_peace",
+          "narrative_description": "Extend a genuine hand of lasting peace, accepting coexistence as the future of Florence",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "graceful_concession",
+          "narrative_description": "Accept a subordinate position to end the conflict and preserve what remains of your house",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "final_gambit",
+          "narrative_description": "Stake everything on one last bid for total dominance, winner take all",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "scorched_earth",
+          "narrative_description": "If you cannot rule Florence, ensure your rival cannot either\u2014destroy everything",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Peace is achieved at last. Both houses survive, neither dominant but both enduring. Florence enters a golden age of balanced power, art, and commerce. The Renaissance flourishes.",
+        "CD": "Your peace offering is spurned. Your rival's final gambit succeeds, and your house is reduced to secondary status. They rule Florence, but you survive in diminished form.",
+        "DC": "Your final gambit triumphs. Your rival's conciliatory approach leaves them vulnerable, and your house achieves the dominance you've sought. Florence is yours\u2014for now.",
+        "DD": "Both houses choose destruction over compromise. The resulting conflict devastates Florence\u2014banking houses collapse, art is destroyed, and foreign powers carve up the ruins. The city that birthed the Renaissance becomes a cautionary tale of ambition destroying everything it sought to control."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": null,
+      "settlement_available": true,
+      "settlement_failed_narrative": "Even at the end, peace proves impossible. The final confrontation cannot be avoided."
+    }
+  ],
+  "branches": {
+    "turn_3_diplomatic": {
+      "turn": 3,
+      "act": 1,
+      "narrative_briefing": "The cooperative spirit from the elections has opened new possibilities. The Venetian delegation arrives seeking banking partners, and both houses see an opportunity to build on recent goodwill. Perhaps this Eastern venture could cement a lasting partnership.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.2,
+        "hare_temptation": 1.4,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "joint_venture",
+          "narrative_description": "Propose a formal partnership to jointly pursue the Venetian opportunity",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "generous_terms",
+          "narrative_description": "Offer your rival favorable terms in any joint venture, building on recent cooperation",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "claim_leadership",
+          "narrative_description": "Use your recent cooperative gestures as leverage to claim the senior position",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "test_commitment",
+          "narrative_description": "Demand significant concessions to verify your rival's commitment to partnership",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The partnership flourishes. Both houses share the Venetian venture equally, and the success strengthens the emerging understanding between the families.",
+        "CD": "Your generous offer is exploited. Your rival claims all the benefits of partnership while giving nothing in return. The diplomatic opening is squandered.",
+        "DC": "Your demands reveal the fragility of recent cooperation. You extract concessions, but the partnership spirit is damaged. Trust erodes.",
+        "DD": "Both houses' positioning destroys the nascent partnership. The Venetians leave disgusted, and the diplomatic opening from the elections is wasted."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_4",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    "turn_3_tense": {
+      "turn": 3,
+      "act": 1,
+      "narrative_briefing": "The bitter electoral contest has poisoned relations. When the Venetian delegation arrives, both houses view the opportunity through the lens of recent conflict. Trust is scarce, and every interaction carries the weight of fresh grievances.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "de_escalate",
+          "narrative_description": "Step back from confrontation and signal willingness to move past the electoral conflict",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "separate_paths",
+          "narrative_description": "Propose dividing the Venetian opportunity to avoid further direct conflict",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "press_advantage",
+          "narrative_description": "Use your stronger position to dominate the Venetian negotiations",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "humiliate_rival",
+          "narrative_description": "Ensure your rival's weakness is visible to the Venetians, destroying their credibility",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both houses step back from the brink. The Venetian opportunity is divided fairly, and the worst of the electoral tension begins to fade.",
+        "CD": "Your attempt to de-escalate is seen as weakness. Your rival presses their advantage ruthlessly, and your position deteriorates further.",
+        "DC": "Your continued aggression succeeds. Your rival's conciliatory gestures make them look desperate, and you consolidate your gains.",
+        "DD": "The confrontation escalates beyond the Venetian matter. Both houses' relentless aggression creates open hostility that threatens to spiral into violence."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_4",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    "turn_6_crisis": {
+      "turn": 6,
+      "act": 2,
+      "narrative_briefing": "The disastrous conclave has left both houses reeling. The reformist Pope has stripped Florentine bankers of their privileges, and creditors across Europe sense weakness. The guild's debt demands come at the worst possible moment\u2014both houses are genuinely struggling.",
+      "matrix_type": "prisoners_dilemma",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "mutual_support",
+          "narrative_description": "Propose pooling resources to survive the crisis together\u2014neither house can weather this alone",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "honest_accounting",
+          "narrative_description": "Share accurate information about your financial position to coordinate a joint response",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "cannibalize_rival",
+          "narrative_description": "Use the crisis to absorb your weakened rival's assets and clients",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "false_confidence",
+          "narrative_description": "Project strength you don't have, hoping to survive while your rival collapses",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "United by crisis, both houses pool resources and survive. The reformist Pope's pressure is weathered together, though both families emerge weakened.",
+        "CD": "Your honest cooperation exposes you to exploitation. Your rival uses your vulnerability to strengthen themselves at your expense.",
+        "DC": "Your predatory response succeeds. Your rival's openness becomes their downfall, and you absorb much of their business. But the cost is a bitter enemy.",
+        "DD": "Both houses' desperate maneuvering accelerates the crisis. Creditors panic, calling in loans across Florence. The banking system teeters on collapse."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_7",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Even crisis cannot force cooperation. The financial situation deteriorates as both houses refuse to compromise."
+    },
+    "turn_7_progress": {
+      "turn": 7,
+      "act": 2,
+      "narrative_briefing": "The successful resolution of the guild matter has created unexpected goodwill. When the artist seeks patronage, both houses see an opportunity to celebrate their cooperation rather than compete. Perhaps Florence's cultural glory can be a shared achievement.",
+      "matrix_type": "pure_coordination",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "grand_collaboration",
+          "narrative_description": "Propose an unprecedented joint patronage celebrating both houses' cooperation",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "defer_gracefully",
+          "narrative_description": "Offer to support your rival's patronage, building on recent goodwill",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "claim_credit",
+          "narrative_description": "Try to position yourself as the primary patron while appearing to cooperate",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "set_conditions",
+          "narrative_description": "Agree to collaborate but demand your family's name be more prominent",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The joint patronage becomes a symbol of Florentine unity. The masterwork celebrates both houses equally, and the collaboration deepens trust.",
+        "CD": "Your generous deferral is accepted graciously. Your rival secures the patronage but acknowledges your contribution publicly.",
+        "DC": "Your attempt to claim credit creates friction. The collaboration proceeds but the goodwill from the guild matter is partially undone.",
+        "DD": "Both houses' jockeying for prominence sours the collaboration. The artist produces a lesser work, and the opportunity for cultural partnership is diminished."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_8",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The patronage question becomes contentious despite recent cooperation. Cultural prestige proves harder to share than commercial success."
+    },
+    "turn_7_escalation": {
+      "turn": 7,
+      "act": 2,
+      "narrative_briefing": "The guild debacle has intensified hostilities. The artist's search for patronage becomes another battleground. Both houses see the commission as an opportunity to demonstrate superiority and humiliate their rival on the cultural stage.",
+      "matrix_type": "deadlock",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 0.5,
+        "punishment": 1.0,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "withdraw_claim",
+          "narrative_description": "Step back from the patronage competition to reduce tensions",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "modest_offer",
+          "narrative_description": "Make a reasonable offer without aggressive bidding",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "overwhelming_bid",
+          "narrative_description": "Outspend any possible rival offer, regardless of cost",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "destroy_opportunity",
+          "narrative_description": "If you can't have the patronage, ensure your rival can't either",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both houses' restraint allows a modest but peaceful resolution. The artist's work is less grand but tensions don't escalate further.",
+        "CD": "Your withdrawal is seen as capitulation. Your rival claims the patronage as another victory in the ongoing conflict.",
+        "DC": "Your aggressive bid wins decisively. The patronage becomes a symbol of your dominance and your rival's weakness.",
+        "DD": "Both houses' aggressive bidding makes the commission impossible. The artist flees Florence, and both families are mocked throughout Italy for their destructive rivalry."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_8",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The patronage battle becomes another chapter in the escalating feud. Neither house will yield."
+    },
+    "turn_10_accommodation": {
+      "turn": 10,
+      "act": 3,
+      "narrative_briefing": "The fair division of post-plague opportunities has created a new equilibrium. The papal project presents a chance to formalize this accommodation. Both houses approach Rome not as rivals but as potential partners, sensing mutual benefit in cooperation.",
+      "matrix_type": "harmony",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.0,
+        "reward": 1.5,
+        "punishment": 0.0,
+        "sucker": 0.5,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "formalize_partnership",
+          "narrative_description": "Propose making the joint approach to Rome the foundation of a lasting alliance",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "equal_terms",
+          "narrative_description": "Ensure the papal contract benefits both houses equally, cementing trust",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "subtle_advantage",
+          "narrative_description": "Seek small advantages in the contract terms while maintaining cooperative appearance",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "test_boundaries",
+          "narrative_description": "Push for better terms to see how far the accommodation can be stretched",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The formal partnership is established. Both houses present a united front to Rome, securing the contract on excellent terms. The alliance solidifies.",
+        "CD": "Your partnership offer is accepted but your rival seeks small advantages. The contract succeeds but with minor friction.",
+        "DC": "Your advantage-seeking creates minor tensions but the overall accommodation holds. The contract is secured with slightly favorable terms for you.",
+        "DD": "Both houses' competitive instincts threaten the accommodation. The papal contract is secured but the partnership remains fragile."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_11",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The accommodation shows signs of strain. Even in cooperation, trust remains limited."
+    },
+    "turn_10_vendetta": {
+      "turn": 10,
+      "act": 3,
+      "narrative_briefing": "The post-plague scramble has become a vendetta. The papal project arrives amid open hostility between the houses. Foreign powers watch as Florence's leading families tear at each other, offering support to whichever side will grant them influence.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.6,
+        "reward": 0.9,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.4,
+        "crash_payoff": -1.2,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "seek_peace",
+          "narrative_description": "Use the papal project as an opportunity to step back from the vendetta",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "propose_truce",
+          "narrative_description": "Offer a formal truce, putting past grievances aside for mutual benefit",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "crush_rival",
+          "narrative_description": "Use your every advantage to destroy your rival's bid and their standing in Rome",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "accept_foreign_aid",
+          "narrative_description": "Accept Milan or Venice's support against your rival, whatever the cost to Florence",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both houses step back from destruction. The papal project becomes a vehicle for de-escalation, though deep wounds remain.",
+        "CD": "Your peace offering is rejected contemptuously. Your rival continues the vendetta while you appear weak.",
+        "DC": "Your continued aggression devastates your rival's remaining standing. Victory seems near, but at terrible cost.",
+        "DD": "The vendetta reaches its climax. Both houses accept foreign support, inviting Milan and Venice into Florentine affairs. The city's independence is compromised as outside powers gain footholds."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_11",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The vendetta continues. Neither house will accept anything less than total victory."
+    },
+    "turn_11_partnership": {
+      "turn": 11,
+      "act": 3,
+      "narrative_briefing": "The successful joint papal contract has created a working partnership. When mercenary captains approach, both houses face the question together: should Florence remain a city of commerce, or is military force now necessary? The decision will define the alliance's future.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.2,
+        "hare_temptation": 1.4,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "joint_demilitarization",
+          "narrative_description": "Agree to jointly reject mercenary offers, keeping Florence a commercial city",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "shared_defense",
+          "narrative_description": "Propose a joint defense force under shared command, if military force is needed",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "secret_hiring",
+          "narrative_description": "Secretly engage mercenaries while publicly agreeing to demilitarization",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "demand_command",
+          "narrative_description": "Insist that any joint force must be under your house's command",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both houses honor the agreement. Florence remains demilitarized, and the partnership strengthens. The alliance proves it can handle difficult decisions together.",
+        "CD": "Your honorable commitment is betrayed. Your partner's secret hiring gives them leverage that threatens the entire partnership.",
+        "DC": "Your secret betrayal succeeds initially but is discovered. The partnership is severely damaged, perhaps fatally.",
+        "DD": "Both houses' duplicity destroys the partnership. Florence becomes an armed camp as the former allies prepare to fight each other with the very forces they hired together."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_12",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The mercenary question strains the partnership to its limits. Trust is tested severely."
+    },
+    "turn_11_warfare": {
+      "turn": 11,
+      "act": 3,
+      "narrative_briefing": "The papal disaster has made open conflict inevitable. Both houses now seek military advantage, and the mercenary captains find eager customers. Florence transforms from a city of commerce into a battlefield. The question is no longer whether there will be war, but how destructive it will be.",
+      "matrix_type": "deadlock",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 0.5,
+        "punishment": 1.0,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "limited_forces",
+          "narrative_description": "Hire only enough forces for defense, hoping to contain the coming conflict",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "negotiate_limits",
+          "narrative_description": "Propose rules of engagement that protect Florence's civilian population",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "maximum_force",
+          "narrative_description": "Hire every available mercenary, preparing for total war",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "first_strike",
+          "narrative_description": "Attack before your rival can fully prepare, seeking decisive advantage",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both houses limit their forces. The coming conflict will be contained, a limited war rather than total destruction. Florence may survive.",
+        "CD": "Your restraint leaves you vulnerable. Your rival's massive forces threaten to overwhelm your limited defenses.",
+        "DC": "Your overwhelming force gives you decisive advantage. Your rival's restraint becomes their doom.",
+        "DD": "Both houses commit everything to the coming war. Florence becomes a slaughterhouse as massive mercenary armies clash in its streets and squares."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_12",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Even facing mutual destruction, neither house will yield. The war will be fought to the end."
+    },
+    "turn_12_peace": {
+      "turn": 12,
+      "act": 3,
+      "narrative_briefing": "The rejection of mercenaries has proven the partnership's strength. The Archbishop's feast offers a chance to make the peace permanent and public. Both houses approach the cathedral with hope\u2014but also wariness born of years of conflict.",
+      "matrix_type": "harmony",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.0,
+        "reward": 1.5,
+        "punishment": 0.0,
+        "sucker": 0.5,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "full_commitment",
+          "narrative_description": "Attend with your full household, demonstrating complete commitment to peace",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "public_reconciliation",
+          "narrative_description": "Prepare a public gesture of reconciliation to seal the peace before all Florence",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "contingency_plans",
+          "narrative_description": "Attend but maintain secret preparations in case of treachery",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "extract_concessions",
+          "narrative_description": "Use the feast to negotiate additional advantages before finalizing peace",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The feast becomes a genuine celebration of peace. Both houses publicly reconcile, and Florence rejoices. A new era of cooperation begins.",
+        "CD": "Your full commitment is met with your rival's hedging. Peace is achieved but your openness creates slight vulnerability.",
+        "DC": "Your contingencies prove unnecessary but create minor friction. Peace is achieved despite your caution.",
+        "DD": "Both houses' conditions and contingencies complicate the reconciliation. Peace is achieved but remains fragile and conditional."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_13",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Even at the moment of peace, old suspicions surface. The reconciliation is delayed."
+    },
+    "turn_12_war": {
+      "turn": 12,
+      "act": 3,
+      "narrative_briefing": "Armed conflict rages through Florence. The Archbishop's feast is a cruel joke\u2014neither house would dare attend without their soldiers. The cathedral stands empty as the city burns. This is no longer about banking or influence. This is about survival.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.4,
+        "reward": 0.8,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.3,
+        "crash_payoff": -1.5,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "seek_ceasefire",
+          "narrative_description": "Request a ceasefire to stop the bloodshed and negotiate terms",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "limited_objectives",
+          "narrative_description": "Restrict your forces to defensive operations, hoping to de-escalate",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "decisive_assault",
+          "narrative_description": "Launch an all-out assault to end the war with total victory",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "burn_everything",
+          "narrative_description": "Destroy your rival's properties and assets, leaving nothing for them to recover",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both houses accept a ceasefire. The war ends without clear victory, but Florence survives. Both families are weakened but intact.",
+        "CD": "Your ceasefire request is answered with attack. Your rival's forces exploit your hesitation to gain decisive advantage.",
+        "DC": "Your assault succeeds against your rival's defensive posture. Victory is within reach, but at terrible cost.",
+        "DD": "Both houses commit to total war. Florence is devastated\u2014palaces burn, treasuries are looted, and both families' wealth is destroyed in the conflagration. The city that birthed the Renaissance becomes a smoking ruin."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_13",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The fighting continues. Neither side can stop now\u2014too much blood has been spilled."
+    },
+    "turn_13_golden": {
+      "turn": 13,
+      "act": 3,
+      "narrative_briefing": "The genuine reconciliation in the Duomo has transformed Florence. Both houses work together to present a united front against foreign interference. The question now is whether this cooperation can endure and become the foundation of a new political order.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.2,
+        "hare_temptation": 1.4,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "formalize_alliance",
+          "narrative_description": "Propose a formal alliance treaty, binding both houses to mutual defense",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "shared_governance",
+          "narrative_description": "Establish joint oversight of Florentine affairs, ensuring neither house dominates",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "secure_advantage",
+          "narrative_description": "Use the alliance to gradually increase your house's influence within the partnership",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "maintain_options",
+          "narrative_description": "Support the alliance publicly while preserving ability to act independently",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The formal alliance is established. Both houses commit to genuine partnership, creating a new model of shared power that will define Florence for generations.",
+        "CD": "Your commitment to the alliance is not fully reciprocated. The partnership succeeds but with underlying tensions.",
+        "DC": "Your hedging creates friction but the alliance holds. Your house gains slight advantages within the partnership structure.",
+        "DD": "Both houses' competitive instincts strain the reconciliation. The alliance exists but remains fragile, vulnerable to future conflict."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_14",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The alliance shows strain. Even in peace, old habits of competition persist."
+    },
+    "turn_13_ruin": {
+      "turn": 13,
+      "act": 3,
+      "narrative_briefing": "The bloodbath in the Duomo has brought foreign intervention. Milan's armies approach from the north, the Pope's forces from the south. Both houses, weakened by their conflict, must now face external conquest. Only unity can save Florence\u2014but can blood enemies become allies?",
+      "matrix_type": "volunteers_dilemma",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.4,
+        "free_ride_bonus": 0.6,
+        "disaster_penalty": 1.2,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "lead_defense",
+          "narrative_description": "Commit your remaining forces to lead Florence's defense, regardless of past conflict",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "propose_unity",
+          "narrative_description": "Reach out to your enemy to propose joint defense against the foreign invaders",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "submit_to_invaders",
+          "narrative_description": "Negotiate separately with the invaders, offering to help them in exchange for your house's survival",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "let_rival_fall",
+          "narrative_description": "Let the invaders destroy your rival while preserving your own forces for later",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "United by existential threat, both houses lead Florence's defense together. The foreign armies are repelled, and the shared sacrifice creates unexpected bonds between former enemies.",
+        "CD": "Your sacrifice saves Florence while your rival holds back. They survive unscathed while your forces are depleted, but the city endures.",
+        "DC": "Your passivity lets your rival bear the cost of defense. They are weakened but the city survives\u2014and they remember your betrayal.",
+        "DD": "Neither house will sacrifice for the other. The foreign armies sweep through a divided Florence, installing puppet governments and ending both houses' independence. The Renaissance city becomes a province of foreign empires."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_14",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Even facing conquest, the houses cannot unite. Florence's fate is sealed."
+    },
+    "turn_14_legacy": {
+      "turn": 14,
+      "act": 3,
+      "narrative_briefing": "The alliance has held through every test. Now, at the end, the question is what legacy both houses will leave. Will this partnership become the foundation of a new Florence, or will old ambitions reassert themselves in the final reckoning?",
+      "matrix_type": "harmony",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.0,
+        "reward": 1.5,
+        "punishment": 0.0,
+        "sucker": 0.5,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "eternal_partnership",
+          "narrative_description": "Commit to a permanent alliance, binding future generations to cooperation",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "magnanimous_peace",
+          "narrative_description": "Accept a peace that leaves both houses strong, even at cost to potential advantages",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "favorable_terms",
+          "narrative_description": "Negotiate for advantages within the alliance that benefit your house's legacy",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "future_options",
+          "narrative_description": "Ensure the alliance allows your house flexibility to pursue future opportunities alone",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The eternal partnership is sealed. Both houses commit their legacy to cooperation, and Florence enters a golden age. The Renaissance flourishes under their joint stewardship, and both families' names echo through history as builders, not destroyers.",
+        "CD": "Your generous commitment creates a lasting peace, though your rival preserves some advantages. Both houses prosper, with yours slightly more constrained.",
+        "DC": "Your negotiated advantages give your house a stronger position, but the partnership endures. Both houses prosper, with yours slightly favored.",
+        "DD": "Both houses' pursuit of advantage creates a conditional peace. The alliance survives but remains a negotiated arrangement rather than a true partnership. Florence prospers, but the houses remain wary of each other."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": null,
+      "settlement_available": true,
+      "settlement_failed_narrative": "Even at the moment of triumph, the houses cannot fully trust each other. The legacy remains uncertain."
+    },
+    "turn_14_collapse": {
+      "turn": 14,
+      "act": 3,
+      "narrative_briefing": "Foreign occupation or total war has brought both houses to the brink of extinction. What remains is barely worth fighting over, yet the hatred runs too deep to simply end. In the ruins of Florence, both houses face their final choice: accept destruction together, or find some way to survive.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.4,
+        "reward": 0.6,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.2,
+        "crash_payoff": -2.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "mutual_survival",
+          "narrative_description": "Propose that both houses accept diminished status but survive to rebuild",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "accept_defeat",
+          "narrative_description": "Concede defeat and hope your rival shows mercy in victory",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "last_gamble",
+          "narrative_description": "Stake everything on one final attempt to destroy your rival and emerge alone",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "mutual_annihilation",
+          "narrative_description": "If your house must fall, ensure your rival falls with you",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both houses accept survival over victory. In the ruins of their ambitions, they find accommodation. Florence will never again be what it was, but both families endure in diminished form.",
+        "CD": "Your offer of peace is rejected. Your rival's final gamble succeeds, and your house is destroyed. They rule the ruins alone.",
+        "DC": "Your final gamble destroys your weakened rival. You rule what remains of Florence, but it is a hollow victory in a devastated city.",
+        "DD": "Both houses choose mutual annihilation. The last resources of both families are spent in destruction. When the fires finally die, nothing remains\u2014no Medici, no Pazzi, no Florence worth ruling. Foreign powers divide the ashes, and the Renaissance city becomes a footnote in history, a warning about what ambition can destroy."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": null,
+      "settlement_available": true,
+      "settlement_failed_narrative": "In the end, there is only hatred. The destruction is complete."
+    }
+  },
+  "personas": {
+    "side_a": {
+      "persona": "richelieu",
+      "role_name": "Banking House Patriarch",
+      "role_description": "Head of a powerful Renaissance banking dynasty."
+    },
+    "side_b": {
+      "persona": "metternich",
+      "role_name": "Rival Banking House",
+      "role_description": "Leader of a competing financial power."
+    }
+  }
+}

@@ -1,0 +1,1873 @@
+{
+  "scenario_id": "brexit_negotiations_2024",
+  "title": "Brexit Negotiations",
+  "theme": "default",
+  "setting": "Brexit negotiations. UK-EU divorce terms, trade deals, Irish border question.\nThe UK and EU must negotiate the terms of their separation. Both sides have red lines,\nbut a no-deal outcome would hurt everyone. Can they find a mutually acceptable agreement,\nor will negotiations collapse?",
+  "max_turns": 14,
+  "turns": [
+    {
+      "turn": 1,
+      "act": 1,
+      "narrative_briefing": "The formal Brexit negotiations begin in Brussels. Both delegations have arrived with thick briefing books and carefully prepared positions. The atmosphere is tense but professional\u2014after decades of partnership, you are now adversaries at the negotiating table. The first issue: establishing the framework and sequencing of talks.",
+      "matrix_type": "pure_coordination",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "accept_eu_sequencing",
+          "narrative_description": "Accept the EU's proposed sequencing: settle divorce terms (citizens' rights, financial settlement, Irish border) before discussing future trade relationship",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "insist_parallel_talks",
+          "narrative_description": "Insist on parallel negotiations of withdrawal terms and future trade deal simultaneously\u2014nothing is agreed until everything is agreed",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "propose_hybrid",
+          "narrative_description": "Propose a hybrid approach: begin with divorce terms but allow preliminary trade discussions to run in parallel",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "demand_trade_first",
+          "narrative_description": "Demand that trade negotiations begin immediately\u2014the UK's economic future is the priority",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides agree on a workable framework. The negotiations will proceed in phases, with sufficient flexibility to address interconnected issues. Diplomats on both sides breathe a sigh of relief\u2014at least the process has begun constructively.",
+        "CD": "You extended an olive branch, but the other side pushed for maximum advantage on procedural terms. The framework that emerges heavily favors their preferred sequencing. Your domestic critics pounce on this early concession.",
+        "DC": "Your firm stance on procedures paid off\u2014the other side backed down and accepted a framework more favorable to your priorities. However, you sense resentment building across the table.",
+        "DD": "The first day ends in acrimony over procedures. Both sides dig in on sequencing, and the talks nearly collapse before they begin. Headlines across Europe scream of failure. A no-deal Brexit suddenly seems more likely."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_2",
+      "settlement_available": false,
+      "settlement_failed_narrative": "Settlement negotiations cannot begin until Act II."
+    },
+    {
+      "turn": 2,
+      "act": 1,
+      "narrative_briefing": "With the framework (however imperfect) established, negotiations turn to citizens' rights\u2014the fate of 3 million EU citizens in the UK and 1 million UK citizens in the EU. Families, livelihoods, and decades of shared history hang in the balance. Both sides claim to prioritize people over politics.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.2,
+        "hare_safe": 0.8,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "comprehensive_protection",
+          "narrative_description": "Offer comprehensive, legally binding protections for all citizens, with European Court of Justice oversight",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "mutual_recognition",
+          "narrative_description": "Propose mutual recognition of existing rights with domestic enforcement mechanisms",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "limited_guarantees",
+          "narrative_description": "Offer limited guarantees contingent on reciprocal treatment, maintaining leverage for future negotiations",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "use_citizens_as_leverage",
+          "narrative_description": "Explicitly link citizens' rights to trade concessions\u2014human beings as bargaining chips",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "A breakthrough on citizens' rights. Both sides agree to comprehensive protections that reassure millions of anxious families. The human dimension of Brexit is addressed with dignity. Trust begins to build.",
+        "CD": "You offered genuine protections, but the other side held back, seeking to use vulnerable citizens as leverage. Your generosity is portrayed domestically as naivety. The citizens remain in limbo.",
+        "DC": "Your tactical approach succeeded in extracting concessions, but at the cost of appearing callous. Human rights organizations condemn the negotiations. The other side's citizens feel betrayed by their representatives.",
+        "DD": "Citizens' rights become a political football. Both sides make minimalist offers contingent on broader deals. Three million EU citizens in the UK and one million UK citizens in the EU face continued uncertainty. The humanitarian cost of Brexit becomes starkly apparent."
+      },
+      "branches": {
+        "CC": "turn_3_constructive",
+        "CD": "turn_3_strained",
+        "DC": "turn_3_strained",
+        "DD": "turn_3_hostile"
+      },
+      "default_next": "turn_3",
+      "settlement_available": false,
+      "settlement_failed_narrative": "Settlement negotiations cannot begin until Act II."
+    },
+    {
+      "turn": 3,
+      "act": 1,
+      "narrative_briefing": "The financial settlement\u2014the 'divorce bill'\u2014emerges asthe thorniest issue. The EU presents a detailed accounting of the UK's outstanding commitments: pensions for EU officials, infrastructure projects, loan guarantees. The figure is enormous. UK tabloids are apoplectic.",
+      "matrix_type": "battle_of_sexes",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.5,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.8,
+        "preference_b": 1.6,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "accept_methodology",
+          "narrative_description": "Accept the EU's calculation methodology and negotiate on specific line items within their framework",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "counter_methodology",
+          "narrative_description": "Present an alternative methodology that results in a substantially lower figure, challenging the EU's legal basis",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "phased_payment",
+          "narrative_description": "Propose a phased payment schedule that acknowledges obligations while managing domestic political optics",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "reject_outright",
+          "narrative_description": "Reject the bill entirely\u2014the UK owes nothing and will pay nothing without concrete trade concessions",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Creative accounting finds a middle path. The headline figure is lower than the EU initially demanded but acknowledges legitimate obligations. Both sides can claim victory. The path to trade talks opens.",
+        "CD": "Your flexibility on finances is met with rigid demands. The other side pockets your concession and pushes for more. You've paid a political price at home for nothing in return.",
+        "DC": "Your hardline stance forces the other sideto moderate their demands. The final figure is closer to your preference, but the EU27 are privately furious at what they see as British bad faith.",
+        "DD": "Financial negotiations collapse entirely. Both sides accuse the other of negotiating in bad faith. Legal experts debate whether any money is owed at all. The prospect of the UK leaving without paying a penny\u2014and without a trade deal\u2014becomes real."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_4",
+      "settlement_available": false,
+      "settlement_failed_narrative": "Settlement negotiations cannot begin until Act II."
+    },
+    {
+      "turn": 4,
+      "act": 1,
+      "narrative_briefing": "The Irish border question can no longer be avoided. The Good Friday Agreement requires no hard border between Northern Ireland and the Republic. But if the UK leaves the customs union, how can the border remain open? The ghost of the Troubles haunts these discussions.",
+      "matrix_type": "reconnaissance",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "northern_ireland_protocol",
+          "narrative_description": "Agree to a Northern Ireland protocol keeping it aligned with EU rules, with checks in the Irish Sea",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "uk_wide_alignment",
+          "narrative_description": "Propose UK-wide regulatory alignment to avoid any border\u2014effectively staying in parts of the single market",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "technology_solution",
+          "narrative_description": "Insist that technology can solve the border problem\u2014no need for regulatory alignment or special status",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "threaten_hard_border",
+          "narrative_description": "Suggest that if the EU won't compromise, a hard border may be necessary\u2014placing blame on their intransigence",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "A creative framework emerges for the Irish border. Both sides acknowledge the unique circumstances require unique solutions. The Good Friday Agreement is protected, and businesses can plan. A major obstacle is cleared.",
+        "CD": "Your good-faith effort to protect the peace process is exploited. The other side uses your commitment to avoid a hard border to extract concessions on other issues. You're trapped by your own decency.",
+        "DC": "Your tough talk forces concessions, but Irish politicians and peace process veterans are alarmed. The delicate balance that ended decades of violence feels suddenly fragile.",
+        "DD": "The Irish border becomes an insurmountable obstacle. Both sides blame each other. In Belfast, old divisions resurface. Security analysts warn of renewed paramilitary activity. The peace dividend of a generation is at risk."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_5",
+      "settlement_available": false,
+      "settlement_failed_narrative": "Settlement negotiations cannot begin until Act II."
+    },
+    {
+      "turn": 5,
+      "act": 2,
+      "narrative_briefing": "Act II begins. With the withdrawal agreement's basic framework established (or not), attention turns to the future relationship. The clock is ticking\u2014Article 50's two-year deadline looms. Both sides must decide: push for a comprehensive deal, or accept a minimal arrangement?",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.8,
+        "reward": 1.2,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.4,
+        "crash_payoff": -1.2,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "comprehensive_partnership",
+          "narrative_description": "Push for a comprehensive economic partnership covering goods, services, security, and science cooperation",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "flexible_framework",
+          "narrative_description": "Propose a flexible political declaration that can evolve\u2014kicking detailed arrangements to the transition period",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "cherry_pick_advantages",
+          "narrative_description": "Demand maximum market access while rejecting regulatory alignment\u2014the 'have cake and eat it' approach",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "threaten_no_deal",
+          "narrative_description": "Explicitly threaten to walk away without a deal\u2014'no deal is better than a bad deal'",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides commit to an ambitious future partnership. The political declaration is substantive and forward-looking. Markets stabilize. The transition period will be used to finalize details, not restart negotiations.",
+        "CD": "Your ambitious vision is met with tactical obstruction. The other side seems content with a minimal framework, forcing you to accept vaguer commitments than you wanted.",
+        "DC": "Your brinkmanship pays off\u2014the other side blinks first and offers more generous terms. But the relationship is becoming transactional, not cooperative. Long-term trust erodes.",
+        "DD": "No-deal preparations accelerate on both sides. Emergency legislation. Stockpiling. Currency volatility. Business investment freezes. Both sides claim readiness for the worst while secretly hoping for a breakthrough."
+      },
+      "branches": {
+        "CC": "turn_6_partnership",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_6_crisis"
+      },
+      "default_next": "turn_6",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The settlement talks collapse. Both sides blame each other for bad faith. The clock continues to tick toward the Article 50 deadline with no resolution in sight."
+    },
+    {
+      "turn": 6,
+      "act": 2,
+      "narrative_briefing": "Trade negotiations intensify. The EU insists on 'level playing field' provisions\u2014the UK cannot undercut EU standards to gain competitive advantage. The UK sees this as an attempt to keep Britain bound by EU rules indefinitely. The fundamental tension between access and autonomy comes to a head.",
+      "matrix_type": "inspection_game",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.6,
+        "reward": 1.1,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "accept_level_playing_field",
+          "narrative_description": "Accept robust level playing field commitments in exchange for comprehensive market access",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "dynamic_alignment",
+          "narrative_description": "Propose dynamic alignment with dispute resolution mechanisms\u2014staying close without being bound",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "reject_regulatory_ties",
+          "narrative_description": "Reject any ongoing regulatory ties\u2014sovereignty cannot be compromised for market access",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "demand_canada_plus",
+          "narrative_description": "Demand a 'Canada-plus' deal with minimal obligations\u2014if Canada can have it, why not the UK?",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "A balanced trade framework emerges. Market access is preserved through agreed standards, with mechanisms for managed divergence over time. Business leaders praise the pragmatism on both sides.",
+        "CD": "Your willingness to accept constraints is exploited. The other side pockets your commitment to standards but offers only limited market access in return. You've given away sovereignty for nothing.",
+        "DC": "Your insistence on autonomy forces concessions on market access. But the deal is thinner than it might have been. Trade in services\u2014crucial to the UK\u2014is largely excluded.",
+        "DD": "Trade talks stall completely. Both sides accuse the other of unrealistic demands. WTO terms loom as the default outcome. Manufacturers calculate the cost of tariffs; service providers plan relocations."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_7",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Settlement negotiations fail spectacularly. Leaked documents suggest both sides came prepared to reject any offer. Business confidence plummets as a hard Brexit seems increasingly likely."
+    },
+    {
+      "turn": 7,
+      "act": 2,
+      "narrative_briefing": "Fishing rights become a symbolic flashpoint. For the UK, taking back control of British waters is emotionally potent. For the EU, protecting the livelihoods of European fishermen is non-negotiable. The actual economic significance is small, but the political stakes are enormous.",
+      "matrix_type": "battle_of_sexes",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.4,
+        "miscoordination_penalty": -0.2,
+        "preference_a": 1.7,
+        "preference_b": 1.5,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "transitional_access",
+          "narrative_description": "Offer transitional access with gradual reduction of EU fishing quotas over time",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "annual_negotiations",
+          "narrative_description": "Propose annual negotiations on fishing access, maintaining flexibility for both sides",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "immediate_exclusion",
+          "narrative_description": "Demand immediate and complete control of UK waters\u2014EU boats must leave",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "link_to_market_access",
+          "narrative_description": "Use fishing access as leverage for broader trade concessions\u2014we'll consider access if you improve the trade deal",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "A pragmatic fishing arrangement is reached. Quotas will transition gradually, giving both fishing communities time to adapt. The symbolic battle is won by both sides in their own way.",
+        "CD": "Your reasonable transition proposal is rejected. The other side sees weakness and demands more. British fishing communities feel abandoned; French fishermen celebrate.",
+        "DC": "Your hardline stance on fishing forces concessions. Exclusive control is achieved faster than expected. But French ports blockade British goods in retaliation. Chaos at Dover ensues.",
+        "DD": "Fishing becomes the hill both sides choose to die on. French fishermen threaten to blockade Calais. British patrol boats are deployed. A symbolic dispute threatens to torpedo the entire deal."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_8",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The fishing dispute poisons broader negotiations. What should have been a manageable issue becomes emblematic of mutual intransigence. Settlement talks collapse amid recriminations."
+    },
+    {
+      "turn": 8,
+      "act": 2,
+      "narrative_briefing": "Gibraltar's status emerges as a late complication. Spain has long coveted the Rock, and Brexit offers an opportunity. The 30,000 Gibraltarians are overwhelmingly pro-British. Can their interests be protected without derailing the broader deal?",
+      "matrix_type": "volunteers_dilemma",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.2,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.4,
+        "free_ride_bonus": 0.3,
+        "disaster_penalty": 1.5,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "bilateral_spain_deal",
+          "narrative_description": "Encourage a bilateral UK-Spain arrangement for Gibraltar, separate from the main EU deal",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "special_status",
+          "narrative_description": "Propose special status for Gibraltar within the withdrawal agreement, protecting residents' rights",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "defend_sovereignty",
+          "narrative_description": "Refuse any special arrangements that could compromise British sovereignty over the Rock",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "threaten_veto_retaliation",
+          "narrative_description": "Warn that UK will block any deal that harms Gibraltar\u2014turning the EU's unanimous requirement against it",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Gibraltar's unique situation is accommodated without derailing the broader deal. Residents' rights are protected, borders remain functional, and Spain's concerns are acknowledged if not fully addressed.",
+        "CD": "Your constructive approach is met with maximalist demands. Spain, emboldened, pushes for shared sovereignty. Gibraltar's future becomes uncertain.",
+        "DC": "Your firm defense of Gibraltar succeeds\u2014the territory's status is protected. But Spain extracts concessions elsewhere, and EU unity on Brexit strengthens.",
+        "DD": "Gibraltar becomes a deal-breaker. Spain threatens to veto any agreement. The UK threatens retaliation. A territorial dispute that predates the EU threatens to survive it."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_9",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Settlement talks collapse over Gibraltar. A dispute about 6.8 square kilometers of rock threatens billions in trade. Both sides' publics blame the other for intransigence."
+    },
+    {
+      "turn": 9,
+      "act": 3,
+      "narrative_briefing": "Act III begins. The Article 50 deadline is weeks away. Both parliaments must ratify any deal. The UK Parliament is deeply divided; Brexiteers want a harder break, Remainers want a closer relationship. The EU27 must maintain unity. Last-minute negotiations are frantic.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 0.9,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 2.0,
+        "reward": 1.3,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.3,
+        "crash_payoff": -1.5,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "final_compromise",
+          "narrative_description": "Offer final compromises on remaining issues to secure a deal before the deadline",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "request_extension",
+          "narrative_description": "Propose an extension of Article 50 to allow more time for negotiations",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "take_or_leave",
+          "narrative_description": "Present a take-it-or-leave-itfinal offer\u2014no more concessions, decide now",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "prepare_no_deal",
+          "narrative_description": "Visibly accelerate no-deal preparations, signaling willingness to walk away",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides make final concessions. A deal is reached that neither side loves but both can live with. The deadline will be met. Relief sweeps through Brussels and London.",
+        "CD": "Your last-minute flexibility is exploited. The other side extracts additional concessions while offering nothing new. The deal, if there is one, is heavily lopsided.",
+        "DC": "Your brinkmanship works\u2014the other side caves under deadline pressure. But the last-minute nature means details are rushed. Implementation will be chaotic.",
+        "DD": "Neither side blinks. The deadline passes with no deal. Emergency measures activate. Queues at Dover stretch for miles. Medicine shortages are reported. Markets crash. The worst-case scenario begins to unfold."
+      },
+      "branches": {
+        "CC": "turn_10_resolution",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_10_nodeal"
+      },
+      "default_next": "turn_10",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Settlement talks fail at the eleventh hour. Both chief negotiators face their respective leaders with the news that there will be no deal. Emergency protocols activate across Europe."
+    },
+    {
+      "turn": 10,
+      "act": 3,
+      "narrative_briefing": "The moment of truth: parliamentary ratification. The deal (or no-deal outcome) must survive domestic politics. In the UK, multiple amendments threaten to unpick the agreement. In the EU, Hungary hints at using its veto to extract unrelated concessions. The finish line is in sight but not yet crossed.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.5,
+        "hare_temptation": 1.3,
+        "hare_safe": 0.8,
+        "stag_fail": -0.5,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "whip_support",
+          "narrative_description": "Work intensively to secure parliamentary support, making personal appeals and minor clarifications",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "public_campaign",
+          "narrative_description": "Launch a public campaign emphasizing the deal's benefits and the costs of no-deal",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "blame_opposition",
+          "narrative_description": "Blame domestic opponents and the other side for any remaining problems\u2014protect your political position",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "threaten_new_election",
+          "narrative_description": "Threaten a new election or referendum if parliament rejects the deal\u2014escalate the domestic stakes",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides successfully shepherd the deal through their respective parliaments. Amendments are defeated. Vetoes are not exercised. Brexit happens on agreed terms.",
+        "CD": "Your good-faith effort to pass the deal is undermined by the other side's political games. Their domestic maneuvering emboldens your opponents. Ratification fails.",
+        "DC": "Your political hardball succeeds domestically but creates backlash abroad. The deal passes your parliament but faces new obstacles in the other's.",
+        "DD": "Ratification collapses on both sides. Parliaments reject the deal. Governments fall. New elections are called. The Brexit process must restart from scratch\u2014if it ever finishes."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_11",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Settlement negotiations fail during ratification. The deal that negotiators painstakingly constructed is rejected by elected representatives on both sides. Chaos ensues."
+    },
+    {
+      "turn": 11,
+      "act": 3,
+      "narrative_briefing": "The transition period\u2014that precious buffer between legal departure and actual divergence\u2014is now the battlefield. How long? What rules apply? Can it be extended? Both sides need time, but admitting it is politically costly.",
+      "matrix_type": "leader",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 2.2,
+        "reward": 1.5,
+        "punishment": -0.3,
+        "sucker": 0.4,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "accept_transition_terms",
+          "narrative_description": "Accept the proposed transition terms, recognizing that implementation takes time",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "request_extension",
+          "narrative_description": "Request an extension of the transition period to ensure orderly implementation",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "minimize_transition",
+          "narrative_description": "Push for the shortest possible transition\u2014clean breaks are better than lingering attachments",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "exploit_transition",
+          "narrative_description": "Use the transition period to prepare for divergence while still enjoying single market access",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "A reasonable transition period is agreed. Businesses have time to adapt. New systems are tested. The divorce is painful but orderly.",
+        "CD": "Your acceptance of transition terms is met with exploitation. The other side uses the period to poach your businesses, workers, and financial institutions.",
+        "DC": "Your aggressive use of the transition backfires. What you saw as preparation, the other side sees as bad faith. Trust evaporates.",
+        "DD": "The transition period becomes a continuation of hostilities by other means. Both sides prepare for conflict rather than cooperation. The temporary arrangement feels permanent\u2014and poisonous."
+      },
+      "branches": {
+        "CC": "turn_12_orderly",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_12_bitter"
+      },
+      "default_next": "turn_12",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Settlement talks during the transition period collapse. What was meant to be a cooling-off period becomes a new phase of confrontation. Business confidence collapses."
+    },
+    {
+      "turn": 12,
+      "act": 3,
+      "narrative_briefing": "Implementation day approaches. The transition is ending. Whatever relationship exists now is the relationship that will govern trade, security, and cooperation for decades. Last-minute adjustments are still possible, but the broad contours are set.",
+      "matrix_type": "prisoners_dilemma",
+      "matrix_parameters": {
+        "scale": 0.9,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.7,
+        "reward": 1.2,
+        "punishment": 0.2,
+        "sucker": -0.2,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "honor_spirit",
+          "narrative_description": "Honor the spirit of the agreement, implementing it generously and resolving ambiguities cooperatively",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "build_institutions",
+          "narrative_description": "Invest in joint institutions for ongoing cooperation\u2014the deal is a beginning, not an end",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "exploit_loopholes",
+          "narrative_description": "Exploit every loophole and ambiguity in the agreement to gain advantage",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "prepare_disputes",
+          "narrative_description": "Begin documenting grievances for future disputes\u2014the legal battles are just beginning",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Implementation proceeds smoothly. Both sides honor their commitments. New joint committees meet constructively. The UK-EU relationship, though changed, remains cooperative.",
+        "CD": "Your good-faith implementation is exploited. The other side finds loopholes, delays compliance, and gains advantages you never anticipated.",
+        "DC": "Your aggressive interpretation of the agreement succeeds in the short term but poisons the relationship for the future. Retaliation is inevitable.",
+        "DD": "Implementation becomes a battlefield. Every clause is contested. Dispute resolution mechanisms are overwhelmed. The 'deal' exists on paper but not in practice."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_13",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Even at this late stage, settlement proves impossible. Implementation proceeds amid mutual recrimination. The post-Brexit relationship begins in acrimony."
+    },
+    {
+      "turn": 13,
+      "act": 3,
+      "narrative_briefing": "Security and defense cooperation\u2014the often-forgotten dimension of Brexit. The UK was central to EU security structures. Now what? Intelligence sharing, Europol membership, defense coordination\u2014all must be renegotiated. In an unstable world, can former allies remain partners?",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.3,
+        "hare_temptation": 1.2,
+        "hare_safe": 0.7,
+        "stag_fail": -0.4,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "deep_security_partnership",
+          "narrative_description": "Propose a deep security partnership with shared intelligence, joint operations, and mutual defense commitments",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "maintain_existing_ties",
+          "narrative_description": "Maintain existing security cooperation arrangements with minimal disruption",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "prioritize_nato",
+          "narrative_description": "Prioritize NATO over EU security structures\u2014pivot away from European defense cooperation",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "restrict_intelligence",
+          "narrative_description": "Restrict intelligence sharing until trade disputes are resolved\u2014security as leverage",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "A robust security partnership emerges. Intelligence continues to flow. Joint counterterrorism operations proceed. The UK and EU remain allies in an uncertain world.",
+        "CD": "Your commitment to security cooperation is met with transactional demands. The other side links security to trade, weaponizing what should be mutual protection.",
+        "DC": "Your security hardball creates genuine risks. A terrorist plot is missed because of information gaps. Both sides' citizens pay the price for political games.",
+        "DD": "Security cooperation collapses. Intelligence agencies stop sharing. Europol excludes UK data. Criminal networks and terrorist cells celebrate this gift to their operations."
+      },
+      "branches": {
+        "CC": "turn_14_partnership_finale",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_14_cold_peace"
+      },
+      "default_next": "turn_14",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Settlement negotiations over security arrangements fail. Former allies become strangers. In an unstable world, both sides are weaker for the rupture."
+    },
+    {
+      "turn": 14,
+      "act": 3,
+      "narrative_briefing": "The final chapter. Years of negotiation have led to this moment. The UK is out of the EU. But what does 'out' mean? The relationship that emerges will shape Europe for generations. Both sides must decide: adversaries, strangers, or partners?",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.5,
+        "hare_temptation": 1.1,
+        "hare_safe": 0.6,
+        "stag_fail": -0.6,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "strategic_partnership",
+          "narrative_description": "Commit to a strategic partnership\u2014Brexit happened, but the UK and EU share values, interests, and a neighborhood",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "managed_coexistence",
+          "narrative_description": "Accept managed coexistence\u2014not friends, not enemies, just neighbors with a functional relationship",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "competitive_divergence",
+          "narrative_description": "Embrace competitive divergence\u2014the UK will chart its own course, EU relationship be damned",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "ongoing_confrontation",
+          "narrative_description": "Prepare for ongoing confrontation\u2014the Brexit battles may be over, but the war continues",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "From the ashes of a difficultdivorce, a mature partnership emerges. The UK and EU are no longer married, but they remain close allies. History will judge Brexit's wisdom, but its execution was ultimately professional. Trade flows. Citizens are protected. Security continues. The relationship is different, but it endures.",
+        "CD": "Your vision of partnership is not shared. The EU (or UK) turns inward, dismissing olive branches. A cold peace descends on the Channel. Trade continues under WTO rules. Citizens face bureaucracy. Security cooperation is minimal. Decades of integration unravel into polite estrangement.",
+        "DC": "Your competitive stance succeeds but at tremendous cost. The relationship is poisoned for a generation. Every interaction is transactional. Every agreement is minimal. The UK and EU are strangers who happen to share a continent.",
+        "DD": "The worst outcome. No deal ever materialized. Trade collapses under WTO rules and mounting tariffs. Northern Ireland descends into renewed violence. Scotland votes for independence. The UK fragments. The EU faces its own crises of legitimacy. Brexit becomes a cautionary tale of democratic self-harm\u2014a wound both sides inflicted and from which neither recovers."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": null,
+      "settlement_available": true,
+      "settlement_failed_narrative": "Settlement proves impossible even at the final hour. Brexit concludes not with a handshake but with slamming doors. Both sides' children will wonder how it came to this."
+    }
+  ],
+  "branches": {
+    "turn_3_constructive": {
+      "turn": 3,
+      "act": 1,
+      "narrative_briefing": "The citizens' rights breakthrough has created goodwill. Both delegations feel they can work together. The financial settlement discussions begin in a constructive atmosphere, with creative accounting replacing rigid positions.",
+      "matrix_type": "battle_of_sexes",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.6,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.7,
+        "preference_b": 1.5,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "accept_methodology",
+          "narrative_description": "Accept the EU's calculation methodology and negotiate on specific line items within their framework",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "counter_methodology",
+          "narrative_description": "Present an alternative methodology that results in a substantially lower figure, challenging the EU's legal basis",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "phased_payment",
+          "narrative_description": "Propose a phased payment schedule that acknowledges obligations while managing domestic political optics",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "reject_outright",
+          "narrative_description": "Reject the bill entirely\u2014the UK owes nothing and will pay nothing without concrete trade concessions",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Building on the citizens' rights success, creative accounting finds a middle path. The financial settlement is agreed with surprising speed. Both sides can claim victory. The path to trade talks opens wide.",
+        "CD": "Your continued flexibility is exploited. The other side pockets another concession. You've established a pattern of giving way under pressure.",
+        "DC": "Despite the earlier goodwill, your hardline stance on finances creates whiplash. The other side feels betrayed after their cooperation on citizens' rights.",
+        "DD": "The constructive atmosphere dissipates. Financial negotiations collapse as both sides overplay their hands. The earlier progress is squandered."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_4",
+      "settlement_available": false,
+      "settlement_failed_narrative": "Settlement negotiations cannot begin until Act II."
+    },
+    "turn_3_strained": {
+      "turn": 3,
+      "act": 1,
+      "narrative_briefing": "The citizens' rights debacle has soured the atmosphere. Trust is thin. Both delegations eye each other warily as discussions turn to the financial settlement. The EU's demand for \u00a350 billion lands like a bomb in London.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.4,
+        "reward": 0.9,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.3,
+        "crash_payoff": -0.8,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "accept_methodology",
+          "narrative_description": "Accept the EU's calculation methodology despite domestic political costs",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "counter_methodology",
+          "narrative_description": "Present an alternative methodology that results in a substantially lower figure",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "phased_payment",
+          "narrative_description": "Propose a phased payment schedule as a face-saving compromise",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "reject_outright",
+          "narrative_description": "Reject the bill entirely\u2014walk away from this extortion",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Despite the strained atmosphere, both sides find a compromise. Professional negotiators suppress their frustrations and reach a workable agreement on finances.",
+        "CD": "Your attempt to mend fences is met with continued hostility. The other side scents weakness and demands even more. Your domestic position weakens further.",
+        "DC": "Your firm stance forces concessions from a weakened opponent. But you've established a pattern of aggression that will define the relationship.",
+        "DD": "The strained negotiations collapse entirely. Both sides storm out. Financial discussions are suspended indefinitely. No-deal preparations accelerate."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_4",
+      "settlement_available": false,
+      "settlement_failed_narrative": "Settlement negotiations cannot begin until Act II."
+    },
+    "turn_3_hostile": {
+      "turn": 3,
+      "act": 1,
+      "narrative_briefing": "The citizens' rights disaster has poisoned everything. Delegations barely speak. Informal contacts have ceased. The financial settlement discussions begin in an atmosphere of mutual recrimination and barely concealed contempt.",
+      "matrix_type": "deadlock",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.3,
+        "reward": 0.4,
+        "punishment": 0.9,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "reluctant_engagement",
+          "narrative_description": "Reluctantly engage on finances despite the hostile atmosphere\u2014someone has to be the adult",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "reject_everything",
+          "narrative_description": "Reject every EU demand as punitive\u2014they're trying to punish Brexit",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "minimal_offer",
+          "narrative_description": "Make a minimal offer just to keep talks alive\u2014something is better than nothing",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "walk_out",
+          "narrative_description": "Walk out of financial discussions entirely\u2014we don't negotiate with extortionists",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Against all odds, professional duty prevails over political poison. A minimal framework for financial discussions is preserved. It's not progress, but it's not collapse.",
+        "CD": "Your attempt to salvage negotiations is thrown back in your face. The other side has decided that obstruction serves their interests better than agreement.",
+        "DC": "Your aggressive stance in a hostile environment somehow works\u2014the other side, exhausted by conflict, caves on key points just to end the fighting.",
+        "DD": "Total breakdown. Financial negotiations are suspended indefinitely. Both sides begin legal proceedings. The 'divorce bill' will be settled in international courts, if at all."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_4",
+      "settlement_available": false,
+      "settlement_failed_narrative": "Settlement negotiations cannot begin until Act II."
+    },
+    "turn_6_partnership": {
+      "turn": 6,
+      "act": 2,
+      "narrative_briefing": "The mutual commitment to an ambitious partnership has transformed the negotiations. Both sides now work together to solve problems rather than create them. Trade discussions focus on maximizing mutual benefit rather than extracting concessions.",
+      "matrix_type": "harmony",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.2,
+        "reward": 1.8,
+        "punishment": 0.0,
+        "sucker": 0.6,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "comprehensive_fta",
+          "narrative_description": "Pursue a comprehensive free trade agreement covering all sectors",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "regulatory_cooperation",
+          "narrative_description": "Establish deep regulatory cooperation to minimize trade friction",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "services_focus",
+          "narrative_description": "Push hard for services access\u2014the UK's comparative advantage must be protected",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "maintain_leverage",
+          "narrative_description": "Keep some issues unresolved to maintain leverage for future negotiations",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "A genuinely comprehensive trade agreement takes shape. Both sides make concessions that would have been unthinkable months ago. The deal becomes a model for future arrangements.",
+        "CD": "Your continued cooperation is taken for granted. The other side starts making demands, sensing they can extract more from a willing partner.",
+        "DC": "Your push for advantage in a cooperative environment succeeds, but it subtly changes the dynamic. The partnership begins to feel transactional.",
+        "DD": "The partnership unravels as both sides revert to competitive instincts. The moment of possibility passes. Negotiations return to the trenches."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_7",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Even in this cooperative environment, settlement proves elusive. Both sides overestimate what the partnership can deliver."
+    },
+    "turn_6_crisis": {
+      "turn": 6,
+      "act": 2,
+      "narrative_briefing": "No-deal preparations are now consuming both governments' attention. Trade negotiations continue in a perfunctory way, but the real focus is on emergency measures. Both sides are building walls while claiming to seek bridges.",
+      "matrix_type": "security_dilemma",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 0.9,
+        "punishment": 0.2,
+        "sucker": -0.3,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "back_from_brink",
+          "narrative_description": "Step back from the brink\u2014propose a cooling-off period to reset negotiations",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "emergency_deal",
+          "narrative_description": "Pursue an emergency minimal deal to avoid the worst outcomes",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "accelerate_preparations",
+          "narrative_description": "Accelerate no-deal preparations\u2014we must be ready for the worst",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "blame_campaign",
+          "narrative_description": "Launch a public campaign blaming the other side for the impasse",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides pull back from the brink. A face-saving formula allows negotiations to restart. The crisis passes, though trust remains damaged.",
+        "CD": "Your attempt to de-escalate is portrayed as weakness. The other side doubles down on crisis preparation, sensing an advantage.",
+        "DC": "Your crisis preparations force the other side to back down. They blink first. But the relationship may be permanently damaged.",
+        "DD": "The crisis deepens. No-deal becomes not just prepared for but expected. Business investment collapses. Recession looms on both sides of the Channel."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_7",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Settlement is impossible in crisis conditions. Both sides are too focused on preparation for disaster to negotiate its prevention."
+    },
+    "turn_10_resolution": {
+      "turn": 10,
+      "act": 3,
+      "narrative_briefing": "The deal is done, against all odds. Both parliaments prepare to ratify an agreement that, while imperfect, represents a genuine compromise. The question now is whether politicians will let the perfect be the enemy of the good.",
+      "matrix_type": "harmony",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.3,
+        "reward": 2.0,
+        "punishment": 0.0,
+        "sucker": 0.7,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "unite_behind_deal",
+          "narrative_description": "Unite behind the deal\u2014this is as good as it gets, and both sides know it",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "address_concerns",
+          "narrative_description": "Address remaining parliamentary concerns with side letters and clarifications",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "extract_more",
+          "narrative_description": "Use ratification as leverage to extract last-minute concessions",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "satisfy_hardliners",
+          "narrative_description": "Modify the deal to satisfy hardliners, even at the cost of the other side's acceptance",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Ratification proceeds smoothly. Both parliaments approve the deal. The Brexit process reaches a dignified conclusion. History will judge the decision, but the process was democratic and orderly.",
+        "CD": "Your commitment to ratification is exploited for last-minute gains. The deal passes, but with a bitter taste.",
+        "DC": "Your last-minute maneuvering succeeds but nearly derails the entire process. The deal passes by the narrowest of margins.",
+        "DD": "The ratified deal is so weakened by amendments that implementation becomes nearly impossible. A 'deal' exists but means little in practice."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_11",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Even after reaching a deal, settlement of final terms proves impossible. The agreement passes into law incomplete and contested."
+    },
+    "turn_10_nodeal": {
+      "turn": 10,
+      "act": 3,
+      "narrative_briefing": "No deal. The deadline has passed. Emergency measures are in effect. Both sides face the reality they claimed to have prepared for but secretly hoped to avoid. Now what?",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 0.9,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.6,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.2,
+        "crash_payoff": -2.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "emergency_talks",
+          "narrative_description": "Propose emergency talks to minimize damage and find a path forward",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "damage_control",
+          "narrative_description": "Focus on domestic damage control while keeping channels open",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "exploit_chaos",
+          "narrative_description": "Exploit the chaos to poach the other side's businesses and talent",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "blame_game",
+          "narrative_description": "Launch an aggressive blame campaign\u2014this is their fault, not ours",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Even after no-deal, mature leadership prevails. Emergency arrangements are quickly established. The worst impacts are mitigated. A deal becomes possible again.",
+        "CD": "Your attempts at damage control are met with opportunism. The other side uses the crisis to gain advantage rather than solve problems.",
+        "DC": "Your exploitation of the chaos succeeds in the short term. But the other side remembers, and retaliation will come.",
+        "DD": "No-deal becomes permanent warfare. Tariffs escalate. Regulations diverge. The Channel becomes a moat. Two economies that were deeply integrated begin a painful separation."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_11",
+      "settlement_available": true,
+      "settlement_failed_narrative": "In the chaos of no-deal, settlement is impossible. Both sides are too busy fighting fires to negotiate."
+    },
+    "turn_12_orderly": {
+      "turn": 12,
+      "act": 3,
+      "narrative_briefing": "The transition is proceeding orderly. Systems are being tested. Businesses are adapting. The relationship is changing but not breaking. Implementation day approaches with cautious optimism.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.2,
+        "hare_temptation": 1.1,
+        "hare_safe": 0.7,
+        "stag_fail": -0.3,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "honor_spirit",
+          "narrative_description": "Honor the spirit of the agreement, implementing it generously",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "build_institutions",
+          "narrative_description": "Invest in joint institutions for ongoing cooperation",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "optimize_position",
+          "narrative_description": "Optimize your position within the agreement's boundaries",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "test_limits",
+          "narrative_description": "Test the limits of the agreement to see what you can get away with",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Implementation becomes a model of good faith. Both sides honor commitments. Joint committees work constructively. The post-Brexit relationship begins on solid foundations.",
+        "CD": "Your good faith is not reciprocated. The other side tests limits while you honor commitments. Resentment builds.",
+        "DC": "Your boundary-testing succeeds but undermines the cooperative atmosphere. Implementation becomes more transactional.",
+        "DD": "Even an orderly transition deteriorates into mutual boundary-testing. The spirit of cooperation fades."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_13",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Settlement during implementation fails. Despite orderly process, final terms cannot be agreed."
+    },
+    "turn_12_bitter": {
+      "turn": 12,
+      "act": 3,
+      "narrative_briefing": "The transition period has been acrimonious. Every clause is contested. Implementation day approaches amid legal threats and political posturing. The relationship is already poisoned before it formally begins.",
+      "matrix_type": "deadlock",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.4,
+        "reward": 0.5,
+        "punishment": 1.0,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "seek_detente",
+          "narrative_description": "Seek a d\u00e9tente\u2014the relationship cannot start this badly and survive",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "minimal_compliance",
+          "narrative_description": "Comply minimally while keeping options open for improvement",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "maximize_damage",
+          "narrative_description": "Maximize damage to the other side within legal boundaries",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "prepare_litigation",
+          "narrative_description": "Prepare for years of litigation\u2014the courts will decide what the deal means",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Even from this bitter starting point, a fragile peace is possible. Both sides step back from maximum confrontation. It's not friendship, but it's survivable.",
+        "CD": "Your attempt at d\u00e9tente is rejected. The other side sees only weakness to exploit. The bitter relationship continues.",
+        "DC": "Your confrontational approach succeeds in the short term. But you've created an enemy for a generation.",
+        "DD": "Implementation becomes permanent warfare. Legal battles. Trade disputes. Political attacks. The UK-EU relationship settles into hostile coexistence."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_13",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Settlement from this poisoned position is impossible. Both sides have given up on agreement."
+    },
+    "turn_14_partnership_finale": {
+      "turn": 14,
+      "act": 3,
+      "narrative_briefing": "Against all expectations, the security partnership that emerged from Brexit negotiations has proven durable. The UK and EU face the future as genuine partners, their relationship transformed but not destroyed. The final chapter writes itself.",
+      "matrix_type": "harmony",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 2.5,
+        "punishment": 0.0,
+        "sucker": 0.8,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "strategic_partnership",
+          "narrative_description": "Formalize the strategic partnership for the decades ahead",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "expand_cooperation",
+          "narrative_description": "Expand cooperation into new areas\u2014science, culture, education",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "protect_gains",
+          "narrative_description": "Protect the gains you've made\u2014don't get complacent",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "consolidate_advantage",
+          "narrative_description": "Consolidate your advantages before the relationship stabilizes",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The UK-EU relationship emerges from Brexit stronger than anyone predicted. Different, yes. But partners in a shared European project, even if no longer married. Future generations will marvel at how close to disaster this came, and how a wise peace was found.",
+        "CD": "Your partnership vision is not fully shared. The relationship settles into something less than you hoped for, but more than you feared.",
+        "DC": "Your last-minute maneuvering succeeds but limits the partnership's potential. The relationship is good, but could have been great.",
+        "DD": "Even after all the progress, the old competitive instincts reassert themselves. The partnership survives but never quite flourishes."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": null,
+      "settlement_available": true,
+      "settlement_failed_narrative": "Even in this positive environment, perfect settlement proves elusive. But the relationship endures."
+    },
+    "turn_14_cold_peace": {
+      "turn": 14,
+      "act": 3,
+      "narrative_briefing": "Security cooperation collapsed. The UK and EU face the future as strangers, not partners. Intelligence is not shared. Threats are faced alone. The final chapter is written in cold ink.",
+      "matrix_type": "prisoners_dilemma",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.8,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": -0.3,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "rebuild_bridges",
+          "narrative_description": "Attempt to rebuild bridges, even at this late stage",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "accept_cold_peace",
+          "narrative_description": "Accept a cold peace\u2014not enemies, just not friends",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "competitive_stance",
+          "narrative_description": "Maintain a competitive stance\u2014they chose this, live with it",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "seek_alternatives",
+          "narrative_description": "Seek alternative alliances and partnerships to replace what was lost",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Even from this cold starting point, a thaw is possible. Both sides recognize that enmity serves no one. The relationship warms, slowly, painfully, but perceptibly.",
+        "CD": "Your attempt to rebuild is rebuffed. The cold peace becomes the permanent state. Generations will grow up treating each other as foreign.",
+        "DC": "Your competitive stance succeeds in the short term but cements the estrangement. The UK and EU are rivals now, not partners.",
+        "DD": "The cold peace freezes into permanent hostility. Security gaps are exploited by common enemies. Both sides are weaker, and both blame the other. Brexit ends not with a bang but with a long, slow freeze."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": null,
+      "settlement_available": true,
+      "settlement_failed_narrative": "From this cold peace, settlement is impossible. The relationship ends as it lived\u2014in mutual incomprehension."
+    }
+  },
+  "personas": {
+    "side_a": {
+      "persona": "bismarck",
+      "role_name": "British Negotiator",
+      "role_description": "UK representative seeking the best possible exit terms."
+    },
+    "side_b": {
+      "persona": "metternich",
+      "role_name": "EU Chief Negotiator",
+      "role_description": "European Union representative defending EU unity and interests."
+    }
+  }
+}

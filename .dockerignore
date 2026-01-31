@@ -26,8 +26,8 @@ venv/
 ENV/
 env/
 
-# UV - uv.lock should be tracked for reproducible builds
-# uv.lock
+# UV lock (we regenerate in Docker)
+uv.lock
 
 # IDE
 .idea/
@@ -45,6 +45,7 @@ env/
 htmlcov/
 .tox/
 .nox/
+tests/
 
 # Type checking
 .mypy_cache/
@@ -61,8 +62,7 @@ dmypy.json
 .DS_Store
 Thumbs.db
 
-# Project specific
-# scenarios/*.json - now tracked for reproducible deployments
+# Instance folder (local SQLite)
 instance/
 seed/
 
@@ -88,7 +88,20 @@ tmp/
 src/brinksmanship/webapp/templates/generated/
 .playwright-mcp/
 
-# Playtest results and work directories (local data)
+# Playtest results and work directories
 playtest_results/
 playtest_work/
 traces/
+
+# Git
+.git/
+.gitignore
+
+# Documentation (not needed in container)
+*.md
+!README.md
+
+# Fly.io
+fly.toml
+
+# Note: scenarios/ is NOT excluded - we need scenario files in the container

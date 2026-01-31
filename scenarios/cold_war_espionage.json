@@ -1,0 +1,2243 @@
+{
+  "scenario_id": "cold_war_mole_hunt_1984",
+  "title": "The Berlin Cipher",
+  "theme": "cold-war",
+  "setting": "Cold War espionage. Mole hunts, double agents, disinformation campaigns.\nIntelligence services face off in a shadow war of spies and secrets. Each side tries to\npenetrate the other while protecting their own agents. Trust is a commodity in short supply\nas the specter of betrayal hangs over every interaction.",
+  "max_turns": 14,
+  "turns": [
+    {
+      "turn": 1,
+      "act": 1,
+      "narrative_briefing": "A cipher clerk in Vienna has gone missing. Both services had contact with him; both now fear exposure. Initial reports are fragmentary, and neither side knows how much the other has learned. The shadow war begins with uncertainty\u2014do you probe for information, or focus on protecting your own networks?",
+      "matrix_type": "reconnaissance",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "probe_vienna",
+          "narrative_description": "Deploy assets to aggressively investigate the missing clerk's contacts and uncover enemy operations",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "activate_sleepers",
+          "narrative_description": "Wake dormant agents to gather intelligence on the enemy's response to the Vienna incident",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "secure_networks",
+          "narrative_description": "Focus on protecting your own agents and communication channels, adopting a defensive posture",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "maintain_cover",
+          "narrative_description": "Continue normal operations to avoid drawing attention; let the situation develop",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both services adopt cautious postures. The Vienna situation remains murky, but neither side has exposed themselves. A tense equilibrium holds as each watches the other through intermediaries.",
+        "CD": "Your restraint allows the enemy to probe freely. Their agents photograph documents at the clerk's apartment while your people stand down. You've protected your networks, but they've gained valuable intelligence.",
+        "DC": "Your aggressive investigation yields results\u2014you identify a dead drop location used by enemy couriers. Meanwhile, the opposition's defensive posture means they learn nothing of your methods.",
+        "DD": "Both services swarm Vienna with operatives. The resulting chaos draws attention from local authorities and burns several cover identities on both sides. The clerk's secrets remain contested, but the escalation has begun."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_2",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    {
+      "turn": 2,
+      "act": 1,
+      "narrative_briefing": "The Vienna dust has settled, but new intelligence suggests both sides have moles higher up than anyone suspected. A defector approaches your embassy claiming knowledge of a penetration agent. Is this a genuine offer or an enemy provocation designed to waste your resources and expose your methods?",
+      "matrix_type": "inspection_game",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "accept_defector",
+          "narrative_description": "Bring the defector in for debriefing, accepting the risk that they may be a plant",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "verify_bona_fides",
+          "narrative_description": "Conduct extensive vetting of the defector before any contact, risking losing them to the other side",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "surveillance_only",
+          "narrative_description": "Watch the defector from a distance without making contact; gather intelligence passively",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "expose_plant",
+          "narrative_description": "Assume the defector is a provocation and feed disinformation back through them",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both services approach the defector situation with caution. The would-be turncoat, frustrated by neither side taking the bait aggressively, provides fragments of genuine intelligence to both\u2014enough to raise suspicions but not enough to act on.",
+        "CD": "Your willingness to engage while the enemy probes leaves you exposed. The defector turns out to be genuine, but your eagerness has revealed safe houses and communication protocols to enemy surveillance.",
+        "DC": "Your aggressive vetting pays off\u2014you identify the defector as a double agent before committing resources. The enemy's passive approach means they've invested heavily in an asset you've now neutralized.",
+        "DD": "Both services aggressively pursue the defector, who proves to be playing both sides. The resulting confrontation in a neutral country causes a diplomatic incident and forces both networks underground."
+      },
+      "branches": {
+        "CC": "turn_3_cautious",
+        "CD": "turn_3_cautious",
+        "DC": "turn_3_aggressive",
+        "DD": "turn_3_aggressive"
+      },
+      "default_next": "turn_3",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    {
+      "turn": 3,
+      "act": 1,
+      "narrative_briefing": "Intercepted communications suggest a major intelligence operation is being planned against one of your key installations. The signals are ambiguous\u2014this could be genuine or an elaborate deception to make you waste resources defending the wrong target. How do you respond to intelligence that may itself be disinformation?",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "reinforce_all",
+          "narrative_description": "Strengthen security across all sensitive installations, spreading resources thin but covering all bases",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "set_trap",
+          "narrative_description": "Identify the most likely target and set an elaborate counterintelligence trap",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "disinformation_campaign",
+          "narrative_description": "Feed false intelligence about your vulnerabilities to misdirect enemy planners",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "ignore_bait",
+          "narrative_description": "Maintain normal operations; don't let the enemy dictate your resource allocation",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides adopt defensive postures. Neither commits to aggressive action, and the intercepted communications turn out to be test messages rather than operational plans. A quiet turn in the shadow war.",
+        "CD": "Your defensive stance is exploited by enemy aggression. While you spread resources thin, they concentrate forces and successfully penetrate a research facility, extracting valuable documents.",
+        "DC": "Your trap catches an enemy operative in the act. Under interrogation, they reveal details of the opposition's communication protocols. Your aggressive gamble paid off handsomely.",
+        "DD": "Both sides execute aggressive operations simultaneously. The resulting chaos sees agents caught on both sides, safe houses burned, and cover identities exposed. The shadow war has turned hot."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_4",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    {
+      "turn": 4,
+      "act": 1,
+      "narrative_briefing": "A critical moment: your most valuable asset, CARDINAL, requests an emergency meeting. The message uses the correct protocols, but something feels wrong. Meanwhile, your analysts have detected unusual activity around one of your own safe houses. Are these events connected? Is CARDINAL compromised, or is this a test of your trust?",
+      "matrix_type": "prisoners_dilemma",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "meet_cardinal",
+          "narrative_description": "Send your best handler to meet CARDINAL, trusting that decades of reliable intelligence prove their loyalty",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "abort_contact",
+          "narrative_description": "Ignore the meeting request and assume CARDINAL is compromised; begin damage control operations",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "send_decoy",
+          "narrative_description": "Send a surveillance team instead of a handler; observe who shows up and who's watching",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "delay_response",
+          "narrative_description": "Request a delay through back channels; buy time to assess the situation without committing",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both services step back from the brink. CARDINAL's emergency turns out to be a genuine warning about a security leak\u2014one that threatens both sides. The meeting produces actionable intelligence that benefits everyone.",
+        "CD": "Your trust is betrayed. The meeting is a trap; your handler is photographed with CARDINAL and the images are sent to internal security. CARDINAL was turned months ago, and now your entire network is suspect.",
+        "DC": "Your surveillance detects an enemy ambush team. CARDINAL was genuine, but the enemy had discovered them. Your caution saves your handler's life and exposes a leak in your communications security.",
+        "DD": "Both sides assume the worst. CARDINAL, caught between suspicious masters, attempts to flee and is killed by unknown assailants. A valuable asset is lost, and both services blame each other."
+      },
+      "branches": {
+        "CC": "turn_5_trust",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_5_betrayal"
+      },
+      "default_next": "turn_5",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    {
+      "turn": 5,
+      "act": 2,
+      "narrative_briefing": "Act II begins with the stakes dramatically raised. A high-ranking military officer has made contact through unofficial channels, offering to exchange prisoners\u2014your captured agents for theirs. This could be a genuine humanitarian gesture, or a trap to identify which of your people are most valuable. The offer expires in 48 hours.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 0.65,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "accept_exchange",
+          "narrative_description": "Accept the prisoner exchange offer at face value; your people's lives matter more than intelligence",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "demand_terms",
+          "narrative_description": "Counter with aggressive demands\u2014more prisoners, better treatment, public acknowledgment",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "delay_tactics",
+          "narrative_description": "Request more time and additional verification; show willingness without committing",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "reject_publicly",
+          "narrative_description": "Leak the offer to the press, embarrassing the other side and demonstrating that you won't negotiate",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The exchange proceeds smoothly. Three agents from each side are returned to their handlers. The successful negotiation opens a tenuous back channel that might prove useful in future crises.",
+        "CD": "Your conciliatory approach is met with escalating demands. The other side interprets your cooperation as weakness and extracts additional concessions before releasing your agents.",
+        "DC": "Your aggressive stance pays off\u2014the other side caves to your demands, releasing additional prisoners and providing intelligence about their detention facilities.",
+        "DD": "Both sides make maximalist demands. The exchange collapses, and in retaliation, treatment of prisoners on both sides deteriorates dramatically. The back channel slams shut."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_6",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The back-channel negotiations collapse. Both sides retreat to hardened positions, and the window for prisoner exchange closes. The agents rot in their cells while their masters play politics with their lives."
+    },
+    {
+      "turn": 6,
+      "act": 2,
+      "narrative_briefing": "Intelligence suggests the enemy is planning to expose one of your networks to the international press\u2014a propaganda coup that would embarrass your government and compromise ongoing operations. You have evidence of their own misdeeds that could serve as a deterrent. Do you threaten mutual exposure, or seek another solution?",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 0.65,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "threaten_exposure",
+          "narrative_description": "Signal through intermediaries that you will release damaging information if they proceed",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "preemptive_strike",
+          "narrative_description": "Release your damaging information first, controlling the narrative before they can act",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "diplomatic_solution",
+          "narrative_description": "Seek a quiet agreement through diplomatic channels\u2014mutual non-disclosure",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "evacuate_networks",
+          "narrative_description": "Focus on extracting vulnerable agents before any exposure; accept the tactical loss",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides step back from the precipice. A tacit understanding emerges: certain secrets will remain buried. The networks survive, though both sides now know how close they came to disaster.",
+        "CD": "Your restraint emboldens them. The exposure goes ahead, and your network in the Baltic states is rolled up. Fifteen agents are arrested; three are executed. Your caution cost lives.",
+        "DC": "Your threat works\u2014they back down. The exposure is called off, and your implicit message is received: escalation will be met with escalation. A new equilibrium of fear takes hold.",
+        "DD": "Mutual exposure devastates both services. Networks across three continents are compromised. Agents are arrested, executed, or driven underground. The intelligence war has become a massacre."
+      },
+      "branches": {
+        "CC": "turn_7_detente",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_7_war"
+      },
+      "default_next": "turn_7",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The mutual exposure agreement falls apart at the last moment. Someone leaks, and the recriminations begin. Trust, already in short supply, becomes nonexistent."
+    },
+    {
+      "turn": 7,
+      "act": 2,
+      "narrative_briefing": "A neutral country has offered to host secret talks between your services. The agenda: establishing rules of engagement for the shadow war\u2014limits on what methods are acceptable, protections for non-combatants, maybe even a framework for future crises. It's unprecedented, and deeply suspicious.",
+      "matrix_type": "leader",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 2.0,
+        "reward": 1.5,
+        "punishment": 0.0,
+        "sucker": 0.5,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "attend_talks",
+          "narrative_description": "Send senior representatives to the talks, empowered to negotiate a framework agreement",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "observe_only",
+          "narrative_description": "Send junior observers without negotiating authority; learn what you can without committing",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "exploit_gathering",
+          "narrative_description": "Use the talks as cover for intelligence gathering operations in the host country",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "reject_invitation",
+          "narrative_description": "Publicly decline, signaling that you see the talks as a trap or a sign of weakness",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The talks exceed expectations. Both sides agree to basic protocols: no targeting families, no operations in hospitals, prisoner notification within 72 hours. It's not peace, but it's civilization.",
+        "CD": "Your good faith is exploited. While your delegation negotiates, the enemy runs operations against your embassy in the host country. The talks collapse, and you look naive.",
+        "DC": "Your intelligence operation during the talks yields a treasure trove: the opposition's delegation includes a communications officer whose briefcase contains cipher materials. Their trust cost them dearly.",
+        "DD": "Both sides use the talks as cover for aggressive operations. The host country, furious at the violation of their sovereignty, expels both delegations. A potential diplomatic channel is permanently closed."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_8",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The framework negotiations collapse. Each side blames the other, and the neutral host country closes its doors to future peace initiatives. The shadow war will have no rules."
+    },
+    {
+      "turn": 8,
+      "act": 2,
+      "narrative_briefing": "End of Act II. A crisis erupts: one of your deep-cover agents has been arrested in the enemy capital. They have information that could compromise your entire operation. You must decide how to respond before they break under interrogation\u2014or before they're traded for someone else entirely.",
+      "matrix_type": "prisoners_dilemma",
+      "matrix_parameters": {
+        "scale": 0.75,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "offer_trade",
+          "narrative_description": "Immediately offer a high-value prisoner exchange to get your agent back before they talk",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "deny_connection",
+          "narrative_description": "Publicly deny any connection to the arrested individual; leave them to their fate",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "threaten_retaliation",
+          "narrative_description": "Signal that harm to your agent will result in immediate retaliation against their people",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "quiet_diplomacy",
+          "narrative_description": "Work through unofficial channels to arrange a quiet release, avoiding public escalation",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Quiet negotiations produce results. Your agent is released in exchange for economic concessions, and both sides maintain the fiction that no such exchange occurred. Honor among spies.",
+        "CD": "Your diplomatic approach is met with public accusations. The enemy announces the arrest with fanfare, using your agent for propaganda while you scramble for leverage.",
+        "DC": "Your threats prove effective. Fear of retaliation leads to quick, quiet release of your agent. But you've shown your hand\u2014they now know how valuable this person is to you.",
+        "DD": "Both sides escalate. Your agent is paraded before cameras while you arrest their cultural attach\u00e9 in response. The diplomatic incident spirals, threatening to become an international crisis."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_9",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The prisoner situation spirals out of control. What started as a quiet intelligence matter becomes front-page news, and both governments are forced to take public positions that make resolution impossible."
+    },
+    {
+      "turn": 9,
+      "act": 3,
+      "narrative_briefing": "Act III: The endgame. New intelligence reveals that the enemy has been running a long-term penetration operation against your service\u2014and your best analyst may be the mole. The evidence is circumstantial but compelling. Do you confront them, investigate quietly, or is this itself a disinformation campaign to make you destroy your own capabilities?",
+      "matrix_type": "pure_coordination",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "confront_suspect",
+          "narrative_description": "Directly confront your analyst with the evidence; force them to prove their loyalty",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "surveillance_operation",
+          "narrative_description": "Place the suspect under intensive surveillance; gather evidence before acting",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "trust_analyst",
+          "narrative_description": "Dismiss the intelligence as enemy disinformation designed to make you paranoid",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "compartmentalize",
+          "narrative_description": "Quietly restrict the suspect's access while continuing to use their expertise",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both services step back from their witch hunts. The mole rumors prove to be exactly that\u2014rumors seeded to create internal chaos. Your analyst is vindicated, and trust within your organization stabilizes.",
+        "CD": "Your trust is misplaced. The analyst was indeed compromised, and your failure to act allows them to transmit critical intelligence before their eventual arrest by civilian authorities.",
+        "DC": "Your surveillance catches the analyst in the act of passing documents. The arrest is clean, the damage assessment reveals the leak was recent, and your swift action prevented worse.",
+        "DD": "Both services tear themselves apart looking for moles that may or may not exist. Careers are destroyed, valuable officers resign in disgust, and the paranoia becomes self-fulfilling."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_10",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The mole hunt consumes both organizations. Resources that should go to operations are spent on internal investigations. The shadow war pauses while both sides bleed from self-inflicted wounds."
+    },
+    {
+      "turn": 10,
+      "act": 3,
+      "narrative_briefing": "A diplomatic summit is scheduled between your governments. Both intelligence services have been ordered to support\u2014or sabotage\u2014the talks depending on political winds. Your leaders want leverage; theirs want concessions. But some in both services wonder if peace might actually serve their interests better than eternal conflict.",
+      "matrix_type": "battle_of_sexes",
+      "matrix_parameters": {
+        "scale": 1.2,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.5,
+        "preference_b": 1.3,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "support_summit",
+          "narrative_description": "Provide genuine intelligence support to help the diplomatic talks succeed",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "hedge_support",
+          "narrative_description": "Offer nominal support while maintaining operational readiness for any outcome",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "covert_sabotage",
+          "narrative_description": "Secretly undermine the talks while publicly supporting them",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "demand_concessions",
+          "narrative_description": "Use the summit as leverage to extract intelligence concessions from the other side",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both services genuinely support the talks. The summit produces a framework agreement that reduces tensions. Some in both services worry they've made themselves obsolete\u2014but the world is slightly safer.",
+        "CD": "Your support is undermined by their sabotage. The summit collapses amid accusations of bad faith, and your leaders blame your service for failing to anticipate the deception.",
+        "DC": "Your sabotage succeeds while they support the talks in good faith. The summit fails, and the other side's intelligence service is blamed for providing bad assessments.",
+        "DD": "Both services sabotage the talks simultaneously. The resulting diplomatic disaster brings both countries to the brink of open conflict. Years of work toward stability are undone in days."
+      },
+      "branches": {
+        "CC": "turn_11_peace",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_11_crisis"
+      },
+      "default_next": "turn_11",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The summit framework collapses. Hardliners on both sides use the failure as evidence that diplomacy is futile. The shadow war enters a dangerous new phase."
+    },
+    {
+      "turn": 11,
+      "act": 3,
+      "narrative_briefing": "The situation has reached a critical juncture. Both services have suffered losses, gained advantages, and made enemies. Now comes the reckoning: a final opportunity to reach an understanding, or to settle scores once and for all. The coming days will determine the course of the shadow war for years to come.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 1.2,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "propose_rules",
+          "narrative_description": "Propose a comprehensive framework for managing the intelligence competition",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "final_offensive",
+          "narrative_description": "Launch a major operation to decisively shift the balance of power in your favor",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "defensive_consolidation",
+          "narrative_description": "Focus on protecting your gains and stabilizing your networks",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "escalation_dominance",
+          "narrative_description": "Signal willingness to escalate beyond any level the enemy is prepared to match",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "A framework emerges from the chaos. Not peace, but a managed competition with understood boundaries. Both services retreat to lick their wounds and prepare for the next round.",
+        "CD": "Your olive branch is met with a dagger. The final offensive catches your networks unprepared, and the damage will take years to repair. Your trust was your undoing.",
+        "DC": "Your offensive succeeds beyond expectations. Key enemy networks are rolled up, high-value assets are turned, and the balance of power shifts decisively in your favor.",
+        "DD": "Total war in the shadows. Both sides throw everything into a final confrontation. When the smoke clears, both services are crippled, and the countries they serve are measurably less safe."
+      },
+      "branches": {
+        "CC": "turn_12_accord",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_12_destruction"
+      },
+      "default_next": "turn_12",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The last chance for an accord slips away. Both sides prepare for the final phase of the shadow war, knowing that the losses to come will far exceed any possible gains."
+    },
+    {
+      "turn": 12,
+      "act": 3,
+      "narrative_briefing": "The shadow war approaches its denouement. Both services have expended enormous resources, sacrificed agents, and compromised operations. Now the question is not who wins, but what remains. One final exchange could seal a lasting arrangement\u2014or trigger a catastrophe from which neither side recovers.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 1.2,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "comprehensive_deal",
+          "narrative_description": "Propose a comprehensive settlement: prisoner exchanges, network acknowledgments, and future protocols",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "strategic_retreat",
+          "narrative_description": "Pull back operations unilaterally, signaling readiness to de-escalate",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "ultimatum",
+          "narrative_description": "Deliver an ultimatum: accept your terms or face the consequences of total intelligence war",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "burn_it_down",
+          "narrative_description": "Execute a scorched-earth policy\u2014if you can't win, ensure the enemy's victory is pyrrhic",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "A historic agreement is reached. The shadow war won't end\u2014it never truly ends\u2014but both sides have established boundaries that will prevent the worst excesses. A cold peace descends.",
+        "CD": "Your concession is exploited ruthlessly. The enemy presses their advantage while you retreat, and what might have been an honorable draw becomes a clear defeat.",
+        "DC": "Your ultimatum succeeds. Faced with your resolve, the enemy capitulates to your key demands. The shadow war ends on your terms, and your service emerges strengthened.",
+        "DD": "Mutual destruction. Both networks are exposed, both agent rosters are compromised, and decades of careful work are undone. The intelligence war will have to be rebuilt from nothing\u2014on both sides."
+      },
+      "branches": {
+        "CC": "turn_13_accord",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_13_ashes"
+      },
+      "default_next": "turn_13",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The comprehensive settlement collapses at the final moment. Someone\u2014perhaps on both sides\u2014decided that peace was less profitable than continued conflict. The war goes on."
+    },
+    {
+      "turn": 13,
+      "act": 3,
+      "narrative_briefing": "The consequences of your choices have crystallized. The shadow war continues, but its character has been fundamentally shaped by the decisions made in these crucial weeks. Now comes the accounting: which agents survived, which networks remain operational, and what kind of intelligence relationship will define the coming years.",
+      "matrix_type": "prisoners_dilemma",
+      "matrix_parameters": {
+        "scale": 1.1,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "honor_agreements",
+          "narrative_description": "Faithfully implement any agreements reached, even when it would be advantageous to cheat",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "exploit_weakness",
+          "narrative_description": "Take advantage of the enemy's vulnerability to gain lasting advantages",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "rebuild_quietly",
+          "narrative_description": "Focus on rebuilding your networks and capabilities without provoking the other side",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "establish_dominance",
+          "narrative_description": "Use this moment of transition to establish permanent intelligence supremacy",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides honor the spirit of their arrangements. The shadow war continues, but with understood limits. A generation of intelligence officers learns that cooperation, however grudging, serves both sides better than chaos.",
+        "CD": "Your honor is repaid with treachery. While you rebuild according to agreements, they exploit every advantage. The lesson is bitter: in this business, nice guys finish last.",
+        "DC": "Your exploitation of their weakness succeeds in the short term, but the precedent you've set ensures that future arrangements will be viewed with suspicion. You've won the battle but complicated the war.",
+        "DD": "Neither side can resist the temptation to cheat. Any agreements are worthless, trust is impossible, and the shadow war descends into a chaotic struggle with no rules and no limits."
+      },
+      "branches": {
+        "CC": "turn_14_legacy",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_14_endless_war"
+      },
+      "default_next": "turn_14",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The post-crisis settlement fails to materialize. Both sides retreat to their corners, nursing grievances and planning revenge. The shadow war will continue indefinitely."
+    },
+    {
+      "turn": 14,
+      "act": 3,
+      "narrative_briefing": "The final accounting. Both services have survived\u2014battered, perhaps, but intact. The question now is what lessons have been learned, and what kind of shadow war will be waged in the years to come. Will it be a managed competition between professionals, or an endless cycle of betrayal and retaliation?",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 1.2,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "institutionalize_peace",
+          "narrative_description": "Work to embed the lessons of this crisis in both services' institutional cultures",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "prepare_next_round",
+          "narrative_description": "Use the breathing space to prepare for the next phase of the shadow war",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "maintain_vigilance",
+          "narrative_description": "Adopt a watchful but non-provocative posture, ready for either peace or war",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "exploit_transition",
+          "narrative_description": "Strike while the enemy is reorganizing and vulnerable",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The Berlin Cipher crisis ends with both services changed but intact. A framework for managed competition emerges\u2014not peace, but something short of total war. The shadow war continues, but with rules. CARDINAL's sacrifice was not in vain.",
+        "CD": "Your attempts at institutionalizing restraint are undermined by their aggression. The crisis ends with your service weakened and their position strengthened. The next round of the shadow war will begin from a position of disadvantage.",
+        "DC": "Your strike during the transition succeeds brilliantly. When the dust settles, your service holds decisive advantages that will shape the intelligence competition for years. Victory, such as it is in this endless game.",
+        "DD": "The crisis ends as it began: in chaos. No lessons are learned, no frameworks established, no limits accepted. The shadow war will continue in its most brutal form, and both services prepare for the next round of a conflict that can never truly end."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": null,
+      "settlement_available": true,
+      "settlement_failed_narrative": "The final opportunity for settlement passes. The Berlin Cipher crisis ends not with resolution but with exhaustion. Both sides retreat to prepare for the next round, knowing it will come."
+    }
+  ],
+  "branches": {
+    "turn_3_cautious": {
+      "turn": 3,
+      "act": 1,
+      "narrative_briefing": "After the careful handling of the Vienna incident, both services have adopted watchful postures. The intercepted communications about a planned operation take on a different character\u2014perhaps a genuine warning rather than deception. The question remains: how do you respond to intelligence that may itself be a trap?",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "share_intelligence",
+          "narrative_description": "Through back channels, offer to share the intercepted communications for verification",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "reinforce_carefully",
+          "narrative_description": "Quietly strengthen security at key installations without alarming anyone",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "set_trap",
+          "narrative_description": "Identify the most likely target and set an elaborate counterintelligence trap",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "disinformation_campaign",
+          "narrative_description": "Feed false intelligence about your vulnerabilities to misdirect enemy planners",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides share intelligence through unofficial channels. The communications turn out to be from a rogue faction within the enemy service, and your cooperation prevents an unauthorized operation that would have embarrassed both governments.",
+        "CD": "Your openness is exploited. While you share information in good faith, they use it to map your communication channels and identify your sources. Trust was a mistake.",
+        "DC": "Your trap catches them off guard while they expected cooperation. An enemy operative walks into your ambush, and the interrogation provides valuable insights into their operations.",
+        "DD": "Both sides execute aggressive operations despite the earlier caution. The shadow war heats up again, and the brief window of potential cooperation slams shut."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_4",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    "turn_3_aggressive": {
+      "turn": 3,
+      "act": 1,
+      "narrative_briefing": "The aggressive postures from Vienna have set the tone. Both services are on high alert, and the intercepted communications about a planned operation seem all too real. The enemy is probing your defenses\u2014or you are probing theirs. In this atmosphere of mutual suspicion, every move could trigger escalation.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "preemptive_strike",
+          "narrative_description": "Hit them before they hit you\u2014execute your own operation against their vulnerable points",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "maximum_defense",
+          "narrative_description": "Go to maximum alert across all installations; make any attack too costly to attempt",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "escalation_signal",
+          "narrative_description": "Demonstrate capability and willingness to escalate beyond any level they can match",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "stand_down",
+          "narrative_description": "Deliberately reduce alert levels to signal you don't want escalation",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides step back from the brink. Maximum defense postures make any attack too costly, and gradually the tension eases. The shadow war continues, but disaster has been averted.",
+        "CD": "Your defensive posture is exploited by their offensive. While you hunker down, they execute a successful penetration of your communications network. Caution has cost you.",
+        "DC": "Your preemptive strike succeeds brilliantly. Enemy safe houses are raided, agents are caught, and their network in your capital is rolled up. Aggression has paid off.",
+        "DD": "Mutual escalation produces mutual disaster. Both services launch operations simultaneously, and the resulting chaos burns agents, safe houses, and cover identities on both sides. The shadow war has turned into open warfare."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_4",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    "turn_5_trust": {
+      "turn": 5,
+      "act": 2,
+      "narrative_briefing": "The CARDINAL situation resolved through mutual restraint, and Act II begins with an unexpected thaw. The high-ranking military officer's prisoner exchange offer arrives in this context\u2014perhaps a genuine opportunity born from the recent cooperation. Both services have reason to hope, and reason to fear.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "enthusiastic_acceptance",
+          "narrative_description": "Accept the exchange offer warmly, viewing it as an extension of the recent cooperation",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "careful_acceptance",
+          "narrative_description": "Accept with verification requirements\u2014trust, but verify",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "exploit_goodwill",
+          "narrative_description": "Use the positive atmosphere to press for additional concessions",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "test_sincerity",
+          "narrative_description": "Propose a small initial exchange to test whether the goodwill is genuine",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The exchange proceeds in a spirit of cautious optimism. Both sides recover valuable personnel, and a regular communication channel is established. The shadow war may be entering a new phase.",
+        "CD": "Your warmth is met with exploitation. They pocket your concessions while giving nothing extra in return. The exchange happens, but you've lost leverage.",
+        "DC": "Your pressure tactics succeed in the favorable atmosphere. You get more prisoners released, better terms, and a favorable narrative. Exploiting goodwill has its rewards.",
+        "DD": "Both sides try to exploit the positive atmosphere, and both fail. The exchange still happens, but the potential for a broader thaw is squandered by mutual greed."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_6",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The promising atmosphere from the CARDINAL resolution dissipates as settlement negotiations fail. Both sides return to their default suspicion, and the brief window of possibility closes."
+    },
+    "turn_5_betrayal": {
+      "turn": 5,
+      "act": 2,
+      "narrative_briefing": "CARDINAL is dead, and both services blame each other. Act II begins in an atmosphere of mutual recrimination. The prisoner exchange offer arrives now as a calculated provocation\u2014or perhaps a cynical opportunity. In this poisoned atmosphere, every gesture is suspect.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "reject_offer",
+          "narrative_description": "Publicly reject the exchange as an insult after CARDINAL's death",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "demand_accountability",
+          "narrative_description": "Accept only if they acknowledge responsibility for CARDINAL and provide compensation",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "pragmatic_acceptance",
+          "narrative_description": "Accept the exchange despite the circumstances\u2014your people's lives matter more than pride",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "conditional_talks",
+          "narrative_description": "Express willingness to discuss, but require guarantees and verification",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Despite the toxic atmosphere, pragmatism prevails. The exchange happens quietly, without fanfare or concessions. Both sides get their people back, and the recriminations continue separately.",
+        "CD": "Your attempt at pragmatism is met with more demands. They use your willingness as leverage to extract additional concessions, rubbing salt in the CARDINAL wound.",
+        "DC": "Your hard line works\u2014they back down and accept the exchange on your terms, implicitly acknowledging their responsibility. A small victory in the aftermath of loss.",
+        "DD": "Neither side gives an inch. The exchange collapses, prisoners rot in their cells, and the shadow war enters its most bitter phase. CARDINAL's death has poisoned everything."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_6",
+      "settlement_available": true,
+      "settlement_failed_narrative": "In the poisoned atmosphere following CARDINAL's death, no settlement is possible. Both sides are too bitter, too suspicious. The shadow war continues without limits or hope."
+    },
+    "turn_7_detente": {
+      "turn": 7,
+      "act": 2,
+      "narrative_briefing": "After stepping back from mutual exposure, an unexpected thaw has developed. The neutral country's offer to host secret talks arrives at a moment when both services might genuinely benefit from establishing rules. The question is whether this opportunity will be seized or squandered.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "full_engagement",
+          "narrative_description": "Send your most senior officials with full authority to negotiate a comprehensive framework",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "careful_participation",
+          "narrative_description": "Participate constructively but maintain operational security throughout",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "intelligence_priority",
+          "narrative_description": "Use the talks primarily as a cover for intelligence gathering",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "symbolic_presence",
+          "narrative_description": "Send junior officials with no real authority\u2014show willingness without commitment",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The talks produce a breakthrough. Both sides agree to unprecedented protocols\u2014prisoner notifications, family protections, limits on certain operations. The shadow war won't end, but it will be civilized.",
+        "CD": "Your full engagement is exploited. While you negotiate in good faith, they gather intelligence and prepare operations. The framework is a sham.",
+        "DC": "Your intelligence priority pays off. You learn their delegation's communications protocols while they waste time on genuine negotiation. A tactical victory.",
+        "DD": "Both sides treat the talks as cover for operations. The neutral host, disgusted by the abuse of their hospitality, expels both delegations and closes the channel permanently."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_8",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The promising talks collapse as settlement negotiations fail. The neutral host is disappointed, and both services return to the shadow war without the framework that might have constrained it."
+    },
+    "turn_7_war": {
+      "turn": 7,
+      "act": 2,
+      "narrative_briefing": "After the mutual exposure disaster, both services are reeling. Networks are compromised, agents are dead or arrested, and trust is nonexistent. The neutral country's offer to host talks seems almost insulting in this context\u2014or perhaps it's the only thing that can prevent total collapse.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "desperate_talks",
+          "narrative_description": "Attend the talks out of desperation\u2014anything to stop the bleeding",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "rebuild_first",
+          "narrative_description": "Skip the talks and focus on rebuilding your shattered networks",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "exploit_chaos",
+          "narrative_description": "Use the chaos as cover to eliminate remaining enemy assets",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "blame_game",
+          "narrative_description": "Publicly blame the other side for the exposure disaster; win the propaganda war",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Desperate pragmatism prevails. Both sides attend the talks, and from the wreckage, a framework emerges. Not trust\u2014that's impossible now\u2014but rules that might prevent another catastrophe.",
+        "CD": "Your attempt to de-escalate is met with continued aggression. While you seek peace, they exploit your weakness to finish off your remaining networks.",
+        "DC": "Your exploitation of the chaos succeeds. While they seek talks, you eliminate their remaining assets. You emerge from the disaster stronger than they do.",
+        "DD": "The war continues. Neither side is willing to stop fighting, and the neutral host's offer is ignored by both. The shadow war has become a war of extermination."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_8",
+      "settlement_available": true,
+      "settlement_failed_narrative": "In the aftermath of mutual exposure, settlement is impossible. Both sides are too damaged, too angry. The shadow war will continue until one side or the other is completely destroyed."
+    },
+    "turn_11_peace": {
+      "turn": 11,
+      "act": 3,
+      "narrative_briefing": "The summit framework succeeded, and both services have been ordered to support a genuine peace process. For the first time in decades, there's a real possibility of ending the shadow war\u2014or at least transforming it into something less destructive. But old habits die hard, and not everyone benefits from peace.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 1.6900000000000002,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "embrace_peace",
+          "narrative_description": "Fully commit to the peace process, even at the cost of intelligence capabilities",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "hedge_bets",
+          "narrative_description": "Support peace publicly while maintaining core capabilities in case it fails",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "undermine_quietly",
+          "narrative_description": "Pay lip service to peace while working to ensure it fails",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "demand_verification",
+          "narrative_description": "Insist on verification measures that would expose enemy capabilities",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The peace process advances. Both services begin the painful work of transformation\u2014from adversaries to monitors of a managed competition. The shadow war is ending, replaced by something new.",
+        "CD": "Your commitment to peace is exploited. While you disarm, they maintain capabilities for future use. When the peace process eventually fails, you'll be at a disadvantage.",
+        "DC": "Your undermining succeeds. The peace process collapses, blamed on the other side, and you emerge with your capabilities intact while they have disarmed. A cynical victory.",
+        "DD": "Neither side commits to peace, and both are caught undermining. The peace process collapses in mutual recrimination, and the shadow war continues worse than ever."
+      },
+      "branches": {
+        "CC": "turn_12_new_era",
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_12",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The peace process collapses as settlement negotiations fail. The brief hope for a new era dies, and both services return to the shadow war with renewed bitterness."
+    },
+    "turn_11_crisis": {
+      "turn": 11,
+      "act": 3,
+      "narrative_briefing": "The summit disaster has brought both countries to the brink of open conflict. Both services are on maximum alert, and operations that would normally require months of planning are being executed in days. The situation is spiraling out of control, and only decisive action\u2014in one direction or another\u2014can prevent catastrophe.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 1.1,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "emergency_deescalation",
+          "narrative_description": "Unilaterally stand down from crisis posture; signal clearly that you don't want war",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "back_channel_plea",
+          "narrative_description": "Reach out through every available channel to find a way back from the brink",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "first_strike",
+          "narrative_description": "If war is coming, strike first; eliminate their capability before they eliminate yours",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "brinksmanship",
+          "narrative_description": "Push to the very edge, betting that they'll blink first",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides step back from the abyss. Through desperate diplomacy and mutual fear, a crisis that might have ended in catastrophe is defused. The shadow war will continue, but not as open war.",
+        "CD": "Your de-escalation is met with aggression. While you stand down, they strike. Your service is devastated, and you emerge from the crisis severely weakened.",
+        "DC": "Your first strike succeeds. While they seek peace, you eliminate their command structure. The enemy service is crippled, and you emerge dominant\u2014but at what cost to the world?",
+        "DD": "Mutual first strikes. Both services are devastated in a single night of coordinated attacks and counterattacks. The intelligence war is over because there's nothing left to fight with. Both networks are destroyed, both agent rosters are dead or compromised, and the countries they served are at war."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": "turn_12_apocalypse"
+      },
+      "default_next": "turn_12",
+      "settlement_available": true,
+      "settlement_failed_narrative": "On the brink of catastrophe, settlement negotiations fail. There is no more time, no more chances. The shadow war ends\u2014one way or another."
+    },
+    "turn_12_new_era": {
+      "turn": 12,
+      "act": 3,
+      "narrative_briefing": "The peace process is succeeding beyond anyone's expectations. Both services are transforming from adversaries to something new\u2014monitors of a managed competition, perhaps even partners in certain areas. But transformation is painful, and there are those on both sides who would rather see it fail.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 1.6900000000000002,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "full_transformation",
+          "narrative_description": "Complete the transformation; become a genuinely different kind of organization",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "preserve_core",
+          "narrative_description": "Embrace the new era while quietly preserving essential capabilities",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "exploit_transition",
+          "narrative_description": "Use the confusion of transition to gain lasting advantages",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "sabotage_process",
+          "narrative_description": "Work to ensure the transformation fails before it goes too far",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "A new era dawns. Both services complete their transformation, and the shadow war gives way to managed competition with understood rules. Not peace\u2014never quite peace\u2014but something better than war.",
+        "CD": "Your transformation is exploited. While you embrace the new era, they preserve capabilities and position themselves for future dominance. Idealism has its costs.",
+        "DC": "Your exploitation succeeds. The new era begins with you holding decisive advantages that will shape the competition for decades. Pragmatism wins again.",
+        "DD": "The transformation fails. Hardliners on both sides ensure that the old shadow war continues, perhaps worse than ever. The brief hope for a new era dies."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_13",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The new era proves impossible to formalize. Both sides continue their transformation\u2014or their resistance to it\u2014without the framework that might have guided them."
+    },
+    "turn_12_accord": {
+      "turn": 12,
+      "act": 3,
+      "narrative_briefing": "Against all odds, a framework has emerged from the crisis. Both services have agreed to boundaries, protocols, and mechanisms for managing future conflicts. It's not peace\u2014the shadow war will continue\u2014but it's civilization. The question now is whether the framework will hold.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 1.6900000000000002,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "strengthen_framework",
+          "narrative_description": "Work to strengthen and institutionalize the agreed framework",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "test_limits",
+          "narrative_description": "Probe the boundaries of the framework to see what you can get away with",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "good_faith_compliance",
+          "narrative_description": "Comply with the framework in good faith, setting a positive precedent",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "prepare_alternatives",
+          "narrative_description": "Comply publicly while preparing for the framework's eventual collapse",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The framework holds. Both sides comply in good faith, and over time, the protocols become habits. The shadow war continues, but within bounds. A remarkable achievement.",
+        "CD": "Your good faith is exploited. They test the limits while you comply, gaining advantages within the framework's grey areas. Compliance was naive.",
+        "DC": "Your testing reveals weaknesses. You gain advantages while they comply faithfully, setting precedents that favor you. The framework serves your interests.",
+        "DD": "Both sides test the limits, and the framework begins to crack. What might have been a lasting arrangement degenerates into a new round of the shadow war."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_13",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The framework proves too fragile to formalize. Both sides continue to operate within its spirit\u2014or outside it\u2014without the settlement that might have made it binding."
+    },
+    "turn_12_destruction": {
+      "turn": 12,
+      "act": 3,
+      "narrative_briefing": "The shadow war has reached its nadir. Both services have suffered catastrophic losses\u2014networks destroyed, agents killed or compromised, decades of work undone. What remains is a question: is there anything worth salvaging, or should both sides simply accept mutual destruction and start over?",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 1.1,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "accept_stalemate",
+          "narrative_description": "Accept that both sides have lost and focus on rebuilding",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "seek_terms",
+          "narrative_description": "Reach out for a settlement that acknowledges mutual exhaustion",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "final_blow",
+          "narrative_description": "Spend your last resources on one final operation to tip the balance",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "scorched_earth",
+          "narrative_description": "If you can't win, ensure the enemy can't either\u2014burn everything",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "From the ashes, something new emerges. Both sides accept stalemate and begin the painful work of rebuilding. The shadow war will resume eventually, but for now, exhaustion brings peace.",
+        "CD": "Your acceptance of stalemate is exploited. While you rebuild, they launch one final operation that tips the balance. You emerge from the destruction in a weaker position.",
+        "DC": "Your final blow succeeds. The enemy, exhausted and rebuilding, cannot stop your operation. You emerge from the destruction with a decisive advantage.",
+        "DD": "Total annihilation. Both sides execute scorched-earth operations simultaneously. When the chaos ends, both services exist only on paper. The shadow war is over because there's nothing left."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_13",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Even in destruction, settlement proves impossible. Both sides continue fighting until there's nothing left to fight with\u2014or for."
+    },
+    "turn_12_apocalypse": {
+      "turn": 12,
+      "act": 3,
+      "narrative_briefing": "The mutual first strikes have devastated both services. What remains is wreckage\u2014burned safe houses, dead agents, compromised networks. The shadow war is over, not because anyone won, but because there's nothing left. Now comes the grim accounting of what was lost.",
+      "matrix_type": "prisoners_dilemma",
+      "matrix_parameters": {
+        "scale": 1.1,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "honest_accounting",
+          "narrative_description": "Acknowledge the mutual destruction and work to prevent it from happening again",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "blame_other",
+          "narrative_description": "Ensure history records that the other side was responsible for the catastrophe",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "salvage_quietly",
+          "narrative_description": "Focus on salvaging what can be saved without recrimination",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "extract_revenge",
+          "narrative_description": "Use the chaos to extract whatever revenge is still possible",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "From the ashes of mutual destruction, a grim understanding emerges. Both sides agree: never again. The lesson is bought with blood, but perhaps it will hold.",
+        "CD": "Your honest accounting is met with propaganda. History will record that you were responsible for the catastrophe, adding insult to the injury of destruction.",
+        "DC": "Your propaganda succeeds. History will blame the enemy for the destruction you both caused. A pyrrhic victory in the ruins.",
+        "DD": "Even in destruction, neither side can stop fighting. The blame game continues, revenge operations are planned, and the seeds of the next shadow war are planted in the ashes of the last."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_13",
+      "settlement_available": true,
+      "settlement_failed_narrative": "In the aftermath of apocalypse, settlement is meaningless. There's nothing left to settle\u2014only ashes and recriminations."
+    },
+    "turn_13_accord": {
+      "turn": 13,
+      "act": 3,
+      "narrative_briefing": "The framework agreement is holding. Both services are implementing their commitments, and the shadow war is transforming into something less destructive. The question now is whether this represents a lasting change or merely a pause before the next round.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 1.6900000000000002,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "institutionalize",
+          "narrative_description": "Work to embed the framework in both services' permanent culture",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "maintain_options",
+          "narrative_description": "Comply with the framework while quietly preserving offensive capabilities",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "expand_scope",
+          "narrative_description": "Propose expanding the framework to cover additional areas",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "test_boundaries",
+          "narrative_description": "Probe the framework's limits to establish favorable precedents",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The framework becomes permanent. Both services institutionalize the new rules, and a generation of intelligence officers grows up with different expectations. The shadow war has changed fundamentally.",
+        "CD": "Your institutionalization is undermined by their boundary-testing. The framework survives but in weakened form, more loophole than law.",
+        "DC": "Your boundary-testing establishes favorable precedents while they institutionalize compliance. You'll operate within a framework designed to your advantage.",
+        "DD": "Both sides game the framework, and it degenerates into a new battleground. The rules become weapons, and the shadow war continues in legal form."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_14",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The framework survives, but the settlement that might have strengthened it fails. Both sides continue under the rules, but without the additional commitments that might have made them binding."
+    },
+    "turn_13_ashes": {
+      "turn": 13,
+      "act": 3,
+      "narrative_briefing": "In the aftermath of mutual destruction, both services are shadows of their former selves. The shadow war continues, but with depleted resources and exhausted personnel. The question is whether to rebuild for another round or to finally accept that some competitions have no winners.",
+      "matrix_type": "prisoners_dilemma",
+      "matrix_parameters": {
+        "scale": 1.1,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "mutual_recovery",
+          "narrative_description": "Propose a recovery period\u2014no operations against each other while both rebuild",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "race_to_rebuild",
+          "narrative_description": "Focus all resources on rebuilding faster than the enemy",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "lessons_learned",
+          "narrative_description": "Use the destruction as a teaching moment; change your approach fundamentally",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "revenge_operations",
+          "narrative_description": "Continue targeting enemy assets even in the midst of mutual exhaustion",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Mutual exhaustion produces mutual restraint. Both sides agree to a recovery period, and slowly the shadow war transforms into something less destructive. Sometimes the only winning move is not to play.",
+        "CD": "Your restraint is exploited. While you recover, they rebuild and prepare. You emerge from the ashes weakened, facing a stronger enemy.",
+        "DC": "Your aggression during recovery pays off. You rebuild while continuing to degrade their capabilities. You'll enter the next round with a decisive advantage.",
+        "DD": "Even in exhaustion, neither side can stop fighting. The shadow war continues in diminished form, two crippled services trying to destroy each other. Pathetic and eternal."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_14",
+      "settlement_available": true,
+      "settlement_failed_narrative": "In the ashes, settlement proves impossible. Both sides are too weak to enforce terms, too bitter to trust. The shadow war staggers on."
+    },
+    "turn_14_legacy": {
+      "turn": 14,
+      "act": 3,
+      "narrative_briefing": "The Berlin Cipher crisis ends with a framework for the future. The shadow war will continue\u2014it always does\u2014but within boundaries that both sides have agreed to respect. The question for the final turn is what legacy this crisis will leave: a model for managed competition, or just another pause before the next escalation?",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 1.6900000000000002,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "cement_legacy",
+          "narrative_description": "Work to ensure the lessons of this crisis shape future policy",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "prepare_next_crisis",
+          "narrative_description": "Use the stability to prepare for the next confrontation",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "institutional_memory",
+          "narrative_description": "Document the crisis thoroughly so future generations understand what worked",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "exploit_complacency",
+          "narrative_description": "Take advantage of the post-crisis relaxation to gain long-term advantages",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The Berlin Cipher crisis becomes a model. Both services study it, learn from it, and apply its lessons to future conflicts. The shadow war continues, but differently. CARDINAL's sacrifice helped build something that might outlast them all.",
+        "CD": "Your effort to cement a legacy is undermined by their preparations for the next crisis. The lessons are recorded but ignored; the cycle continues.",
+        "DC": "Your preparations for the next crisis give you lasting advantages. The legacy is one-sided: your side learned exploitation, theirs learned complacency.",
+        "DD": "Neither side learns the right lessons. The crisis becomes just another chapter in an endless war, its potential for transformation squandered by mutual suspicion."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": null,
+      "settlement_available": true,
+      "settlement_failed_narrative": "Even at the end, settlement proves elusive. The crisis concludes without the formal agreement that might have given it lasting meaning. The shadow war goes on."
+    },
+    "turn_14_endless_war": {
+      "turn": 14,
+      "act": 3,
+      "narrative_briefing": "The Berlin Cipher crisis ends as it began: in mutual suspicion and recrimination. No framework emerged, no lessons were learned, no boundaries were established. The shadow war will continue in its most brutal form, and both services prepare for the next round of a conflict that can never truly end.",
+      "matrix_type": "prisoners_dilemma",
+      "matrix_parameters": {
+        "scale": 1.1,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "eternal_vigilance",
+          "narrative_description": "Accept the endless war and focus on sustainable, long-term competition",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "decisive_action",
+          "narrative_description": "Launch one more major operation to try to end the war on favorable terms",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "adapt_and_survive",
+          "narrative_description": "Transform your service to be more resilient in endless conflict",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "scorched_earth",
+          "narrative_description": "If the war must continue, ensure the enemy pays the highest possible price",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides accept the endless war and adapt accordingly. The shadow war continues, but in a sustainable form. Not peace, not resolution\u2014just the permanent twilight struggle. The Berlin Cipher crisis fades into history, one chapter among many.",
+        "CD": "Your adaptation is exploited by their aggression. The endless war continues, but you're at a disadvantage. Survival is possible, but victory is not.",
+        "DC": "Your aggression succeeds while they adapt. The endless war continues, butyou've established dominance that will take years to overcome. A bitter victory in a bitter war.",
+        "DD": "Neither side can accept stalemate. The endless war intensifies, and both services sacrifice everything in pursuit of a victory that will never come. The Berlin Cipher crisis was just the beginning."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": null,
+      "settlement_available": true,
+      "settlement_failed_narrative": "At the end of the endless war, settlement is meaningless. Both sides know the war will continue; any agreement is just a tactical pause. The shadow war is eternal."
+    }
+  },
+  "personas": {
+    "side_a": {
+      "persona": "kissinger",
+      "role_name": "CIA Counterintelligence Chief",
+      "role_description": "Director of CIA counterintelligence, hunting for Soviet moles."
+    },
+    "side_b": {
+      "persona": "khrushchev",
+      "role_name": "KGB Handler",
+      "role_description": "KGB officer running agents inside Western intelligence."
+    }
+  }
+}

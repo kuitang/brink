@@ -1,0 +1,1799 @@
+{
+  "scenario_id": "silicon_valley_tech_wars_001",
+  "title": "Silicon Valley Tech Wars",
+  "theme": "corporate",
+  "setting": "Silicon Valley tech giants battling for market dominance. Acquisitions, platform wars,\nantitrust threats. Two tech companies compete for dominance in a rapidly evolving market.\nThey must decide whether to compete, cooperate, or attempt to eliminate the competition\nentirely. Regulatory threats loom as market power grows.",
+  "max_turns": 14,
+  "turns": [
+    {
+      "turn": 1,
+      "act": 1,
+      "narrative_briefing": "Both companies are set to announce competing AI development platforms at next week's major tech conference. Industry insiders are speculating about whether this signals the beginning of an all-out platform war or an opportunity for ecosystem collaboration. Your legal team warns that aggressive tactics could draw FTC attention.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.2,
+        "hare_safe": 0.8,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "announce_interoperability",
+          "narrative_description": "Announce that your AI platform will support interoperability with competing systems, signaling openness to ecosystem collaboration.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "form_standards_body",
+          "narrative_description": "Propose forming an industry standards body for AI development, positioning yourself as a responsible market leader.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "exclusive_partnerships",
+          "narrative_description": "Lock in exclusive partnerships with major enterprise clients before your competitor can reach them.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "aggressive_pricing",
+          "narrative_description": "Announce aggressive pricing that undercuts your competitor, signaling you're willing to sacrifice margins for market share.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both companies announce complementary AI platforms with interoperability features. Tech media praises the 'mature approach' and analysts upgrade both stocks. The collaborative tone sets expectations for a potential industry-wide standards effort.",
+        "CD": "Your olive branch is met with a surprise announcement of exclusive enterprise deals. Your competitor captures key accounts while you appear weak. Investors question your competitive strategy.",
+        "DC": "Your aggressive move catches your competitor flat-footed. Their interoperability announcement looks naive as you lock in major clients. Market analysts praise your decisive action.",
+        "DD": "Both companies announce exclusive partnerships and aggressive pricing simultaneously. The tech press declares 'Platform War Begins.' Stock prices for both companies drop as investors fear a value-destroying price war. Regulatory lawyers start drafting memos."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_2",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    {
+      "turn": 2,
+      "act": 1,
+      "narrative_briefing": "A major AI chip manufacturer has signaled they're open to an exclusive supply agreement. Securing this partnership would give one company a significant advantage in hardware costs and availability. Both companies are quietly negotiating. Intelligence suggests your competitor has sent a delegation to Taiwan.",
+      "matrix_type": "inspection_game",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.25,
+        "cheat_gain": 0.6,
+        "caught_penalty": 0.9,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "transparent_negotiations",
+          "narrative_description": "Conduct negotiations openly and propose a shared supply agreement that benefits both companies.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "verify_competitor_claims",
+          "narrative_description": "Hire industry consultants to verify your competitor's public claims about their manufacturing capabilities.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "secret_exclusive_deal",
+          "narrative_description": "Quietly negotiate an exclusive multi-year supply agreement, cutting your competitor out of the market.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "corporate_intelligence",
+          "narrative_description": "Deploy corporate intelligence assets to learn your competitor's negotiating position and chip requirements.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both companies engage transparently with the chip manufacturer, who proposes a shared supply arrangement. Neither gains exclusive advantage, but both secure reliable supply chains. Industry observers note the unusual cooperation.",
+        "CD": "Your transparent approach is exploited. While you negotiate openly, your competitor locks in exclusive terms. You're left scrambling for alternative suppliers at higher costs.",
+        "DC": "Your covert maneuvering succeeds. You secure favorable exclusive terms while your competitor discovers too late that they've been outmaneuvered. Their stock drops on supply chain concerns.",
+        "DD": "Both companies attempt secret exclusive deals simultaneously. The chip manufacturer, frustrated by the duplicity, announces they'll supply both companies at premium prices with no exclusivity. Your corporate intelligence operations are leaked to the press\u2014both companies face embarrassing headlines about 'Silicon Valley spy games.'"
+      },
+      "branches": {
+        "CC": "turn_3_collaborative",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_3_hostile"
+      },
+      "default_next": "turn_3",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    {
+      "turn": 3,
+      "act": 1,
+      "narrative_briefing": "The FTC has opened a preliminary inquiry into competitive practices in the AI sector. Both companies receive subpoenas. How you respond to the inquiry\u2014and whether you cooperate with regulators or fight them\u2014will shape the regulatory landscape for years to come.",
+      "matrix_type": "prisoners_dilemma",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.4,
+        "reward": 1.0,
+        "punishment": 0.35,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "cooperate_ftc",
+          "narrative_description": "Fully cooperate with the FTC inquiry and advocate for reasonable industry-wide regulations.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "industry_coalition",
+          "narrative_description": "Propose forming an industry coalition with your competitor to present unified positions to regulators.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "aggressive_lobbying",
+          "narrative_description": "Launch aggressive lobbying efforts to shape regulations in your favor while providing damaging information about your competitor.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "legal_obstruction",
+          "narrative_description": "Deploy legal resources to delay and obstruct the inquiry while your competitor bears the brunt of regulatory scrutiny.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both companies cooperate fully with regulators and present a united industry front. The FTC concludes its inquiry with light-touch recommendations. Tech stocks rally on regulatory clarity.",
+        "CD": "Your cooperation is used against you. While you provide full disclosure, your competitor's lobbyists use your information to argue you're the 'real monopolist.' The FTC focuses its investigation on your company.",
+        "DC": "Your aggressive tactics pay off. Regulators focus on your competitor while your lobbying secures favorable treatment. Your competitor faces consent decrees while you operate freely.",
+        "DD": "Both companies wage an all-out regulatory war. Lobbyists on both sides provide damaging information about the other. The FTC, overwhelmed by the mutual destruction, expands its inquiry into a full antitrust investigation against both companies. Stock prices crater as investors flee regulatory uncertainty."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_4",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    {
+      "turn": 4,
+      "act": 1,
+      "narrative_briefing": "A promising AI startup with breakthrough technology has put itself up for sale. Both companies have submitted bids. The startup's founders are idealistic and have publicly stated they'll consider 'cultural fit' alongside price. The acquisition could shift the competitive balance significantly.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.4,
+        "crash_payoff": -0.8,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "reasonable_bid",
+          "narrative_description": "Submit a reasonable bid and signal willingness to let the founders choose based on vision alignment.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "joint_acquisition",
+          "narrative_description": "Propose a joint acquisition with your competitor, sharing the technology and talent.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "overwhelming_bid",
+          "narrative_description": "Submit an overwhelming bid at 3x the startup's valuation, making it impossible for your competitor to match.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "hostile_tactics",
+          "narrative_description": "Approach key employees directly with retention packages, effectively gutting the startup whether or not you win the bid.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both companies submit reasonable bids and the founders choose based on vision. The losing bidder gracefully accepts the outcome. Industry commentators praise the 'civilized' process as evidence that tech can self-regulate.",
+        "CD": "Your restraint is punished. While you bid reasonably, your competitor's overwhelming offer wins the auction. They gain breakthrough technology while you're left empty-handed.",
+        "DC": "Your aggressive bid secures the acquisition. The founders take your money despite misgivings. Your competitor is shut out of the key technology, weakening their competitive position.",
+        "DD": "Both companies engage in a bidding war that drives the price to absurd levels. The founders, disgusted by the aggressive tactics, reject both bids and take the company public instead. Both companies wasted months of executive time and damaged their reputations with the startup community. Future acquisition targets will be wary of dealing with either company."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_5",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    {
+      "turn": 5,
+      "act": 2,
+      "narrative_briefing": "The platform war has escalated. Both companies are now competing directly for enterprise cloud contracts worth billions. A major Fortune 100 company has put out an RFP that will set the standard for enterprise AI adoption. Winning this contract would establish dominance in the enterprise market for years.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.6,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.3,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "competitive_bid",
+          "narrative_description": "Submit a competitive but sustainable bid that maintains healthy margins.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "partnership_proposal",
+          "narrative_description": "Propose a partnership with your competitor to jointly serve the enterprise client.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "below_cost_bid",
+          "narrative_description": "Submit a bid below your actual costs, planning to make up losses with lock-in and upsells.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "sabotage_competitor",
+          "narrative_description": "Leak negative information about your competitor's reliability to the enterprise client's procurement team.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both companies submit professional bids. The enterprise client splits the contract, giving each company different divisions. The healthy competition produces good terms for the client without destroying industry margins.",
+        "CD": "Your sustainable bid loses to your competitor's aggressive pricing. They capture the flagship contract while you're left with secondary opportunities.",
+        "DC": "Your aggressive tactics win the contract. Your competitor is shut out of the marquee deal, damaging their enterprise credibility.",
+        "DD": "Both companies bid below cost and leak damaging information about each other. The enterprise client, alarmed by the mutual character assassination, cancels the RFP entirely and builds an in-house solution. Both companies lose the opportunity and face lawsuits from the client for tortious interference. Wall Street downgrades both stocks on 'irrational competition.'"
+      },
+      "branches": {
+        "CC": "turn_6_constructive",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_6_destructive"
+      },
+      "default_next": "turn_6",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Settlement talks collapse as neither CEO can agree on market boundaries. The failed negotiation leaks to the press, interpreted as a sign that the platform war will intensify. Both stocks drop on the news."
+    },
+    {
+      "turn": 6,
+      "act": 2,
+      "narrative_briefing": "Congressional hearings on AI have been announced. Both CEOs will be called to testify. The political environment is hostile\u2014legislators from both parties are looking for tech companies to blame. How you position yourself in the hearings could shape regulation for the entire industry.",
+      "matrix_type": "reconnaissance",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "unified_testimony",
+          "narrative_description": "Coordinate testimony with your competitor to present a unified industry position on responsible AI development.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "voluntary_commitments",
+          "narrative_description": "Announce voluntary commitments to AI safety and ethics, inviting your competitor to join.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "blame_competitor",
+          "narrative_description": "In your testimony, subtly blame your competitor for industry problems while positioning yourself as the responsible actor.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "political_allies",
+          "narrative_description": "Mobilize political allies to direct tough questions at your competitor during the hearings.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both CEOs present unified testimony advocating for sensible regulation. Legislators, impressed by the mature approach, propose a light-touch regulatory framework developed in partnership with industry. Both companies' political risk decreases.",
+        "CD": "Your cooperative approach is exploited in the hearing room. While you advocate for the industry, your competitor's allies grill you on past controversies. You leave the hearing looking defensive while your competitor appears statesmanlike.",
+        "DC": "Your political maneuvering succeeds brilliantly. Your competitor faces hostile questioning while you're praised for your 'thoughtful' approach. Legislative proposals target your competitor's business model.",
+        "DD": "Both CEOs throw each other under the bus. The spectacle of tech titans attacking each other delights legislators, who conclude the industry cannot self-regulate. Sweeping legislation is proposed that would fundamentally restructure both companies. Both stocks crater as investors price in existential regulatory risk."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_7",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The attempt to negotiate a truce before the hearings fails. Both CEOs leave the negotiating table convinced the other will attack them in testimony. The hearings will be contentious."
+    },
+    {
+      "turn": 7,
+      "act": 2,
+      "narrative_briefing": "A whistleblower has emerged with documents about both companies' AI development practices. The documents could be damaging to either or both companies depending on how the story is spun. Media outlets are reaching out for comment. How you handle this crisis could define public perception of your company.",
+      "matrix_type": "prisoners_dilemma",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "joint_statement",
+          "narrative_description": "Reach out to your competitor to issue a joint statement addressing the whistleblower's concerns transparently.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "acknowledge_issues",
+          "narrative_description": "Acknowledge the issues raised and announce corrective measures, taking the high road.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "deflect_to_competitor",
+          "narrative_description": "Quietly feed journalists information that the whistleblower's concerns apply primarily to your competitor's practices.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "attack_whistleblower",
+          "narrative_description": "Launch an aggressive legal and PR campaign to discredit the whistleblower and suppress the story.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both companies issue transparent statements and announce joint corrective measures. The story becomes about 'industry reform' rather than 'corporate malfeasance.' Public trust in AI development actually increases.",
+        "CD": "Your transparency is weaponized against you. While you acknowledge issues, your competitor's spin operation makes you the villain of the story. Media coverage focuses on your failings while ignoring theirs.",
+        "DC": "Your information operation succeeds. The whistleblower story becomes entirely about your competitor's practices. Your company is portrayed as the 'good actor' in the industry.",
+        "DD": "Both companies attack the whistleblower and each other. The resulting media circus exposes both companies' worst practices. Congressional investigations are announced. Multiple executives face personal legal liability. Employee morale collapses as workers question whether they're working for ethical companies."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_8",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Crisis negotiations fail. Both companies will face the whistleblower fallout without coordination. The media will play you against each other."
+    },
+    {
+      "turn": 8,
+      "act": 2,
+      "narrative_briefing": "Your competitor has approached you about a potential merger. The combined company would dominate the AI market but would almost certainly face antitrust challenge. Alternatively, you could reject the merger and continue the platform war, or use the overture as intelligence about your competitor's weakness.",
+      "matrix_type": "battle_of_sexes",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.2,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.5,
+        "preference_b": 1.4,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "explore_merger",
+          "narrative_description": "Seriously explore the merger proposal, engaging in good-faith due diligence.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "strategic_alliance",
+          "narrative_description": "Counter-propose a strategic alliance short of merger that would reduce competition without triggering antitrust.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "reject_publicly",
+          "narrative_description": "Publicly reject the merger proposal to signal confidence and potentially embarrass your competitor for appearing desperate.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "exploit_intelligence",
+          "narrative_description": "Use the merger talks to gather intelligence about your competitor's financial position, then leak it to weaken them.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both companies engage seriously in merger discussions. Even if the deal ultimately doesn't happen, the process reveals opportunities for value-creating collaboration. Market analysts upgrade both stocks on 'strategic optionality.'",
+        "CD": "Your good-faith engagement is betrayed. While you share sensitive information in due diligence, your competitor uses the talks to gather intelligence and then publicly mocks your 'desperation' to merge.",
+        "DC": "Your competitive response catches your competitor off-balance. Their merger overture looks like weakness, and your public rejection is seen as confidence. Their stock drops while yours rises.",
+        "DD": "Both companies attempt to exploit the merger talks. Sensitive information is leaked on both sides. The SEC opens an investigation into potential securities violations. The board of directors of both companies lose confidence in their CEOs' judgment. Activist investors begin circling both companies."
+      },
+      "branches": {
+        "CC": "turn_9_cooperative_track",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_9_hostile_track"
+      },
+      "default_next": "turn_9",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Merger talks collapse acrimoniously. Both companies accuse the other of bad faith. The platform war will continue with renewed intensity."
+    },
+    {
+      "turn": 9,
+      "act": 3,
+      "narrative_briefing": "The stakes have reached critical levels. The FTC has announced it will make a decision on antitrust action within months. Both companies' stock prices are volatile. Your boards are demanding resolution\u2014either victory or settlement. The next moves will determine which company dominates the next decade of technology.",
+      "matrix_type": "security_dilemma",
+      "matrix_parameters": {
+        "scale": 0.9,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.6,
+        "reward": 1.0,
+        "punishment": 0.25,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "propose_market_division",
+          "narrative_description": "Propose a formal market division agreement\u2014you take enterprise, they take consumer, or vice versa.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "de_escalate_publicly",
+          "narrative_description": "Announce a unilateral pause in aggressive competitive tactics, inviting your competitor to match.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "final_offensive",
+          "narrative_description": "Launch a massive final offensive to capture market share before antitrust action can land.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "regulatory_alliance",
+          "narrative_description": "Secretly offer to cooperate with regulators against your competitor in exchange for favorable treatment.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both companies publicly de-escalate and begin serious market division negotiations. Wall Street rallies on the prospect of 'rational competition.' The FTC, impressed by the self-regulation, delays its antitrust decision.",
+        "CD": "Your de-escalation is exploited. While you pull back, your competitor launches an aggressive campaign to capture your market share. You lose significant ground and look weak to investors.",
+        "DC": "Your offensive succeeds dramatically. While your competitor de-escalates, you capture crucial market segments. Their stock plummets as investors lose confidence in their leadership.",
+        "DD": "Both companies launch all-out offensives simultaneously. The market is flooded with below-cost products and services. Neither can sustain the burn rate. Credit ratings are downgraded. The FTC, citing market dysfunction, files emergency antitrust actions against both companies. A court-appointed monitor is assigned to oversee both companies' competitive practices."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_10",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Market division talks collapse. The FTC interprets the failed negotiation as evidence that the companies cannot self-regulate. Antitrust action becomes more likely."
+    },
+    {
+      "turn": 10,
+      "act": 3,
+      "narrative_briefing": "A foreign tech giant has entered the US market with a competitive AI platform backed by substantial government subsidies. Both American companies face an existential threat. Do you set aside your rivalry to face the common enemy, or try to ally with the newcomer against your domestic rival?",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 0.8,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.2,
+        "hare_temptation": 1.4,
+        "hare_safe": 0.9,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "domestic_alliance",
+          "narrative_description": "Propose a formal alliance with your domestic competitor to counter the foreign threat together.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "joint_lobbying",
+          "narrative_description": "Coordinate with your competitor to lobby for restrictions on foreign competitors receiving government subsidies.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "foreign_partnership",
+          "narrative_description": "Secretly approach the foreign competitor about a partnership that would disadvantage your domestic rival.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "market_opportunism",
+          "narrative_description": "Let your domestic competitor bear the brunt of the foreign competition while you consolidate your strongest markets.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both American companies form a united front against the foreign competitor. Joint lobbying secures Congressional action to level the playing field. The foreign competitor's US expansion stalls. Both domestic companies benefit from national champion status.",
+        "CD": "Your attempt at domestic alliance is rejected. While you prepare for a united front, your competitor cuts a deal with the foreign entrant. You face a two-front war and your market position deteriorates rapidly.",
+        "DC": "Your foreign partnership gives you access to subsidized technology while your competitor fights alone. Their market share collapses as they face enemies on all sides.",
+        "DD": "Both American companies try to ally with the foreign competitor against each other. The foreign company plays both sides, extracting technology and market intelligence from each. Both domestic companies are weakened while the foreign competitor gains strength. Congressional hearings are called on 'betraying American technology leadership.'"
+      },
+      "branches": {
+        "CC": "turn_11_partnership",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_11_crisis"
+      },
+      "default_next": "turn_11",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Alliance negotiations fail. Both American companies will face the foreign threat divided. The foreign competitor's executives celebrate privately."
+    },
+    {
+      "turn": 11,
+      "act": 3,
+      "narrative_briefing": "The FTC has issued its preliminary ruling: both companies face significant restrictions on future acquisitions and mandatory data sharing requirements. The ruling can be appealed, but the outcome is uncertain. Both companies must decide whether to accept the new regulatory reality or fight it\u2014potentially together or against each other.",
+      "matrix_type": "prisoners_dilemma",
+      "matrix_parameters": {
+        "scale": 0.65,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "accept_ruling",
+          "narrative_description": "Accept the FTC ruling and work constructively within the new regulatory framework.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "joint_appeal",
+          "narrative_description": "Coordinate with your competitor on a joint legal appeal of the most onerous provisions.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "selective_compliance",
+          "narrative_description": "Publicly accept the ruling while secretly lobbying for exemptions that would disadvantage your competitor.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "scorched_earth",
+          "narrative_description": "Fight the ruling aggressively while arguing your competitor should face even stricter restrictions.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both companies accept the ruling and coordinate appeals on key provisions. The FTC, satisfied with compliance, signals it will consider relaxing restrictions over time. Stock prices stabilize as regulatory uncertainty decreases.",
+        "CD": "Your acceptance is exploited. While you comply in good faith, your competitor's lobbying secures exemptions that give them competitive advantage under the new rules.",
+        "DC": "Your lobbying succeeds. You secure favorable treatment while your competitor faces the full weight of the restrictions. Their business model is significantly constrained.",
+        "DD": "Both companies fight the ruling aggressively while trying to worsen each other's treatment. The FTC, angered by the defiance, issues even stricter supplemental restrictions. Appeals courts, seeing industry bad faith, rule against both companies. The regulatory environment becomes a nightmare for the entire tech sector."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_12",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Regulatory cooperation talks fail. Both companies will navigate the FTC ruling alone, with no coordination on appeals."
+    },
+    {
+      "turn": 12,
+      "act": 3,
+      "narrative_briefing": "The board demands a decisive resolution. Shareholders are restless, employees are exhausted from the constant battle, and the foreign competitor is gaining ground daily. This is the moment of truth: peace or war, dominance or partnership, survival or mutual destruction.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.7,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.35,
+        "crash_payoff": -1.2,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "comprehensive_settlement",
+          "narrative_description": "Propose a comprehensive settlement that divides markets, shares key technologies, and ends the platform war.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "peaceful_coexistence",
+          "narrative_description": "Announce a unilateral commitment to peaceful coexistence and invite your competitor to match.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "knockout_blow",
+          "narrative_description": "Launch a final, all-in offensive to deliver a knockout blow and establish permanent dominance.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "hostile_takeover",
+          "narrative_description": "Launch a surprise hostile takeover bid for your competitor, betting everything on total victory.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both companies agree to a comprehensive settlement. The platform war ends with a negotiated peace. Markets rally, employees celebrate, and both companies can focus on innovation instead of destruction.",
+        "CD": "Your peace overture is met with a knockout blow. While you extend an olive branch, your competitor launches a devastating offensive. Your market position collapses.",
+        "DC": "Your final offensive succeeds. Your competitor's peace overture leaves them vulnerable, and you capitalize. You emerge as the dominant player.",
+        "DD": "Both companies launch all-out offensives simultaneously. Hostile takeover bids fly in both directions. Poison pills are triggered. Massive debt is accumulated. The ensuing chaos triggers a tech sector collapse. Both companies' stocks crash 70%. Mass layoffs follow. The FTC steps in with emergency breakup proceedings. The foreign competitor emerges as the dominant force in global AI."
+      },
+      "branches": {
+        "CC": "turn_13_peace",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_13_apocalypse"
+      },
+      "default_next": "turn_13",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Final settlement talks collapse. Both CEOs return to their war rooms. The endgame begins."
+    },
+    {
+      "turn": 13,
+      "act": 3,
+      "narrative_briefing": "The dust is settling on months of conflict. Regardless of the path taken, both companies must now confront the long-term consequences of their choices. The market is watching to see if the lessons have been learned or if the cycle will repeat.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.3,
+        "hare_safe": 0.9,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "institutionalize_peace",
+          "narrative_description": "Work to institutionalize cooperative practices through formal agreements and regular CEO summits.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "industry_norms",
+          "narrative_description": "Champion new industry norms for competition that benefit all players, including future entrants.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "quiet_positioning",
+          "narrative_description": "While appearing cooperative, quietly position for the next round of competition.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "exploit_weakness",
+          "narrative_description": "Take advantage of any weakness your competitor shows from the recent conflict.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both companies commit to sustainable competition. Industry norms are established. The market enters a period of innovation-focused rather than destruction-focused competition.",
+        "CD": "Your commitment to peace is exploited. While you work on industry norms, your competitor quietly captures strategic positions for the next battle.",
+        "DC": "Your quiet repositioning succeeds. You emerge from the peace process in a stronger position than your competitor realized.",
+        "DD": "Both companies immediately begin positioning for the next conflict. The 'peace' proves illusory. Industry observers predict the cycle will repeat, and long-term investors flee both stocks."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_14",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Attempts to formalize peace collapse. The d\u00e9tente is fragile and may not last."
+    },
+    {
+      "turn": 14,
+      "act": 3,
+      "narrative_briefing": "The final reckoning. Your board meets to assess the outcome of the technology war. The market has rendered its verdict on your strategy. What remains is to see if you can secure the best possible position as this chapter closes and the next begins.",
+      "matrix_type": "harmony",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.0,
+        "reward": 1.5,
+        "punishment": 0.0,
+        "sucker": 0.6,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "graceful_close",
+          "narrative_description": "Close this chapter gracefully, acknowledging both victories and defeats, and prepare for sustainable competition.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "lessons_learned",
+          "narrative_description": "Share lessons learned with industry, helping to prevent future destructive conflicts.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "claim_victory",
+          "narrative_description": "Regardless of actual outcome, spin the narrative to claim victory and demoralize your competitor.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "plant_seeds",
+          "narrative_description": "While closing this chapter, plant the seeds for future competitive advantages.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both companies close this chapter with dignity and mutual respect. The technology war ends not with victory parades but with handshakes and forward-looking statements. The industry enters a new era of productive competition.",
+        "CD": "Your graceful close is met with triumphalism. Your competitor claims total victory regardless of reality. But the market remembers who acted with integrity.",
+        "DC": "Your victory lap succeeds in shaping the narrative. Your competitor's graciousness is interpreted as defeat. But this approach may set the tone for the next conflict.",
+        "DD": "Both companies claim victory and prepare for the next round. The 'conclusion' is merely a pause. Investors, seeing that nothing has been learned, reduce their expectations for both companies' long-term value creation."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": null,
+      "settlement_available": true,
+      "settlement_failed_narrative": "Even at the end, settlement proves impossible. The conflict will continue in new forms."
+    }
+  ],
+  "branches": {
+    "turn_3_collaborative": {
+      "turn": 3,
+      "act": 1,
+      "narrative_briefing": "The cooperative approach to the chip supply negotiations has created an unexpected atmosphere of trust. Industry observers are watching to see if this extends to the looming FTC inquiry. Both companies have received subpoenas\u2014will you maintain the collaborative momentum?",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.2,
+        "hare_temptation": 1.3,
+        "hare_safe": 0.85,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "extend_cooperation",
+          "narrative_description": "Build on the chip deal by proposing coordinated regulatory strategy.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "joint_counsel",
+          "narrative_description": "Hire joint outside counsel to present a unified industry position to the FTC.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "capitalize_goodwill",
+          "narrative_description": "Use the goodwill from chip negotiations to make your competitor overconfident while you lobby aggressively.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "separate_track",
+          "narrative_description": "Maintain public cooperation while pursuing aggressive separate regulatory strategy.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The cooperation deepens. Joint counsel presents a compelling case for light-touch regulation. The FTC is impressed by industry unity and issues favorable preliminary findings.",
+        "CD": "Your extended olive branch is exploited. While you coordinate openly, your competitor's separate lobbying succeeds in making you the target of regulatory attention.",
+        "DC": "Your feigned cooperation successfully masks your aggressive strategy. Your competitor is blindsided when regulations target them specifically.",
+        "DD": "The nascent cooperation collapses. Both companies revert to aggressive lobbying. The FTC, having seen the potential for cooperation, is especially disappointed and pursues both companies more aggressively."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_4",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    "turn_3_hostile": {
+      "turn": 3,
+      "act": 1,
+      "narrative_briefing": "The corporate espionage revelations have poisoned the well. Trust between the companies is at rock bottom. Now the FTC inquiry arrives against this backdrop of mutual suspicion. Both companies have received subpoenas\u2014this could become an opportunity for regulatory warfare.",
+      "matrix_type": "prisoners_dilemma",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.6,
+        "reward": 1.0,
+        "punishment": 0.25,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "reset_relations",
+          "narrative_description": "Use the FTC inquiry as an opportunity to reset relations\u2014propose coordinated compliance.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "good_faith_response",
+          "narrative_description": "Respond to the FTC in good faith without trying to harm your competitor.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "weaponize_inquiry",
+          "narrative_description": "Provide the FTC with evidence of your competitor's espionage activities.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "mutual_destruction_threat",
+          "narrative_description": "Signal that if your competitor weaponizes the inquiry, you'll respond in kind with damaging disclosures.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Despite the recent hostility, both companies manage to respond professionally to the FTC. The inquiry proceeds without becoming a battleground. Some trust is tentatively rebuilt.",
+        "CD": "Your attempt to reset relations is rejected. Your competitor weaponizes the inquiry, providing damaging information. You face increased regulatory scrutiny while they appear cooperative.",
+        "DC": "Your evidence about your competitor's espionage proves devastating. Regulators focus their attention on your competitor's practices. You emerge as the 'clean' player.",
+        "DD": "Both companies turn the FTC inquiry into total war. Mutual disclosures reveal embarrassing practices on both sides. The FTC expands its investigation to include criminal referrals. Both companies face existential regulatory threat."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_4",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    "turn_6_constructive": {
+      "turn": 6,
+      "act": 2,
+      "narrative_briefing": "The professional handling of the enterprise contract has created positive momentum. Congressional hearings on AI are approaching, and there's an opportunity to present a united industry front. Both CEOs will testify\u2014will you coordinate your message or compete for political favor?",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.3,
+        "hare_temptation": 1.3,
+        "hare_safe": 0.85,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "coordinated_testimony",
+          "narrative_description": "Coordinate testimony to present unified pro-industry positions on AI regulation.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "voluntary_framework",
+          "narrative_description": "Jointly propose a voluntary regulatory framework that both companies will follow.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "differentiate_subtly",
+          "narrative_description": "While appearing cooperative, subtly differentiate your approach as more responsible.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "political_capital",
+          "narrative_description": "Use your recent good behavior to build political capital at your competitor's expense.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both CEOs deliver coordinated, statesmanlike testimony. Congress is impressed by the industry's maturity. Proposed regulations are favorable and light-touch.",
+        "CD": "Your coordination is undermined by your competitor's subtle political maneuvering. They emerge as the 'reasonable' party while you look like a follower.",
+        "DC": "Your political strategy succeeds. While appearing cooperative, you've positioned yourself as the industry leader regulators should consult.",
+        "DD": "The coordination facade collapses during testimony. Both CEOs contradict each other on key points. Congress concludes the industry cannot self-regulate and imposes strict requirements."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_7",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Coordination talks before the hearings fail. Both CEOs will testify without alignment."
+    },
+    "turn_6_destructive": {
+      "turn": 6,
+      "act": 2,
+      "narrative_briefing": "The enterprise contract debacle has left both companies damaged. Congressional hearings on AI loom as legislators seek someone to blame for industry dysfunction. Both CEOs must testify under this hostile spotlight. This could be an opportunity to rebuild\u2014or to inflict fatal political damage on your rival.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.6,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.3,
+        "crash_payoff": -1.1,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "extend_olive_branch",
+          "narrative_description": "Use the hearings as an opportunity for reconciliation\u2014propose coordinated damage control.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "take_responsibility",
+          "narrative_description": "Take responsibility for your role in the dysfunction and propose reforms.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "blame_competitor",
+          "narrative_description": "Blame the enterprise contract disaster entirely on your competitor's predatory tactics.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "nuclear_option",
+          "narrative_description": "Reveal damaging information about your competitor's practices that will destroy their political standing.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both CEOs acknowledge industry dysfunction and propose reforms. Congress, impressed by the accountability, focuses on constructive regulation rather than punishment.",
+        "CD": "Your olive branch is met with blame. Your competitor successfully paints you as the bad actor. Regulatory proposals specifically target your company.",
+        "DC": "Your blame strategy succeeds. Congress accepts your narrative and your competitor faces the political consequences of the enterprise disaster.",
+        "DD": "Both CEOs engage in mutual destruction in the hearing room. Damaging revelations emerge about both companies. Congress responds with draconian legislation. Both companies face criminal referrals. The tech sector enters crisis as investors flee regulatory uncertainty."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_7",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Damage control coordination fails. Both CEOs will face Congress alone and hostile."
+    },
+    "turn_9_cooperative_track": {
+      "turn": 9,
+      "act": 3,
+      "narrative_briefing": "The merger exploration, while not resulting in a deal, has created understanding between the companies. Both leadership teams have seen each other's books. The FTC is watching closely\u2014will this transparency lead to sustainable detente or will it be exploited?",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.3,
+        "hare_temptation": 1.4,
+        "hare_safe": 0.85,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "formalize_detente",
+          "narrative_description": "Use the mutual understanding from merger talks to formalize a competitive ceasefire.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "market_boundaries",
+          "narrative_description": "Propose informal market boundaries that reduce direct competition.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "exploit_knowledge",
+          "narrative_description": "Use the confidential information learned in merger talks to target competitor weaknesses.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "preemptive_strike",
+          "narrative_description": "Launch a preemptive competitive strike before your competitor can use what they learned about you.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The merger talks evolve into a sustainable competitive framework. Both companies reduce direct competition while maintaining innovation. The FTC tacitly approves the arrangement.",
+        "CD": "Your attempt to formalize detente is met with betrayal. Your competitor uses confidential merger information against you. Your competitive position is severely damaged.",
+        "DC": "Your exploitation of merger intelligence succeeds. Your competitor's vulnerabilities are exposed and exploited. Their market position weakens significantly.",
+        "DD": "Both companies attempt to exploit merger intelligence simultaneously. Massive lawsuits are filed for breach of confidentiality. The SEC investigates both companies. The mutual destruction creates an opening for the foreign competitor to capture market share."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_10",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The post-merger-talks detente collapses. Both companies will compete aggressively with sensitive knowledge about each other."
+    },
+    "turn_9_hostile_track": {
+      "turn": 9,
+      "act": 3,
+      "narrative_briefing": "The failed merger talks have left both companies wounded and angry. Activist investors are circling. The FTC is preparing its decision. Both companies face potential destruction\u2014but neither is willing to back down. This is the most dangerous moment of the conflict.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 0.85,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.8,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.25,
+        "crash_payoff": -1.3,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "step_back",
+          "narrative_description": "Step back from the brink\u2014propose emergency talks to prevent mutual destruction.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "ceasefire",
+          "narrative_description": "Unilaterally declare a competitive ceasefire, inviting your competitor to match.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "double_down",
+          "narrative_description": "Double down on the conflict, committing all resources to defeating your competitor.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "scorched_earth",
+          "narrative_description": "If you can't win, ensure your competitor doesn't either\u2014launch scorched earth tactics.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both companies step back from the brink. Emergency talks lead to a fragile ceasefire. The worst has been avoided, but trust remains minimal.",
+        "CD": "Your peace overture is rejected. While you step back, your competitor launches a devastating attack. Your market position collapses.",
+        "DC": "Your all-in commitment succeeds. Your competitor's ceasefire leaves them vulnerable, and you capitalize ruthlessly.",
+        "DD": "Both companies go scorched earth. The tech sector collapses as the destruction spreads. Massive layoffs at both companies. The FTC imposes emergency breakup orders. The foreign competitor inherits the market. Both companies' market caps decline by 80%. This will be studied in business schools as a cautionary tale."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_10",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Emergency talks fail. Both companies prepare for what may be a final confrontation."
+    },
+    "turn_11_partnership": {
+      "turn": 11,
+      "act": 3,
+      "narrative_briefing": "The domestic alliance against the foreign competitor has succeeded beyond expectations. Congressional support is strong. Now the FTC ruling arrives\u2014and because both companies presented a united front, the restrictions are moderate. The question is whether to maintain the alliance now that the external threat is contained.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.2,
+        "hare_temptation": 1.4,
+        "hare_safe": 0.9,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "maintain_alliance",
+          "narrative_description": "Maintain the domestic alliance as a permanent feature of the competitive landscape.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "expand_partnership",
+          "narrative_description": "Expand the partnership into joint R&D and standard-setting activities.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "exit_alliance",
+          "narrative_description": "Now that the foreign threat is contained, exit the alliance and resume competition.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "alliance_advantage",
+          "narrative_description": "Remain in the alliance publicly while secretly positioning to dominate once it dissolves.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The alliance becomes permanent. Both companies benefit from cooperation against external threats while maintaining healthy domestic competition. The model is praised as 'coopetition' done right.",
+        "CD": "Your commitment to the alliance is exploited. While you maintain good faith, your competitor positions for dominance. When the alliance dissolves, they hold the advantage.",
+        "DC": "Your exit strategy succeeds. You've benefited from the alliance while positioning for post-alliance dominance. Your competitor is caught flat-footed.",
+        "DD": "Both companies try to exploit the alliance simultaneously. The partnership collapses acrimoniously. The foreign competitor, seeing the opportunity, renews its US expansion. Neither domestic company is strong enough alone to resist."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_12",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Alliance continuation talks fail. The partnership that saved both companies dissolves."
+    },
+    "turn_11_crisis": {
+      "turn": 11,
+      "act": 3,
+      "narrative_briefing": "The betrayal of both companies allying with the foreign competitor has created a disaster. Congressional hearings have been called on 'tech treason.' The FTC ruling arrives against this backdrop\u2014and it's severe. Both companies face breakup proceedings. This may be the end.",
+      "matrix_type": "deadlock",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 0.6,
+        "punishment": 1.0,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "accept_breakup",
+          "narrative_description": "Accept the breakup terms and work to salvage what value you can.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "joint_appeal",
+          "narrative_description": "Coordinate with your competitor on a joint legal appeal against the breakup.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "fight_alone",
+          "narrative_description": "Fight the breakup aggressively while ensuring your competitor faces even worse terms.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "final_sabotage",
+          "narrative_description": "If you're going down, take your competitor with you\u2014maximum disclosure of their wrongdoing.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both companies accept partial breakups and coordinate their survival. Some value is salvaged. The experience is traumatic but survivable.",
+        "CD": "Your acceptance of breakup terms while seeking coordination is exploited. Your competitor's fighting strategy succeeds in worsening your terms.",
+        "DC": "Your aggressive defense succeeds. Your competitor faces worse breakup terms while you negotiate a more favorable restructuring.",
+        "DD": "Both companies fight to the death. Mutual destruction is complete. Both companies are broken up into fragments. The US tech industry loses its leadership position globally. The foreign competitor dominates the AI market for a generation."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_12",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Survival coordination fails. Both companies face the breakup alone."
+    },
+    "turn_13_peace": {
+      "turn": 13,
+      "act": 3,
+      "narrative_briefing": "The comprehensive settlement has transformed the industry. Where there was warfare, there is now structured competition. Both companies have survived and can now focus on innovation and growth. The question is whether this peace can be institutionalized.",
+      "matrix_type": "harmony",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.0,
+        "reward": 1.6,
+        "punishment": 0.0,
+        "sucker": 0.5,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "institutionalize_peace",
+          "narrative_description": "Work to make the peace permanent through formal structures and regular communication.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "model_cooperation",
+          "narrative_description": "Become a model for industry cooperation, sharing lessons learned.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "quiet_advantage",
+          "narrative_description": "While maintaining the peace, quietly build advantages for eventual resumed competition.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "test_boundaries",
+          "narrative_description": "Test the boundaries of the settlement to see what you can get away with.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The peace is institutionalized. A new era of productive competition begins. Both companies thrive, and the industry is better for it.",
+        "CD": "Your commitment to peace is tested by your competitor's boundary-pushing. You hold firm, and eventually they back down.",
+        "DC": "Your quiet advantage-building succeeds within the bounds of the settlement. You enter the next phase in a stronger position.",
+        "DD": "Both companies test the settlement boundaries. The fragile peace holds, but barely. The next conflict may not end as well."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_14",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Institutionalization talks fail. The peace remains informal and fragile."
+    },
+    "turn_13_apocalypse": {
+      "turn": 13,
+      "act": 3,
+      "narrative_briefing": "The mutual destruction has been catastrophic. Stock prices have collapsed. Mass layoffs are underway. The FTC is breaking both companies apart. The foreign competitor dominates the market. What remains is salvage operations\u2014can anything be saved from the wreckage?",
+      "matrix_type": "volunteers_dilemma",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 0.8,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.4,
+        "free_ride_bonus": 0.3,
+        "disaster_penalty": 1.2,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "salvage_cooperation",
+          "narrative_description": "Work with your former competitor to salvage what value you can together.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "take_blame",
+          "narrative_description": "Take responsibility for the destruction, potentially saving your competitor from the worst.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "grab_remnants",
+          "narrative_description": "In the breakup, grab the most valuable pieces before your competitor can.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "blame_others",
+          "narrative_description": "Ensure the narrative blames your competitor more than you for the destruction.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both companies cooperate in the salvage. Some value is preserved. The experience is traumatic but not total destruction.",
+        "CD": "Your cooperation in salvage is exploited. Your competitor grabs the most valuable pieces while you're left with scraps.",
+        "DC": "Your grab strategy succeeds. You emerge from the destruction with the better pieces of the broken companies.",
+        "DD": "Both companies fight over the scraps. The salvage is consumed by litigation. Nothing is left. Both companies cease to exist as independent entities. The worst possible outcome has been achieved."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_14",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Salvage coordination fails. The remnants will be fought over to the bitter end."
+    }
+  },
+  "personas": {
+    "side_a": {
+      "persona": "gates",
+      "role_name": "Tech Company CEO",
+      "role_description": "Leader of a major technology company competing for market dominance."
+    },
+    "side_b": {
+      "persona": "jobs",
+      "role_name": "Rival Tech CEO",
+      "role_description": "Visionary leader of a competing technology empire."
+    }
+  }
+}

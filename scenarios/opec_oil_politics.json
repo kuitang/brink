@@ -1,0 +1,2169 @@
+{
+  "scenario_id": "opec_oil_politics_2026",
+  "title": "OPEC Oil Politics",
+  "theme": "default",
+  "setting": "OPEC oil politics. Cartel discipline, production quotas, price wars between Saudi Arabia\nand rivals. The world's oil producers must balance their desire for high prices against the\ntemptation to cheat on quotas. Can the cartel maintain discipline, or will defection lead\nto a price war that hurts everyone?",
+  "max_turns": 14,
+  "turns": [
+    {
+      "turn": 1,
+      "act": 1,
+      "narrative_briefing": "The OPEC+ ministerial meeting in Vienna has just concluded with agreement on modest production cuts to support prices above $80 per barrel. Behind closed doors, however, both delegations are aware of mounting pressures. Satellite imagery and tanker tracking suggest someone may already be cheating on the previous quota agreement. The question is whether to address suspicions openly or let them fester.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "signal_commitment",
+          "narrative_description": "Issue a public statement strongly endorsing the new quota agreement and pledge full compliance, sending a signal of cartel solidarity.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "propose_verification",
+          "narrative_description": "Suggest implementing enhanced transparency measures including independent monitoring of export volumes.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "hedge_production",
+          "narrative_description": "Quietly authorize domestic producers to maintain slightly higher output levels while publicly claiming compliance.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "gather_intelligence",
+          "narrative_description": "Deploy additional resources to monitor the rival's actual production and export levels through satellite imagery and port tracking.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both producers issue strong statements of commitment, and energy markets respond positively. Oil prices firm up as traders perceive genuine cartel unity. The foundation for cooperation is laid.",
+        "CD": "Your commitment to transparency is met with evasion. Intelligence reports confirm the rival is quietly exceeding quotas while paying lip service to the agreement. You've shown your cards; they've hidden theirs.",
+        "DC": "Your hedging is detected by the rival's intelligence apparatus. They publicly call for 'enhanced compliance monitoring'\u2014a veiled accusation. You've gained barrels but lost trust.",
+        "DD": "Neither side commits genuinely. Both quietly exceed quotas while issuing hollow statements. Traders sense the discord, and prices drift lower as market confidence in OPEC discipline erodes."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_2",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    {
+      "turn": 2,
+      "act": 1,
+      "narrative_briefing": "Tanker tracking data has leaked to Reuters, revealing discrepancies between declared and actual export volumes. The market is buzzing with speculation about quota cheating. Your economic ministry reports that current oil revenues are critical for budget commitments. A bilateral meeting between energy ministers is scheduled for next week.",
+      "matrix_type": "inspection_game",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "accept_audit",
+          "narrative_description": "Proactively invite independent auditors to verify your production figures and challenge your rival to do the same.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "propose_bilateral",
+          "narrative_description": "Seek a private meeting to discuss mutual concerns about compliance without public confrontation.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "demand_proof",
+          "narrative_description": "Publicly demand that suspected cheaters prove their compliance, putting them on the defensive.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "expand_quietly",
+          "narrative_description": "Accelerate your own covert production increases, reasoning that if they're cheating, you'd be foolish not to.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides agree to enhanced transparency. The bilateral meeting produces a joint commitment to independent verification, impressing markets and stabilizing prices.",
+        "CD": "Your openness to auditing contrasts sharply with your rival's deflection. The market notes who is willing to be transparent, but your restraint costs you barrels while they pump freely.",
+        "DC": "Your aggressive demands backfire when auditors confirm your own quota violations. The rival's cooperation makes you look like both a cheater and a hypocrite.",
+        "DD": "Mutual accusations fly while both sides quietly exceed quotas. The pretense of cartel discipline crumbles as traders lose faith. Prices begin to slide."
+      },
+      "branches": {
+        "CC": "turn_3_diplomatic",
+        "CD": "turn_3_diplomatic",
+        "DC": "turn_3_tense",
+        "DD": "turn_3_tense"
+      },
+      "default_next": "turn_3",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    {
+      "turn": 3,
+      "act": 1,
+      "narrative_briefing": "The energy ministers' bilateral meeting is underway in an ornate Riyadh hotel. Outside, demonstrators wave signs about energy prices. Inside, both delegations sit across a mahogany table, papers spread before them. The atmosphere is cordial but wary. Each side must decide how much to reveal about their true production plans.",
+      "matrix_type": "prisoners_dilemma",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "share_plans",
+          "narrative_description": "Present your actual production schedule and offer to coordinate future adjustments jointly.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "offer_concession",
+          "narrative_description": "Volunteer to take a slightly larger cut than required, demonstrating good faith.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "probe_position",
+          "narrative_description": "Ask probing questions while revealing little, attempting to learn their plans without committing to anything.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "issue_warning",
+          "narrative_description": "Subtly remind them of your market power and willingness to flood the market if provoked.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "A productive exchange leads to genuine understanding. Both sides leave with clearer expectations and a sense that cooperation is possible. Markets respond to leaked reports of progress.",
+        "CD": "Your candor is exploited. The rival takes your information and offers nothing in return, leaving you exposed. They now know your limits; you know nothing of theirs.",
+        "DC": "Your probing pays off\u2014they reveal too much, and you reveal too little. You've gained valuable intelligence about their constraints and plans.",
+        "DD": "A tense, unproductive meeting ends with both sides knowing less than when they started. The communiqu\u00e9 is vague, and markets read between the lines. Confidence falters."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_4",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    {
+      "turn": 4,
+      "act": 1,
+      "narrative_briefing": "A surprise development: U.S. shale production numbers come in higher than expected, threatening to undercut OPEC's price targets regardless of internal discipline. Both producers face a choice: strengthen cartel unity against the common competitor, or use the chaos to grab market share from each other.",
+      "matrix_type": "reconnaissance",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "coordinate_response",
+          "narrative_description": "Propose a joint OPEC+ strategy to counter U.S. shale, including coordinated deeper cuts.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "maintain_discipline",
+          "narrative_description": "Publicly reaffirm commitment to existing quotas and call for cartel unity in face of external threats.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "preemptive_expansion",
+          "narrative_description": "Use the distraction of shale news to quietly boost your own production before prices fall further.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "blame_rival",
+          "narrative_description": "Leak stories suggesting the rival's cheating is the real threat to prices, deflecting attention from U.S. shale.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "United against the common threat, OPEC+ announces a coordinated response. The shale challenge bonds the rivals together, at least temporarily. Markets stabilize.",
+        "CD": "Your call for unity is ignored as the rival grabs market share during the chaos. You've shown loyalty to the cartel; they've shown loyalty only to themselves.",
+        "DC": "Your opportunistic expansion during the crisis is noted. The rival's calls for unity ring hollow when you're flooding the market. Trust erodes further.",
+        "DD": "Both producers abandon discipline, each grabbing barrels while blaming external factors. The cartel's response to shale competition is incoherent. Prices begin a steeper decline."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_5",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    {
+      "turn": 5,
+      "act": 2,
+      "narrative_briefing": "Act II begins with oil prices testing the $70 support level. The Saudi finance minister warns that budget deficits are unsustainable at current prices. Your rival faces similar pressures\u2014their sovereign wealth fund has been selling assets to cover shortfalls. An emergency OPEC+ meeting is called. Real decisions must now be made.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "volunteer_cuts",
+          "narrative_description": "Announce unilateral production cuts to support prices, hoping the rival will follow your lead.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "seek_compromise",
+          "narrative_description": "Propose a burden-sharing formula that distributes cuts proportionally across all producers.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "demand_equal_cuts",
+          "narrative_description": "Insist that any cuts must be equally distributed, knowing this is harder for smaller producers.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "threaten_flood",
+          "narrative_description": "Warn that you're prepared to abandon quotas entirely and flood the market if others don't comply.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both producers agree to meaningful cuts. The emergency meeting produces a credible response, and prices rebound toward $75. Cartel discipline holds.",
+        "CD": "Your voluntary cuts are met with intransigence. They pocket the price benefit of your restraint while maintaining their own production. You're losing market share for nothing.",
+        "DC": "Your hard line forces them to make concessions. They cut production while you maintain levels. A short-term win, but their resentment is obvious.",
+        "DD": "Neither side blinks. The emergency meeting collapses in acrimony. Without agreed cuts, the market panics. Prices crash through $70 and keep falling. A price war has begun."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": "turn_6_price_war"
+      },
+      "default_next": "turn_6",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The negotiations break down without agreement. Both delegations return home to prepare for a prolonged confrontation. The market senses blood in the water."
+    },
+    {
+      "turn": 6,
+      "act": 2,
+      "narrative_briefing": "Intelligence reports land on your desk: satellite imagery shows the rival ramping up production at a major field. Meanwhile, your own national oil company executives are pressuring you to match their expansion or lose market share permanently. The situation is deteriorating, but there may still be room for a face-saving deal.",
+      "matrix_type": "prisoners_dilemma",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.6,
+        "reward": 1.0,
+        "punishment": 0.25,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "restrain_expansion",
+          "narrative_description": "Order your national oil company to hold current production levels despite competitive pressures.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "back_channel_offer",
+          "narrative_description": "Send a private envoy with a compromise proposal: both sides return to quota compliance within 60 days.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "match_expansion",
+          "narrative_description": "Authorize your own production ramp-up to match the rival's expansion barrel-for-barrel.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "undercut_price",
+          "narrative_description": "Begin offering discounts to Asian buyers to capture market share from the rival.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides show restraint despite the pressures. The back-channel offer finds receptive ears. A tentative understanding emerges to stabilize production levels.",
+        "CD": "Your restraint is exploited mercilessly. While you hold the line, they flood the market. Your market share erodes daily. Patience has a cost.",
+        "DC": "Your aggressive expansion catches them off guard. They'd expected you to maintain discipline while they cheated. Now both sides are racing to the bottom.",
+        "DD": "Mutual escalation accelerates. Both producers abandon any pretense of quota compliance. Oil floods into the market. Prices crater toward $60. Revenue hemorrhages on all sides."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_7",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The back-channel collapses when your rival interprets your flexibility as weakness. They escalate production further. War it is."
+    },
+    {
+      "turn": 7,
+      "act": 2,
+      "narrative_briefing": "Global financial markets are now watching the OPEC crisis closely. Energy stocks are volatile, and emerging market currencies tied to oil revenues are under pressure. The IMF issues a warning about potential sovereign debt crises among oil-dependent nations. Both producers are bleeding, but neither wants to be the first to sue for peace.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.6,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.4,
+        "crash_payoff": -1.2,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "signal_flexibility",
+          "narrative_description": "Through intermediaries, signal willingness to discuss a mutual stand-down if face-saving terms can be found.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "propose_freeze",
+          "narrative_description": "Publicly call for all parties to freeze production at current levels as a first step toward negotiation.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "escalate_discounts",
+          "narrative_description": "Deepen price discounts to key markets, accepting lower margins to maintain volume.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "announce_expansion",
+          "narrative_description": "Publicly announce plans to bring new production capacity online, signaling you can outlast them.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides signal willingness to talk. The freeze proposal gains traction. Markets interpret this as a potential ceasefire, and prices stabilize. The bleeding may stop.",
+        "CD": "Your peace overture is rebuffed. They interpret it as weakness and double down on market share gains. Your flexibility bought nothing but lost leverage.",
+        "DC": "Your escalation puts unbearable pressure on them. Their economy can't sustain current prices. They'll have to come to the table eventually\u2014on your terms.",
+        "DD": "Neither side will blink. Both announce expansion plans. The market interprets this as all-out war. Prices collapse through $50. Sovereign wealth funds liquidate assets. Budget crises loom."
+      },
+      "branches": {
+        "CC": "turn_8_recovery",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_8_crisis"
+      },
+      "default_next": "turn_8",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Peace talks collapse. Both sides accuse the other of bad faith. The price war intensifies as each producer tries to outlast the other."
+    },
+    {
+      "turn": 8,
+      "act": 2,
+      "narrative_briefing": "The final turn of Act II arrives with oil at $55\u2014below breakeven for most producers. Your rival's currency has devalued 15% this month. Your own budget deficit has ballooned. Both sides are hemorrhaging, but the question of who will blink first remains unanswered. External powers\u2014the U.S., China, the Gulf states\u2014are beginning to intervene, offering mediation.",
+      "matrix_type": "battle_of_sexes",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.2,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.6,
+        "preference_b": 1.4,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "accept_mediation",
+          "narrative_description": "Accept Chinese or U.S. mediation, acknowledging you need external help to resolve the crisis.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "propose_formula",
+          "narrative_description": "Put forward a face-saving formula: proportional cuts based on pre-crisis market share.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "reject_terms",
+          "narrative_description": "Reject any formula that doesn't acknowledge your rival's initial provocation and require them to cut first.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "demonstrate_resolve",
+          "narrative_description": "Announce austerity measures domestically, signaling you're prepared to endure pain longer than they are.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both accept mediation. Chinese and American diplomats shuttle between capitals. A framework emerges: synchronized cuts with independent verification. Act II ends with a ceasefire taking shape.",
+        "CD": "You accept mediation while they dig in. Mediators pressure you to make concessions 'for stability.' Your flexibility is rewarded with demands for more flexibility.",
+        "DC": "Your rejection of terms is vindicated when they capitulate to mediators' pressure. They agree to cut first. Act II ends with you in the stronger position.",
+        "DD": "Both reject mediation and demonstrate resolve. External powers throw up their hands. The price war will continue into Act III, where the stakes\u2014and the potential for catastrophe\u2014are higher."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_9",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Mediation efforts fail when neither side can accept the proposed terms. The crisis enters its most dangerous phase."
+    },
+    {
+      "turn": 9,
+      "act": 3,
+      "narrative_briefing": "Act III begins. Oil is at $45, below any producer's fiscal breakeven. Your rival's finance ministry is reportedly considering IMF assistance. Your own crown prince has summoned oil executives for emergency consultations. The stakes are now existential: continued escalation risks sovereign debt crises, political instability, and potential regime change on both sides.",
+      "matrix_type": "security_dilemma",
+      "matrix_parameters": {
+        "scale": 1.6900000000000002,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.7,
+        "reward": 1.0,
+        "punishment": 0.2,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "announce_cuts",
+          "narrative_description": "Unilaterally announce significant production cuts, taking a leap of faith that the rival will reciprocate.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "seek_direct_talks",
+          "narrative_description": "Propose a summit between heads of state to resolve the crisis at the highest level.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "maximum_production",
+          "narrative_description": "Order all wells to maximum output, determined to break the rival's will before they break yours.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "target_customers",
+          "narrative_description": "Offer unprecedented discounts to the rival's most important customers, attempting to permanently capture their market share.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both announce cuts simultaneously. The summit proposal is accepted. For the first time in months, prices tick upward. There's a path out of this catastrophe.",
+        "CD": "Your cuts are not matched. They interpret your restraint as surrender and press their advantage. You've sacrificed barrels for nothing. The war continues.",
+        "DC": "Your maximum production overwhelms their weakening economy. Their currency collapses further. They'll have to negotiate now\u2014from a position of desperation.",
+        "DD": "Total war. Both sides at maximum production, both bleeding profusely. Oil crashes through $40. Credit rating agencies downgrade both nations. The global economy shudders."
+      },
+      "branches": {
+        "CC": "turn_10_summit",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_10_collapse"
+      },
+      "default_next": "turn_10",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The summit proposal is rejected as a delaying tactic. Both sides prepare for a war of attrition that neither can afford."
+    },
+    {
+      "turn": 10,
+      "act": 3,
+      "narrative_briefing": "Oil has stabilized around $50, but both producers remain in crisis mode. The price war has destroyed hundreds of billions in revenue. Your intelligence services report that key figures in the rival's government are pushing for accommodation\u2014but others are advocating doubling down. The same debate rages in your own capital.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 1.6900000000000002,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.5,
+        "hare_temptation": 1.8,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "comprehensive_offer",
+          "narrative_description": "Put forward a comprehensive peace offer: return to pre-war quotas, joint verification, and a commitment to future coordination.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "partial_compliance",
+          "narrative_description": "Begin partial compliance with pre-war quotas as a gesture of good faith, hoping for reciprocation.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "maintain_pressure",
+          "narrative_description": "Keep production at current elevated levels, betting the rival will crack before you do.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "strategic_patience",
+          "narrative_description": "Wait for the rival to make the first move, preserving optionality while they suffer.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The comprehensive offer is accepted. Both sides begin winding down production to pre-war levels. The cartel is damaged but may survive. Relief sweeps through energy markets.",
+        "CD": "Your good faith is met with continued intransigence. They pocket the price benefit of your partial compliance while maintaining elevated production. Trust was misplaced.",
+        "DC": "Your pressure finally breaks them. They announce unilateral cuts, hoping you'll follow. You have the upper hand\u2014but at what cost to the relationship?",
+        "DD": "Neither side moves first. The stalemate continues, grinding down both economies. The war of attrition drains sovereign wealth funds and tests political stability."
+      },
+      "branches": {
+        "CC": "turn_11_peace",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_11_attrition"
+      },
+      "default_next": "turn_11",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The peace offer is rejected as insufficient. Both sides dig in for a protracted struggle that may destroy them both."
+    },
+    {
+      "turn": 11,
+      "act": 3,
+      "narrative_briefing": "The price war has entered its fourth month. Both producers have burned through hundreds of billions in reserves. Social unrest is reported in oil-dependent regions. The IMF warns of 'systemic risks to global financial stability.' Even third-party nations are pressuring both sides to end the madness. But ending it means someone must appear to lose.",
+      "matrix_type": "volunteers_dilemma",
+      "matrix_parameters": {
+        "scale": 1.6900000000000002,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.4,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.5,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "take_initiative",
+          "narrative_description": "Be the bigger party: announce significant cuts regardless of what the rival does, absorbing the political cost.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "mutual_proposal",
+          "narrative_description": "Propose simultaneous announcements to give both sides political cover.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "wait_them_out",
+          "narrative_description": "Hold firm and wait for them to crack first, preserving your reputation for resolve.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "final_push",
+          "narrative_description": "One last surge of production to break their will once and for all.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both announce cuts simultaneously, providing mutual political cover. The price war ends not with a victor, but with exhausted combatants agreeing to stop the bleeding.",
+        "CD": "You take the initiative; they do not reciprocate. Your domestic opponents call it surrender. You've stopped the bleeding, but at the cost of appearing weak.",
+        "DC": "They blink first. Your patience is rewarded as they announce cuts while you maintain production. A clear win\u2014but the cartel may never recover from the betrayal.",
+        "DD": "Neither will be the one to blink. The final push meets the final push. Oil crashes through $35. Bond yields spike. The IMF prepares emergency interventions."
+      },
+      "branches": {
+        "CC": "turn_12_reconstruction",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_12_catastrophe"
+      },
+      "default_next": "turn_12",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Neither side will take the political risk of being first to cut. The game of chicken continues toward the cliff's edge."
+    },
+    {
+      "turn": 12,
+      "act": 3,
+      "narrative_briefing": "A critical juncture: the rival's central bank has intervened to support their currency, burning through foreign exchange reserves at an alarming rate. Your own budget has been slashed, with major infrastructure projects suspended. Both sides are approaching the point of no return. Peace now, or mutual ruin?",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 1.6900000000000002,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.8,
+        "reward": 1.2,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.4,
+        "crash_payoff": -1.5,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "emergency_summit",
+          "narrative_description": "Call for an emergency summit between leaders, offering significant concessions to get a deal done.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "unilateral_deescalation",
+          "narrative_description": "Begin unilateral de-escalation, cutting production 500,000 barrels per day regardless of rival's response.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "threaten_bankruptcy",
+          "narrative_description": "Publicly state you're prepared to let the rival go bankrupt rather than subsidize their cheating.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "full_mobilization",
+          "narrative_description": "Bring every available barrel online, signaling you'll fight to the last drop of oil.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The emergency summit produces a breakthrough. Exhausted leaders agree to coordinated cuts and a reset of the OPEC+ framework. The price war ends. Reconstruction begins.",
+        "CD": "Your de-escalation is met with continued aggression. They interpret your concessions as weakness and press for total victory. Your sacrifice may have been in vain.",
+        "DC": "Your hard line forces their capitulation. Facing economic collapse, they agree to cuts on your terms. Victory\u2014but the rival seethes with resentment.",
+        "DD": "Neither will yield. Full mobilization meets full mobilization. Oil crashes through $30. Credit markets freeze for oil-dependent nations. The global economy enters recession. Both producers face sovereign debt crises that will take a decade to resolve."
+      },
+      "branches": {
+        "CC": "turn_13_recovery",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_13_collapse"
+      },
+      "default_next": "turn_13",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Summit talks collapse in recrimination. Each side blames the other for the failure. The market concludes there is no bottom to this crisis."
+    },
+    {
+      "turn": 13,
+      "act": 3,
+      "narrative_briefing": "The penultimate stage of the crisis. Global pressure has intensified\u2014the G20 has issued a joint statement calling on both producers to reach agreement 'for the stability of the global economy.' Your finance minister reports that without a resolution soon, painful choices about debt restructuring may become necessary. The end is near, one way or another.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 1.6900000000000002,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.8,
+        "hare_temptation": 2.0,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "accept_g20_terms",
+          "narrative_description": "Accept the G20 framework for resolution, even though it requires painful concessions.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "last_offer",
+          "narrative_description": "Make a final, generous offer: you'll cut 700,000 barrels if they cut 500,000.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "reject_pressure",
+          "narrative_description": "Reject external pressure, insisting this is a bilateral matter to be resolved without interference.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "blame_rival",
+          "narrative_description": "Launch a diplomatic offensive blaming the rival for the crisis, seeking to win the narrative battle.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both accept the G20 framework. The great powers guarantee compliance. The price war ends with international supervision of a new production agreement. Painful, but survivable.",
+        "CD": "You accept international terms; they don't. The G20 imposes informal sanctions on the holdout. You're seen as the reasonable party, but the crisis continues.",
+        "DC": "Your rejection of external pressure is matched by their acceptance. You appear intransigent while they appear cooperative. International opinion shifts against you.",
+        "DD": "Both reject G20 pressure. The great powers withdraw from mediation, concluding that both parties prefer mutual ruin. The final act of the tragedy approaches."
+      },
+      "branches": {
+        "CC": "turn_14_resolution",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_14_destruction"
+      },
+      "default_next": "turn_14",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The G20 framework is rejected by both parties. International mediators give up. The path to mutual destruction is now clear."
+    },
+    {
+      "turn": 14,
+      "act": 3,
+      "narrative_briefing": "The final turn. Oil markets are in chaos, with prices whipsawing on every rumor of negotiation or escalation. Both producers' economies are in crisis mode. The question that has defined this conflict\u2014who will blink first?\u2014must finally be answered. The world holds its breath.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 1.6900000000000002,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 2.0,
+        "reward": 1.3,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.3,
+        "crash_payoff": -2.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "final_concession",
+          "narrative_description": "Make the final concession needed to seal a deal, accepting less than you wanted to end the nightmare.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "mutual_face_saving",
+          "narrative_description": "Propose a face-saving formula where both sides can claim victory while actually compromising.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "no_surrender",
+          "narrative_description": "Refuse any deal that doesn't acknowledge your position. Better to go down fighting than accept humiliation.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "scorched_earth",
+          "narrative_description": "Announce you'll flood the market for the next decade if necessary\u2014make them believe you're irrational.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "A deal is reached. Both sides claim victory, both sides lie. Oil prices begin their long recovery. The cartel survives, scarred but intact. The price war ends not with a bang, but with exhausted handshakes.",
+        "CD": "Your concession is pocketed without reciprocation. They've won the price war through superior resolve. You'll rebuild, but the humiliation will not be forgotten.",
+        "DC": "Your intransigence is rewarded when they finally break. Total victory\u2014the rival accepts your terms. But the cartel will never be the same, and they'll wait for their moment of revenge.",
+        "DD": "Neither yields. Scorched earth meets scorched earth. The great OPEC price war of the 2020s ends in mutual destruction. Both producers face debt crises, political instability, and years of economic hardship. The global economy tips into recession. There are no winners\u2014only survivors."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": null,
+      "settlement_available": true,
+      "settlement_failed_narrative": "Final negotiations collapse. Both sides have chosen ruin over compromise. History will judge them harshly."
+    }
+  ],
+  "branches": {
+    "turn_3_diplomatic": {
+      "turn": 3,
+      "act": 1,
+      "narrative_briefing": "Following the encouraging bilateral progress, both energy ministers arrive at the Riyadh meeting with cautious optimism. The verification framework discussed earlier provides a foundation for more substantive talks. The question now is whether to build on this momentum or protect your position.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.2,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "deepen_cooperation",
+          "narrative_description": "Propose expanding the transparency framework into a permanent monitoring mechanism.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "share_concerns",
+          "narrative_description": "Openly discuss your budget pressures and ask about theirs, building mutual understanding.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "lock_in_gains",
+          "narrative_description": "Use the improved atmosphere to extract concessions on market share allocation.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "test_limits",
+          "narrative_description": "Probe for weaknesses while maintaining a cooperative facade.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The diplomatic opening blossoms into genuine partnership. Both sides leave with concrete agreements and growing trust. Markets respond enthusiastically.",
+        "CD": "Your openness is met with opportunism. They use the cooperative atmosphere to extract concessions without offering any in return.",
+        "DC": "Your attempt to extract concessions poisons the atmosphere. The rival feels betrayed after their earlier good faith. Trust evaporates.",
+        "DD": "Both try to exploit the improved atmosphere. The promising diplomatic opening collapses into mutual suspicion."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_4",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    "turn_3_tense": {
+      "turn": 3,
+      "act": 1,
+      "narrative_briefing": "The ministerial meeting in Riyadh takes place under a cloud of mutual suspicion. Recent accusations and counter-accusations have poisoned the atmosphere. Armed guards are posted outside the conference room. Both delegations eye each other warily across the table.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.4,
+        "reward": 0.9,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.4,
+        "crash_payoff": -0.8,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "extend_olive_branch",
+          "narrative_description": "Despite the tension, offer a genuine concession to reset the relationship.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "propose_reset",
+          "narrative_description": "Suggest both sides acknowledge past mistakes and start fresh with clean slate.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "demand_apology",
+          "narrative_description": "Insist on acknowledgment of the rival's provocations before any substantive talks.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "walk_out",
+          "narrative_description": "Threaten to leave the meeting unless preconditions are met.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Despite the difficult start, both sides find a way to de-escalate. The olive branch is accepted. The meeting produces a framework for moving forward.",
+        "CD": "Your olive branch is slapped away. They demand apologies and preconditions. Your conciliatory approach looks like weakness.",
+        "DC": "Your demands for apology are met with counter-demands. But then, unexpectedly, they offer a reset. You've won the first round.",
+        "DD": "The meeting collapses in acrimony. One delegation walks out. Headlines scream about OPEC crisis. Markets tumble."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_4",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    "turn_6_price_war": {
+      "turn": 6,
+      "act": 2,
+      "narrative_briefing": "The price war has begun in earnest. Both producers have abandoned quotas entirely. Tankers are being loaded at maximum capacity. Oil prices have crashed through $65 and show no signs of stabilizing. Your treasury secretary warns that current burn rates are unsustainable. But backing down now would mean accepting defeat.",
+      "matrix_type": "deadlock",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 0.4,
+        "punishment": 1.0,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "sue_for_peace",
+          "narrative_description": "Seek an immediate ceasefire, accepting the current market conditions as the new baseline.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "signal_exhaustion",
+          "narrative_description": "Through back channels, signal that you're open to talks if they make the first move.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "double_down",
+          "narrative_description": "Increase production further, betting you can outlast them financially.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "target_market_share",
+          "narrative_description": "Focus on capturing permanent market share, accepting short-term losses for long-term position.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides are exhausted. Peace feelers find receptive audiences. The price war may end as suddenly as it began.",
+        "CD": "Your peace overture is rejected. They smell blood and press their advantage. The war continues.",
+        "DC": "Your doubled-down aggression forces them to sue for peace. Victory may be within reach.",
+        "DD": "Mutual escalation in a price war. Oil crashes toward $55. Both producers hemorrhage revenue. No end in sight."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_7",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Peace talks fail as neither side can accept the terms. The price war grinds on."
+    },
+    "turn_8_recovery": {
+      "turn": 8,
+      "act": 2,
+      "narrative_briefing": "The ceasefire is holding. Both producers have agreed to production freezes pending formal negotiations. Oil prices have stabilized around $60, still below budget breakeven but no longer in freefall. External mediators are working on a comprehensive framework. Trust remains fragile.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.2,
+        "hare_temptation": 1.6,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "support_framework",
+          "narrative_description": "Actively support the mediators' framework, even when it requires compromises.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "show_good_faith",
+          "narrative_description": "Implement early compliance measures before the framework is finalized.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "negotiate_hard",
+          "narrative_description": "Use the improved position to extract maximum concessions in the framework negotiations.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "hedge_bets",
+          "narrative_description": "Maintain elevated production levels as leverage while negotiations continue.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both support the emerging framework. The ceasefire evolves into a lasting agreement. Act II ends with cautious optimism.",
+        "CD": "Your support for the framework is not reciprocated. They use the pause to strengthen their position.",
+        "DC": "Your hard negotiating pays off as they make concessions to keep the peace process alive.",
+        "DD": "Both hedge their bets. The ceasefire frays at the edges. The mediators' framework may not survive."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_9",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The framework negotiations collapse. The ceasefire ends. Act III begins with renewed hostilities."
+    },
+    "turn_8_crisis": {
+      "turn": 8,
+      "act": 2,
+      "narrative_briefing": "The price war has reached a critical intensity. Oil is at $50 and falling. Your rival's currency is in crisis. Your own sovereign wealth fund is liquidating assets to cover budget shortfalls. The IMF has begun informal discussions with both governments. This is no longer about winning\u2014it's about survival.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.7,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.3,
+        "crash_payoff": -1.4,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "accept_imf",
+          "narrative_description": "Begin formal discussions with the IMF about stabilization assistance.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "emergency_outreach",
+          "narrative_description": "Make a desperate outreach to the rival for emergency talks before it's too late.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "go_for_knockout",
+          "narrative_description": "Your rival is weakening\u2014push harder now to force their collapse.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "mutual_assured_destruction",
+          "narrative_description": "Signal that you're prepared to take them down with you if they don't negotiate.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both reach out simultaneously. Emergency talks produce a breakthrough. The worst is avoided\u2014barely.",
+        "CD": "Your emergency outreach is rebuffed. They sense victory and won't stop now.",
+        "DC": "Your knockout blow lands. Their economy reels. They'll have to surrender soon.",
+        "DD": "Mutual assured destruction becomes mutual actual destruction. Both economies enter crisis. The global markets panic."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_9",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Even emergency talks fail. Both sides are locked in a death spiral."
+    },
+    "turn_10_summit": {
+      "turn": 10,
+      "act": 3,
+      "narrative_briefing": "The summit between heads of state is underway at a neutral location. Camera crews wait outside while inside, the leaders confer privately. Both understand the stakes: their political futures, their nations' economies, perhaps the global financial system. This is the moment of truth.",
+      "matrix_type": "battle_of_sexes",
+      "matrix_parameters": {
+        "scale": 1.6900000000000002,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.3,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.7,
+        "preference_b": 1.5,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "accept_compromise",
+          "narrative_description": "Accept the emerging compromise framework, even though it falls short of your initial demands.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "grand_gesture",
+          "narrative_description": "Make a dramatic public gesture of reconciliation to lock in the deal.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "final_demand",
+          "narrative_description": "With the deal in sight, push for one more concession\u2014this is your last leverage.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "play_hardball",
+          "narrative_description": "Insist on your preferred terms, betting they need this deal more than you do.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The summit succeeds. Leaders emerge to announce a comprehensive agreement. Markets rally. The worst is over.",
+        "CD": "Your flexibility is met with last-minute demands. The summit nearly collapses before a grudging compromise is reached.",
+        "DC": "Your final demand is accepted. Victory at the summit\u2014but your rival's humiliation plants seeds of future conflict.",
+        "DD": "Both leaders play hardball. The summit collapses in failure. Both go home to face political consequences and continued economic crisis."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_11",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The summit ends in failure. Both leaders return home empty-handed. The crisis deepens."
+    },
+    "turn_10_collapse": {
+      "turn": 10,
+      "act": 3,
+      "narrative_briefing": "The global economy is now in recession, driven by the oil price collapse and credit market disruptions. Your rival's government is facing street protests. Your own political opposition is calling for your resignation. Both sides are locked in a death spiral, yet neither can afford to be seen as the one who blinked.",
+      "matrix_type": "deadlock",
+      "matrix_parameters": {
+        "scale": 1.6900000000000002,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.6,
+        "reward": 0.3,
+        "punishment": 1.1,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "capitulate",
+          "narrative_description": "Accept defeat to end the crisis, whatever the political cost.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "mutual_exit",
+          "narrative_description": "Propose a face-saving mutual withdrawal that lets both sides claim victory.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "fight_on",
+          "narrative_description": "Continue the war regardless of cost. You'll win or go down fighting.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "burn_it_all",
+          "narrative_description": "If you're going down, take them with you. Maximum production, maximum pain.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both find a way out. The face-saving formula lets both claim they didn't lose. It's a lie, but a necessary one.",
+        "CD": "Your capitulation ends the war\u2014on their terms. You've lost, but the bleeding stops.",
+        "DC": "They capitulate first. Victory! But at what cost? Your economy is shattered, theirs is worse.",
+        "DD": "Neither will stop. The mutual destruction that everyone warned about becomes reality. Both economies collapse."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_11",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Even capitulation is refused. Both sides are truly committed to mutual destruction."
+    },
+    "turn_11_peace": {
+      "turn": 11,
+      "act": 3,
+      "narrative_briefing": "The peace process is advancing. Technical committees are working out the details of production quotas, verification mechanisms, and dispute resolution procedures. There's cautious optimism that the worst is behind. But hardliners on both sides are watching for any sign of weakness.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 1.6900000000000002,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.6,
+        "hare_temptation": 1.8,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "full_support",
+          "narrative_description": "Give the technical committees everything they need. Make this deal work.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "early_compliance",
+          "narrative_description": "Begin implementing cuts before the formal agreement is signed, building confidence.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "protect_interests",
+          "narrative_description": "Ensure the final deal protects your core interests, even if it risks derailing negotiations.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "maintain_leverage",
+          "narrative_description": "Keep production elevated until the deal is signed\u2014trust, but verify.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The deal comes together rapidly. Both sides demonstrate commitment. The new OPEC+ framework is born.",
+        "CD": "Your early compliance is not matched. They maintain leverage while you cut. The deal is signed, but the asymmetry rankles.",
+        "DC": "Your maintained leverage pays off in better final terms. The deal is signed\u2014on your terms.",
+        "DD": "Both maintain leverage. The technical committees can't reach agreement. The peace process stalls."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_12",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The peace process collapses at the last minute. Hardliners on both sides prevail."
+    },
+    "turn_11_attrition": {
+      "turn": 11,
+      "act": 3,
+      "narrative_briefing": "The war of attrition grinds on. Both producers are running on fumes, burning through reserves accumulated over decades. Your finance ministry projects bankruptcy within 18 months at current prices. Intelligence suggests the rival is in even worse shape\u2014but can you last long enough to see them break?",
+      "matrix_type": "war_of_attrition",
+      "matrix_parameters": {
+        "scale": 1.6900000000000002,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "quit_first",
+          "narrative_description": "Accept defeat to preserve what's left of your economy.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "negotiate_exit",
+          "narrative_description": "Seek negotiated withdrawal where both sides can claim they didn't lose.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "outlast_them",
+          "narrative_description": "Hold on. They're closer to breaking than you are.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "all_in",
+          "narrative_description": "Bet everything on one final push to break their will.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both quit simultaneously. Neither admits defeat. The war ends in exhausted stalemate.",
+        "CD": "You quit; they don't. Defeat. Your economy is saved, but your pride is shattered.",
+        "DC": "They quit; you win. Victory through superior endurance. But at what cost?",
+        "DD": "Neither quits. The attrition continues. Both economies deteriorate toward collapse."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_12",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Even negotiated exit fails. Both sides are committed to fighting to the end."
+    },
+    "turn_12_reconstruction": {
+      "turn": 12,
+      "act": 3,
+      "narrative_briefing": "The new OPEC+ framework is in place. Production cuts are being implemented. Oil prices are recovering toward $65. The worst is over, but the scars remain deep. Years of revenue have been lost. Trust must be rebuilt. The question now is whether this peace will last.",
+      "matrix_type": "harmony",
+      "matrix_parameters": {
+        "scale": 1.6900000000000002,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.2,
+        "reward": 1.8,
+        "punishment": 0.2,
+        "sucker": 0.6,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "full_compliance",
+          "narrative_description": "Implement cuts fully and transparently, building the foundation for lasting peace.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "advocate_framework",
+          "narrative_description": "Publicly advocate for the new framework, defending it against domestic critics.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "compliance_plus",
+          "narrative_description": "Comply publicly while quietly maintaining production options for the future.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "declare_victory",
+          "narrative_description": "Use the peace to claim political victory, taking more credit than deserved.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both commit fully to reconstruction. The new framework strengthens. The future looks brighter than anyone dared hope months ago.",
+        "CD": "Your commitment is not fully matched. Cheating begins around the edges. The new framework may be fragile.",
+        "DC": "Your hedging is noticed. The rival's full commitment makes you look opportunistic. Questions arise.",
+        "DD": "Neither fully commits. The new framework is hollow. Another crisis is just a matter of time."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_13",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Even in reconstruction, agreement proves elusive. The peace is fragile."
+    },
+    "turn_12_catastrophe": {
+      "turn": 12,
+      "act": 3,
+      "narrative_briefing": "Oil is at $35. Both producers are in sovereign debt crisis. The IMF is preparing emergency interventions. Global recession has arrived. Political instability threatens both governments. This is the catastrophe everyone warned about\u2014and it's happening.",
+      "matrix_type": "deadlock",
+      "matrix_parameters": {
+        "scale": 1.6900000000000002,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 0.2,
+        "punishment": 1.2,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "unconditional_surrender",
+          "narrative_description": "Accept any terms to end the crisis before your government falls.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "beg_for_terms",
+          "narrative_description": "Request emergency negotiations, offering significant concessions.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "defiant_to_end",
+          "narrative_description": "Refuse to surrender. If your government falls, let it fall fighting.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "blame_and_shame",
+          "narrative_description": "Launch a propaganda offensive to ensure history blames them for the catastrophe.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both beg for terms. A humiliating peace is reached. Both governments are weakened, but they survive.",
+        "CD": "Your surrender ends it\u2014on their terms. You're finished politically, but the crisis is over.",
+        "DC": "They surrender; you win. But victory over ruins is hollow. Both economies will take decades to recover.",
+        "DD": "Neither surrenders. The catastrophe reaches its full extent. Both governments may fall. The global economy reels."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_13",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Even catastrophe cannot force agreement. Both sides choose ruin."
+    },
+    "turn_13_recovery": {
+      "turn": 13,
+      "act": 3,
+      "narrative_briefing": "The agreement is holding. Oil has recovered to $70. Markets have stabilized. The crisis is officially over, though its effects will be felt for years. Now comes the long work of rebuilding: trust, revenues, and the institutions that were damaged.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 1.6900000000000002,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.5,
+        "hare_temptation": 1.7,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "strengthen_institutions",
+          "narrative_description": "Invest in making the new OPEC+ framework more robust and transparent.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "reconciliation",
+          "narrative_description": "Pursue genuine reconciliation with your rival, putting the past behind.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "prepare_next_time",
+          "narrative_description": "Quietly prepare for the next conflict, learning from this one's mistakes.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "extract_advantages",
+          "narrative_description": "Use the recovery period to strengthen your position relative to the weakened rival.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both invest in lasting peace. The new OPEC+ framework becomes more robust. A genuine partnership may emerge from the ashes of conflict.",
+        "CD": "Your reconciliation efforts are not reciprocated. They're already preparing for the next round.",
+        "DC": "Your preparations are wise\u2014they're focused on reconciliation while you strengthen your position.",
+        "DD": "Neither truly commits to peace. Both prepare for the next conflict. It's only a matter of time."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_14",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Even in recovery, agreement on final terms proves elusive."
+    },
+    "turn_13_collapse": {
+      "turn": 13,
+      "act": 3,
+      "narrative_briefing": "The collapse is complete. Both producers are under IMF supervision. Austerity measures have sparked protests. The global economy is in recession. Years of accumulated wealth have been destroyed. The question now is not who won, but who will survive.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 1.6900000000000002,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.9,
+        "reward": 1.1,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.2,
+        "crash_payoff": -2.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "accept_supervision",
+          "narrative_description": "Accept full IMF supervision and implement required reforms.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "joint_recovery",
+          "narrative_description": "Propose joint recovery efforts with your former rival\u2014you're both in this together now.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "resist_terms",
+          "narrative_description": "Resist IMF conditions, maintaining sovereignty even in crisis.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "blame_others",
+          "narrative_description": "Deflect blame for the crisis onto the rival, the IMF, or external forces.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both accept the new reality. Joint recovery efforts begin. From the ashes of mutual destruction, cooperation may finally emerge.",
+        "CD": "You accept supervision; they resist. The IMF focuses pressure on the holdout. You're the cooperative partner.",
+        "DC": "They accept supervision; you resist. You maintain independence but face continued crisis.",
+        "DD": "Both resist. The IMF withdraws support. The collapse continues without international assistance."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_14",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Even in collapse, neither side can agree on terms. The suffering continues."
+    },
+    "turn_14_resolution": {
+      "turn": 14,
+      "act": 3,
+      "narrative_briefing": "The final turn of the crisis. The G20 framework is in place. Both producers have accepted international supervision. Oil prices are stabilizing. The world's worst fears have been avoided\u2014but only just. Now comes the moment to formalize the peace.",
+      "matrix_type": "harmony",
+      "matrix_parameters": {
+        "scale": 1.6900000000000002,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.3,
+        "reward": 2.0,
+        "punishment": 0.3,
+        "sucker": 0.7,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "seal_the_deal",
+          "narrative_description": "Commit fully to the final agreement, accepting all terms.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "generous_gesture",
+          "narrative_description": "Make a final generous gesture to cement the peace.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "last_minute_demand",
+          "narrative_description": "With agreement in sight, push for one final concession.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "preserve_optionality",
+          "narrative_description": "Sign the agreement while preserving flexibility for the future.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The crisis ends with a comprehensive peace agreement. Both leaders shake hands for the cameras. The OPEC price war of the 2020s is over. Recovery begins.",
+        "CD": "Your commitment is undermined by their last-minute demands. The peace holds, but bitterness remains.",
+        "DC": "Your demands are met. A peace on favorable terms\u2014but your rival will remember the humiliation.",
+        "DD": "Even at the final moment, neither can resist seeking advantage. The peace is signed, but neither side trusts it to last."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": null,
+      "settlement_available": true,
+      "settlement_failed_narrative": "The final peace collapses. After everything, agreement proves impossible. The crisis continues."
+    },
+    "turn_14_destruction": {
+      "turn": 14,
+      "act": 3,
+      "narrative_briefing": "The end. Oil is at $25\u2014below the cost of production for many wells. Both producers' economies have collapsed. The IMF has intervened in both nations. Political regimes are tottering. The global economy is in its worst recession since 2008. This is what mutual destruction looks like.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 1.6900000000000002,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 2.0,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.1,
+        "crash_payoff": -2.5,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "unconditional_peace",
+          "narrative_description": "Accept any terms to end the nightmare. Survival is all that matters now.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "final_plea",
+          "narrative_description": "Make one last attempt at negotiation, offering everything.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "scorched_earth_final",
+          "narrative_description": "If this is the end, ensure the rival goes down too.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "historical_revenge",
+          "narrative_description": "Position the narrative for history\u2014ensure posterity blames them.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Finally, exhausted beyond all measure, peace is reached. Both sides have lost everything. But they survive. Recovery will take a generation.",
+        "CD": "Your plea for peace is answered with continued aggression. Your collapse is complete. They 'win'\u2014inheriting ashes.",
+        "DC": "Their plea for peace is rejected. You 'win.' But what have you won? A ruined economy and a devastated rival.",
+        "DD": "Neither yields, even at the very end. Total mutual destruction. Both economies collapse completely. Both regimes fall. The great OPEC price war ends with no victors, only victims. The global economy enters depression. History records it as the greatest act of mutual self-destruction in economic history."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": null,
+      "settlement_available": true,
+      "settlement_failed_narrative": "Even facing complete destruction, neither side can agree. The final collapse proceeds without negotiation. There will be no peace\u2014only ruin."
+    }
+  },
+  "personas": {
+    "side_a": {
+      "persona": "kissinger",
+      "role_name": "Western Energy Minister",
+      "role_description": "Representative of Western oil-consuming nations."
+    },
+    "side_b": {
+      "persona": "bismarck",
+      "role_name": "OPEC Representative",
+      "role_description": "Spokesman for oil-producing nations seeking fair prices."
+    }
+  }
+}

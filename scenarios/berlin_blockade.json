@@ -1,0 +1,1799 @@
+{
+  "scenario_id": "berlin_blockade_1948",
+  "title": "Berlin Blockade",
+  "theme": "cold-war",
+  "setting": "Berlin Blockade 1948-49. Stalin's blockade of West Berlin, Allied airlift response.\nThe Soviets cut off all ground access to West Berlin, attempting to force the Western powers\nto abandon the city. The Allies must decide whether to confront, negotiate, or find a creative\nsolution. A test of wills that will shape the Cold War for decades.",
+  "max_turns": 14,
+  "turns": [
+    {
+      "turn": 1,
+      "act": 1,
+      "narrative_briefing": "June 24, 1948. Soviet forces have severed all rail, road, and canal links to West Berlin. The city has food supplies for 36 days, coal for 45. General Lucius Clay proposes sending an armed convoy down the autobahn; others counsel diplomatic protest. The world watches to see how this confrontation will unfold.",
+      "matrix_type": "inspection_game",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "diplomatic_probe",
+          "narrative_description": "Send diplomatic note demanding explanation while assessing Soviet intentions",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "mobilize_quietly",
+          "narrative_description": "Begin quiet military preparations while keeping channels open",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "armed_convoy",
+          "narrative_description": "Send armed ground convoy to force the blockade",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "public_ultimatum",
+          "narrative_description": "Issue public demand that blockade be lifted within 48 hours",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides probe cautiously. Diplomatic notes are exchanged while military preparations proceed quietly. The situation remains fluid, with room for maneuver.",
+        "CD": "Your restraint is met with Soviet aggression. They tighten the blockade while you seek diplomatic solutions, appearing weak to observers.",
+        "DC": "Your forceful response catches the Soviets off-guard. They expected hesitation but found resolve. The balance shifts in your favor.",
+        "DD": "Armed convoys meet Soviet roadblocks. Tanks face off at Helmstedt checkpoint. Gunfire is exchanged\u2014three soldiers dead. The world holds its breath as nuclear powers teeter on the edge of war."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_2",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    {
+      "turn": 2,
+      "act": 1,
+      "narrative_briefing": "Initial positions are established. Intelligence suggests the Soviet blockade is comprehensive but not impenetrable. General Curtis LeMay believes American air power could supply Berlin indefinitely\u2014but no one has ever attempted an operation of this scale. Moscow watches to see if the West has the will to sustain such an effort.",
+      "matrix_type": "reconnaissance",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "airlift_proposal",
+          "narrative_description": "Propose massive airlift operation while signaling willingness to negotiate",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "four_power_talks",
+          "narrative_description": "Request four-power talks on Berlin's status",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "economic_pressure",
+          "narrative_description": "Impose counter-blockade on Soviet zone, cutting industrial goods",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "military_buildup",
+          "narrative_description": "Ostentatious reinforcement of NATO forces in Western Europe",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides show willingness to find solutions short of war. The airlift begins as a demonstration while diplomatic channels remain open. A path to resolution emerges.",
+        "CD": "Your offer of talks is rebuffed. The Soviets tighten the noose, interpreting your overture as weakness. Berliners begin to worry they'll be abandoned.",
+        "DC": "Your pressure tactics force Soviet recalculation. They hadn't expected such resolve, and cracks appear in their unified front.",
+        "DD": "Counter-blockade meets blockade. Both sides dig in. European trade collapses. Civilians on both sides suffer. The continent slides toward economic warfare that could easily become the real thing."
+      },
+      "branches": {
+        "CC": "turn_3_diplomatic",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_3_tense"
+      },
+      "default_next": "turn_3",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    {
+      "turn": 3,
+      "act": 1,
+      "narrative_briefing": "The airlift has begun\u2014Operation Vittles. C-47s and C-54s land at Tempelhof every three minutes, bringing flour, coal, and hope. But winter approaches, and fuel demands will triple. The Soviets could shoot down the aircraft, but so far they've limited themselves to harassment. The question: is this a temporary measure or a long-term strategy?",
+      "matrix_type": "prisoners_dilemma",
+      "matrix_parameters": {
+        "scale": 0.55,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "expand_airlift",
+          "narrative_description": "Commit to major airlift expansion while seeking diplomatic off-ramps",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "secret_contacts",
+          "narrative_description": "Establish backchannel communications through neutral parties",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "fighter_escorts",
+          "narrative_description": "Add fighter escorts to airlift corridors with orders to engage if fired upon",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "nuclear_signals",
+          "narrative_description": "Forward-deploy B-29 bombers (nuclear-capable) to Britain",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The airlift proceeds while quiet diplomacy begins. Both sides maintain public positions but explore compromises privately. Berlin survives another week.",
+        "CD": "Your restraint is met with escalation. Soviet fighters buzz the air corridors, forcing several transports to abort. The blockade tightens.",
+        "DC": "Your show of force gives Moscow pause. Nuclear-capable bombers in Britain concentrate minds wonderfully. The Soviets begin to question their strategy.",
+        "DD": "B-29s arrive as Soviet fighters harass the corridors. A transport is forced down; two crewmen injured. Both sides mobilize reserve forces. The smell of war hangs over Europe."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_4",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    {
+      "turn": 4,
+      "act": 1,
+      "narrative_briefing": "Autumn 1948. The airlift exceeds all expectations\u20144,500 tons daily, keeping West Berlin alive. But intelligence reports indicate growing Soviet frustration. Hardliners in Moscow push for more aggressive action against the air corridors. Moderates counsel patience, believing winter will break Western resolve. The UN Security Council debates the crisis while armies mass along the Iron Curtain.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "winter_commitment",
+          "narrative_description": "Announce commitment to continue airlift through winter while seeking face-saving solution for Soviets",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "un_mediation",
+          "narrative_description": "Accept UN mediation proposal, signaling flexibility",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "corridor_expansion",
+          "narrative_description": "Demand expansion of air corridors, threatening consequences if denied",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "reconnaissance_flights",
+          "narrative_description": "Begin high-altitude reconnaissance over Soviet zone to map military positions",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides accept UN mediation while maintaining their positions. The airlift continues; the blockade persists. But a framework for resolution begins to take shape.",
+        "CD": "Your diplomatic overtures are rejected as weakness. Soviet harassment of air corridors intensifies. Three more aircraft damaged this week alone.",
+        "DC": "Your aggressive posture forces Soviet concessions on corridor safety. Moscow realizes the blockade may fail, and begins to reconsider.",
+        "DD": "Reconnaissance flights are intercepted. A Soviet fighter collides with an American aircraft\u2014both pilots killed. Military commanders on both sides request authorization for retaliatory strikes. The world stands at the precipice of nuclear war."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_5",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    {
+      "turn": 5,
+      "act": 2,
+      "narrative_briefing": "Winter 1948. The airlift has become a logistics marvel\u20148,000 tons daily, exceeding pre-blockade supply levels. West Berliners, initially skeptical, now cheer every landing aircraft. But the operation costs $200 million monthly. Stalin faces a choice: escalate and risk war, or find a way to end the blockade without appearing to capitulate. Both sides are locked in a test of wills with no clear exit.",
+      "matrix_type": "security_dilemma",
+      "matrix_parameters": {
+        "scale": 0.75,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "backchannel_offer",
+          "narrative_description": "Through intermediaries, signal willingness to discuss broader German settlement",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "maintain_status_quo",
+          "narrative_description": "Continue current operations without escalation, waiting for the other side to move",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "ground_probe",
+          "narrative_description": "Send lightly armed convoy to test Soviet roadblocks",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "economic_warfare",
+          "narrative_description": "Intensify counter-blockade, targeting critical Soviet industrial supplies",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Quiet signals are exchanged. Neither side admits it publicly, but private communications suggest both seek a way out. The deadlock may be breaking.",
+        "CD": "Your peace feelers are leaked to embarrass you. Soviet propaganda portrays you as weak and ready to abandon Berlin. Your allies waver.",
+        "DC": "Your probe reveals cracks in Soviet resolve. Local commanders are confused about orders. The blockade is not as solid as it appears.",
+        "DD": "Ground probes meet armed resistance. Counter-blockade cripples East German industry. Soviet and American commanders exchange threats. Both sides mobilize for a war neither wants but neither can back down from."
+      },
+      "branches": {
+        "CC": "turn_6_diplomatic",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_6_tense"
+      },
+      "default_next": "turn_6",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Diplomatic overtures collapse in mutual recrimination. Each side blames the other for acting in bad faith. The blockade continues; the airlift continues. But any hope for quick resolution has evaporated."
+    },
+    {
+      "turn": 6,
+      "act": 2,
+      "narrative_briefing": "January 1949. The airlift has survived its greatest test\u2014the brutal winter. Soviet jamming of navigation signals has intensified, but Allied ingenuity counters each new tactic. In Moscow, Politburo discussions turn heated. The blockade was supposed to be cheap pressure; instead it's becoming a propaganda disaster. In Washington, Truman considers his options as the presidential election approaches.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 0.8,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.6,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.4,
+        "crash_payoff": -1.2,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "face_saving_proposal",
+          "narrative_description": "Propose currency reform talks that could give Soviets cover to end blockade",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "endurance_signal",
+          "narrative_description": "Announce major expansion of airlift capacity, signaling ability to continue indefinitely",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "nato_formation",
+          "narrative_description": "Accelerate NATO treaty negotiations, demonstrating permanent Western military commitment",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "nuclear_exercise",
+          "narrative_description": "Conduct nuclear delivery exercises within range of Soviet territory",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Currency talks provide diplomatic cover. Both sides can claim they're negotiating, not capitulating. The framework for ending the blockade begins to emerge.",
+        "CD": "Your olive branch is met with mockery. Soviet propaganda uses your proposal as evidence of Western desperation. Hardliners gain influence in Moscow.",
+        "DC": "NATO formation proceeds as Soviets seek accommodation. They realize the blockade has backfired, unifying the West as nothing else could have.",
+        "DD": "Nuclear exercises coincide with Soviet military maneuvers. Both sides' forces go on high alert. A radar malfunction nearly triggers launch authorization. The world comes within minutes of nuclear exchange."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_7",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Negotiations break down over preconditions. Each side demands the other act first. Trust has evaporated. The blockade enters its second year with no end in sight."
+    },
+    {
+      "turn": 7,
+      "act": 2,
+      "narrative_briefing": "Spring 1949. The airlift now moves more tonnage than ground routes ever did. West Berlin thrives while East Germany stagnates under the counter-blockade. Stalin privately admits to Molotov that 'the blockade has failed.' But how to end it without looking weak? In Washington, the question becomes: how to let the Soviets save face without appearing to reward aggression?",
+      "matrix_type": "pure_coordination",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "secret_summit",
+          "narrative_description": "Propose secret high-level summit to find mutual face-saving solution",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "linkage_offer",
+          "narrative_description": "Offer broader negotiations on German reunification in exchange for lifting blockade",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "deadline_pressure",
+          "narrative_description": "Set public deadline for blockade end, threatening severe consequences",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "west_german_state",
+          "narrative_description": "Announce formation of West German state, making division permanent",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Secret negotiations begin through the UN. Both sides maintain public positions while working toward resolution. The outlines of an agreement take shape.",
+        "CD": "Your diplomatic initiative is rejected. Soviet hardliners argue the West will crack first. The blockade continues despite its obvious failure.",
+        "DC": "Your pressure accelerates Soviet decision-making. Facing the reality of permanent German division, Moscow reconsiders its strategy.",
+        "DD": "West Germany is declared as Soviets issue ultimatums. Europe is now formally divided. The Iron Curtain solidifies. Both sides prepare for a Cold War that could last generations\u2014or end in nuclear fire."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_8",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Summit preparations collapse amid mutual accusations of bad faith. Hardliners on both sides gain strength. The brief window for negotiation has closed."
+    },
+    {
+      "turn": 8,
+      "act": 2,
+      "narrative_briefing": "The Jessup-Malik talks begin at the UN\u2014secret conversations between American and Soviet diplomats. Both sides finally acknowledge privately what neither can say publicly: the blockade must end, but neither can be seen to capitulate. The question is not whether to settle, but how to frame the settlement so both sides can claim victory.",
+      "matrix_type": "battle_of_sexes",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.2,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.6,
+        "preference_b": 1.4,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "simultaneous_announcement",
+          "narrative_description": "Propose simultaneous lifting of blockade and counter-blockade",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "cfm_meeting",
+          "narrative_description": "Offer Council of Foreign Ministers meeting as cover for ending blockade",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "victory_framing",
+          "narrative_description": "Insist on terms that allow your side to claim clear victory",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "precondition_demands",
+          "narrative_description": "Demand significant preconditions before any agreement",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "A formula emerges: simultaneous lifting of all restrictions, with a CFM meeting to discuss German questions. Both sides can claim they achieved their objectives. The end is in sight.",
+        "CD": "Your flexibility is exploited. The other side claims your concessions as their victory while offering nothing in return. Domestic critics accuse you of appeasement.",
+        "DC": "Your firm stance forces concessions. The final agreement tilts clearly in your favor, though the other side finds enough fig leaves to save face.",
+        "DD": "Both sides demand victory and neither can yield. The Jessup-Malik talks collapse. The moment of opportunity passes. Extremists gain influence as moderates are discredited."
+      },
+      "branches": {
+        "CC": "turn_9_resolution",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_9_deadlock"
+      },
+      "default_next": "turn_9",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The Jessup-Malik talks end in failure. Both diplomats return to their capitals to report that no agreement was possible. The blockade continues as both sides dig in for prolonged confrontation."
+    },
+    {
+      "turn": 9,
+      "act": 3,
+      "narrative_briefing": "April 1949. The NATO treaty has been signed, transforming the Western alliance into a permanent military commitment. The airlift has delivered over a million tons of supplies. Soviet internal documents reveal frustration: 'We have created the very Western unity we sought to prevent.' Yet no one can find the formula to end the standoff without appearing to surrender.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 0.9,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.7,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.3,
+        "crash_payoff": -1.5,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "package_deal",
+          "narrative_description": "Accept package deal linking blockade end to broader German negotiations",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "quiet_withdrawal",
+          "narrative_description": "Begin quietly reducing tensions without formal announcement",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "final_ultimatum",
+          "narrative_description": "Issue final ultimatum with specific deadline and consequences",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "permanent_division",
+          "narrative_description": "Accept permanent German division as preferable to continued conflict",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The package deal takes shape. Both sides quietly de-escalate while public negotiations provide cover. The end of the blockade is now matter of timing, not substance.",
+        "CD": "Your conciliatory gesture is pocketed without reciprocation. The other side presses for more concessions, sensing weakness.",
+        "DC": "Your ultimatum forces decision. Faced with clear consequences, the other side finally moves toward settlement on your terms.",
+        "DD": "Ultimatums cross and both sides mobilize. Ground forces mass at checkpoints. Aircraft are loaded with nuclear weapons. One miscalculation away from Armageddon, both sides realize they have pushed too far\u2014but neither knows how to step back."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_10",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The package deal collapses at the last moment over seemingly minor details that carry enormous symbolic weight. Both sides blame the other for negotiating in bad faith."
+    },
+    {
+      "turn": 10,
+      "act": 3,
+      "narrative_briefing": "May 1949. Nearly a year since the blockade began. The airlift has become the symbol of Western resolve; the blockade, of Soviet overreach. Intelligence reports suggest Stalin is looking for a way out\u2014but Soviet bureaucratic inertia and fear of appearing weak prevent any first move. The question: who will blink first, and how can the other side let them?",
+      "matrix_type": "harmony",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.0,
+        "reward": 1.5,
+        "punishment": 0.0,
+        "sucker": 0.5,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "informal_assurances",
+          "narrative_description": "Provide informal assurances about post-blockade cooperation",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "mutual_deescalation",
+          "narrative_description": "Propose mutual, unannounced de-escalation steps",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "propaganda_offensive",
+          "narrative_description": "Launch major propaganda offensive highlighting other side's failures",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "military_demonstration",
+          "narrative_description": "Stage major military demonstration of capability and resolve",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Informal assurances build trust. Both sides begin quiet de-escalation. The end of the blockade becomes a matter of choreography rather than substance.",
+        "CD": "Your good faith is exploited for propaganda purposes. The other side claims your assurances as concessions won through their firm stance.",
+        "DC": "Your demonstration of strength accelerates the other side's decision to settle. They realize continued confrontation risks everything.",
+        "DD": "Propaganda war escalates into near-conflict. Military demonstrations produce incidents\u2014aircraft shot down, soldiers killed. Both populations demand their leaders not back down. The logic of escalation takes hold."
+      },
+      "branches": {
+        "CC": "turn_11_peace",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_11_crisis"
+      },
+      "default_next": "turn_11",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Final negotiations collapse. Both sides' populations are now too inflamed to accept any compromise. The crisis enters its most dangerous phase."
+    },
+    {
+      "turn": 11,
+      "act": 3,
+      "narrative_briefing": "The endgame approaches. After nearly a year of blockade and airlift, both sides are exhausted. The economic costs have been staggering; the political costs, incalculable. Yet the same logic that created the crisis prevents its resolution: neither side can afford to appear to have lost. The only question remaining: will this end in settlement or catastrophe?",
+      "matrix_type": "security_dilemma",
+      "matrix_parameters": {
+        "scale": 0.9,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.6,
+        "reward": 1.0,
+        "punishment": 0.2,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "final_terms",
+          "narrative_description": "Accept reasonable final terms to end the crisis",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "graceful_exit",
+          "narrative_description": "Allow other side graceful exit while claiming mutual victory",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "last_push",
+          "narrative_description": "Make one final push for maximum advantage before settlement",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "brinksmanship",
+          "narrative_description": "Push to the absolute brink to extract final concessions",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides accept the terms. The blockade will end; the airlift will stand down. Berlin remains divided but at peace. The Cold War continues, but World War III has been averted.",
+        "CD": "Your acceptance of terms is met with last-minute demands. The other side pockets your concession and asks for more, humiliating you before domestic audiences.",
+        "DC": "Your final push extracts crucial concessions. The settlement clearly favors your side, though the other side finds enough face-saving elements to accept.",
+        "DD": "Both sides push to the brink simultaneously. Neither blinks. A Soviet fighter shoots down an American transport with 22 crew aboard. The President authorizes nuclear retaliation. The world's first nuclear exchange begins over Berlin."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_12",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Last-ditch negotiations fail. Both sides retreat to their capitals to prepare for the worst. The smell of war hangs over Europe."
+    },
+    {
+      "turn": 12,
+      "act": 3,
+      "narrative_briefing": "May 12, 1949. The Soviets have signaled they are ready to lift the blockade\u2014but everything depends on the final choreography. Who announces first? Who claims victory? Who appears to have yielded? The substance is settled; only the symbolism remains. But in international politics, symbolism can be everything.",
+      "matrix_type": "battle_of_sexes",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.5,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.7,
+        "preference_b": 1.5,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "joint_announcement",
+          "narrative_description": "Agree to simultaneous joint announcement of agreement",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "generous_framing",
+          "narrative_description": "Allow other side to frame the outcome favorably in their press",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "victory_declaration",
+          "narrative_description": "Announce agreement in terms that clearly claim victory for your side",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "conditional_acceptance",
+          "narrative_description": "Accept only with public conditions that emphasize other side's concessions",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The joint announcement proceeds flawlessly. Both sides claim victory; both sides are right. The blockade ends at midnight. Berlin remains free. The Cold War will continue, but its first great crisis ends without nuclear war.",
+        "CD": "Your generosity is exploited. The other side's announcement makes you appear to have capitulated completely. Domestic critics demand resignations.",
+        "DC": "Your victory declaration becomes the historical record. Future generations will remember this as your triumph and their humiliation.",
+        "DD": "Both sides race to claim victory first, each announcement contradicting the other. The agreed framework collapses in mutual accusations of bad faith. The blockade resumes. There will be no peaceful resolution."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_13",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The announcement is botched. Contradictory statements emerge from both capitals. The carefully negotiated settlement unravels in a storm of mutual recrimination."
+    },
+    {
+      "turn": 13,
+      "act": 3,
+      "narrative_briefing": "The aftermath. If the blockade has ended, both sides must now manage the peace. If it continues, both must prepare for the consequences. The decisions made now will echo for decades\u2014determining whether Berlin becomes a symbol of successful deterrence or the flashpoint for global catastrophe.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.8,
+        "hare_temptation": 1.2,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "implementation_cooperation",
+          "narrative_description": "Cooperate fully on implementing agreement terms",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "future_framework",
+          "narrative_description": "Establish framework for managing future Berlin crises",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "advantage_consolidation",
+          "narrative_description": "Use post-crisis period to consolidate strategic advantages",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "reputation_building",
+          "narrative_description": "Use outcome to build reputation for toughness in future crises",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides implement the agreement faithfully. Berlin becomes a model for crisis management. The rules of the Cold War are established: compete vigorously, but never cross the nuclear threshold.",
+        "CD": "Your cooperation is met with continued pressure. The other side uses the transition period to improve their position for the next crisis.",
+        "DC": "You consolidate gains while the other side honors the agreement. The balance of power shifts clearly in your favor.",
+        "DD": "Both sides use the transition to gain advantage. The agreement becomes a dead letter. Within months, a new crisis erupts. The world returns to the brink."
+      },
+      "branches": {
+        "CC": "turn_14_peace",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_14_cold_war"
+      },
+      "default_next": "turn_14",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Implementation talks collapse. Both sides accuse the other of violating the spirit of the agreement. The blockade may be over, but the underlying conflict remains unresolved."
+    },
+    {
+      "turn": 14,
+      "act": 3,
+      "narrative_briefing": "The final reckoning. History will record how the Berlin Blockade ended\u2014whether with the triumph of resolve over aggression, the wisdom of compromise over confrontation, or the tragedy of miscalculation leading to catastrophe. Your final choice will determine not just Berlin's fate, but the shape of the Cold War to come.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 0.9,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.8,
+        "reward": 1.2,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.3,
+        "crash_payoff": -2.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "lasting_peace",
+          "narrative_description": "Commit to durable peace framework for Berlin and Germany",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "managed_competition",
+          "narrative_description": "Accept long-term managed competition with clear rules",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "final_pressure",
+          "narrative_description": "Apply final pressure to maximize long-term advantage",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "permanent_confrontation",
+          "narrative_description": "Accept permanent confrontation as preferable to unsatisfactory peace",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The Berlin crisis ends with honor on both sides. The city remains divided but at peace. The Cold War will continue for four more decades, but the Berlin Blockade established the principle that nuclear powers, however hostile, can step back from the brink. Humanity survives to face another day.",
+        "CD": "Your commitment to peace is exploited. The other side gains lasting advantage from your restraint. History remembers this as your defeat, though you prevented war.",
+        "DC": "Your final pressure secures decisive advantage. The settlement clearly favors your side. Future crises will begin from a position of strength.",
+        "DD": "Neither side accepts anything less than total victory. The final confrontation escalates beyond control. Nuclear weapons are launched. Berlin, Moscow, Washington, London\u2014all burn. The first crisis of the nuclear age becomes the last crisis of human civilization. In the ashes, there are no victors."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": null,
+      "settlement_available": true,
+      "settlement_failed_narrative": "All paths to negotiated settlement have been exhausted. Only force remains. The fate of millions now rests on the final decisions of a handful of leaders."
+    }
+  ],
+  "branches": {
+    "turn_3_diplomatic": {
+      "turn": 3,
+      "act": 1,
+      "narrative_briefing": "Following the cooperative opening, both sides have established back-channels. The airlift begins as a confidence-building measure rather than a desperate gamble. Soviet commanders have received quiet instructions to avoid provocative actions. A window for negotiation has opened\u2014but it may not stay open long.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.2,
+        "hare_temptation": 1.4,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "build_trust",
+          "narrative_description": "Continue confidence-building measures while expanding back-channels",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "diplomatic_track",
+          "narrative_description": "Propose formal diplomatic track parallel to ongoing operations",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "hedge_position",
+          "narrative_description": "Quietly improve military position while maintaining diplomatic facade",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "test_resolve",
+          "narrative_description": "Test other side's limits with minor provocations",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Trust builds on trust. Both sides expand diplomatic contacts while military tensions ease. A comprehensive settlement framework begins to take shape ahead of schedule.",
+        "CD": "Your trust-building is met with hedging. The other side improves their position while you maintain good faith. Your allies question your judgment.",
+        "DC": "Your hedging pays dividends as the other side remains accommodating. You've gained strategic advantage while appearing cooperative.",
+        "DD": "The promising diplomatic opening collapses as both sides test limits. Military incidents destroy the fragile trust. Back to confrontation."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_4",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    "turn_3_tense": {
+      "turn": 3,
+      "act": 1,
+      "narrative_briefing": "The initial confrontation has escalated dangerously. Soviet and Allied forces now face each other at multiple checkpoints. Several incidents have resulted in casualties. Diplomatic communications have broken down; only military hotlines remain active. Both sides prepare for the worst while hoping to avoid it.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 0.55,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.6,
+        "reward": 0.9,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.4,
+        "crash_payoff": -1.3,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "deescalate_quietly",
+          "narrative_description": "Quietly pull back forces from flashpoints without public announcement",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "hotline_proposal",
+          "narrative_description": "Propose military hotline to prevent accidental escalation",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "reinforce_positions",
+          "narrative_description": "Reinforce forward positions and authorize commanders to respond to provocations",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "escalate_pressure",
+          "narrative_description": "Increase military pressure to force the other side to back down",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides quietly pull back from immediate confrontation. The crisis remains serious, but the hair-trigger tension eases. Room for diplomacy reopens.",
+        "CD": "Your de-escalation is interpreted as weakness. The other side presses their advantage, emboldened by your apparent hesitation.",
+        "DC": "Your pressure forces a climbdown. The other side's quiet retreat becomes a visible humiliation, strengthening your position.",
+        "DD": "Reinforcements meet reinforcements. A tank battle erupts at Checkpoint Alpha\u2014twelve dead. Both sides' publics demand retaliation. World leaders scramble to prevent nuclear exchange as the situation spirals."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_4",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    "turn_6_diplomatic": {
+      "turn": 6,
+      "act": 2,
+      "narrative_briefing": "The diplomatic track has borne fruit. Secret talks through neutral Switzerland have produced a framework: the blockade ends in exchange for four-power talks on Germany's future. Neither side admits it publicly, but both know this is the way out. The question is whether hardliners on both sides can be controlled.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.3,
+        "hare_temptation": 1.3,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "accept_framework",
+          "narrative_description": "Accept the Swiss framework and begin implementing it",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "domestic_preparation",
+          "narrative_description": "Prepare domestic political ground for settlement announcement",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "improve_terms",
+          "narrative_description": "Push for better terms now that momentum favors settlement",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "delay_tactics",
+          "narrative_description": "Delay to see if conditions improve further in your favor",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides accept the framework. Implementation begins quietly. The blockade will end within weeks, not months. History will record this as a triumph of diplomacy.",
+        "CD": "Your acceptance is met with delay tactics. The other side wants more, having sensed your eagerness to settle. The framework frays.",
+        "DC": "Your push for better terms succeeds as the other side is committed to settlement. The final agreement clearly favors your position.",
+        "DD": "Both sides overplay their hands. The promising framework collapses amid mutual accusations. The hardliners are vindicated; moderates discredited."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_7",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The Swiss framework collapses despite both sides having agreed in principle. Bureaucratic inertia and domestic politics prove stronger than diplomacy."
+    },
+    "turn_6_tense": {
+      "turn": 6,
+      "act": 2,
+      "narrative_briefing": "The crisis has intensified. Multiple military incidents have occurred; casualties mount on both sides. The airlift continues under increasingly dangerous conditions\u2014Soviet fighters now actively intercept transports. World opinion is horrified; both populations are mobilized for war. The point of no return approaches.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.7,
+        "reward": 0.8,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.3,
+        "crash_payoff": -1.5,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "ceasefire_proposal",
+          "narrative_description": "Propose immediate military ceasefire while political issues are negotiated",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "reduce_operations",
+          "narrative_description": "Quietly reduce provocative military operations",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "overwhelming_force",
+          "narrative_description": "Mass overwhelming force to demonstrate unshakeable resolve",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "nuclear_alert",
+          "narrative_description": "Raise nuclear forces to highest alert status",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides step back from the brink. The ceasefire allows emotions to cool and diplomacy to resume.The crisis remains grave but has not become catastrophe.",
+        "CD": "Your ceasefire proposal is rejected as a sign of weakness. Nuclear forces go on alert; war seems inevitable.",
+        "DC": "Your overwhelming force display shocks the other side into accommodation. They blink; you've won this round.",
+        "DD": "Nuclear forces on both sides go to maximum alert. A Soviet submarine commander, communications cut, prepares to launch. Only a last-minute technical failure prevents the missiles from flying. The world survives by accident."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_7",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Ceasefire talks collapse amid ongoing military incidents. Both sides' commanders have standing orders to respond to provocations. Control is slipping away."
+    },
+    "turn_9_resolution": {
+      "turn": 9,
+      "act": 3,
+      "narrative_briefing": "The Jessup-Malik framework has held. Both sides are committed to ending the blockade; only details remain. The mood is cautiously optimistic\u2014but veterans of diplomacy know that agreements can collapse at the last moment over seemingly minor issues. The final negotiations will determine whether this crisis ends in settlement or renewed confrontation.",
+      "matrix_type": "battle_of_sexes",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.4,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.5,
+        "preference_b": 1.3,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "finalize_terms",
+          "narrative_description": "Accept current terms and finalize agreement",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "minor_concession",
+          "narrative_description": "Offer minor concession to close remaining gaps",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "final_adjustment",
+          "narrative_description": "Push for final favorable adjustment to terms",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "public_pressure",
+          "narrative_description": "Use public pressure to extract final concessions",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Terms are finalized to mutual satisfaction. The announcement is scheduled; the blockade will end within days. Both sides can claim victory with some justification.",
+        "CD": "Your concession is pocketed without reciprocation. The final agreement tilts against you, though it still ends the crisis.",
+        "DC": "Your final push succeeds. The agreement clearly favors your side; history will record this as your diplomatic triumph.",
+        "DD": "Both sides push for maximum advantage at the last moment. The carefully constructed agreement falls apart. Negotiators despair as the crisis returns to confrontation."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_10",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Last-minute demands derail the settlement. Both negotiators return to their capitals to report failure. The brief hope of resolution evaporates."
+    },
+    "turn_9_deadlock": {
+      "turn": 9,
+      "act": 3,
+      "narrative_briefing": "The Jessup-Malik talks have failed. No diplomatic solution appears possible. Both sides are now committed to outlasting the other\u2014a test of will and resources that could last years. The airlift continues; the blockade continues. Berlin has become a permanent wound in the heart of Europe.",
+      "matrix_type": "deadlock",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 0.5,
+        "punishment": 1.0,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "reopen_talks",
+          "narrative_description": "Attempt to reopen diplomatic channels despite previous failure",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "long_game",
+          "narrative_description": "Settle in for long-term competition, avoiding further escalation",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "squeeze_harder",
+          "narrative_description": "Tighten pressure in hopes of forcing capitulation",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "new_front",
+          "narrative_description": "Open new front of pressure elsewhere to change the equation",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides accept the reality of prolonged competition. The immediate crisis eases, though the underlying conflict remains. Cold War, not hot war.",
+        "CD": "Your attempt to de-escalate is met with increased pressure. The other side smells weakness and presses harder.",
+        "DC": "Your new pressure succeeds in changing the equation. The other side is forced to reconsider their strategy.",
+        "DD": "Pressure meets pressure. New fronts open worldwide. The Cold War spreads and intensifies. The risk of nuclear conflict grows with each passing month."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_10",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Even the attempt to reopen talks fails. Both sides have concluded that only force\u2014or exhaustion\u2014will resolve this crisis."
+    },
+    "turn_11_peace": {
+      "turn": 11,
+      "act": 3,
+      "narrative_briefing": "The path to peace is clear. Both sides have invested heavily in finding a resolution, and mutual trust has built over months of careful diplomacy. The blockade will end; the airlift will wind down. Berlin will remain divided but at peace. The question now is ensuring the settlement endures.",
+      "matrix_type": "harmony",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.0,
+        "reward": 1.5,
+        "punishment": 0.0,
+        "sucker": 0.5,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "institutionalize_peace",
+          "narrative_description": "Create permanent institutions to manage Berlin and prevent future crises",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "confidence_building",
+          "narrative_description": "Implement confidence-building measures to reinforce settlement",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "secure_gains",
+          "narrative_description": "Quietly secure strategic gains before settlement is fully implemented",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "future_leverage",
+          "narrative_description": "Position for maximum leverage in future negotiations",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Permanent institutions are established. Both sides commit to peaceful management of Berlin. The crisis ends not just in settlement, but in a framework for lasting stability.",
+        "CD": "Your institution-building is undermined by the other side's maneuvering. The settlement holds, but future crises seem likely.",
+        "DC": "You secure gains while the other side focuses on peace. The settlement favors you, but resentment may fuel future conflict.",
+        "DD": "Both sides position for advantage. The settlement holds in letter but not spirit. Berlin remains a flashpoint, the crisis merely postponed."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_12",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Even with peace in sight, final negotiations fail. Both sides' suspicions prove stronger than their desire for resolution."
+    },
+    "turn_11_crisis": {
+      "turn": 11,
+      "act": 3,
+      "narrative_briefing": "The crisis has reached its most dangerous moment. Military forces on both sides are at maximum readiness. Nuclear weapons are armed and targeted. Commanders await final authorization. One wrong move\u2014one miscommunication\u2014could end civilization. Yet even now, both sides know that backing down means political destruction.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 0.8,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.9,
+        "reward": 0.7,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.2,
+        "crash_payoff": -2.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "step_back",
+          "narrative_description": "Unilaterally step back from the brink, accepting political costs",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "desperate_diplomacy",
+          "narrative_description": "Make desperate last-minute diplomatic approach",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "hold_firm",
+          "narrative_description": "Hold firm in belief the other side will break first",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "demonstrate_resolve",
+          "narrative_description": "Take visible action to demonstrate absolute resolve",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides step back simultaneously. The world exhales. The crisis ends not with victory but with survival\u2014which, in nuclear standoff, is victory enough.",
+        "CD": "Your retreat is met with their firmness. You've lost the confrontation, but humanity survives. Cold comfort, but comfort nonetheless.",
+        "DC": "Your firmness forces their retreat. You've won the crisis\u2014but came within minutes of destroying the world to do it.",
+        "DD": "Neither side blinks. The final order is given. Missiles launch. Cities burn. Hundreds of millions die in the first hour. The Berlin Blockade becomes humanity's epitaph."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_12",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Final diplomatic efforts fail. Both leaders conclude that only one side will survive this crisis. They reach for the nuclear codes."
+    },
+    "turn_14_peace": {
+      "turn": 14,
+      "act": 3,
+      "narrative_briefing": "May 12, 1949. The blockade ends at one minute past midnight. The first ground convoy rolls through to West Berlin, cheered by tens of thousands. The airlift continues briefly before standing down\u2014'Operation Vittles' has delivered 2.3 million tons of supplies in 277,000 flights. Both sides claim victory; both are partly right. The Cold War continues, but its first great crisis ends in peace.",
+      "matrix_type": "harmony",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.0,
+        "reward": 1.8,
+        "punishment": 0.0,
+        "sucker": 0.6,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "celebrate_peace",
+          "narrative_description": "Celebrate the peaceful resolution and honor those who achieved it",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "learn_lessons",
+          "narrative_description": "Draw lessons for managing future crises peacefully",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "claim_credit",
+          "narrative_description": "Claim maximum credit for your side's role in resolution",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "prepare_next",
+          "narrative_description": "Begin preparing for the next confrontation",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The Berlin Blockade ends as it should\u2014with both sides wiser, neither destroyed. The Cold War will continue for forty more years, but the principle is established: nuclear powers can compete without annihilation. Berlin becomes a symbol not of division, but of what humanity can achieve when it steps back from the brink.",
+        "CD": "Peace comes, but the other side claims all the credit. History will remember their triumph and your accommodation. Yet Berlin is free, and the world survives.",
+        "DC": "You claim the victory, and history agrees. The blockade's end is remembered as your triumph. The other side learns to fear your resolve.",
+        "DD": "Both sides claim total victory, poisoning the peace. The blockade ends, but mutual resentment ensures future crises. Berlin remains a flashpoint for decades. The lessons of restraint are forgotten."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": null,
+      "settlement_available": true,
+      "settlement_failed_narrative": "Even in the hour of peace, final negotiations fail. The blockade ends, but without formal agreement. The underlying conflicts remain, ensuring future crises."
+    },
+    "turn_14_cold_war": {
+      "turn": 14,
+      "act": 3,
+      "narrative_briefing": "The blockade ends\u2014not through agreement, but through exhaustion. Both sides have spent themselves. Berlin remains divided; Germany remains divided; Europe remains divided. The airlift proved that the West would not be pushed out, but proved nothing about resolution. The Cold War freezes into permanent confrontation.",
+      "matrix_type": "deadlock",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 0.5,
+        "punishment": 1.0,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "accept_stalemate",
+          "narrative_description": "Accept the stalemate and focus on managing long-term competition",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "reduce_hostility",
+          "narrative_description": "Work to reduce hostility despite absence of formal settlement",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "maintain_pressure",
+          "narrative_description": "Maintain pressure in hopes of eventual breakthrough",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "next_crisis",
+          "narrative_description": "Begin planning the next crisis to shift the balance",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides accept the reality of prolonged competition. The immediate crisis ends in stalemate, but World War III is avoided. The Cold War settles into its long, frozen pattern\u2014dangerous, but survivable.",
+        "CD": "Your acceptance of stalemate is met with continued pressure. The other side sees your fatigue as opportunity. The next crisis comes sooner than expected.",
+        "DC": "Your continued pressure wears down the other side's resolve. They accept the stalemate on terms that favor your position.",
+        "DD": "Neither side accepts stalemate. The next crisis begins before this one truly ends. The cycle of confrontation continues, each crisis bringing the world closer to the nuclear threshold."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": null,
+      "settlement_available": true,
+      "settlement_failed_narrative": "There is no settlement\u2014only exhaustion. Both sides retreat to their corners, bloodied but unbowed. The Berlin Question remains unanswered."
+    }
+  },
+  "personas": {
+    "side_a": {
+      "persona": "nixon",
+      "role_name": "Western Allied Commander",
+      "role_description": "Representative of Western powers, defending Berlin's freedom."
+    },
+    "side_b": {
+      "persona": "khrushchev",
+      "role_name": "Soviet Leadership",
+      "role_description": "Soviet leadership seeking to consolidate control over Eastern Europe."
+    }
+  }
+}

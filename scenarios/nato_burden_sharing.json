@@ -1,0 +1,1725 @@
+{
+  "scenario_id": "nato_burden_sharing_2026",
+  "title": "NATO Burden Sharing",
+  "theme": "default",
+  "setting": "NATO burden sharing. Free-riding accusations, credible commitment to collective defense.\nAlliance members must decide how much to contribute to collective defense. Some members\nare accused of free-riding while others bear disproportionate costs. Can the alliance\nmaintain solidarity, or will disputes undermine collective security?",
+  "max_turns": 14,
+  "turns": [
+    {
+      "turn": 1,
+      "act": 1,
+      "narrative_briefing": "A NATO summit approaches amid growing tensions over defense spending. Intelligence reports suggest a major ally is preparing to publicly criticize burden-sharing arrangements. Both sides must decide their opening posture: seek common ground, or stake out firm positions?",
+      "matrix_type": "pure_coordination",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "signal_cooperation",
+          "narrative_description": "Signal willingness to negotiate burden-sharing reforms through diplomatic channels",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "private_consultations",
+          "narrative_description": "Propose private bilateral consultations before the summit to align positions",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "public_positioning",
+          "narrative_description": "Brief journalists on your position to shape the narrative before talks begin",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "demand_commitment",
+          "narrative_description": "Publicly call for binding commitments and accountability measures",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both delegations arrive at the summit having quietly coordinated their messaging. The atmosphere is constructive, with shared talking points emphasizing alliance unity.",
+        "CD": "Your diplomatic overture is met with a public statement that puts you on the defensive. The press interprets your flexibility as weakness.",
+        "DC": "Your firm public stance catches your counterpart off-guard. They scramble to respond, and media coverage favors your framing of the burden-sharing debate.",
+        "DD": "Both sides arrive at the summit having staked out incompatible public positions. The press smells blood, and summit organizers worry about an open rift."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_2",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    {
+      "turn": 2,
+      "act": 1,
+      "narrative_briefing": "The summit's first day focuses on threat assessments. Both delegations must decide whether to share intelligence openly\u2014building trust but revealing sources\u2014or hold back to maintain information advantage.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.3,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "full_intel_share",
+          "narrative_description": "Share comprehensive threat intelligence, including sensitive source information",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "partial_share",
+          "narrative_description": "Share general threat assessments while protecting most sensitive sources",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "selective_share",
+          "narrative_description": "Share only information that supports your position on burden sharing",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "withhold_intel",
+          "narrative_description": "Keep most intelligence classified, citing security protocols",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both delegations share comprehensive intelligence. The collaborative atmosphere builds trust, and planners develop a shared threat picture that justifies coordinated investment.",
+        "CD": "Your open intelligence sharing is not reciprocated. Your counterpart learns your threat priorities while revealing little of their own assessments.",
+        "DC": "You maintain information advantage while your counterpart shares openly. You now understand their strategic vulnerabilities better than they understand yours.",
+        "DD": "Both sides maintain their information cards close to their chests. The threat briefing session becomes a dance of generalities, and no shared understanding emerges."
+      },
+      "branches": {
+        "CC": "turn_3_diplomatic",
+        "CD": "turn_3_standard",
+        "DC": "turn_3_standard",
+        "DD": "turn_3_tense"
+      },
+      "default_next": "turn_3",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    {
+      "turn": 3,
+      "act": 1,
+      "narrative_briefing": "Burden-sharing discussions begin. The 2% GDP spending target remains contentious. Both sides must decide whether to offer flexibility or hold the line on their demands.",
+      "matrix_type": "leader",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 2.0,
+        "reward": 1.5,
+        "punishment": 0.0,
+        "sucker": 0.5,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "offer_flexibility",
+          "narrative_description": "Propose flexible timelines for meeting spending targets with verification mechanisms",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "propose_formula",
+          "narrative_description": "Suggest a new burden-sharing formula that accounts for different economic circumstances",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "hold_firm",
+          "narrative_description": "Insist on the existing 2% target with no exemptions or delays",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "escalate_pressure",
+          "narrative_description": "Threaten to reconsider commitments if burden sharing isn't addressed",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides show flexibility, and a working group forms to develop a revised burden-sharing framework. The summit mood lightens.",
+        "CD": "Your flexibility is pocketed as a concession while your counterpart maintains their demands. You've given ground without getting anything in return.",
+        "DC": "Your firm stance pays off as your counterpart offers concessions. The press reports your negotiating success.",
+        "DD": "Neither side budges. The burden-sharing session ends in stalemate, and delegates break for sidebar meetings amid growing frustration."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_4",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    {
+      "turn": 4,
+      "act": 1,
+      "narrative_briefing": "Behind closed doors, negotiators explore whether a grand bargain is possible. This is a moment for trust-building\u2014or calculating betrayal. Both sides must decide how much to reveal about their true bottom lines.",
+      "matrix_type": "reconnaissance",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "reveal_redlines",
+          "narrative_description": "Share your true negotiating constraints and domestic political limitations",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "propose_framework",
+          "narrative_description": "Offer a detailed framework for incremental burden-sharing improvements",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "probe_limits",
+          "narrative_description": "Test your counterpart's resolve with provocative proposals while hiding your own flexibility",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "maximize_leverage",
+          "narrative_description": "Hold back concessions to extract maximum value from any eventual deal",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both delegations share their real constraints. For the first time, negotiators see a path to a deal that both sides can sell domestically.",
+        "CD": "Your honesty is exploited. Your counterpart now knows exactly how to pressure you while revealing nothing about their own limits.",
+        "DC": "Your strategic approach reveals their vulnerabilities while keeping your options open. You enter Act II with the upper hand.",
+        "DD": "The back-channel session produces nothing but mutual suspicion. Both sides return to their positions, and the summit's working sessions resume with no progress."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_5",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    {
+      "turn": 5,
+      "act": 2,
+      "narrative_briefing": "A security incident on NATO's eastern flank forces both sides to confront the practical stakes. The alliance must coordinate a response, but the burden-sharing dispute colors every decision about who provides what capabilities.",
+      "matrix_type": "volunteers_dilemma",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.2,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.4,
+        "free_ride_bonus": 0.6,
+        "disaster_penalty": 1.2,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "volunteer_assets",
+          "narrative_description": "Immediately offer military assets for the alliance response",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "share_burden",
+          "narrative_description": "Propose a joint contribution with clear cost-sharing",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "wait_others",
+          "narrative_description": "Wait to see what other allies commit before making promises",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "cite_constraints",
+          "narrative_description": "Emphasize domestic constraints that limit your immediate response capability",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both allies commit resources to the response. The coordinated action demonstrates alliance solidarity and deters further escalation.",
+        "CD": "You volunteer while your counterpart waits. The mission succeeds, but the burden falls disproportionately on your forces\u2014reinforcing your grievances.",
+        "DC": "Your counterpart volunteers while you hold back. You benefit from their commitment without equivalent sacrifice.",
+        "DD": "Neither side commits adequate resources promptly. The response is delayed and underwhelming, emboldening adversaries and raising questions about alliance credibility."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_6",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Your attempt to negotiate a burden-sharing settlement during the crisis falls flat. Your counterpart sees it as opportunistic, and the moment for agreement passes."
+    },
+    {
+      "turn": 6,
+      "act": 2,
+      "narrative_briefing": "The eastern flank incident has passed, but it has laid bare the alliance's coordination problems. A special ministerial meeting convenes to address burden sharing directly. Both sides must decide whether to compromise or dig in.",
+      "matrix_type": "battle_of_sexes",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.2,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.6,
+        "preference_b": 1.4,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "accept_their_framework",
+          "narrative_description": "Accept the other side's burden-sharing framework with minor modifications",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "propose_compromise",
+          "narrative_description": "Propose a middle-ground framework that requires concessions from both sides",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "push_your_framework",
+          "narrative_description": "Push for adoption of your preferred burden-sharing framework",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "threaten_walkout",
+          "narrative_description": "Signal that you'll walk away if your core demands aren't met",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides show willingness to compromise. A joint working group is established with a mandate to draft a new burden-sharing agreement by year's end.",
+        "CD": "Your willingness to accept their framework is met with additional demands. Your concession is pocketed without reciprocity.",
+        "DC": "Your firm negotiating stance forces the other side to accept a framework closer to your preferences. You claim a diplomatic victory.",
+        "DD": "Neither side will accept the other's framework. The ministerial meeting ends without a joint statement, and the press reports open division."
+      },
+      "branches": {
+        "CC": "turn_7_progress",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_7_crisis"
+      },
+      "default_next": "turn_7",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Your settlement proposal is rejected as one-sided. The ministerial meeting ends badly, and trust between delegations reaches a new low."
+    },
+    {
+      "turn": 7,
+      "act": 2,
+      "narrative_briefing": "Domestic political pressures are mounting on both sides. Parliament/Congress is demanding action, and the next defense budget vote approaches. Both sides must decide whether to make credible commitments or continue playing for time.",
+      "matrix_type": "inspection_game",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "announce_increase",
+          "narrative_description": "Announce a significant defense budget increase tied to alliance commitments",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "propose_joint_program",
+          "narrative_description": "Propose a joint defense procurement program that shares costs and capabilities",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "defer_decision",
+          "narrative_description": "Delay any commitment until after your next election cycle",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "conditional_commitment",
+          "narrative_description": "Make any increase conditional on other allies matching your contribution",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides announce credible budget commitments. The coordinated announcement generates positive press coverage and reassures smaller allies about alliance cohesion.",
+        "CD": "Your budget announcement is undercut when your counterpart defers their own commitment. You've spent political capital without achieving burden-sharing progress.",
+        "DC": "Your conditional approach pays off when your counterpart makes unconditional commitments. You've extracted concessions while preserving flexibility.",
+        "DD": "Neither side makes binding commitments. The defense industry complains about planning uncertainty, and allies begin hedging their own commitments."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_8",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Your settlement attempt collapses amid mutual recriminations. Both sides accuse the other of bad faith, and the window for agreement narrows."
+    },
+    {
+      "turn": 8,
+      "act": 2,
+      "narrative_briefing": "An adversary power announces a major military exercise near alliance territory, testing both parties' resolve. The alliance must present a unified front\u2014or reveal its internal divisions.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.8,
+        "reward": 1.2,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.6,
+        "crash_payoff": -1.2,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "joint_response",
+          "narrative_description": "Propose a coordinated alliance response that demonstrates unity",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "de_escalate",
+          "narrative_description": "Advocate for diplomatic engagement to reduce tensions",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "unilateral_show",
+          "narrative_description": "Announce your own show of force without coordinating with allies",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "exploit_crisis",
+          "narrative_description": "Use the crisis to pressure allies on burden sharing",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides commit to a coordinated response. The unified alliance posture deters further provocation, and the adversary backs down.",
+        "CD": "Your call for unity is ignored as your counterpart pursues their own agenda. The alliance appears divided, encouraging the adversary.",
+        "DC": "Your assertive approach forces allies to fall in line. You emerge as the decisive actor, but resentment simmers.",
+        "DD": "Both sides prioritize their bilateral agendas over alliance cohesion. The adversary's exercise succeeds in demonstrating NATO's internal divisions, and external confidence in the alliance drops sharply."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_9",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Settlement talks collapse as the external crisis exposes irreconcilable differences. Both sides blame the other for the alliance's poor response."
+    },
+    {
+      "turn": 9,
+      "act": 3,
+      "narrative_briefing": "The external crisis has passed, but it has accelerated the reckoning on burden sharing. Both sides must now decide whether to rebuild trust or prepare for alliance transformation\u2014potentially including a reduced role for one party.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.6,
+        "hare_temptation": 1.6,
+        "hare_safe": 1.1,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "rebuild_trust",
+          "narrative_description": "Propose confidence-building measures and regular consultations",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "new_framework",
+          "narrative_description": "Offer a comprehensive new burden-sharing framework with verification mechanisms",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "alternative_arrangements",
+          "narrative_description": "Begin exploring alternative security arrangements outside the current alliance framework",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "public_ultimatum",
+          "narrative_description": "Issue a public ultimatum on burden sharing with clear deadlines",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides commit to rebuilding the relationship. A new burden-sharing framework emerges with genuine buy-in from both parties.",
+        "CD": "Your rebuilding efforts are spurned. Your counterpart seems to be preparing for a different kind of alliance relationship.",
+        "DC": "Your exploration of alternatives puts pressure on your counterpart, who scrambles to prevent alliance fragmentation.",
+        "DD": "Both sides begin positioning for alliance transformation. The post-crisis period becomes a cold reorganization, with each side building alternative coalitions within the broader alliance."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_10",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Your final attempt at a negotiated settlement fails. Both sides have invested too much in their positions to back down now."
+    },
+    {
+      "turn": 10,
+      "act": 3,
+      "narrative_briefing": "The annual NATO summit arrives with burden sharing as the dominant issue. This is the decisive moment\u2014agreements made here will shape alliance relations for a decade. Both sides prepare their final positions.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 2.0,
+        "reward": 1.4,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.5,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "grand_compromise",
+          "narrative_description": "Propose a grand compromise that addresses both sides' core concerns",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "accept_terms",
+          "narrative_description": "Signal willingness to accept the other side's core demands in exchange for key concessions",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "final_stand",
+          "narrative_description": "Take a final stand on your core position, signaling you'll accept no less",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "threaten_consequences",
+          "narrative_description": "Explicitly threaten consequences if burden sharing isn't resolved at this summit",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The summit produces a historic burden-sharing agreement. Both sides make meaningful commitments, and the alliance emerges stronger.",
+        "CD": "Your compromise proposal is met with intransigence. The summit ends with your concessions on the record but no agreement.",
+        "DC": "Your firm stance forces last-minute concessions. You secure favorable terms, though your counterpart leaves embittered.",
+        "DD": "The summit ends in open acrimony. Both sides issue contradictory statements, and the press declares the alliance in crisis. External adversaries take note."
+      },
+      "branches": {
+        "CC": "turn_11_peace",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_11_crisis"
+      },
+      "default_next": "turn_11",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The summit was the last chance for a negotiated settlement. Its failure marks a turning point in alliance relations."
+    },
+    {
+      "turn": 11,
+      "act": 3,
+      "narrative_briefing": "The summit's outcome reverberates through capitals. Parliamentary committees convene, editorials are written, and both sides must decide how to characterize what happened\u2014and what comes next.",
+      "matrix_type": "battle_of_sexes",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.4,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.7,
+        "preference_b": 1.5,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "positive_spin",
+          "narrative_description": "Characterize the summit as progress despite challenges, emphasizing common ground",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "extend_olive_branch",
+          "narrative_description": "Publicly praise your counterpart's flexibility and call for continued dialogue",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "claim_victory",
+          "narrative_description": "Characterize the summit as a vindication of your position",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "assign_blame",
+          "narrative_description": "Publicly blame the other side for any failures or shortcomings",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides emphasize progress and partnership. The coordinated messaging reassures markets, allies, and adversaries that the alliance remains functional.",
+        "CD": "Your positive messaging is undercut by your counterpart's victory claims. Your domestic critics accuse you of being outmaneuvered.",
+        "DC": "Your victory narrative dominates the news cycle. Your counterpart looks weak and defensive.",
+        "DD": "Dueling narratives create confusion about what actually happened. The alliance's credibility suffers as both sides trade accusations."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_12",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Even post-summit settlement efforts fail. The burden-sharing dispute has become too politically charged for quiet resolution."
+    },
+    {
+      "turn": 12,
+      "act": 3,
+      "narrative_briefing": "Intelligence reports indicate an adversary power is testing alliance responses, probing for weakness. Both sides must decide whether to coordinate their response or pursue separate approaches.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.8,
+        "hare_temptation": 1.7,
+        "hare_safe": 1.2,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "coordinate_response",
+          "narrative_description": "Share intelligence and coordinate a unified alliance response",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "joint_exercise",
+          "narrative_description": "Propose an immediate joint military exercise to demonstrate solidarity",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "bilateral_talks",
+          "narrative_description": "Pursue bilateral discussions with the adversary, cutting out your ally",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "strategic_ambiguity",
+          "narrative_description": "Maintain strategic ambiguity about your commitment to collective defense",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "A coordinated response demonstrates that despite burden-sharing disputes, the alliance remains operationally unified. The adversary backs off.",
+        "CD": "Your coordination efforts are undermined by your counterpart's separate diplomacy. The adversary exploits the division.",
+        "DC": "Your bilateral approach yields results but damages alliance cohesion. You've gained tactically while losing strategically.",
+        "DD": "Both sides pursue separate approaches, and the adversary successfully divides alliance responses. The credibility of collective defense erodes further."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_13",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Settlement fails as the external threat exposes incompatible strategic visions. The burden-sharing dispute has metastasized into a fundamental disagreement about alliance purpose."
+    },
+    {
+      "turn": 13,
+      "act": 3,
+      "narrative_briefing": "The year's final defense planning conference convenes. Budget decisions made here will lock in burden-sharing outcomes for the next fiscal cycle. This is the last chance to reshape the alliance's trajectory.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 2.2,
+        "reward": 1.5,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.4,
+        "crash_payoff": -1.8,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "increase_spending",
+          "narrative_description": "Announce a significant defense spending increase above the 2% target",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "binding_commitment",
+          "narrative_description": "Accept binding burden-sharing commitments with verification",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "maintain_position",
+          "narrative_description": "Maintain current spending levels and resist new commitments",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "reallocation_demand",
+          "narrative_description": "Demand that others meet their commitments before you increase yours",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides make meaningful budgetary commitments. The defense planning conference produces a credible multi-year spending framework that addresses burden-sharing concerns.",
+        "CD": "Your spending increase is not matched. You've committed resources while the free-riding problem persists.",
+        "DC": "Your firm stance extracts commitments from your counterpart. The burden-sharing balance shifts in your favor.",
+        "DD": "Neither side makes new commitments. The defense planning conference ends in stalemate, and military planners struggle with an uncertain resource picture. Alliance planning capability degrades significantly."
+      },
+      "branches": {
+        "CC": "turn_14_resolution",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_14_collapse"
+      },
+      "default_next": "turn_14",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The defense planning conference was the last opportunity for resolution. Its failure portends fundamental changes to alliance structures."
+    },
+    {
+      "turn": 14,
+      "act": 3,
+      "narrative_briefing": "The year draws to a close with the burden-sharing question still unresolved. Both sides must make final decisions about the alliance's future. Will it survive as a meaningful security partnership, or has the dispute caused irreparable damage?",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 3.0,
+        "hare_temptation": 1.8,
+        "hare_safe": 1.3,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "reaffirm_alliance",
+          "narrative_description": "Publicly reaffirm commitment to collective defense and burden sharing reform",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "new_beginning",
+          "narrative_description": "Propose a new burden-sharing framework with fresh negotiations next year",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "hedge_bets",
+          "narrative_description": "Begin developing alternative security arrangements while maintaining nominal alliance membership",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "issue_warning",
+          "narrative_description": "Issue a final warning that alliance obligations may not be honored if burden sharing isn't addressed",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides reaffirm their commitment to the alliance. While burden-sharing disputes remain, the framework for resolution is in place, and collective defense remains credible.",
+        "CD": "Your commitment is not reciprocated. The alliance enters the new year with one party clearly less committed than the other.",
+        "DC": "Your hedging forces your counterpart to make concessions to keep you engaged. You've secured a better position, but alliance cohesion is weakened.",
+        "DD": "Both sides hedge their alliance commitments. The year ends with collective defense in doubt. External adversaries sense opportunity, and smaller alliance members begin their own contingency planning. The alliance that once deterred great power conflict has become a hollow shell."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": null,
+      "settlement_available": true,
+      "settlement_failed_narrative": "The final settlement attempt fails. The burden-sharing dispute has fundamentally damaged the alliance, and both sides must now manage the consequences of collective failure."
+    }
+  ],
+  "branches": {
+    "turn_3_diplomatic": {
+      "turn": 3,
+      "act": 1,
+      "narrative_briefing": "Following the productive intelligence exchange, burden-sharing discussions begin in a constructive atmosphere. Both sides sense an opportunity for a breakthrough on the 2% GDP spending target.",
+      "matrix_type": "harmony",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.2,
+        "reward": 1.8,
+        "punishment": 0.0,
+        "sucker": 0.6,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "build_momentum",
+          "narrative_description": "Build on the trust established to propose comprehensive burden-sharing reforms",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "joint_statement",
+          "narrative_description": "Draft a joint statement acknowledging shared responsibility for defense",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "push_advantage",
+          "narrative_description": "Use the positive atmosphere to push for maximum concessions",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "set_conditions",
+          "narrative_description": "Set demanding conditions while the other side is in a conciliatory mood",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The collaborative momentum continues. Both sides agree on principles for burden-sharing reform, and working groups are established with clear mandates.",
+        "CD": "Your constructive approach is exploited. Your counterpart uses the goodwill to extract concessions without offering reciprocal commitments.",
+        "DC": "You capitalize on the positive atmosphere to secure favorable terms. The deal tilts in your direction.",
+        "DD": "Both sides try to exploit the positive atmosphere for unilateral gain, and the goodwill evaporates. The summit returns to its tense default."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_4",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    "turn_3_standard": {
+      "turn": 3,
+      "act": 1,
+      "narrative_briefing": "With intelligence sharing having produced mixed results, burden-sharing discussions begin on uncertain footing. The 2% GDP spending target remains contentious, and both sides probe for advantage.",
+      "matrix_type": "leader",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 2.0,
+        "reward": 1.5,
+        "punishment": 0.0,
+        "sucker": 0.5,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "offer_flexibility",
+          "narrative_description": "Propose flexible timelines for meeting spending targets with verification mechanisms",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "propose_formula",
+          "narrative_description": "Suggest a new burden-sharing formula that accounts for different economic circumstances",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "hold_firm",
+          "narrative_description": "Insist on the existing 2% target with no exemptions or delays",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "escalate_pressure",
+          "narrative_description": "Threaten to reconsider commitments if burden sharing isn't addressed",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides show flexibility, and a working group forms to develop a revised burden-sharing framework. The summit mood lightens.",
+        "CD": "Your flexibility is pocketed as a concession while your counterpart maintains their demands. You've given ground without getting anything in return.",
+        "DC": "Your firm stance pays off as your counterpart offers concessions. The press reports your negotiating success.",
+        "DD": "Neither side budges. The burden-sharing session ends in stalemate, and delegates break for sidebar meetings amid growing frustration."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_4",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    "turn_3_tense": {
+      "turn": 3,
+      "act": 1,
+      "narrative_briefing": "After the failed intelligence exchange, suspicion permeates the burden-sharing discussions. Neither side trusts the other's stated positions, and the 2% GDP target has become a proxy for deeper grievances.",
+      "matrix_type": "prisoners_dilemma",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.8,
+        "reward": 1.2,
+        "punishment": 0.4,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "attempt_reset",
+          "narrative_description": "Attempt to reset the atmosphere with a goodwill gesture",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "offer_minimum",
+          "narrative_description": "Offer the minimum concession necessary to keep talks alive",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "double_down",
+          "narrative_description": "Double down on your position, citing the other side's bad faith",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "threaten_exit",
+          "narrative_description": "Threaten to walk out of burden-sharing discussions entirely",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Despite the tension, both sides manage a minimal de-escalation. The talks continue, though trust remains low.",
+        "CD": "Your attempt to reset is met with continued hostility. You look weak, and your counterpart smells blood.",
+        "DC": "Your hardline approach forces your counterpart to make concessions to prevent a complete breakdown.",
+        "DD": "The burden-sharing session descends into open acrimony. Delegates exchange harsh words, and the summit's success is in doubt."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_4",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    "turn_7_progress": {
+      "turn": 7,
+      "act": 2,
+      "narrative_briefing": "Following the successful ministerial meeting, momentum builds for a comprehensive burden-sharing agreement. Both sides face a choice: lock in gains through credible commitments, or push for even more favorable terms.",
+      "matrix_type": "harmony",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.3,
+        "reward": 2.0,
+        "punishment": 0.0,
+        "sucker": 0.7,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "lock_in_gains",
+          "narrative_description": "Announce binding commitments that cement the ministerial progress",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "public_celebration",
+          "narrative_description": "Publicly celebrate the breakthrough and build domestic support for implementation",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "push_further",
+          "narrative_description": "Use the momentum to push for additional concessions beyond the ministerial agreement",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "add_conditions",
+          "narrative_description": "Add new conditions to your commitments that weren't in the ministerial framework",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides commit to the ministerial framework. The burden-sharing dispute appears on track for resolution, and alliance confidence rises.",
+        "CD": "Your commitment is not matched with equivalent follow-through. The ministerial progress begins to unravel.",
+        "DC": "Your push for more extracts additional concessions, but poisons the well for implementation.",
+        "DD": "Both sides try to renegotiate the ministerial agreement, and the progress evaporates. You're back to square one."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_8",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Even with ministerial progress as a foundation, your settlement attempt fails. The momentum dissipates."
+    },
+    "turn_7_crisis": {
+      "turn": 7,
+      "act": 2,
+      "narrative_briefing": "The ministerial meeting's failure has triggered a political crisis. Parliamentary opposition exploits the division, and both governments face pressure to demonstrate resolve. The alliance is entering dangerous territory.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 2.0,
+        "reward": 1.3,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.4,
+        "crash_payoff": -1.5,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "damage_control",
+          "narrative_description": "Prioritize damage control, offering private assurances to prevent further escalation",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "seek_mediation",
+          "narrative_description": "Seek mediation from a trusted third party within the alliance",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "escalate_rhetoric",
+          "narrative_description": "Escalate public rhetoric to shore up domestic support",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "announce_review",
+          "narrative_description": "Announce a fundamental review of alliance commitments",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides step back from the brink. Private channels reopen, and the immediate crisis is contained\u2014though underlying tensions remain.",
+        "CD": "Your attempt at damage control is exploited. Your counterpart's escalation makes you look weak domestically.",
+        "DC": "Your escalation forces your counterpart into defensive mode. You gain the upper hand, but at cost to alliance stability.",
+        "DD": "Both sides escalate. The alliance crisis deepens, and smaller members begin contingency planning for an alliance breakdown. External adversaries take note of the deepening rift."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_8",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Settlement attempts fail as political pressures make compromise toxic domestically. The crisis deepens."
+    },
+    "turn_11_peace": {
+      "turn": 11,
+      "act": 3,
+      "narrative_briefing": "The summit's success creates a window for consolidation. Both sides must decide whether to cement the historic agreement or risk reopening negotiations for marginal gains.",
+      "matrix_type": "harmony",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.4,
+        "reward": 2.2,
+        "punishment": 0.0,
+        "sucker": 0.8,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "implement_agreement",
+          "narrative_description": "Move immediately to implement the summit agreement",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "joint_announcement",
+          "narrative_description": "Make a joint announcement celebrating the historic breakthrough",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "seek_clarifications",
+          "narrative_description": "Seek 'clarifications' that reinterpret the agreement in your favor",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "delay_implementation",
+          "narrative_description": "Delay implementation pending domestic approval processes",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides move swiftly to implement the agreement. The burden-sharing framework enters force, and alliance confidence reaches new heights.",
+        "CD": "Your good-faith implementation is not matched. The agreement begins to fray at the edges.",
+        "DC": "Your tactical maneuvering extracts last-minute advantages, but undermines the spirit of the agreement.",
+        "DD": "Both sides try to reinterpret the agreement, and implementation stalls. The historic opportunity is squandered."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_12",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Even after the summit success, your settlement refinement fails. The agreement remains in place but with reduced commitment."
+    },
+    "turn_11_crisis": {
+      "turn": 11,
+      "act": 3,
+      "narrative_briefing": "The summit's failure has created an existential crisis for the alliance. Both governments face domestic pressure to either salvage the relationship or move toward fundamental transformation.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 2.2,
+        "reward": 1.4,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.3,
+        "crash_payoff": -2.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "emergency_talks",
+          "narrative_description": "Propose emergency back-channel talks to prevent further deterioration",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "last_olive_branch",
+          "narrative_description": "Extend a last olive branch with significant concessions",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "prepare_alternatives",
+          "narrative_description": "Begin publicly preparing alternative security arrangements",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "issue_ultimatum",
+          "narrative_description": "Issue a final ultimatum on burden sharing with non-negotiable terms",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides pull back from the brink. Emergency talks produce a face-saving compromise that keeps the alliance functional, if weakened.",
+        "CD": "Your olive branch is rejected. The alliance appears to be heading toward fundamental transformation.",
+        "DC": "Your ultimatum forces capitulation, but the alliance relationship is permanently damaged.",
+        "DD": "Both sides prepare for alliance transformation. The burden-sharing dispute has metastasized into a complete breakdown of collective defense coordination. Smaller allies scramble for bilateral arrangements, and adversaries sense historic opportunity."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_12",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Emergency settlement negotiations fail. The alliance is now in free fall."
+    },
+    "turn_14_resolution": {
+      "turn": 14,
+      "act": 3,
+      "narrative_briefing": "The defense planning conference's success has created a foundation for lasting burden-sharing reform. Both sides must now decide whether to build on this foundation or rest on their laurels.",
+      "matrix_type": "harmony",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 2.5,
+        "punishment": 0.0,
+        "sucker": 0.9,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "institutionalize",
+          "narrative_description": "Work to institutionalize burden-sharing reforms in alliance structures",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "celebrate_success",
+          "narrative_description": "Jointly celebrate the successful resolution and honor commitments made",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "claim_credit",
+          "narrative_description": "Position your side as the architect of the successful resolution",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "extract_more",
+          "narrative_description": "Use the positive atmosphere to extract additional commitments",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides work together to institutionalize burden-sharing reforms. The alliance emerges from the crisis stronger and more resilient, with a credible framework for collective defense that will endure for decades.",
+        "CD": "Your institution-building efforts are undermined by your counterpart's credit-claiming. The reforms remain in place but lack the deep buy-in needed for longevity.",
+        "DC": "Your credit-claiming succeeds domestically but irritates your counterpart. The burden-sharing issue is resolved, but personal relationships between leaders are strained.",
+        "DD": "Both sides claim credit for the resolution, and the cooperative spirit evaporates. The burden-sharing framework exists on paper but lacks the political commitment for full implementation."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": null,
+      "settlement_available": true,
+      "settlement_failed_narrative": "Even at the moment of resolution, final settlement terms cannot be agreed. The burden-sharing framework exists but without the completeness both sides sought."
+    },
+    "turn_14_collapse": {
+      "turn": 14,
+      "act": 3,
+      "narrative_briefing": "The defense planning conference's failure has triggered the alliance's worst crisis since its founding. Both sides must now choose between last-ditch rescue efforts and acceptance of fundamental transformation.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 2.5,
+        "reward": 1.6,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.3,
+        "crash_payoff": -2.5,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "final_rescue",
+          "narrative_description": "Launch a final desperate effort to rescue collective defense",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "unconditional_commitment",
+          "narrative_description": "Make an unconditional commitment to the alliance regardless of burden sharing",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "announce_withdrawal",
+          "narrative_description": "Announce a phased withdrawal from integrated military structures",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "demand_restructuring",
+          "narrative_description": "Demand a fundamental restructuring of the alliance on your terms",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Against all odds, both sides pull back from the brink. A minimal burden-sharing framework is salvaged, and collective defense\u2014while weakened\u2014survives.",
+        "CD": "Your rescue effort is not reciprocated. The alliance transforms fundamentally, with one party significantly reducing its commitment.",
+        "DC": "Your hardline approach forces your counterpart into submission, but the alliance is permanently weakened. Victory is pyrrhic.",
+        "DD": "Both sides move toward alliance transformation. Collective defense as it existed for decades ceases to function. Smaller allies are left exposed as the great powers pursue separate arrangements. External adversaries move to exploit the vacuum, and the security architecture that maintained peace collapses into uncertainty and competition."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": null,
+      "settlement_available": true,
+      "settlement_failed_narrative": "Final settlement negotiations fail catastrophically. The alliance that once deterred great power conflict cannot survive the burden-sharing dispute. Decades of collective security give way to uncertainty, bilateral arrangements, and vulnerability to external threats."
+    }
+  },
+  "personas": {
+    "side_a": {
+      "persona": "nixon",
+      "role_name": "American President",
+      "role_description": "US leader pushing for fairer burden sharing among NATO allies."
+    },
+    "side_b": {
+      "persona": "bismarck",
+      "role_name": "European Alliance Leader",
+      "role_description": "European statesman balancing alliance obligations with national interests."
+    }
+  }
+}

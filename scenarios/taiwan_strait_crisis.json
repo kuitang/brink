@@ -1,0 +1,1947 @@
+{
+  "scenario_id": "taiwan_strait_2024",
+  "title": "Taiwan Strait Crisis",
+  "theme": "default",
+  "setting": "Taiwan Strait Crisis. US-China tensions over Taiwan's status, ambiguity and deterrence.\nThe delicate balance of strategic ambiguity faces its greatest test as tensions rise in the\nTaiwan Strait. Both sides must navigate between deterrence and reassurance, knowing that\nmiscalculation could lead to catastrophic conflict.",
+  "max_turns": 14,
+  "turns": [
+    {
+      "turn": 1,
+      "act": 1,
+      "narrative_briefing": "A Taiwanese legislative delegation arrives in Washington for high-profile meetings. Beijing issues stern warnings about 'foreign interference in internal affairs.' Satellite imagery shows unusual activity at coastal military bases. Both capitals await signals about the other's intentions.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "quiet_reception",
+          "narrative_description": "Receive the delegation quietly with minimal publicity, signaling restraint to Beijing",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "private_reassurance",
+          "narrative_description": "Send private diplomatic messages to Beijing emphasizing stability",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "public_ceremony",
+          "narrative_description": "Host a public ceremony with prominent officials, demonstrating resolve",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "announce_arms_sale",
+          "narrative_description": "Announce new arms sales package during the visit, sending a clear signal",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides show restraint. The visit proceeds without fanfare, and Beijing's military exercises are quietly scaled back. A window for dialogue opens.",
+        "CD": "Your restraint is met with increased pressure. PLA aircraft probe Taiwan's ADIZ in record numbers, and state media declares your 'weakness' has been noted.",
+        "DC": "Your show of resolve catches Beijing off-guard. The delegation is celebrated, but Chinese diplomats issue unusually harsh warnings. The temperature rises.",
+        "DD": "Mutual escalation begins. Your public display is matched by live-fire exercises in the Taiwan Strait. News anchors on both sides speak of 'deteriorating relations.'"
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_2",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    {
+      "turn": 2,
+      "act": 1,
+      "narrative_briefing": "Intelligence reports indicate increased communications between PLA Eastern Theater Command and naval units. Meanwhile, Congressional pressure mounts for stronger Taiwan support. Both sides are watching for signals about the other's threshold for escalation.",
+      "matrix_type": "inspection_game",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "routine_intel",
+          "narrative_description": "Maintain routine intelligence collection without provocative surveillance",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "diplomatic_query",
+          "narrative_description": "Query Beijing through diplomatic channels about military movements",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "enhanced_surveillance",
+          "narrative_description": "Deploy reconnaissance assets closer to Chinese waters for detailed collection",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "carrier_positioning",
+          "narrative_description": "Reposition a carrier strike group to signal attention to the region",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides maintain measured postures. Diplomatic channels remain functional, and military-to-military communications are restored.",
+        "CD": "Your restraint allows adversary forces to complete undetected preparations. Intelligence gaps widen as you realize how much you've missed.",
+        "DC": "Your aggressive posture pays off\u2014detailed intelligence reveals true capabilities.But your assets were tracked, and Beijing knows what you know.",
+        "DD": "A dangerous game of cat-and-mouse develops. A P-8 Poseidon and a PLA-N J-15 have a near-collision over the Taiwan Strait, making international headlines."
+      },
+      "branches": {
+        "CC": "turn_3_diplomatic",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_3_tense"
+      },
+      "default_next": "turn_3",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    {
+      "turn": 3,
+      "act": 1,
+      "narrative_briefing": "Routine military communications continue as both sides assess the developing situation. Your intelligence analysts are working to understand the adversary's true intentions and redlines.",
+      "matrix_type": "prisoners_dilemma",
+      "matrix_parameters": {
+        "scale": 0.6,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "military_dialogue",
+          "narrative_description": "Propose resumption of military-to-military dialogue channels",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "exercise_postponement",
+          "narrative_description": "Delay planned regional exercises as a confidence-building measure",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "freedom_navigation",
+          "narrative_description": "Conduct freedom of navigation operations near contested features",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "joint_training",
+          "narrative_description": "Announce enhanced joint training with regional allies",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Military-to-military channels reopen. Both sides exchange information about exerciseschedules, reducing the risk of misperception.",
+        "CD": "Your olive branch is rejected. While you show restraint, adversary forces conduct aggressive maneuvers that test your defensive perimeter.",
+        "DC": "Your assertive operations succeed while the adversary's conciliatory gestures are ignored. Regional allies are emboldened, but trust erodes.",
+        "DD": "Competitive military activities intensify. Both sides conduct overlapping exercises, and commanders report increasingly dangerous encounters."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_4",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    {
+      "turn": 4,
+      "act": 1,
+      "narrative_briefing": "As Act I concludes, both sides must decide whether to consolidate positions or seek de-escalation. The next phase will bring higher stakes and more consequential decisions. Leadership on both sides reviews the situation.",
+      "matrix_type": "reconnaissance",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "summit_proposal",
+          "narrative_description": "Propose a leader-level summit to address tensions directly",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "hotline_activation",
+          "narrative_description": "Activate crisis hotline and propose regular communications",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "force_enhancement",
+          "narrative_description": "Announce force enhancements in the region for 'routine rotation'",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "ally_coordination",
+          "narrative_description": "Coordinate with allies on contingency planning, making plans visible",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides agree to a cooling-off period. A preliminary framework for talks is established, and military activities return to baseline.",
+        "CD": "Your diplomatic outreach is rebuffed. While you seek dialogue, the adversary interprets your overtures as weakness and presses advantages.",
+        "DC": "Your force enhancements are completed without interference. The adversary's diplomatic initiatives are dismissed as delaying tactics.",
+        "DD": "The situation hardens. Both sides complete military preparations while diplomatic rhetoric sharpens. The confrontation phase begins."
+      },
+      "branches": {
+        "CC": "turn_5_hopeful",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_5_hardened"
+      },
+      "default_next": "turn_5",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    {
+      "turn": 5,
+      "act": 2,
+      "narrative_briefing": "Act II begins. The Taiwan Strait has become the world's most dangerous flashpoint. Global markets react to every headline. Both capitals face pressure from domestic hawks and international mediators. The choices made now will determine whether this crisis ends in compromise or catastrophe.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 0.9,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "back_channel",
+          "narrative_description": "Open secret back-channel negotiations through third-party intermediaries",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "reduce_tempo",
+          "narrative_description": "Reduce the tempo of military operations as a signal of restraint",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "blockade_rehearsal",
+          "narrative_description": "Conduct exercises simulating a response to a blockade scenario",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "public_ultimatum",
+          "narrative_description": "Issue a public statement declaring clear redlines with consequences",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Back-channel communications open. Both sides quietly reduce military visibility while maintaining public postures. Hope emerges for face-saving resolution.",
+        "CD": "Your restraint is exploited. Military assets are moved into advantageous positions while your de-escalation signals are portrayed as retreat.",
+        "DC": "Your aggressive posture forces the adversary to back down publicly. Regional allies rally, but dangerous precedents are set.",
+        "DD": "Naval forces from both sides operate in dangerous proximity. A collision between escort vessels results in damage and casualties. The world holds its breath."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_6",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Back-channel negotiations collapse as neither side can accept the other's terms. The failed dialogue hardens positions and erodes remaining trust. Risk of miscalculation increases."
+    },
+    {
+      "turn": 6,
+      "act": 2,
+      "narrative_briefing": "The situation remains volatile. Intelligence indicates the adversary's leadership is divided between hawks and moderates. Your own government faces similar internal debates. A wrong move could tip the balance toward the hawks on both sides.",
+      "matrix_type": "security_dilemma",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "transparency_measures",
+          "narrative_description": "Implement transparency measures on military deployments",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "hold_position",
+          "narrative_description": "Maintain current posture without additional deployments",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "defensive_reinforcement",
+          "narrative_description": "Reinforce defensive positions citing legitimate security concerns",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "preemptive_deployment",
+          "narrative_description": "Deploy additional assets to prevent adversary fait accompli",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Mutual transparency reduces misperception. Both sides accurately read the other's defensive intent, and space for dialogue expands.",
+        "CD": "Your transparency reveals dispositions that are immediately exploited. Forces are repositioned to negate your defensive advantages.",
+        "DC": "Your reinforcements succeed while the adversary's transparency is used against them. Strategic advantage shifts, but so does the adversary's calculus.",
+        "DD": "The security dilemma spirals. Each defensive move appears offensive to the other. Force concentrations on both sides reach concerning levels."
+      },
+      "branches": {
+        "CC": "turn_7_deescalation",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_7_escalation"
+      },
+      "default_next": "turn_7",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Negotiations break down over irreconcilable positions on Taiwan's status. Both sides blame the other for intransigence. The window for diplomatic resolution narrows."
+    },
+    {
+      "turn": 7,
+      "act": 2,
+      "narrative_briefing": "Military movements are now tracked minute-by-minute by both sides. Submarines have been deployed, and air defense networks are on high alert. Every action is interpreted through the lens of potential conflict.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 0.9,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.6,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.4,
+        "crash_payoff": -1.2,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "stand_down_signal",
+          "narrative_description": "Order a visible stand-down of some forward-deployed forces",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "ceasefire_proposal",
+          "narrative_description": "Propose a mutual freeze on military activities",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "demonstrate_capability",
+          "narrative_description": "Conduct a highly visible demonstration of military capability",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "commitment_signal",
+          "narrative_description": "Make public commitments that would be costly to reverse",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides pull back from the brink. A tacit understanding emerges that neither seeks war, and military postures stabilize.",
+        "CD": "Your de-escalation is met with continued pressure. The adversary interprets your restraint as a sign their strategy is working.",
+        "DC": "Your demonstration of resolve forces a climb-down. The adversary backs away from immediate confrontation, but resentment builds.",
+        "DD": "Commitment traps are set on both sides. Neither can back down without catastrophic loss of face. The situation approaches the point of no return."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_8",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The ceasefire proposal is rejected as a ploy. Both sides accuse the other of negotiating in bad faith. Military commanders begin planning for worst-case scenarios."
+    },
+    {
+      "turn": 8,
+      "act": 2,
+      "narrative_briefing": "Act II reaches its climax. Reports of live ammunition being distributed to front-line units. Civilian traffic in the Taiwan Strait has been diverted. The next 48 hours may determine whether decades of peace continue or end.",
+      "matrix_type": "leader",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 2.0,
+        "reward": 1.5,
+        "punishment": 0.0,
+        "sucker": 0.5,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "direct_communication",
+          "narrative_description": "Request direct leader-to-leader communication to prevent miscalculation",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "unilateral_restraint",
+          "narrative_description": "Order unilateral restraint on provocative military movements",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "escalation_ladder",
+          "narrative_description": "Move one step up the escalation ladder to demonstrate resolve",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "coalition_signal",
+          "narrative_description": "Signal coalition partners to prepare for potential contingencies",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "A leader-level phone call defuses immediate tensions. Both sides agree to pull back from the most dangerous positions. The crisis continues, but war is not imminent.",
+        "CD": "Your request for dialogue is ignored. While you show restraint, the adversary continues preparations, gambling that you will not respond.",
+        "DC": "Your escalation is successful. The adversary blinks first, and international pressure mounts on them to de-escalate.",
+        "DD": "Escalation matches escalation. Coalition forces begin mobilizing. Chinese forces move to higher readiness. The next incident could trigger war."
+      },
+      "branches": {
+        "CC": "turn_9_recovery",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_9_brink"
+      },
+      "default_next": "turn_9",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Direct communication is rejected. The adversary views your outreach as a sign of desperation. Both sides prepare for the possibility that diplomacy has failed."
+    },
+    {
+      "turn": 9,
+      "act": 3,
+      "narrative_briefing": "Act III begins. The world watches as the two great powers approach the brink. Every action is magnified. The margin for error is gone. This is the crucible where the fate of the Taiwan Strait\u2014and perhaps the international order\u2014will be determined.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.7,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.3,
+        "crash_payoff": -1.5,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "mutual_framework",
+          "narrative_description": "Propose a mutual framework for crisis de-escalation",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "symbolic_concession",
+          "narrative_description": "Offer a symbolic concession to give the other side a face-saving exit",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "final_warning",
+          "narrative_description": "Issue a final warning with clear consequences for continued escalation",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "demonstrate_readiness",
+          "narrative_description": "Demonstrate full combat readiness to make the threat credible",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides find a face-saving off-ramp. The framework is imperfect, but it prevents catastrophe. The immediate crisis begins to subside.",
+        "CD": "Your concession is pocketed without reciprocation. The adversary claims victory while you are left with a weakened position and domestic criticism.",
+        "DC": "Your final warning is heeded. The adversary pulls back, and your position is strengthened\u2014but the underlying tensions remain unresolved.",
+        "DD": "Both sides are locked in. A Chinese coast guard vessel rams a Philippine supply boat. American forces move to intervene. The guns are loaded."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_10",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The framework proposal is dismissed as unworkable. Both sides accuse the other of making impossible demands. The path to peaceful resolution grows ever narrower."
+    },
+    {
+      "turn": 10,
+      "act": 3,
+      "narrative_briefing": "The crisis continues into its most dangerous phase. Risk of accidental escalation is extreme. Crisis termination now becomes possible if tensions spiral beyond control. Every decision carries existential weight.",
+      "matrix_type": "security_dilemma",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.7,
+        "reward": 1.0,
+        "punishment": 0.2,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "mutual_withdrawal",
+          "narrative_description": "Propose mutual withdrawal from flashpoint areas",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "hold_fire_order",
+          "narrative_description": "Issue explicit hold-fire orders to all forces",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "local_superiority",
+          "narrative_description": "Establish local military superiority in key areas",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "escalation_dominance",
+          "narrative_description": "Signal willingness to escalate to the next level if necessary",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides implement withdrawals from the most dangerous flashpoints. The crisis de-escalates, though positions remain contested.",
+        "CD": "Your withdrawal is exploited. Forces move into areas you vacated, establishing new facts on the ground.",
+        "DC": "Your local superiority is established. The adversary's restraint is interpreted as weakness, shifting the strategic balance.",
+        "DD": "Escalation dominance is contested. Both sides demonstrate willingness to go further. Nuclear-capable platforms are moved into the theater."
+      },
+      "branches": {
+        "CC": "turn_11_cooling",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_11_nuclear"
+      },
+      "default_next": "turn_11",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Withdrawal proposals are rejected as preconditions for surrender. Both sides prepare for the possibility of extended confrontation or worse."
+    },
+    {
+      "turn": 11,
+      "act": 3,
+      "narrative_briefing": "The international community pleads for restraint. Economic costs are mounting. But neither side can appear to back down. The logic of commitment is now driving events more than rational calculation.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.8,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.2,
+        "crash_payoff": -2.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "international_mediation",
+          "narrative_description": "Accept international mediation and third-party involvement",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "face_saving_retreat",
+          "narrative_description": "Engineer a face-saving retreat from the most forward positions",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "double_down",
+          "narrative_description": "Double down on current positions, making retreat impossible",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "brinkmanship_test",
+          "narrative_description": "Test the adversary's resolve with a provocative but reversible action",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "International mediation is accepted. A UN-brokered ceasefire framework begins to take shape. The world exhales.",
+        "CD": "Your acceptance of mediation is portrayed as weakness. The adversary continues pressure while claiming you have already conceded.",
+        "DC": "Your resolve is rewarded as the adversary accepts mediation. You enter negotiations from a position of strength.",
+        "DD": "Both sides double down. A missile test goes wrong, striking within miles of civilian shipping. The next move could be the last."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_12",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Mediation collapses as both sides blame the other for bad faith. The mediators withdraw, warning of imminent catastrophe."
+    },
+    {
+      "turn": 12,
+      "act": 3,
+      "narrative_briefing": "The crisis enters its endgame. All previous turns have led to this moment. The decisions made now will determine whether this confrontation ends in a new equilibrium, a frozen conflict, or the catastrophe both sides claimed to want to avoid.",
+      "matrix_type": "matching_pennies",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "comprehensive_agreement",
+          "narrative_description": "Pursue a comprehensive agreement addressing root causes",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "modus_vivendi",
+          "narrative_description": "Seek a modus vivendi that restores strategic ambiguity",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "fait_accompli",
+          "narrative_description": "Attempt to establish a fait accompli while the adversary is constrained",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "final_pressure",
+          "narrative_description": "Apply final pressure to force maximum concessions",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Trust is rebuilt through mutual commitment. A new framework for Taiwan Strait stability emerges, imperfect but durable.",
+        "CD": "Your pursuit of agreement is exploited. The adversary secures concessions while offering nothing of substance in return.",
+        "DC": "Your final pressure succeeds. The adversary accepts terms that preserve your interests, though at the cost of lasting resentment.",
+        "DD": "Both sides attempt final pressure. A naval skirmish erupts. Ships are sunk. The shooting war that everyone feared has begun."
+      },
+      "branches": {
+        "CC": "turn_13_resolution",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_13_war"
+      },
+      "default_next": "turn_13",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Comprehensive agreement proves impossible. The chasm between positions is too wide. Both sides prepare for a protracted confrontation."
+    },
+    {
+      "turn": 13,
+      "act": 3,
+      "narrative_briefing": "The final phase. Regardless of how we arrived here, the ultimate outcome of this crisis will now be determined. History waits to record whether wisdom or tragedy prevails.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 0.9,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.8,
+        "reward": 1.1,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.3,
+        "crash_payoff": -2.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "peace_framework",
+          "narrative_description": "Commit to a long-term peace framework with verification mechanisms",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "status_quo_plus",
+          "narrative_description": "Accept a modified status quo that addresses some concerns",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "last_stand",
+          "narrative_description": "Take a last stand on core principles regardless of consequences",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "victory_or_ruin",
+          "narrative_description": "Push for outright victory, accepting the risk of mutual ruin",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Peace prevails. A new architecture for cross-strait relations is established. The world celebrates the triumph of diplomacy over destruction.",
+        "CD": "Your commitment to peace is not reciprocated. The adversary extracts concessions while maintaining pressure. A cold peace, but peace.",
+        "DC": "Your last stand forces the adversary to accept your terms. Victory is achieved, but at the cost of a bitter adversary waiting for revenge.",
+        "DD": "Mutual ruin. The shooting war escalates. Cities burn. The death toll mounts. The war everyone said would never happen is here."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_14",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The peace framework collapses. Both sides blame each other as the final hopes for diplomatic resolution fade."
+    },
+    {
+      "turn": 14,
+      "act": 3,
+      "narrative_briefing": "The final turn. Everything that came before has led to this moment. The Taiwan Strait Crisis will now be resolved\u2014one way or another. Make your final choice.",
+      "matrix_type": "security_dilemma",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.9,
+        "reward": 1.2,
+        "punishment": 0.2,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "lasting_peace",
+          "narrative_description": "Commit to lasting peace with institutional guarantees",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "graceful_exit",
+          "narrative_description": "Accept a graceful exit that preserves essential interests",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "final_gambit",
+          "narrative_description": "Execute a final gambit to secure maximum advantage",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "mutual_assured",
+          "narrative_description": "Embrace mutual assured destruction as the ultimate deterrent",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The Taiwan Strait Crisis ends in lasting peace. Both powers establish a framework for managing their differences. The world order adjusts. War was averted. History will remember those who chose restraint.",
+        "CD": "Your commitment to peace is exploited at the final moment. You achieve peace, but on unfavorable terms. The adversary claims victory, but at least the guns are silent.",
+        "DC": "Your final gambit succeeds. The adversary accepts peace on your terms. Strategic victory is yours, but the defeated power will remember.",
+        "DD": "Total war. Nuclear-capable systems are activated. The Pacific is engulfed in conflict. Cities are destroyed. Millions die. The catastrophe that all claimed to want to prevent has come. Neither side wins. Everyone loses."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": null,
+      "settlement_available": true,
+      "settlement_failed_narrative": "The final negotiation fails. There is nothing left to say. Both sides have made their choices, and now must live\u2014or die\u2014with the consequences."
+    }
+  ],
+  "branches": {
+    "turn_3_diplomatic": {
+      "turn": 3,
+      "act": 1,
+      "narrative_briefing": "The cooperative signals from both sides have created an unexpected opening. Back-channel communications suggest both capitals are looking for ways to reduce tensions without appearing weak. This may be a window for genuine de-escalation.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.2,
+        "hare_temptation": 1.4,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "build_trust",
+          "narrative_description": "Build on positive momentum with additional confidence-building measures",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "reciprocal_restraint",
+          "narrative_description": "Demonstrate reciprocal restraint in military activities",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "pocket_gains",
+          "narrative_description": "Pocket the gains from adversary restraint while maintaining pressure",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "test_limits",
+          "narrative_description": "Test whether the cooperative signals are genuine or a feint",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "A virtuous cycle develops. Both sides recognize mutual interest in stability, and a framework for ongoing dialogue takes shape.",
+        "CD": "Your trust is betrayed. The adversary used the cooperative moment to reposition forces. Your good faith was exploited.",
+        "DC": "Your testing reveals the adversary's restraint was genuine\u2014but your suspicion has now damaged the fragile trust being built.",
+        "DD": "The diplomatic opening closes as both sides revert to competitive postures. The opportunity for early de-escalation is lost."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_4",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    "turn_3_tense": {
+      "turn": 3,
+      "act": 1,
+      "narrative_briefing": "The near-collision over the Taiwan Strait has made international headlines. Both sides are under pressure to respond strongly. Military commanders are requesting rules of engagement changes. The situation is escalating faster than expected.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.6,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.4,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "immediate_deconfliction",
+          "narrative_description": "Propose immediate military-to-military deconfliction talks",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "pause_operations",
+          "narrative_description": "Pause provocative operations while awaiting adversary response",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "assert_rights",
+          "narrative_description": "Assert navigation rights with additional patrols",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "demand_apology",
+          "narrative_description": "Demand an apology and compensation for the dangerous incident",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides step back from the brink. The incident becomes a catalyst for new safety mechanisms rather than a casus belli.",
+        "CD": "Your restraint is met with escalation. The adversary demands you cease all operations in 'their' waters.",
+        "DC": "Your assertiveness pays off. The adversary backs down from the confrontation and agrees to deconfliction talks.",
+        "DD": "The confrontation intensifies. Both sides reinforce their positions. Another incident seems inevitable."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_4",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    "turn_5_hopeful": {
+      "turn": 5,
+      "act": 2,
+      "narrative_briefing": "The cooling-off period has held. Both sides have pulled back from the most dangerous postures. Now the harder work begins: translating temporary restraint into durable arrangements. The stakes remain high, but there is now room to maneuver.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.4,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "formalize_dialogue",
+          "narrative_description": "Propose formalizing the dialogue into a regular mechanism",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "extend_pause",
+          "narrative_description": "Extend the pause on military activities to build confidence",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "secure_gains",
+          "narrative_description": "Secure territorial and positional gains made during the crisis",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "reset_baseline",
+          "narrative_description": "Attempt to reset the baseline in your favor before normalizing",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Dialogue is formalized. Regular communication channels reduce the risk of future crises. A new normal begins to take shape.",
+        "CD": "Your extension of the pause is exploited. The adversary uses the time to consolidate gains while you wait.",
+        "DC": "Your opportunism succeeds. But the goodwill built during the cooling-off period is squandered.",
+        "DD": "Both sides attempt to revise the baseline. The pause collapses. The crisis resumes with renewed intensity."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_6",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The attempt to formalize dialogue fails as both sides cannot agree on the format and agenda. The hopeful moment passes."
+    },
+    "turn_5_hardened": {
+      "turn": 5,
+      "act": 2,
+      "narrative_briefing": "The confrontation phase has begun in earnest. Both sides have completed military preparations and diplomatic rhetoric has hardened. The international community watches with growing alarm. Every move now carries the weight of potential escalation.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.6,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.4,
+        "crash_payoff": -1.2,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "offer_offramp",
+          "narrative_description": "Quietly offer the adversary an off-ramp that preserves their face",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "signal_limits",
+          "narrative_description": "Signal clear limits on your own escalation to reduce miscalculation",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "press_advantage",
+          "narrative_description": "Press your current advantage before the adversary can adjust",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "raise_stakes",
+          "narrative_description": "Raise the stakes to force the adversary to back down",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides find a way to de-escalate without losing face. The immediate danger recedes, though tensions remain.",
+        "CD": "Your offer of an off-ramp is rejected. The adversary sees your restraint as weakness and presses harder.",
+        "DC": "Your pressure forces the adversary to accept the off-ramp. Crisis de-escalates, but on your terms.",
+        "DD": "Stakes are raised on both sides. Naval task forces move into close proximity. The next incident could be the spark."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_6",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The hardened positions make settlement impossible. Both sides view any compromise as unacceptable surrender."
+    },
+    "turn_7_deescalation": {
+      "turn": 7,
+      "act": 2,
+      "narrative_briefing": "The mutual transparency measures have created a foundation of trust. For the first time, both sides believe they understand the other's defensive intent. Military commanders report reduced tension. Now is the time to lock in these gains.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.1,
+        "hare_temptation": 1.4,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "codify_transparency",
+          "narrative_description": "Propose codifying transparency measures in a formal agreement",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "reduce_presence",
+          "narrative_description": "Begin reducing military presence as confidence builds",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "maintain_vigilance",
+          "narrative_description": "Maintain high vigilance despite the thaw\u2014trust but verify",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "exploit_opening",
+          "narrative_description": "Use the adversary's reduced guard to secure advantages",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "A formal agreement on transparency is reached. Both sides begin systematic de-escalation. The crisis may actually be ending.",
+        "CD": "Your pursuit of formal agreement is rejected. The adversary prefers the current informal understanding\u2014easier to walk away from.",
+        "DC": "Your vigilance pays off\u2014you catch the adversary trying to exploit the opening. Trust collapses.",
+        "DD": "Both sides remain suspicious despite the transparency. The opportunity for breakthrough is missed."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_8",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The agreement on transparency cannot be reached. Both sides retreat to previous positions, wasting the opportunity."
+    },
+    "turn_7_escalation": {
+      "turn": 7,
+      "act": 2,
+      "narrative_briefing": "The security dilemma has spiraled dangerously. Force concentrations on both sides have reached levels not seen since the 1996 crisis. Every defensive move is interpreted as preparation for offense. The risk of war is now acute.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.7,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.3,
+        "crash_payoff": -1.5,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "emergency_diplomacy",
+          "narrative_description": "Launch emergency diplomatic initiative to halt the spiral",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "unilateral_restraint",
+          "narrative_description": "Demonstrate unilateral restraint to break the action-reaction cycle",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "escalate_to_deescalate",
+          "narrative_description": "Escalate dramatically to force the adversary to back down",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "prepare_worst_case",
+          "narrative_description": "Prepare for worst case while continuing pressure",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Emergency diplomacy succeeds. Both sides agree to immediate force reductions. The spiral is halted.",
+        "CD": "Your diplomatic initiative is rejected. The adversary views your restraint as an opportunity to press.",
+        "DC": "Your escalation succeeds in forcing adversary restraint. But the relationship is now purely coercive.",
+        "DD": "Both sides prepare for war. Forces are at maximum readiness. The next 24 hours are the most dangerous in decades."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_8",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Emergency diplomacy fails. Both sides blame the other. Military commanders are now planning for conflict, not prevention."
+    },
+    "turn_9_recovery": {
+      "turn": 9,
+      "act": 3,
+      "narrative_briefing": "The leader-level phone call has defused the immediate danger. Both sides have agreed to pull back from forward positions. But the underlying issues remain unresolved. Act III will determine whether this respite becomes lasting peace or merely a pause before renewed confrontation.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.2,
+        "hare_temptation": 1.4,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "institutionalize_dialogue",
+          "narrative_description": "Institutionalize the leader-level dialogue into regular summits",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "confidence_building",
+          "narrative_description": "Propose a package of confidence-building measures",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "consolidate_position",
+          "narrative_description": "Consolidate your current position while dialogue continues",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "conditional_restraint",
+          "narrative_description": "Offer only conditional restraint linked to adversary concessions",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Dialogue is institutionalized. Both sides commit to regular communication. The foundation for lasting peace is laid.",
+        "CD": "Your proposal for summits is deflected. The adversary wants to keep options open rather than commit to regular dialogue.",
+        "DC": "Your conditional approach succeeds. The adversary agrees to concessions in exchange for your restraint.",
+        "DD": "Both sides condition future cooperation on the other moving first. Progress stalls. The respite may not last."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_10",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The attempt to institutionalize dialogue fails. Both sides are relieved tension is reduced but cannot agree on next steps."
+    },
+    "turn_9_brink": {
+      "turn": 9,
+      "act": 3,
+      "narrative_briefing": "The coalition forces are mobilizing. Chinese forces are at their highest readiness level. The shooting has not started, but the preparations for war are complete. Act III will now determine whether this ends in catastrophe or whether, somehow, the brink can still be stepped back from.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.8,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.2,
+        "crash_payoff": -2.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "last_chance_diplomacy",
+          "narrative_description": "Launch one final diplomatic initiative\u2014the last chance to prevent war",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "signal_willingness_to_stop",
+          "narrative_description": "Signal willingness to stop if the adversary reciprocates",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "cross_rubicon",
+          "narrative_description": "Cross a threshold that demonstrates absolute commitment",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "preemptive_action",
+          "narrative_description": "Consider preemptive action to prevent adversary first strike",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "At the brink of catastrophe, both sides pull back. The world watches in relief as the immediate threat of war recedes.",
+        "CD": "Your diplomatic initiative is dismissed as weakness. The adversary interprets your restraint as proof their pressure is working.",
+        "DC": "Your threshold-crossing forces the adversary to halt. They accept terms to avoid war, but harbor deep resentment.",
+        "DD": "Both sides cross the threshold. A missile strikes a naval vessel. The exchange of fire begins. War has come to the Pacific."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_10",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The final diplomatic initiative fails. Both sides blame the other as the world braces for war."
+    },
+    "turn_11_cooling": {
+      "turn": 11,
+      "act": 3,
+      "narrative_briefing": "The mutual withdrawal from flashpoints has created space for negotiation. International mediators have arrived. For the first time in weeks, military commanders are planning de-escalation rather than operations. The path to peace is visible, if both sides choose to walk it.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.3,
+        "hare_temptation": 1.4,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "comprehensive_settlement",
+          "narrative_description": "Work with mediators toward a comprehensive settlement",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "step_by_step",
+          "narrative_description": "Propose step-by-step confidence building before final settlement",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "maximize_terms",
+          "narrative_description": "Use the favorable moment to maximize terms in any settlement",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "delay_and_consolidate",
+          "narrative_description": "Delay settlement while consolidating gains from the crisis",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Comprehensive settlement negotiations begin in earnest. Both sides make genuine concessions. Peace is within reach.",
+        "CD": "Your pursuit of settlement is exploited. The adversary uses the negotiations to buy time while strengthening positions.",
+        "DC": "Your maximizing strategy succeeds. The adversary accepts unfavorable terms rather than risk resumed escalation.",
+        "DD": "Both sides attempt to delay and consolidate. Mediators withdraw in frustration. The cooling period ends."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_12",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The comprehensive settlement talks break down. Mediators continue to try but both sides are reverting to competitive postures."
+    },
+    "turn_11_nuclear": {
+      "turn": 11,
+      "act": 3,
+      "narrative_briefing": "Nuclear-capable platforms have been moved into the theater. Both sides deny targeting, but both sides understand the implications. The shadow of nuclear war now hangs over every decision. This is the most dangerous moment in human history since the Cuban Missile Crisis.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.9,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.1,
+        "crash_payoff": -3.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "nuclear_deescalation",
+          "narrative_description": "Propose mutual nuclear de-escalation as a first step",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "no_first_use_pledge",
+          "narrative_description": "Reiterate no-first-use pledge and request reciprocation",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "nuclear_signaling",
+          "narrative_description": "Conduct visible nuclear signaling to reinforce deterrence",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "launch_authority_delegation",
+          "narrative_description": "Delegate launch authority to theater commanders as commitment device",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides step back from nuclear brinkmanship. Platforms are withdrawn. The conventional crisis remains, but nuclear escalation is avoided.",
+        "CD": "Your nuclear de-escalation is met with continued signaling. The adversary believes nuclear threats are working.",
+        "DC": "Your nuclear signaling forces the adversary to de-escalate. But the nuclear threshold has been lowered forever.",
+        "DD": "Nuclear signaling intensifies on both sides. Launch authorities are delegated. A single mistake could now end civilization."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_12",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Nuclear de-escalation proposals are rejected. Both sides continue nuclear posturing. The risk of humanity-ending catastrophe is real."
+    },
+    "turn_13_resolution": {
+      "turn": 13,
+      "act": 3,
+      "narrative_briefing": "A new framework for Taiwan Strait stability is emerging. Both sides have made genuine concessions. The crisis that brought the world to the brink of war may instead become the foundation for a more stable peace. The final details must now be resolved.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.4,
+        "hare_temptation": 1.3,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "sign_framework",
+          "narrative_description": "Sign the framework agreement and commit to implementation",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "final_concession",
+          "narrative_description": "Make a final concession to seal the deal",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "last_minute_revision",
+          "narrative_description": "Seek last-minute revisions to improve your terms",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "preserve_options",
+          "narrative_description": "Sign with reservations that preserve future options",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The framework is signed without reservations. Both sides commit to full implementation. The Taiwan Strait Crisis ends in genuine peace.",
+        "CD": "Your final concession is not reciprocated. The framework is signed, but with asymmetric commitments that favor the adversary.",
+        "DC": "Your last-minute revisions succeed. The framework is signed on favorable terms. Peace is achieved on your terms.",
+        "DD": "Both sides sign with reservations. The framework is weak and ambiguous. Peace is achieved, but it may not last."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_14",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The framework agreement collapses at the last moment. Both sides blame the other as the opportunity for peace slips away."
+    },
+    "turn_13_war": {
+      "turn": 13,
+      "act": 3,
+      "narrative_briefing": "Ships have been sunk. Casualties have been taken. The shooting war that both sides claimed to want to avoid has begun. Now the only question is whether it can be stopped before it escalates further\u2014or whether this is the beginning of the great power war that will define the century.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.9,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.1,
+        "crash_payoff": -3.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "immediate_ceasefire",
+          "narrative_description": "Propose immediate ceasefire before further escalation",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "limit_war",
+          "narrative_description": "Signal willingness to limit the war to prevent nuclear escalation",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "decisive_victory",
+          "narrative_description": "Press for decisive victory before the adversary can recover",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "horizontal_escalation",
+          "narrative_description": "Horizontally escalate to additional theaters to spread adversary thin",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Ceasefire is agreed. The war ends with an armistice. Casualties are grieved, but further destruction is prevented.",
+        "CD": "Your ceasefire proposal is rejected. The adversary presses the attack while you hold fire. Your position deteriorates.",
+        "DC": "Your decisive push succeeds. The adversary accepts ceasefire on your terms. Victory, but at terrible cost.",
+        "DD": "The war escalates. Additional theaters are opened. The conflict spreads. Nuclear weapons remain in reserve\u2014for now."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_14",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Ceasefire negotiations collapse. Both sides continue military operations. The war will be decided by force of arms."
+    }
+  },
+  "personas": {
+    "side_a": {
+      "persona": "kissinger",
+      "role_name": "American Diplomat",
+      "role_description": "US diplomatic representative managing the delicate Taiwan situation."
+    },
+    "side_b": {
+      "persona": "khrushchev",
+      "role_name": "Communist Leadership",
+      "role_description": "Representative of Communist bloc interests in the region."
+    }
+  }
+}

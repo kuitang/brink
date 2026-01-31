@@ -1,0 +1,29 @@
+# fly.toml - Fly.io configuration for Brinksmanship webapp
+# See https://fly.io/docs/reference/configuration/ for reference
+
+app = 'brink'
+primary_region = 'ewr'
+
+[build]
+
+[env]
+  PORT = "8080"
+  # Database path on persistent volume
+  DATABASE_URL = "sqlite:////data/brinksmanship.db"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['app']
+
+[[vm]]
+  memory = '1gb'
+  cpu_kind = 'shared'
+  cpus = 1
+
+[[mounts]]
+  source = 'brink_data'
+  destination = '/data'

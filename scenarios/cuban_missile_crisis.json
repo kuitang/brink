@@ -1,0 +1,2317 @@
+{
+  "scenario_id": "cuban_missile_crisis_1962",
+  "title": "Cuban Missile Crisis",
+  "theme": "cold-war",
+  "setting": "Cuban Missile Crisis, October 1962. Kennedy vs Khrushchev. Nuclear brinkmanship\nover Soviet missiles in Cuba. The world stands on the brink of nuclear war as two superpowers\nface off in the most dangerous confrontation of the Cold War. Kennedy must balance domestic\npolitical pressure with the risk of escalation, while Khrushchev seeks to protect his Cuban\nally without triggering armageddon.",
+  "max_turns": 14,
+  "turns": [
+    {
+      "turn": 1,
+      "act": 1,
+      "narrative_briefing": "October 16, 1962. U-2 reconnaissance photographs confirm the presence of Soviet medium-range ballistic missiles in Cuba. The Executive Committee of the National Security Council convenes in secret. Both superpowers must decide their opening posture before the crisis becomes public.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "private_diplomacy",
+          "narrative_description": "Establish private back-channel communications before going public. Seek to understand opponent's true intentions.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "quiet_preparations",
+          "narrative_description": "Make quiet military preparations while keeping options open for negotiation.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "immediate_ultimatum",
+          "narrative_description": "Issue immediate demands through official channels. Make clear this situation is unacceptable.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "military_mobilization",
+          "narrative_description": "Begin visible military mobilization to demonstrate resolve and readiness.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides choose restraint. Private channels open between Washington and Moscow. The crisis remains contained, known only to inner circles. There may be room for a face-saving resolution.",
+        "CD": "You extended an olive branch while your opponent prepared for confrontation. Your gesture of goodwill was met with hardening positions. You appear weak while they consolidate their stance.",
+        "DC": "Your firm stance catches your opponent seeking accommodation. They appear unprepared, scrambling to respond to your show of resolve. Initiative shifts your way.",
+        "DD": "Both sides open with confrontation. Military assets move into position as rhetoric hardens. The crisis has begun with both parties committed to hardline postures. De-escalation will now require someone to blink."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_2",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    {
+      "turn": 2,
+      "act": 1,
+      "narrative_briefing": "October 18, 1962. Intelligence reports flood in from both sides. The Americans consider their options: blockade, airstrikes, or invasion. The Soviets must decide whether to accelerate missile deployment or pause to assess American intentions. Both sides desperately need information about the other's true resolve.",
+      "matrix_type": "inspection_game",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "intensive_reconnaissance",
+          "narrative_description": "Increase U-2 overflights and intelligence gathering. Verify opponent's deployments and intentions before acting.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "diplomatic_probing",
+          "narrative_description": "Send diplomatic feelers through multiple channels to gauge opponent's flexibility.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "accelerate_preparations",
+          "narrative_description": "Rush military preparations while opponent gathers intelligence. Use the time to improve your position.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "deception_operations",
+          "narrative_description": "Feed disinformation through known intelligence channels. Confuse opponent about your true capabilities and intentions.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides invest in understanding rather than acting. Intelligence assessments become clearer. Each side begins to grasp the other's red lines and potential off-ramps. The fog of crisis lifts slightly.",
+        "CD": "Your careful intelligence work reveals an opponent rushing to exploit the situation. Their deception is penetrated; you now understand their strategy better than they realize.",
+        "DC": "While you pressed your advantage, your opponent mapped your true position. They've gained insight into your capabilities and constraints that may prove costly.",
+        "DD": "Both sides chose action over understanding. Military preparations accelerate on both sides while intelligence pictures remain murky. Each side operates on worst-case assumptions about the other."
+      },
+      "branches": {
+        "CC": "turn_3_diplomatic",
+        "CD": "turn_3_diplomatic",
+        "DC": "turn_3_tense",
+        "DD": "turn_3_tense"
+      },
+      "default_next": "turn_3",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    {
+      "turn": 3,
+      "act": 1,
+      "narrative_briefing": "October 20, 1962. The moment of decision approaches. Kennedy must choose how to reveal the crisis to the world. Khrushchev must decide whether to complete the missile installations or seek a diplomatic exit. The next 48 hours will determine whether this becomes a confrontation or a negotiation.",
+      "matrix_type": "prisoners_dilemma",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "measured_announcement",
+          "narrative_description": "Announce the crisis publicly but emphasize desire for peaceful resolution. Leave doors open.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "seek_backchannel_deal",
+          "narrative_description": "Intensify secret negotiations to find a face-saving compromise before public confrontation.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "dramatic_revelation",
+          "narrative_description": "Reveal the crisis in the most damaging way possible to opponent's credibility. Seize the narrative.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "fait_accompli",
+          "narrative_description": "Rush to complete your strategic moves before opponent can respond. Present them with accomplished facts.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides manage the public revelation carefully. The crisis is acknowledged, but rhetoric remains measured. International opinion is alarmed but not panicked. Space remains for diplomacy.",
+        "CD": "Your measured approach was exploited. While you sought accommodation, your opponent seized the narrative and completed strategic preparations. You appear reactive and uncertain.",
+        "DC": "Your aggressive move caught your opponent off-guard. Their conciliatory posture looks like weakness as you dictate the terms of engagement. Momentum is yours.",
+        "DD": "The crisis explodes into public view with maximum drama. Both sides issue stark warnings. Allied capitals panic. The United Nations convenes emergency sessions. Escalation pressures mount rapidly."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_4",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    {
+      "turn": 4,
+      "act": 1,
+      "narrative_briefing": "October 22, 1962. Kennedy addresses the nation, revealing Soviet missiles in Cuba. The naval 'quarantine' is announced. Soviet ships carrying missile components steam toward Cuba. The world holds its breath as the first direct superpower confrontation unfolds.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "limited_quarantine",
+          "narrative_description": "Implement blockade but allow non-military ships through. Signal firmness with restraint.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "offer_negotiations",
+          "narrative_description": "Publicly call for immediate summit negotiations while maintaining defensive posture.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "total_blockade",
+          "narrative_description": "Enforce complete naval blockade. Stop and board all Soviet vessels approaching Cuba.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "challenge_directly",
+          "narrative_description": "Order direct interception of Soviet ships. Force a confrontation at sea.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides show restraint at the quarantine line. Soviet ships slow their approach. American vessels hold position but don't force confrontation. The blockade becomes a pause point, not a flashpoint.",
+        "CD": "Your restrained approach was met with aggression. Soviet ships challenged the quarantine line while you hesitated. Your credibility suffers as you appear unwilling to enforce your own ultimatum.",
+        "DC": "Your firm enforcement of the blockade paid off. Soviet ships halted or turned back as you demonstrated resolve. The Kremlin must now reassess its position.",
+        "DD": "Naval confrontation at the quarantine line. Ships come within visual range, weapons trained. Only last-minute orders from both capitals prevent an exchange of fire. The world has come within minutes of war."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": "turn_5_crisis"
+      },
+      "default_next": "turn_5",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    {
+      "turn": 5,
+      "act": 2,
+      "narrative_briefing": "October 24, 1962. The quarantine line holds, but Soviet missiles in Cuba are becoming operational. Each day brings them closer to full readiness. American forces mass in Florida for possible invasion. Back-channel communications hint at possible deals, but public positions remain hardened.",
+      "matrix_type": "security_dilemma",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "halt_deployments",
+          "narrative_description": "Pause military buildups and signal willingness to negotiate. Accept strategic pause.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "explore_trade",
+          "narrative_description": "Quietly explore a missile trade\u2014Cuban missiles for Turkish Jupiters\u2014through back channels.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "continue_buildup",
+          "narrative_description": "Continue strengthening military position. Complete missile installations or invasion preparations.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "demonstrate_force",
+          "narrative_description": "Conduct major military exercises near the crisis zone. Show capability and resolve.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides pause their buildups. The military pressure eases slightly as diplomats work frantically. A framework for negotiation begins to emerge. The worst possibilities recede.",
+        "CD": "You paused while your opponent continued building strength. Your gesture of goodwill was pocketed without reciprocation. Your strategic position has weakened.",
+        "DC": "Your continued preparations while your opponent paused gives you significant leverage. They've shown willingness to compromise; you've shown resolve. The correlation of forces shifts.",
+        "DD": "The arms race accelerates within the crisis. More missiles become operational. More invasion forces assemble. Each side's defensive measures appear offensive to the other. The spiral tightens."
+      },
+      "branches": {
+        "CC": "turn_6_hopeful",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_6_dire"
+      },
+      "default_next": "turn_6",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The settlement proposal collapsed. Your opponent rejected the terms, and the failed negotiation has only deepened mutual suspicion. The crisis continues with even less trust between the parties."
+    },
+    {
+      "turn": 6,
+      "act": 2,
+      "narrative_briefing": "October 25, 1962. UN Ambassador Adlai Stevenson confronts Soviet Ambassador Zorin with photographic evidence at the Security Council. 'Don't wait for the translation!' The world watches as the superpowers clash in the court of global opinion while their militaries remain on hair-trigger alert.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.6,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.4,
+        "crash_payoff": -1.2,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "accept_scrutiny",
+          "narrative_description": "Accept international inspection and oversight. Let the truth speak for itself.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "propose_summit",
+          "narrative_description": "Call for immediate superpower summit to resolve the crisis at the highest level.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "press_advantage",
+          "narrative_description": "Exploit the diplomatic opening to maximum effect. Demand unconditional opponent capitulation.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "defiant_denial",
+          "narrative_description": "Deny, deflect, and counterattack in the diplomatic arena. Never concede ground.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides engage constructively at the UN. A framework emerges: missiles removed under international supervision, guarantees against invasion. The outlines of a deal become visible.",
+        "CD": "Your openness was met with stonewalling. While you accepted scrutiny, your opponent maintained defiance. You appear accommodating; they appear strong. Public opinion is mixed.",
+        "DC": "Your aggressive diplomacy dominated the proceedings while your opponent retreated. International opinion swings your way as you control the narrative. Pressure mounts on them to concede.",
+        "DD": "The UN session becomes a propaganda battleground. Both sides hurl accusations. Neutral nations despair of mediation. The Security Council fails to produce any resolution. Military options move to the forefront."
+      },
+      "branches": {
+        "CC": "turn_7_breakthrough",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_7_escalation"
+      },
+      "default_next": "turn_7",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The UN framework collapsed when your opponent rejected the terms. Stevenson's evidence swayed global opinion, but Soviet intransigence\u2014or American overreach\u2014killed the diplomatic moment. The crisis deepens."
+    },
+    {
+      "turn": 7,
+      "act": 2,
+      "narrative_briefing": "October 26, 1962. A long, emotional letter arrives from Khrushchev offering a deal: Soviet missiles withdrawn in exchange for American pledge not to invade Cuba. Before Kennedy can respond, a second, harder letter arrives demanding removal of Jupiter missiles from Turkey. Which letter represents Soviet policy?",
+      "matrix_type": "reconnaissance",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "accept_first_letter",
+          "narrative_description": "Respond to the conciliatory letter, ignoring the harder one. Give opponent a face-saving exit.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "offer_secret_deal",
+          "narrative_description": "Secretly agree to remove Turkish missiles in exchange for Cuban withdrawal. Public concession on invasion guarantee only.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "reject_all_conditions",
+          "narrative_description": "Reject both letters. Demand unconditional withdrawal. No concessions, public or private.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "set_ultimatum",
+          "narrative_description": "Issue final deadline for missile removal. Make clear military action will follow non-compliance.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides seize the opportunity for de-escalation. The back-channel deal takes shape: Cuban missiles out, American invasion pledge, quiet understanding on Turkey. The framework for resolution solidifies.",
+        "CD": "Your attempt to find common ground was rebuffed. Your opponent hardened their demands while you offered flexibility. The moderate faction in your opponent's government has lost influence.",
+        "DC": "Your rejection of compromise caught your opponent extending an olive branch. They look desperate while you look strong. But have you closed off the best exit from this crisis?",
+        "DD": "Both sides rejected compromise. The letters go unanswered or rebuffed. Hardliners dominate in both capitals. The window for diplomatic resolution is closing rapidly."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_8",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The letter exchange produced nothing. What seemed like a breakthrough\u2014Khrushchev's emotional appeal, Kennedy's measured response\u2014collapsed when the actual terms proved unacceptable. The clock continues to tick."
+    },
+    {
+      "turn": 8,
+      "act": 2,
+      "narrative_briefing": "October 27, 1962\u2014Black Saturday. A U-2 is shot down over Cuba, killing Major Rudolf Anderson. Another U-2 strays into Soviet airspace over Siberia. Castro urges Khrushchev to launch a nuclear first strike. Curtis LeMay urges Kennedy to begin bombing. The generals on both sides strain at their leashes.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.7,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.3,
+        "crash_payoff": -1.5,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "ignore_shootdown",
+          "narrative_description": "Treat the U-2 incident as unauthorized. Do not retaliate. Keep the diplomatic track alive.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "final_appeal",
+          "narrative_description": "Send urgent personal message to opposing leader. Make clear this is the last chance before military action.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "limited_strike",
+          "narrative_description": "Authorize limited retaliatory strikes on SAM sites. Show that attacks on your forces will not go unpunished.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "general_attack",
+          "narrative_description": "Begin full military operations. The diplomatic path has failed; only force remains.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides step back from the abyss. The U-2 incidents are treated as unauthorized. The hot line burns with urgent messages. Leaders overrule their generals. This is not the day the world ends.",
+        "CD": "Your restraint was met with aggression. While you held fire, your opponent struck. Your forces have taken losses while you hesitated. Domestic pressure for retaliation becomes overwhelming.",
+        "DC": "Your strike succeeded while your opponent held back. Their restraint looks like paralysis. Your military advisors are vindicated; their moderates are discredited. But retaliation may be coming.",
+        "DD": "The shooting war begins. Limited strikes escalate. Air defenses engage. Ships exchange fire. Both capitals face the ultimate question: does this remain conventional, or does someone reach for the nuclear button?"
+      },
+      "branches": {
+        "CC": "turn_9_resolution",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_9_brink"
+      },
+      "default_next": "turn_9",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Black Saturday ends with no resolution. Major Anderson's death goes unanswered\u2014or avenged\u2014but the underlying crisis remains. Tomorrow brings either breakthrough or catastrophe."
+    },
+    {
+      "turn": 9,
+      "act": 3,
+      "narrative_briefing": "October 28, 1962. The crisis reaches its climax. Khrushchev must decide whether to withdraw the missiles or escalate further. Kennedy must decide whether to accept a deal or proceed with military options. The world waits for Radio Moscow's announcement. Everything depends on the next few hours.",
+      "matrix_type": "prisoners_dilemma",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.6,
+        "reward": 1.2,
+        "punishment": 0.2,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "announce_withdrawal",
+          "narrative_description": "Announce missile withdrawal and accept the deal on the table. End the crisis.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "accept_terms",
+          "narrative_description": "Accept opponent's terms for resolution. Guarantee no invasion or reciprocal withdrawal.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "demand_more",
+          "narrative_description": "Pocket opponent's concessions and demand additional terms. Extract maximum advantage.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "prepare_final_option",
+          "narrative_description": "Make final military preparations. If opponent doesn't capitulate, proceed with attack.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The crisis ends. Khrushchev announces missile withdrawal on Radio Moscow. Kennedy pledges no invasion of Cuba. Secret understanding on Turkey. The world steps back from the brink. Humanity survives.",
+        "CD": "You offered resolution while your opponent sought advantage. Your concessions were pocketed, additional demands issued. The deal that could have ended the crisis is slipping away.",
+        "DC": "Your demands for more were met with capitulation. Your opponent gave in across the board. Victory\u2014but at what cost to their dignity? Seeds of future crisis may have been planted.",
+        "DD": "Neither side will accept the other's terms. Mutual demands escalate. The deal collapses. Military options move from contingency to implementation. The clock runs out on diplomacy."
+      },
+      "branches": {
+        "CC": "turn_10_aftermath",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_10_countdown"
+      },
+      "default_next": "turn_10",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The settlement that would have ended the crisis collapsed at the final moment. Neither side could accept the other's terms. October 28 brings no resolution, only the continuation of existential danger."
+    },
+    {
+      "turn": 10,
+      "act": 3,
+      "narrative_briefing": "The announced resolution faces implementation challenges. Verification of missile removal, timeline for withdrawal, status of nuclear warheads already in Cuba\u2014each detail threatens to unravel the fragile agreement. Or if no agreement exists, each hour brings the military option closer.",
+      "matrix_type": "inspection_game",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.35,
+        "cheat_gain": 0.6,
+        "caught_penalty": 1.2,
+        "loss_if_exploited": 0.8
+      },
+      "actions": [
+        {
+          "action_id": "full_compliance",
+          "narrative_description": "Begin immediate, visible implementation of agreement terms. Allow verification.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "trust_opponent",
+          "narrative_description": "Trust opponent's good faith without demanding intrusive verification. Focus on moving forward.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "delay_compliance",
+          "narrative_description": "Slow-roll implementation while extracting additional concessions. Use compliance as leverage.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "demand_verification",
+          "narrative_description": "Insist on rigorous verification before any reciprocal concessions. Trust nothing.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Implementation proceeds smoothly. Missiles are crated and loaded onto ships under observation. Invasion forces stand down. The crisis enters its resolution phase with both sides honoring their commitments.",
+        "CD": "Your good faith was exploited. While you implemented your commitments, your opponent dragged their feet and sought additional gains. The agreement is in jeopardy.",
+        "DC": "Your insistence on verification revealed opponent's attempted deception. Your distrust was justified. Additional concessions are extracted as price for their bad faith.",
+        "DD": "Mutual suspicion paralyzes implementation. Each side accuses the other of cheating. Verification demands become pretexts for delay. The agreement exists on paper only."
+      },
+      "branches": {
+        "CC": "turn_11_peace",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_11_unraveling"
+      },
+      "default_next": "turn_11",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The implementation collapsed into mutual accusations. What should have been the end of the crisis became a new phase of confrontation over verification and compliance."
+    },
+    {
+      "turn": 11,
+      "act": 3,
+      "narrative_briefing": "November 1962. The world watches as the agreement is tested. Soviet ships depart Cuba\u2014or don't. American forces stand down\u2014or remain on alert. Castro rages against any deal made over Cuba's head. The crisis may be ending, or may be entering a new phase.",
+      "matrix_type": "matching_pennies",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "complete_withdrawal",
+          "narrative_description": "Complete all agreed withdrawals and commitments. Demonstrate full compliance.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "build_relations",
+          "narrative_description": "Begin discussions on broader arms control and communication improvements. Turn crisis into opportunity.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "retain_leverage",
+          "narrative_description": "Keep some forces in place or some missiles uncrated. Maintain pressure and options.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "exploit_weakness",
+          "narrative_description": "Take advantage of opponent's compliance to improve your strategic position elsewhere.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The agreement holds. Missiles leave Cuba. Jupiter missiles quietly depart Turkey. A hotline is established between Washington and Moscow. The crisis becomes a turning point toward d\u00e9tente.",
+        "CD": "Your full compliance was met with continued pressure. While you honored every commitment, your opponent sought to exploit your good faith. Trust erodes.",
+        "DC": "Your retention of leverage while opponent complied fully gives you the upper hand. But your opportunism may have poisoned the well for future cooperation.",
+        "DD": "Neither side fully implements the agreement. Missiles remain or forces stay on alert. The formal crisis may be over, but a new cold war phase has begun with heightened tensions."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_12",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The November negotiations collapsed. The crisis drags on as implementation fails. What should have been resolution becomes protracted confrontation."
+    },
+    {
+      "turn": 12,
+      "act": 3,
+      "narrative_briefing": "Late November 1962. The IL-28 bombers remain a sticking point. Castro refuses UN inspectors on Cuban soil. Verification disputes threaten to unravel everything. Or perhaps the crisis is truly over and both sides are looking to the future. The final shape of the post-crisis world hangs in the balance.",
+      "matrix_type": "security_dilemma",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.1,
+        "punishment": 0.25,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "final_concession",
+          "narrative_description": "Make the last concessions needed to finalize the agreement. Accept less than perfect terms.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "declare_success",
+          "narrative_description": "Declare the crisis resolved and begin normalization efforts. Move on.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "hold_firm",
+          "narrative_description": "Refuse final concessions. Insist on complete compliance with all original terms.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "reopen_demands",
+          "narrative_description": "Use remaining leverage to extract additional concessions beyond the original agreement.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The final obstacles are cleared. IL-28s depart. Quarantine lifts. Both leaders declare victory to their domestic audiences. The most dangerous moment in human history has passed.",
+        "CD": "Your concession was met with new demands. The agreement you thought was final keeps expanding in your opponent's favor. Domestic critics accuse you of appeasement.",
+        "DC": "Your firmness paid off with final capitulation. Every term is met. But your opponent's humiliation is complete\u2014and humiliated powers remember.",
+        "DD": "The agreement unravels. Each side accuses the other of bad faith. The crisis is not resolved\u2014merely frozen. A cold peace descends, worse than before October."
+      },
+      "branches": {
+        "CC": "turn_13_legacy_peace",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_13_legacy_cold"
+      },
+      "default_next": "turn_13",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The final settlement collapsed over verification and bomber withdrawal. The crisis that should have been over continues to poison superpower relations."
+    },
+    {
+      "turn": 13,
+      "act": 3,
+      "narrative_briefing": "December 1962. The immediate crisis is past, but its legacy remains to be written. Will this near-miss lead to arms control and communication? Or will both sides draw lessons about the value of nuclear brinkmanship? The future of the Cold War depends on what happens next.",
+      "matrix_type": "harmony",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.0,
+        "reward": 1.5,
+        "punishment": 0.0,
+        "sucker": 0.5,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "arms_control_initiative",
+          "narrative_description": "Propose comprehensive arms control negotiations. Turn the crisis into a turning point.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "hotline_agreement",
+          "narrative_description": "Establish permanent crisis communication channels. Ensure this never happens again.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "military_buildup",
+          "narrative_description": "Learn the lesson that nuclear superiority wins crises. Accelerate the arms race.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "strategic_pressure",
+          "narrative_description": "Maintain pressure on opponent. The crisis revealed their weakness\u2014exploit it.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both superpowers choose to learn from their brush with extinction. The Test Ban Treaty begins negotiation. The hotline is installed. The seeds of d\u00e9tente are planted. October 1962 becomes a turning point toward peace.",
+        "CD": "Your arms control initiative was rebuffed. While you sought lasting peace, your opponent prepared for the next confrontation. The opportunity for transformation is lost.",
+        "DC": "Your pressure tactics worked in the short term but foreclosed long-term cooperation. Your opponent will not forget this humiliation. The next crisis may not end as well.",
+        "DD": "Both sides draw the wrong lessons. Arms races accelerate. Proxy conflicts intensify. October 1962 was just a preview of worse to come. The Cold War enters its most dangerous phase."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": "turn_14_darkness"
+      },
+      "default_next": "turn_14",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The post-crisis negotiations failed. What could have been a new beginning became a continuation of confrontation by other means."
+    },
+    {
+      "turn": 14,
+      "act": 3,
+      "narrative_briefing": "January 1963. A new year begins in the shadow of October. The crisis taught both superpowers something\u2014but what? The final moves will determine whether humanity learned to avoid the brink, or merely how to approach it more skillfully. History awaits its verdict.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.5,
+        "hare_temptation": 1.2,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "peace_initiative",
+          "narrative_description": "Launch major peace initiative building on crisis lessons. Propose lasting framework for coexistence.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "normalize_relations",
+          "narrative_description": "Begin normalizing relations and reducing tensions across all fronts.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "consolidate_gains",
+          "narrative_description": "Consolidate strategic gains from the crisis. Ensure opponent cannot reverse the outcome.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "prepare_next_crisis",
+          "narrative_description": "The crisis proved brinkmanship works. Prepare for the next confrontation from a stronger position.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The Cuban Missile Crisis becomes humanity's greatest near-miss and greatest lesson. Arms control advances. Communication improves. The world remains dangerous, but catastrophe has been averted\u2014and perhaps prevented forever.",
+        "CD": "Your peace initiative was rejected. History will record that one power sought lasting peace while the other prepared for war. The next crisis may have a different ending.",
+        "DC": "You emerged stronger from the crisis by exploiting your opponent's desire for peace. Short-term victory, but at what long-term cost? The seeds of future confrontation are planted.",
+        "DD": "Both superpowers chose confrontation over cooperation. The Cuban Missile Crisis taught nothing except that the other side cannot be trusted. The doomsday clock moves closer to midnight. Nuclear war is not prevented, merely postponed."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": null,
+      "settlement_available": true,
+      "settlement_failed_narrative": "The final opportunity for settlement has passed. The crisis ends not with resolution but exhaustion. Both sides claim victory; both sides prepare for the next confrontation."
+    }
+  ],
+  "branches": {
+    "turn_3_diplomatic": {
+      "turn": 3,
+      "act": 1,
+      "narrative_briefing": "October 20, 1962. The initial intelligence exchange has created unexpected understanding. Both sides know more about each other's positions and constraints than their domestic audiences realize. A window exists for quiet resolution before public confrontation.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.2,
+        "hare_temptation": 1.4,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "private_deal",
+          "narrative_description": "Attempt to resolve the crisis entirely through back channels before any public announcement.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "soft_announcement",
+          "narrative_description": "Announce the situation publicly but frame it as manageable, with resolution already in progress.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "public_pressure",
+          "narrative_description": "Use public announcement to maximize pressure on opponent. Force their hand.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "strategic_leak",
+          "narrative_description": "Leak selective information to the press to shape the narrative in your favor.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The back-channel relationship deepens. Both sides manage the public revelation together, presenting a crisis already on its way to resolution. The world is alarmed but reassured.",
+        "CD": "Your private overtures were exploited. While you sought quiet resolution, your opponent prepared a public ambush. You're caught off-guard as the crisis goes public on their terms.",
+        "DC": "Your public pressure caught your opponent still hoping for private resolution. They appear naive while you control the narrative.",
+        "DD": "The diplomatic opening closes. Both sides resort to public pressure tactics. The early cooperation is forgotten as hardliners gain control of both governments' crisis response."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_4",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    "turn_3_tense": {
+      "turn": 3,
+      "act": 1,
+      "narrative_briefing": "October 20, 1962. The early confrontation has hardened positions on both sides. Intelligence is murky, intentions unclear. Each side fears the worst about the other's plans. The moment of decision approaches with maximum uncertainty and minimum trust.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.6,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.4,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "pause_escalation",
+          "narrative_description": "Halt the spiral. Pause military preparations and signal openness to negotiation despite tensions.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "measured_response",
+          "narrative_description": "Continue preparations but signal that negotiation remains possible. Keep all options open.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "double_down",
+          "narrative_description": "Accelerate preparations and harden rhetoric. Show opponent you won't be intimidated.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "preemptive_move",
+          "narrative_description": "Make a major strategic move before opponent can respond. Seize the initiative.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides step back from the brink. The early confrontation is recognized as mutual posturing. A pause emerges that allows cooler heads to reassert control.",
+        "CD": "Your pause was seen as weakness. While you sought de-escalation, your opponent pressed forward. You've lost initiative and appear to be backing down.",
+        "DC": "Your continued pressure while opponent paused puts you in the driver's seat. They've blinked first. The question is whether to press your advantage or accept their offer of negotiation.",
+        "DD": "Neither side backs down. Preparations accelerate on both sides. The crisis enters a dangerous new phase with both parties committed to confrontation. Nuclear war is no longer unthinkable."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_4",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    "turn_5_crisis": {
+      "turn": 5,
+      "act": 2,
+      "narrative_briefing": "October 24, 1962. The naval confrontation at the quarantine line has brought both superpowers to the edge of war. Ships nearly exchanged fire. Both governments are shaken by how close they came. Hardliners on both sides demand action while moderates desperately seek off-ramps.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.7,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.3,
+        "crash_payoff": -1.5,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "pull_back",
+          "narrative_description": "Order forces to create distance. Prevent any further incidents at sea. De-escalate immediately.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "urgent_diplomacy",
+          "narrative_description": "Launch urgent diplomatic initiative. The near-miss proves negotiation is essential.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "maintain_pressure",
+          "narrative_description": "Keep forces on hair-trigger alert. Show opponent you won't be deterred by near-misses.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "escalate_further",
+          "narrative_description": "The near-confrontation proved opponent will back down. Press harder.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The near-miss sobers both sides. Forces pull back slightly. Emergency diplomatic channels open. Both leaders recognize how close they came and resolve to find a way out.",
+        "CD": "Your de-escalation was met with continued pressure. While you sought to reduce danger, your opponent interpreted your restraint as weakness and pressed forward.",
+        "DC": "Your maintained pressure while opponent backed down proves your resolve. But the crisis is now more dangerous\u2014your opponent feels cornered with no face-saving exit.",
+        "DD": "Neither side backs down after the near-miss. If anything, positions harden. The world is on notice that the next naval confrontation may not end without shots fired."
+      },
+      "branches": {
+        "CC": "turn_6_hopeful",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_6_dire"
+      },
+      "default_next": "turn_6",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The urgent negotiations following the naval near-miss have failed. What should have been a wake-up call became another round of failed diplomacy. The crisis continues with both sides traumatized but uncommitted to resolution."
+    },
+    "turn_6_hopeful": {
+      "turn": 6,
+      "act": 2,
+      "narrative_briefing": "October 25, 1962. The mutual restraint of the past days has created a window. Both governments sense that a deal is possible. The UN provides cover for negotiations. Back-channel communications are frequent and substantive. The outlines of resolution are visible\u2014if both sides can reach for it.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.3,
+        "hare_temptation": 1.3,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "propose_framework",
+          "narrative_description": "Put forward a comprehensive settlement framework. Missiles, inspections, guarantees\u2014the whole package.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "accept_mediation",
+          "narrative_description": "Accept UN or third-party mediation. Let neutrals facilitate the final agreement.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "last_demands",
+          "narrative_description": "Before agreeing to anything, make final demands. Extract maximum concessions from opponent's desire for peace.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "hedge_bets",
+          "narrative_description": "Continue military preparations even while negotiating. Don't let hope cloud judgment.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The framework comes together. Both sides seize the moment. UN inspectors are agreed. Timelines are set. The crisis will end with both sides able to claim they protected their interests while avoiding catastrophe.",
+        "CD": "Your framework proposal was met with new demands. Your opponent seems more interested in exploiting your desire for peace than achieving it. The hopeful moment may be passing.",
+        "DC": "Your last-minute demands were accepted by an opponent eager for resolution. You've improved your position\u2014but have you undermined the trust needed for implementation?",
+        "DD": "The hopeful moment collapses. Both sides' demands prove incompatible. Military preparations resume. The window that seemed to open has slammed shut."
+      },
+      "branches": {
+        "CC": "turn_7_breakthrough",
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_7",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The hopeful negotiations have collapsed. What seemed like imminent resolution became another failed round of talks. The crisis continues with diminished hope for peaceful resolution."
+    },
+    "turn_6_dire": {
+      "turn": 6,
+      "act": 2,
+      "narrative_briefing": "October 25, 1962. The mutual escalation has brought the world closer to nuclear war than anyone realized possible. Military commanders on both sides strain against civilian control. The UN Security Council debates while the superpowers move toward confrontation. Time for diplomacy is running out.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.8,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.2,
+        "crash_payoff": -1.8,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "emergency_summit",
+          "narrative_description": "Call for immediate emergency summit at highest level. Only leaders can stop this now.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "unilateral_pause",
+          "narrative_description": "Order unilateral pause in escalation. Someone must break the spiral before it's too late.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "final_warning",
+          "narrative_description": "Issue final ultimatum with deadline. Make clear what will happen if opponent doesn't comply.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "authorize_action",
+          "narrative_description": "Give military commanders authority to respond to provocations. Take the decision out of your own hands.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides step back from the brink. The emergency summit is agreed. Leaders realize they've lost control of events and must personally intervene. The military spiral pauses.",
+        "CD": "Your call for summit was met with ultimatum. While you sought direct communication, your opponent tightened the noose. You appear desperate while they appear resolute.",
+        "DC": "Your ultimatum caught your opponent seeking accommodation. They back down in the face of your resolve. But humiliation breeds resentment\u2014what comes next?",
+        "DD": "Both sides issue ultimatums. Military commanders receive expanded authority. The civilian leadership is losing control of events. The logic of war begins to dominate the logic of survival."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": "turn_7_escalation"
+      },
+      "default_next": "turn_7",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The emergency negotiations have failed. In the dire atmosphere of mutual ultimatums, no compromise was possible. The world edges closer to nuclear war."
+    },
+    "turn_7_breakthrough": {
+      "turn": 7,
+      "act": 2,
+      "narrative_briefing": "October 26, 1962. The framework agreement is taking shape. Khrushchev's emotional letter arrives, offering withdrawal in exchange for non-invasion pledge. The back-channel deal on Turkey is nearly complete. Both sides sense that resolution is within reach\u2014if they can close the final gaps.",
+      "matrix_type": "harmony",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.0,
+        "reward": 1.6,
+        "punishment": 0.0,
+        "sucker": 0.6,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "accept_offer",
+          "narrative_description": "Accept the offer as written. Don't let perfect be the enemy of good. End this crisis.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "minor_adjustment",
+          "narrative_description": "Accept with minor adjustments for domestic political cover. The substance is agreed.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "seek_improvements",
+          "narrative_description": "The basic framework is good, but push for better terms on key issues.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "reopen_talks",
+          "narrative_description": "New issues have emerged. The framework needs substantial revision before agreement.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The deal is done. Both sides accept the framework. Implementation details remain, but the fundamental agreement is reached. The most dangerous moment in human history is passing.",
+        "CD": "Your acceptance was met with new demands. What seemed like a breakthrough was apparently just an opening position. Your opponent continues to negotiate while you've shown your cards.",
+        "DC": "Your push for improvements succeeded against an opponent eager to conclude. You've gotten better terms\u2014but implementation becomes trickier when one side feels they gave too much.",
+        "DD": "The breakthrough collapses. Both sides reopen settled issues. What seemed like agreement dissolves into renewed negotiation. The crisis continues."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_8",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The breakthrough collapsed at the final moment. Details that seemed minor proved fatal. The crisis continues as the apparent resolution evaporates."
+    },
+    "turn_7_escalation": {
+      "turn": 7,
+      "act": 2,
+      "narrative_briefing": "October 26, 1962. The mutual ultimatums have brought civilization to the edge of extinction. Military forces on both sides await orders. The letters from Moscow are contradictory\u2014emotional pleas mixed with hard demands. Washington is divided between hawks and doves. The world has hours, not days.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.9,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.1,
+        "crash_payoff": -2.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "emergency_concession",
+          "narrative_description": "Make emergency concession to prevent war. Accept opponent's terms to stop the escalation.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "desperate_appeal",
+          "narrative_description": "Send desperate personal appeal to opposing leader. Cut through the bureaucracy.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "hold_line",
+          "narrative_description": "Maintain ultimatum. Opponent must believe you will follow through or they won't back down.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "prepare_strike",
+          "narrative_description": "Position forces for first strike. If opponent won't back down, be ready to act first.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "At the last moment, both sides step back. The emergency concessions and desperate appeals succeed. Leaders recognize they've been on the brink of ending civilization and pull back together.",
+        "CD": "Your concession was accepted but not reciprocated. You backed down while they held firm. The crisis ends in your humiliation\u2014but at least it ends.",
+        "DC": "Your firmness broke opponent's will. They conceded at the last moment. You've won\u2014but the world has come within hours of nuclear holocaust.",
+        "DD": "Neither side backs down. The military logic takes over. Launch orders are prepared. Either someone blinks in the next hours, or human civilization ends in nuclear fire."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_8",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The emergency negotiations failed. In the shadow of mutual annihilation, neither side could accept the other's terms. The clock continues to tick toward midnight."
+    },
+    "turn_9_resolution": {
+      "turn": 9,
+      "act": 3,
+      "narrative_briefing": "October 28, 1962. Black Saturday is past. Both sides held fire despite provocation. The U-2 incidents have been contained. Now comes the moment of decision: will Khrushchev accept the deal? Will Kennedy? The world awaits Radio Moscow's announcement.",
+      "matrix_type": "harmony",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.0,
+        "reward": 1.7,
+        "punishment": 0.0,
+        "sucker": 0.7,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "announce_agreement",
+          "narrative_description": "Announce the agreement. Missiles will be withdrawn. The crisis is over.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "gracious_acceptance",
+          "narrative_description": "Accept opponent's announcement graciously. Don't gloat. Help them save face.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "claim_victory",
+          "narrative_description": "Accept the resolution but frame it as your victory. Maximize domestic political gain.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "demand_verification",
+          "narrative_description": "Accept in principle but demand rigorous verification before any reciprocal moves.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The crisis ends. Both sides announce the agreement with dignity. The world exhales. Missiles will be removed under supervision. No invasion of Cuba. Quiet understanding on Turkey. Humanity survives.",
+        "CD": "Your gracious acceptance was met with victory crowing. You've ended the crisis but given your opponent a political triumph. Domestic critics accuse you of weakness.",
+        "DC": "Your victory claims were accepted by an opponent happy to have any resolution. You emerge looking strong\u2014but have you poisoned future cooperation?",
+        "DD": "Even in resolution, both sides jockey for advantage. The agreement holds but bad faith pervades. Implementation will be difficult when neither side trusts the other's motives."
+      },
+      "branches": {
+        "CC": "turn_10_aftermath",
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_10",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Even at the moment of resolution, negotiations failed. The basic agreement exists but terms cannot be finalized. The crisis continues in a strange limbo."
+    },
+    "turn_9_brink": {
+      "turn": 9,
+      "act": 3,
+      "narrative_briefing": "October 28, 1962. Black Saturday's violence has not been contained. Limited strikes have been exchanged. The world watches in horror as conventional war erupts between nuclear superpowers. The question is no longer whether there will be war, but whether it stays conventional.",
+      "matrix_type": "deadlock",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 0.5,
+        "punishment": 1.0,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "ceasefire_appeal",
+          "narrative_description": "Call for immediate ceasefire. Stop the fighting before it goes nuclear.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "limited_war_only",
+          "narrative_description": "Commit publicly to keeping the war conventional. Remove nuclear options from the table.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "escalation_dominance",
+          "narrative_description": "Match or exceed every escalation. Show opponent you can't be intimidated into backing down.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "nuclear_signal",
+          "narrative_description": "Signal readiness to use nuclear weapons if conventional war continues. Raise the stakes.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides pull back from the nuclear threshold. The conventional war is terrible, but both leaders agree to keep it conventional. A ceasefire is negotiated. The world survives, barely.",
+        "CD": "Your ceasefire appeal was met with continued aggression. You've shown weakness while your opponent presses the attack. Surrender or escalation are your only options.",
+        "DC": "Your continued pressure while opponent sought ceasefire has broken their will. They capitulate. You've won the conventional war\u2014but at tremendous cost.",
+        "DD": "Escalation dominance meets nuclear signaling. Both sides refuse to back down. The conventional war expands. Nuclear release authority is delegated downward. The unthinkable becomes thinkable."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": "turn_10_countdown"
+      },
+      "default_next": "turn_10",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Ceasefire negotiations failed even as conventional war raged. Neither side would accept terms that looked like defeat. The fighting continues with nuclear weapons still on the table."
+    },
+    "turn_10_aftermath": {
+      "turn": 10,
+      "act": 3,
+      "narrative_briefing": "Late October 1962. The agreement is announced. Now comes implementation. Soviet ships are being loaded with missile components. American invasion forces are standing down. But Castro is furious, and verification disputes linger. Can the agreement survive its implementation?",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.4,
+        "hare_temptation": 1.2,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "visible_compliance",
+          "narrative_description": "Make compliance highly visible. Invite verification. Build trust through transparency.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "manage_allies",
+          "narrative_description": "Manage angry allies (Castro, hawks in Congress). Prevent them from undermining the agreement.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "slow_compliance",
+          "narrative_description": "Comply with the letter but not the spirit. Slow-roll implementation to extract additional concessions.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "add_conditions",
+          "narrative_description": "Add new conditions to implementation. The agreement was just the start of negotiations.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Implementation proceeds smoothly. Both sides manage their hardliners. Missiles leave Cuba visibly. Invasion forces stand down visibly. Trust builds through demonstrated good faith.",
+        "CD": "Your visible compliance was met with foot-dragging. While you honored every commitment, your opponent sought advantage in implementation. The agreement is fraying.",
+        "DC": "Your slow compliance while opponent rushed to honor commitments gives you leverage\u2014but undermines the foundation of the deal. Was this worth the short-term gain?",
+        "DD": "Implementation becomes a new battleground. Both sides add conditions and slow-roll compliance. The agreement exists on paper but means less each day."
+      },
+      "branches": {
+        "CC": "turn_11_peace",
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_11",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Implementation negotiations have stalled. What should have been the easy part\u2014carrying out an agreed deal\u2014has become a new crisis. The agreement may not survive."
+    },
+    "turn_10_countdown": {
+      "turn": 10,
+      "act": 3,
+      "narrative_briefing": "The conventional war has escalated beyond anyone's expectations. Both sides have taken heavy losses. Pressure mounts to use tactical nuclear weapons to break the deadlock. Military commanders argue that nuclear use is now inevitable\u2014the only question is who uses them first.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 2.0,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.0,
+        "crash_payoff": -2.5,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "nuclear_renunciation",
+          "narrative_description": "Publicly renounce first use of nuclear weapons. Accept conventional defeat rather than nuclear war.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "conventional_surrender",
+          "narrative_description": "Accept conventional military defeat. End the war on opponent's terms to prevent nuclear exchange.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "nuclear_ultimatum",
+          "narrative_description": "Issue nuclear ultimatum: opponent must cease hostilities or face nuclear attack.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "first_strike",
+          "narrative_description": "Launch limited nuclear strike to achieve battlefield victory before opponent can respond.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides step back from nuclear use. The conventional war ends in exhausted stalemate. Millions have died, but billions survive. The nuclear taboo holds\u2014barely.",
+        "CD": "Your nuclear renunciation was exploited. While you accepted defeat, opponent considered nuclear options. You've lost everything but prevented armageddon.",
+        "DC": "Your nuclear ultimatum broke opponent's will. They surrendered rather than face nuclear attack. You've won\u2014but at what cost to your soul and humanity's future?",
+        "DD": "Nuclear weapons are used. The taboo is broken. Whether it remains 'limited' or escalates to full exchange, nothing will ever be the same. Civilization enters its darkest hour."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": "turn_11_apocalypse"
+      },
+      "default_next": "turn_11",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Settlement negotiations failed even as nuclear war loomed. Neither side could accept terms that looked like surrender. The countdown to armageddon continues."
+    },
+    "turn_11_peace": {
+      "turn": 11,
+      "act": 3,
+      "narrative_briefing": "November 1962. The crisis is truly ending. Missiles are gone. Forces have stood down. Both governments are exhausted but relieved. The question now is what lessons to draw. Can this near-disaster become a foundation for lasting peace?",
+      "matrix_type": "harmony",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 0.9,
+        "reward": 1.6,
+        "punishment": 0.0,
+        "sucker": 0.6,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "propose_detente",
+          "narrative_description": "Propose broader d\u00e9tente. Use the crisis as a foundation for improved relations.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "arms_control_talks",
+          "narrative_description": "Propose immediate arms control negotiations. Never again let the world come this close.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "claim_lessons",
+          "narrative_description": "Draw lessons favorable to your position. The crisis proved your approach was right.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "strengthen_deterrent",
+          "narrative_description": "The crisis showed deterrence works. Strengthen your nuclear forces to ensure it works next time.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides choose peace. Arms control talks begin. The hotline is established. The Test Ban Treaty is negotiated. The Cuban Missile Crisis becomes humanity's greatest near-miss and greatest lesson.",
+        "CD": "Your peace initiative was rebuffed. While you sought transformation, opponent saw weakness to exploit. The opportunity for lasting change is lost.",
+        "DC": "Your interpretation of lessons dominates while opponent's peace initiative fails. Short-term you've 'won'\u2014but have you foreclosed a better future?",
+        "DD": "Both sides draw competitive lessons. The arms race accelerates. Proxy conflicts intensify. The crisis ends but the Cold War gets colder."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_12",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The post-crisis peace talks have failed. What could have been a new beginning became another round of cold war positioning."
+    },
+    "turn_11_unraveling": {
+      "turn": 11,
+      "act": 3,
+      "narrative_briefing": "November 1962. The agreement is falling apart. Verification disputes, delayed withdrawals, and mutual accusations dominate. The crisis that seemed resolved is reemerging. Both sides must decide whether to salvage the deal or prepare for renewed confrontation.",
+      "matrix_type": "prisoners_dilemma",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.6,
+        "reward": 1.1,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "recommit",
+          "narrative_description": "Recommit to the original agreement. Accept some violations to save the overall deal.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "renegotiate",
+          "narrative_description": "Propose renegotiation to address legitimate concerns. Find a deal both sides can live with.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "declare_breach",
+          "narrative_description": "Declare opponent in material breach. Resume military pressure.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "selective_compliance",
+          "narrative_description": "Comply only with convenient parts of the agreement. Match opponent's bad faith.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides recommit to making the agreement work. Disputes are resolved through negotiation. The deal survives its implementation phase.",
+        "CD": "Your recommitment was exploited. While you sought to save the deal, opponent continued to violate it. You appear weak while they pocket gains.",
+        "DC": "Your declaration of breach while opponent sought accommodation puts you in control. But have you killed the best chance for resolution?",
+        "DD": "The agreement collapses. Both sides declare the other in breach. The crisis that seemed resolved reemerges, worse than before."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_12",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Attempts to salvage the agreement have failed. The implementation dispute has become a new crisis. Everything achieved in October is unraveling."
+    },
+    "turn_11_apocalypse": {
+      "turn": 11,
+      "act": 3,
+      "narrative_briefing": "Nuclear weapons have been used. The world holds its breath to see if this is the beginning of the end. Millions are already dead. Both sides must decide: escalate to full strategic exchange, or pull back from the abyss? There may still be time to save what remains of civilization.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 2.2,
+        "reward": 0.8,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": -0.5,
+        "crash_payoff": -3.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "emergency_ceasefire",
+          "narrative_description": "Call for immediate emergency ceasefire. No more nuclear use. Pull back before it's too late.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "accept_defeat",
+          "narrative_description": "Accept defeat to stop the nuclear exchange. Unconditional surrender if necessary.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "limited_response",
+          "narrative_description": "Respond with limited nuclear strike. Match escalation to deter further use.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "full_retaliation",
+          "narrative_description": "Launch full strategic nuclear response. If civilization dies, opponent dies with it.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides step back from full exchange. The nuclear taboo is broken but total war is averted. The world will never be the same, but it continues.",
+        "CD": "Your ceasefire appeal was ignored. While you sought to stop the horror, opponent continued to escalate. Your surrender prevents your destruction but at the cost of everything.",
+        "DC": "Your escalation while opponent sought peace has won the exchange\u2014but at what cost? You rule the ashes of a destroyed civilization.",
+        "DD": "Full strategic nuclear exchange. Hundreds of millions die immediately. Billions more will follow from fallout and nuclear winter. Human civilization as we knew it has ended."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_12",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Ceasefire negotiations failed even after nuclear weapons were used. The logic of annihilation has taken over. What remains of humanity continues to destroy itself."
+    },
+    "turn_13_legacy_peace": {
+      "turn": 13,
+      "act": 3,
+      "narrative_briefing": "December 1962. The crisis is truly over. Both governments have learned from their brush with extinction. Arms control negotiations are underway. The hotline is being installed. The question now is whether these lessons will endure or fade with time.",
+      "matrix_type": "harmony",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 0.8,
+        "reward": 1.8,
+        "punishment": 0.0,
+        "sucker": 0.7,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "institutionalize_peace",
+          "narrative_description": "Create lasting institutions to prevent future crises. Turn the lessons into permanent structures.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "test_ban_treaty",
+          "narrative_description": "Push for comprehensive test ban treaty. Take the first concrete step toward arms control.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "consolidate_advantage",
+          "narrative_description": "Use the post-crisis moment to consolidate strategic advantages before the new order takes hold.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "hedge_commitments",
+          "narrative_description": "Agree to arms control in principle while maintaining capabilities in practice.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The legacy of the crisis is peace. Institutions are created. Treaties are signed. The nuclear taboo is strengthened. October 1962 becomes the moment humanity chose survival.",
+        "CD": "Your push for lasting peace was undermined by opponent's hedging. The institutions you built are hollow. The opportunity for transformation fades.",
+        "DC": "Your hedging while opponent built peace gives you short-term advantage but poisons the well. The arms control moment passes; the arms race continues.",
+        "DD": "Both sides hedge their commitments. The post-crisis institutions are weak, the treaties are limited. The lessons of October fade. The next crisis may not end as well."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_14",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The negotiations over the crisis legacy have failed. What could have been a foundation for peace became another chapter in cold war competition."
+    },
+    "turn_13_legacy_cold": {
+      "turn": 13,
+      "act": 3,
+      "narrative_briefing": "December 1962. The crisis ended but left deep scars. Mutual suspicion dominates. The agreement holds but barely. Both sides are drawing lessons about the value of brinkmanship rather than the value of peace. The Cold War continues, colder than before.",
+      "matrix_type": "security_dilemma",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.4,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "peace_initiative",
+          "narrative_description": "Despite everything, propose peace initiative. Try to salvage something positive from the crisis.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "careful_cooperation",
+          "narrative_description": "Maintain minimal cooperation needed to prevent renewed crisis. Nothing more.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "arms_buildup",
+          "narrative_description": "The crisis showed nuclear superiority matters. Build more weapons.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "proxy_pressure",
+          "narrative_description": "Apply pressure through proxies and allies. Continue the confrontation by other means.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Despite the bitter legacy, both sides choose some cooperation. The Cold War continues but with guardrails. Not peace, but not war either.",
+        "CD": "Your peace initiative in this hostile environment was exploited. Your gesture of goodwill was seen as weakness and punished.",
+        "DC": "Your pressure while opponent sought cooperation pays off short-term. But you've ensured the next crisis will be even more dangerous.",
+        "DD": "The crisis taught nothing. Arms races accelerate. Proxy wars intensify. The doomsday clock moves closer to midnight. October was just a preview."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": "turn_14_darkness"
+      },
+      "default_next": "turn_14",
+      "settlement_available": true,
+      "settlement_failed_narrative": "No agreement is possible in this atmosphere. The cold peace continues with no prospect of warming."
+    },
+    "turn_14_darkness": {
+      "turn": 14,
+      "act": 3,
+      "narrative_briefing": "January 1963. The crisis ended, but the world is more dangerous than before. Both superpowers are accelerating their nuclear buildups. Proxy conflicts are multiplying. The lessons of October have been forgotten or perverted. The next crisis is already brewing.",
+      "matrix_type": "deadlock",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 0.5,
+        "punishment": 1.0,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "last_chance",
+          "narrative_description": "Make one last attempt at cooperation. Perhaps sanity can still prevail.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "damage_control",
+          "narrative_description": "Accept that relations are poisoned. Focus on preventing the worst outcomes.",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "prepare_for_worst",
+          "narrative_description": "The next crisis is coming. Be ready to win it.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "strike_first",
+          "narrative_description": "The correlation of forces favors action now. Don't wait for opponent to strike first.",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "At the last moment, some sanity prevails. The darkness lifts slightly. The world remains dangerous, but catastrophe is deferred. Perhaps the lessons of October will yet be learned.",
+        "CD": "Your attempt at last-minute cooperation was rejected. You've shown weakness; they've shown resolve. The next crisis will find you at a disadvantage.",
+        "DC": "Your preparation while opponent sought cooperation has succeeded. You're stronger now. But you've ensured the next confrontation will be even more dangerous.",
+        "DD": "The darkness deepens. Both superpowers prepare for the war they believe is inevitable. October 1962 was not the end of the crisis\u2014it was only the beginning. The doomsday clock strikes midnight."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": null,
+      "settlement_available": true,
+      "settlement_failed_narrative": "No settlement is possible. The world stands on the brink once more, and this time there may be no stepping back."
+    }
+  },
+  "personas": {
+    "side_a": {
+      "persona": "nixon",
+      "role_name": "American President",
+      "role_description": "Leader of the United States, balancing domestic pressure with the risk of nuclear war."
+    },
+    "side_b": {
+      "persona": "khrushchev",
+      "role_name": "Soviet Premier",
+      "role_description": "Leader of the Soviet Union, defending Communist interests while avoiding catastrophe."
+    }
+  }
+}

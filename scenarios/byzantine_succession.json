@@ -1,0 +1,2095 @@
+{
+  "scenario_id": "byzantine_succession_001",
+  "title": "Byzantine Succession",
+  "theme": "byzantine",
+  "setting": "Byzantine imperial succession. Palace factions, legitimacy claims, religious politics.\nThe Emperor is dying and the succession is contested. Powerful factions vie for control,\neach claiming divine right and popular support. The empire's fate hangs in the balance\nas intrigue and ambition clash in the corridors of power.",
+  "max_turns": 14,
+  "turns": [
+    {
+      "turn": 1,
+      "act": 1,
+      "narrative_briefing": "The Emperor has taken to his bed, and physicians whisper that he has days, not weeks. Both factions have been summoned to the Sacred Palace. In the shadows of the Great Hall, your agents watch the other side's movements. Before the crisis truly begins, there is an opportunity to gauge the other faction's true strength and intentions through careful observation.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "coordinate_mourning",
+          "narrative_description": "Propose joint preparations for the Emperor's funeral rites, showing unity in grief",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "extend_olive_branch",
+          "narrative_description": "Send a trusted emissary to discuss a peaceful transition arrangement",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "secure_positions",
+          "narrative_description": "Move your guards to control key palace corridors and gates",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "rally_supporters",
+          "narrative_description": "Summon your partisans to Constantinople with all speed",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both factions show remarkable restraint. Emissaries exchange respectful words, and the palace remains calm. The dying Emperor reportedly smiled when told of this unity. Perhaps a peaceful transition is possible.",
+        "CD": "Your gesture of goodwill is met with suspicion and maneuvering. While you extend the olive branch, the other faction positions their people in key locations. You appear naive, but have learned something of their intentions.",
+        "DC": "While the other faction attempts diplomacy, you seize the initiative. Your guards now control the Chalke Gate, and your supporters stream into the city. You have the advantage, but may have poisoned future negotiations.",
+        "DD": "Both factions move simultaneously to secure positions. Guards nearly clash in the Hall of Nineteen Couches. Only the intervention of palace eunuchs prevents bloodshed. The empire holds its breath."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_2",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    {
+      "turn": 2,
+      "act": 1,
+      "narrative_briefing": "The Patriarch has called both factions to the Hagia Sophia for prayers. This is an opportunity to demonstrate legitimacy\u2014or to probe the other faction's true position through careful intelligence gathering. Your spies report unusual movements, but the information is unclear. Do you attempt to verify through your own channels, or extend trust in this sacred space?",
+      "matrix_type": "inspection_game",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "attend_openly",
+          "narrative_description": "Attend the service with minimal guards, demonstrating trust and piety",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "share_intelligence",
+          "narrative_description": "Offer to share information about external threats to show good faith",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "verify_claims",
+          "narrative_description": "Deploy agents to verify the other faction's claimed strength and positions",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "test_loyalties",
+          "narrative_description": "Approach key figures in the other faction to test their commitment",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both factions attend in good faith. The Patriarch's blessing falls on both candidates equally. In the incense-filled darkness, there is a moment of genuine hope that God's will can be discerned peacefully.",
+        "CD": "Your open attendance allows the other faction's agents to map your weaknesses. Their intelligence network has learned much about your true position while you prayed sincerely.",
+        "DC": "While the other faction prays, your agents uncover valuable intelligence. You now have a clearer picture of their actual support\u2014it differs from their public claims.",
+        "DD": "Both factions deploy their intelligence networks simultaneously. Agents bump into each other in the cathedral's shadows. The sacred space becomes a battleground of whispers and suspicion. The Patriarch is not pleased."
+      },
+      "branches": {
+        "CC": "turn_3_diplomatic",
+        "CD": "turn_3_diplomatic",
+        "DC": "turn_3_tense",
+        "DD": "turn_3_tense"
+      },
+      "default_next": "turn_3",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    {
+      "turn": 3,
+      "act": 1,
+      "narrative_briefing": "The Emperor's condition worsens. Both factions have begun positioning their candidates. The Senate has been called to emergency session to discuss the succession, but the real decisions will be made in private chambers. Someone must take the lead in proposing a framework\u2014but if both try to lead, chaos ensues.",
+      "matrix_type": "leader",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 2.0,
+        "reward": 1.5,
+        "punishment": 0.0,
+        "sucker": 0.5,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "propose_framework",
+          "narrative_description": "Put forward a succession framework for Senate consideration",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "support_process",
+          "narrative_description": "Defer to Senate traditions and support regular procedures",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "seize_initiative",
+          "narrative_description": "Attempt to control the Senate session through your partisans",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "challenge_legitimacy",
+          "narrative_description": "Question the other candidate's right to the purple",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both factions work within established procedures. The Senate session proceeds with dignity. While nothing is decided, the framework for legitimate succession remains intact.",
+        "CD": "Your cooperative approach allows the other faction to dominate the Senate. They set the terms of debate while you appear passive. The momentum shifts against you.",
+        "DC": "Your bold initiative captures the Senate's attention. The other faction's procedural approach looks weak. You have set the agenda, though some senators resent the pressure.",
+        "DD": "Both factions attempt to dominate the Senate simultaneously. Senators shout over each other, and the session collapses in acrimony. The Senate's legitimacy as arbiter is damaged."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_4",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    {
+      "turn": 4,
+      "act": 1,
+      "narrative_briefing": "The Emperor dies at midnight. The succession crisis has begun in earnest. Both candidates must be presented to the people\u2014but who goes first? The order of acclamation matters greatly. This is a moment where coordination with distributional conflict emerges: both benefit from orderly presentation, but each wants their candidate acclaimed first.",
+      "matrix_type": "battle_of_sexes",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.5,
+        "preference_b": 1.3,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "accept_second",
+          "narrative_description": "Agree to present your candidate second in exchange for fair process",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "propose_lottery",
+          "narrative_description": "Suggest a lottery or divine sign to determine the order",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "demand_precedence",
+          "narrative_description": "Insist your candidate must be presented first by right",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "present_immediately",
+          "narrative_description": "Attempt to present your candidate before any agreement is reached",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "An orderly process emerges. Both candidates are presented to the people in sequence. The crowd's reaction is mixed, but legitimate. Constantinople has seen proper imperial acclamation.",
+        "CD": "Your willingness to accept process is exploited. The other faction presents first, capturing the crowd's enthusiasm. Your candidate's later appearance feels anticlimactic.",
+        "DC": "Your swift action secures precedence. Your candidate receives the first acclamation, and the crowd's energy peaks for them. The other candidate's presentation feels secondary.",
+        "DD": "Both candidates are rushed to the Hippodrome simultaneously. The crowd splits into rival factions. Blue and Green demes clash in the stands. The acclamation becomes a riot."
+      },
+      "branches": {
+        "CC": "turn_5_hopeful",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_5_crisis"
+      },
+      "default_next": "turn_5",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    {
+      "turn": 5,
+      "act": 2,
+      "narrative_briefing": "A week has passed since the Emperor's death. Neither candidate has been definitively acclaimed. The Patriarch offers to mediate, but both factions know that accepting mediation means ceding some control. The armies watch from the provinces, waiting to see who will emerge. This is a classic test of trust: will both sides negotiate in good faith?",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "accept_mediation",
+          "narrative_description": "Accept the Patriarch's mediation with genuine willingness to compromise",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "offer_concessions",
+          "narrative_description": "Publicly offer significant concessions to demonstrate good faith",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "set_conditions",
+          "narrative_description": "Accept mediation but set preconditions that favor your position",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "build_coalition",
+          "narrative_description": "Use the mediation period to secretly build support among fence-sitters",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both factions enter mediation sincerely. The Patriarch finds common ground. A power-sharing arrangement begins to take shape\u2014perhaps two emperors, or a designated heir for the survivor?",
+        "CD": "Your sincere engagement is exploited. While you negotiate in good faith, the other faction uses the time to consolidate support. The mediation becomes a trap.",
+        "DC": "Your maneuvering during mediation pays off. You've gained new allies while the other faction committed to compromise positions they cannot easily abandon.",
+        "DD": "Both factions use the mediation as cover for consolidation. The Patriarch realizes he's being played and withdraws in frustration. The Church's blessing now hangs in the balance."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_6",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The mediation collapses as both sides blame each other for bad faith. The Patriarch retreats to his chambers, and the palace corridors grow cold with suspicion."
+    },
+    {
+      "turn": 6,
+      "act": 2,
+      "narrative_briefing": "Provincial armies begin to move. The themes of Anatolia and the Balkans must choose sides. Gold flows freely as both factions seek to buy loyalty. This is a direct confrontation of resources and will\u2014a game of chicken where the one who blinks first loses military support, but mutual escalation could trigger civil war.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 0.8,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "restrain_armies",
+          "narrative_description": "Order your provincial supporters to hold position and await developments",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "negotiate_garrisons",
+          "narrative_description": "Propose mutual troop limitations in the capital region",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "summon_legions",
+          "narrative_description": "Order your loyal tagmata to march on Constantinople",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "bribe_commanders",
+          "narrative_description": "Offer enormous sums to key military commanders on both sides",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both factions show restraint. Provincial armies remain in their garrisons. The crisis remains political, not military. There is still hope for a peaceful resolution.",
+        "CD": "Your restraint is punished. The other faction's armies approach while yours remain stationary. You must now negotiate from a position of military weakness.",
+        "DC": "Your armies march while the other faction hesitates. The military advantage is clearly yours. Provincial lords rush to join the winning side.",
+        "DD": "Both factions summon their armies. Tagmata regiments clash near Nicaea. The first blood of civil war has been spilled. The empire tears itself apart as Bulgars and Arabs watch hungrily."
+      },
+      "branches": {
+        "CC": "turn_7_diplomatic",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_7_military"
+      },
+      "default_next": "turn_7",
+      "settlement_available": true,
+      "settlement_failed_narrative": "With armies on the move, your negotiators cannot find common ground. The clatter of approaching hooves drowns out the voices of reason."
+    },
+    {
+      "turn": 7,
+      "act": 2,
+      "narrative_briefing": "The treasury is running low for both factions. Mercenaries demand payment, and the guilds grow restless as trade suffers. Someone must volunteer to make economic concessions for the good of the empire\u2014but whoever does so weakens their position. Each side hopes the other will bear the burden.",
+      "matrix_type": "volunteers_dilemma",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "fund_stability",
+          "narrative_description": "Open your faction's treasury to pay arrears and calm the guilds",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "share_burden",
+          "narrative_description": "Propose joint funding of essential imperial functions",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "hoard_resources",
+          "narrative_description": "Preserve your treasury for the decisive moment",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "blame_opposition",
+          "narrative_description": "Publicly blame the other faction for the economic crisis",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both factions contribute to stabilizing the economy. The guilds are mollified, and mercenaries are paid. The empire's infrastructure holds\u2014for now.",
+        "CD": "Your generosity is exploited. You've spent precious resources while the other faction hoarded theirs. They thank you publicly while privately celebrating your weakness.",
+        "DC": "The other faction bears the economic burden while you preserve your war chest. You appear shrewd, though some whisper about your patriotism.",
+        "DD": "Neither faction will pay. Mercenaries begin deserting. Guilds close their workshops. The economy begins to collapse. Soon there may be no empire worth fighting over."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_8",
+      "settlement_available": true,
+      "settlement_failed_narrative": "With empty treasuries and hungry soldiers, neither side can commit to peace terms. The negotiations dissolve into mutual recriminations about economic sabotage."
+    },
+    {
+      "turn": 8,
+      "act": 2,
+      "narrative_briefing": "Foreign ambassadors from the Caliphate, the Bulgars, and the Italian city-states have arrived, sensing opportunity in Byzantine weakness. Both factions could use foreign support\u2014but inviting outsiders risks the empire itself. This is a security dilemma: arming against internal threats appears offensive to the other faction.",
+      "matrix_type": "security_dilemma",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "united_front",
+          "narrative_description": "Present a united front to foreign powers, refusing outside interference",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "defensive_only",
+          "narrative_description": "Accept only defensive guarantees that protect imperial territory",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "seek_allies",
+          "narrative_description": "Secretly negotiate with foreign powers for military support",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "promise_concessions",
+          "narrative_description": "Offer territorial or trade concessions in exchange for backing",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both factions refuse foreign entanglement. The ambassadors depart empty-handed. Whatever happens, the empire's fate will be decided by Romans alone.",
+        "CD": "While you maintain imperial dignity, the other faction secretly courts foreign allies. You learn of treaties being drafted that promise Byzantine territory to outsiders.",
+        "DC": "Your foreign negotiations succeed while the other faction remains isolated. Bulgar cavalry and Arab gold flow to your cause. But at what long-term cost?",
+        "DD": "Both factions invite foreign intervention. The Caliphate backs one side, the Bulgars the other. The civil war becomes an international conflict. The empire's borders begin to crumble."
+      },
+      "branches": {
+        "CC": "turn_9_unified",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_9_fragmented"
+      },
+      "default_next": "turn_9",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Foreign ambassadors smile as your negotiations fail. Each departs to their master with reports of Byzantine division and opportunities for expansion."
+    },
+    {
+      "turn": 9,
+      "act": 3,
+      "narrative_briefing": "Act III begins. The crisis reaches its peak. Reports arrive that the Varangian Guard\u2014the elite imperial bodyguard\u2014remains uncommitted. Their support could be decisive. Both factions must decide whether to approach them together, establishing shared legitimacy, or attempt to win them exclusively. But if both compete aggressively, the Guard may simply leave Constantinople entirely.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "joint_approach",
+          "narrative_description": "Propose that both candidates address the Guard together",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "honor_neutrality",
+          "narrative_description": "Respect the Guard's traditional neutrality in succession disputes",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "exclusive_appeal",
+          "narrative_description": "Make a secret approach to the Guard commander with promises of reward",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "nordic_gold",
+          "narrative_description": "Offer the Varangians land grants in exchange for exclusive support",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both factions respect the Guard's position. The Varangians, impressed by this restraint, declare they will support whoever achieves legitimate acclamation. Their neutrality becomes a moderating force.",
+        "CD": "Your respectful approach looks naive as the other faction wins Varangian support through lavish promises. Northern axes will soon guard your rival's coronation.",
+        "DC": "Your promises win the Guard. The other faction's principled stance earns respect but not swords. The Varangians will fight for you\u2014and you now have the military advantage in the palace itself.",
+        "DD": "Both factions' competing bribes insult the Guard's honor. The Varangian commander withdraws his men to their barracks, declaring they serve the empire, not factions. A crucial force becomes unavailable to both sides."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_10",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The Varangian commander watches your failed negotiations with cold Norse eyes. He mutters something about Byzantine duplicity and retires to count his men."
+    },
+    {
+      "turn": 10,
+      "act": 3,
+      "narrative_briefing": "A plague outbreak strikes the capital. Thousands die daily. Both factions face a choice: use the chaos to advance their position, or cooperate to manage the disaster. The people watch to see which candidate acts like an emperor. This is a moment of pure coordination\u2014but with the temptation to exploit the crisis.",
+      "matrix_type": "prisoners_dilemma",
+      "matrix_parameters": {
+        "scale": 0.9,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "crisis_unity",
+          "narrative_description": "Propose joint crisis management with shared resources and credit",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "lead_relief",
+          "narrative_description": "Personally lead relief efforts, sharing credit with your rival",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "exploit_chaos",
+          "narrative_description": "Use the plague's disruption to eliminate rival supporters",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "hoard_supplies",
+          "narrative_description": "Secure food and medicine for your faction's neighborhoods only",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both factions work together to fight the plague. The people see two candidates acting as emperors should. The crisis response actually builds bridges between the factions.",
+        "CD": "Your humanitarian efforts are exploited. While you tend to the sick, the other faction seizes key positions and blames plague deaths on your negligence.",
+        "DC": "Your ruthless exploitation of the plague gains you advantage, but the people notice. Whispers spread that your faction let people die for political gain.",
+        "DD": "Both factions exploit the plague. Rival neighborhoods receive no aid. Bodies pile up while soldiers guard grain stores. The people curse both candidates equally as tens of thousands perish."
+      },
+      "branches": {
+        "CC": "turn_11_reconciliation",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_11_apocalypse"
+      },
+      "default_next": "turn_11",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Even as the plague rages, you cannot agree on terms. The dead are carried past your negotiating chambers as you argue about titles and territories."
+    },
+    {
+      "turn": 11,
+      "act": 3,
+      "narrative_briefing": "The plague recedes, leaving a changed city. Popular sentiment has shifted dramatically based on how the factions handled the crisis. A council of magnates\u2014senators, generals, and bishops\u2014has convened to finally resolve the succession. This is the penultimate moment: a chicken game where backing down means accepting subordinate status, but mutual aggression means civil war.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 0.9,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "accept_compromise",
+          "narrative_description": "Accept a power-sharing arrangement or subordinate position",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "defer_to_council",
+          "narrative_description": "Announce you will accept whatever the council decides",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "demand_crown",
+          "narrative_description": "Insist your candidate must be sole emperor with full powers",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "threaten_war",
+          "narrative_description": "Make clear that rejection means immediate civil war",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both factions accept the council's wisdom. A creative solution emerges\u2014perhaps co-emperors, or a marriage alliance, or a defined succession. The empire finds peace through compromise.",
+        "CD": "Your willingness to compromise is seen as weakness. The council awards the throne to the other candidate, with you receiving minor consolation titles.",
+        "DC": "Your firm stance wins the day. The other faction's compromise is interpreted as submission. Your candidate is acclaimed emperor, and the other faction must bend the knee.",
+        "DD": "Neither faction will yield. The council session erupts in violence. Swords are drawn in the sacred hall. The civil war begins in earnest as the empire descends into chaos."
+      },
+      "branches": {
+        "CC": "turn_12_peace",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_12_war"
+      },
+      "default_next": "turn_12",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The council watches in despair as your negotiations collapse. Bishops weep. Generals check their sword-arms. The dream of peaceful succession dies."
+    },
+    {
+      "turn": 12,
+      "act": 3,
+      "narrative_briefing": "The final reckoning approaches. Armies mass outside the city walls. The Patriarch prepares to anoint whoever emerges victorious\u2014or to flee if the city burns. This is the moment of truth: one final opportunity for peace, or the descent into destruction.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 0.85,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "last_offer",
+          "narrative_description": "Make one final, generous offer for peaceful resolution",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "accept_terms",
+          "narrative_description": "Accept the other faction's terms to prevent bloodshed",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "total_victory",
+          "narrative_description": "Launch the assault, seeking total victory",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "scorched_earth",
+          "narrative_description": "If you cannot have the throne, ensure your rival cannot either",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "At the last moment, wisdom prevails. Both factions agree to terms. The empire is saved from civil war. Whatever the specific arrangement, the realm endures.",
+        "CD": "Your final peace offer is rejected. The other faction attacks with full force. Your conciliatory stance left you unprepared. Defeat is swift and total.",
+        "DC": "Your assault catches the other faction hoping for peace. Their forces collapse. Victory is absolute. Your candidate takes the throne\u2014but over a realm scarred by war.",
+        "DD": "Both factions attack simultaneously. Constantinople burns. The Hagia Sophia's dome cracks from the heat. Bulgars pour through undefended frontiers. The empire collapses into warring fragments that will never reunite."
+      },
+      "branches": {
+        "CC": "turn_13_resolution",
+        "CD": null,
+        "DC": null,
+        "DD": "turn_13_collapse"
+      },
+      "default_next": "turn_13",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Your last negotiation fails as flames rise from the harbor district. There will be no more chances for peace."
+    },
+    {
+      "turn": 13,
+      "act": 3,
+      "narrative_briefing": "The endgame unfolds. The previous turn's outcome has set the empire on its final path. Whatever arrangement or conflict emerged now crystallizes into the new order. One last decision remains: how to consolidate the outcome\u2014through reconciliation or elimination of rivals.",
+      "matrix_type": "prisoners_dilemma",
+      "matrix_parameters": {
+        "scale": 0.95,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "extend_amnesty",
+          "narrative_description": "Offer full amnesty to the losing faction and its supporters",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "share_power",
+          "narrative_description": "Include former rivals in the new government",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "purge_rivals",
+          "narrative_description": "Eliminate the other faction's leadership through exile or execution",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "seize_assets",
+          "narrative_description": "Confiscate the lands and wealth of your former enemies",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both factions embrace reconciliation. Former rivals become partners in governance. The succession crisis ends not in victory for one side, but in a new synthesis that strengthens the empire.",
+        "CD": "Your magnanimity is exploited. While you offer olive branches, the other faction positions itself for future revenge. Your generosity may prove fatal.",
+        "DC": "Your ruthless consolidation eliminates all rivals. The other faction's peaceful gestures made them easy targets. You rule unchallenged\u2014but over a court of fear.",
+        "DD": "Both factions pursue vengeance. Purges and counter-purges empty the court of talent. The empire's administration collapses. Without capable ministers, even the victor cannot govern effectively."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_14",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Even now, with the crisis nearly resolved, neither side trusts the other enough for formal terms. The settlement collapses into informal arrangements that satisfy no one."
+    },
+    {
+      "turn": 14,
+      "act": 3,
+      "narrative_briefing": "The final turn. The succession has been decided, for better or worse. This is the moment of coronation\u2014or final destruction. The Patriarch stands ready with the crown, or the undertakers stand ready with the shrouds. The empire's fate is sealed by one last choice.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "legitimize",
+          "narrative_description": "Publicly endorse the final settlement and the new order",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "graceful_acceptance",
+          "narrative_description": "Accept the outcome with dignity, preserving honor and future opportunities",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "last_betrayal",
+          "narrative_description": "Attempt one final betrayal at the coronation ceremony",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "flee_abroad",
+          "narrative_description": "Flee to foreign courts to plot future return and revenge",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The coronation proceeds in glory. Both factions participate in the ceremony. The empire has weathered its crisis. A new dynasty rises on foundations of hard-won compromise.",
+        "CD": "Your graceful acceptance is betrayed at the final moment. The other faction's treachery at the coronation throws the empire back into chaos. Your trust was misplaced.",
+        "DC": "Your betrayal at the coronation succeeds. The other faction's good faith made them vulnerable. You seize the throne through treachery\u2014but your reign will forever be stained.",
+        "DD": "Mutual betrayal at the coronation. Daggers flash in the Hagia Sophia. Blood pools beneath the altar. The Patriarch is cut down trying to intervene. The empire dies in its holiest place, and centuries of civilization end in screaming chaos."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": null,
+      "settlement_available": true,
+      "settlement_failed_narrative": "Your final negotiation fails before the altar of the Hagia Sophia. The Patriarch's prayers cannot bridge the gulf between you. God's judgment falls upon the empire."
+    }
+  ],
+  "branches": {
+    "turn_3_diplomatic": {
+      "turn": 3,
+      "act": 1,
+      "narrative_briefing": "Following the cooperative atmosphere at Hagia Sophia, both factions find themselves in an unexpected moment of mutual understanding. The Patriarch has arranged a private dinner for the faction leaders. This is an opportunity to build on the goodwill\u2014or to probe the other faction's true position through careful observation. Your spymaster awaits your instructions: reveal your genuine stance, or attempt to read theirs while masking your own?",
+      "matrix_type": "reconnaissance",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.5,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "honest_dialogue",
+          "narrative_description": "Engage in genuine discussion about shared concerns",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "propose_alliance",
+          "narrative_description": "Suggest a formal alliance between the factions",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "probe_weakness",
+          "narrative_description": "Use the dinner to identify exploitable weaknesses",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "plant_agents",
+          "narrative_description": "Use the goodwill as cover to infiltrate the other faction",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The dinner becomes a turning point. Real connections form between the factions. Both sides begin to see cooperation as genuinely possible.",
+        "CD": "Your openness is met with manipulation. The dinner reveals your positions while teaching you nothing about theirs.",
+        "DC": "Your subtle probing uncovers valuable intelligence while the other side shares freely. The goodwill was their mistake.",
+        "DD": "Both sides come to dinner with hidden agendas. The conversation is stilted and suspicious. The promising moment evaporates."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_4",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    "turn_3_tense": {
+      "turn": 3,
+      "act": 1,
+      "narrative_briefing": "The intelligence gathering in Hagia Sophia has created a tense atmosphere. Both factions know they're being watched. The Senate session that follows becomes a battleground of accusations and counter-accusations. Trust has evaporated; now it's about damage control and positioning.",
+      "matrix_type": "chicken",
+      "matrix_parameters": {
+        "scale": 0.7,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "de_escalate",
+          "narrative_description": "Publicly apologize for the cathedral incident and seek reconciliation",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "call_truce",
+          "narrative_description": "Propose a formal pause in hostilities while tensions cool",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "double_down",
+          "narrative_description": "Accuse the other faction of sacrilege in the holy space",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "escalate_pressure",
+          "narrative_description": "Use the incident to demand the other faction's exclusion from the succession",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Cooler heads prevail. Both factions step back from the brink. The incident is quietly forgotten, though suspicions linger.",
+        "CD": "Your de-escalation is interpreted as weakness. The other faction presses their advantage, demanding concessions.",
+        "DC": "Your aggressive stance forces the other side to back down. They apologize publicly, though resentment festers.",
+        "DD": "Accusations fly. The Senate session becomes a shouting match. Guards draw weapons. Only the Emperor's chamberlain prevents bloodshed by clearing the hall."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_4",
+      "settlement_available": false,
+      "settlement_failed_narrative": ""
+    },
+    "turn_5_hopeful": {
+      "turn": 5,
+      "act": 2,
+      "narrative_briefing": "The orderly acclamation has created unexpected optimism. Both candidates were received well by the people. The Patriarch sees an opportunity for a historic compromise\u2014perhaps the first co-emperorship in a generation. But old ambitions die hard.",
+      "matrix_type": "harmony",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.0,
+        "reward": 1.5,
+        "punishment": 0.0,
+        "sucker": 0.5,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "embrace_coregency",
+          "narrative_description": "Publicly endorse the idea of shared rule",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "negotiate_division",
+          "narrative_description": "Work out a practical division of imperial responsibilities",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "undermine_sharing",
+          "narrative_description": "Quietly work to make power-sharing unworkable",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "seek_sole_rule",
+          "narrative_description": "Maneuver to become the senior partner in any arrangement",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "A genuine co-emperorship takes shape. Both candidates will be crowned together. The empire enters a new era of shared rule.",
+        "CD": "Your embrace of sharing is exploited. The other faction positions to dominate any joint arrangement.",
+        "DC": "Your maneuvering undermines the co-emperorship. The other side's sincerity becomes a liability.",
+        "DD": "Both factions undermine the Patriarch's initiative. The hope for peaceful co-rule dies. Competition resumes."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_6",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Even in this hopeful moment, formal terms cannot be agreed. The Patriarch sighs heavily and returns to his prayers."
+    },
+    "turn_5_crisis": {
+      "turn": 5,
+      "act": 2,
+      "narrative_briefing": "The Hippodrome riot has left the city on edge. Streets are barricaded between Blue and Green neighborhoods. The rival acclamations have created two parallel claims to legitimacy. Now each faction must decide: retreat to de-escalate, or press the advantage?",
+      "matrix_type": "security_dilemma",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "withdraw_supporters",
+          "narrative_description": "Order your faction's supporters to stand down and go home",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "open_corridors",
+          "narrative_description": "Allow free movement through your controlled neighborhoods",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "fortify_positions",
+          "narrative_description": "Strengthen barricades and arm your supporters",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "expand_control",
+          "narrative_description": "Seize additional strategic locations while chaos reigns",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both factions pull back. The immediate crisis eases. Constantinople's streets empty of armed partisans.",
+        "CD": "Your withdrawal leaves strategic positions undefended. The other faction swiftly occupies them.",
+        "DC": "Your expansion during their withdrawal gives you control of key parts of the city.",
+        "DD": "Both factions expand aggressively. Street fighting erupts. The city burns in patches. Civil war has begun within Constantinople's walls."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_6",
+      "settlement_available": true,
+      "settlement_failed_narrative": "With barricades dividing the city, your emissaries cannot even reach each other safely. The negotiation never properly begins."
+    },
+    "turn_7_diplomatic": {
+      "turn": 7,
+      "act": 2,
+      "narrative_briefing": "With provincial armies still in their garrisons, the crisis remains centered on Constantinople. The guilds have proposed themselves as mediators\u2014they have no stake in which candidate wins, only in stability for trade. This is an opportunity for a back-channel exchange of genuine intentions.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "honest_assessment",
+          "narrative_description": "Share your faction's true minimum requirements through the guild intermediaries",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "build_trust",
+          "narrative_description": "Make a unilateral concession to demonstrate good faith",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "exploit_channel",
+          "narrative_description": "Use the back channel to feed disinformation",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "bribe_mediators",
+          "narrative_description": "Buy the guild leaders' loyalty to bias the mediation",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "The guild mediation produces a breakthrough. Both factions learn they have more common ground than expected. A framework for settlement emerges.",
+        "CD": "Your honest engagement is betrayed. Your true positions are now known while theirs remain hidden. The disadvantage is severe.",
+        "DC": "Your manipulation of the channel succeeds. The other faction has revealed their hand while you've fed them false information.",
+        "DD": "Both factions corrupt the mediation. The guild leaders, disgusted, withdraw their services. A valuable neutral channel is destroyed."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_8",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The guild mediation collapses in recriminations. Merchants shutter their shops and prepare for the worst."
+    },
+    "turn_7_military": {
+      "turn": 7,
+      "act": 2,
+      "narrative_briefing": "Blood has been spilled. The clash near Nicaea has made this a military confrontation. Both armies are now fully mobilized. The question is whether to press the attack or seek a battlefield truce before more lives are lost.",
+      "matrix_type": "war_of_attrition",
+      "matrix_parameters": {
+        "scale": 1.0,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "offer_truce",
+          "narrative_description": "Propose a battlefield ceasefire and prisoner exchange",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "hold_lines",
+          "narrative_description": "Order your forces to hold position and await developments",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "press_attack",
+          "narrative_description": "Order a full assault on enemy positions",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "outflank",
+          "narrative_description": "Attempt a risky flanking maneuver to cut off enemy supplies",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both armies pause. A informal truce emerges. Generals on both sides, many of whom trained together, seek a negotiated end to the fighting.",
+        "CD": "Your truce offer is rejected with an attack. Your peacefully disposed forces are caught off guard. The battle goes badly.",
+        "DC": "Your attack during their peace overture succeeds brilliantly. Their forces, expecting negotiations, are routed.",
+        "DD": "Both armies attack. The battle becomes a bloodbath. Thousands of the empire's best soldiers die fighting each other while enemies mass on the frontiers."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_8",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Your negotiators meet between the battle lines, but the screams of the wounded make productive conversation impossible."
+    },
+    "turn_9_unified": {
+      "turn": 9,
+      "act": 3,
+      "narrative_briefing": "Both factions' refusal of foreign entanglement has earned respect at home and abroad. The crisis remains internal\u2014a Roman matter to be settled by Romans. The Patriarch declares this a sign of God's favor on the empire. A final diplomatic push could resolve everything.",
+      "matrix_type": "pure_coordination",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.5,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "comprehensive_talks",
+          "narrative_description": "Propose final, comprehensive peace talks with all issues on the table",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "public_reconciliation",
+          "narrative_description": "Stage a public reconciliation ceremony at Hagia Sophia",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "final_pressure",
+          "narrative_description": "Make one final push to improve your position before any settlement",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "set_traps",
+          "narrative_description": "Prepare contingencies in case negotiations fail",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Comprehensive talks succeed. Both factions commit to a binding settlement process. The empire's future looks secure.",
+        "CD": "Your openness to settlement is met with positioning. The talks stall as the other side seeks advantage.",
+        "DC": "Your maneuvering during their peace initiative improves your position, but poisons the atmosphere.",
+        "DD": "Both sides enter talks with hidden agendas. The comprehensive settlement collapses into mutual recrimination."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_10",
+      "settlement_available": true,
+      "settlement_failed_narrative": "The unified stance against foreigners could not translate into unity within. The empire remains divided despite its momentary honor."
+    },
+    "turn_9_fragmented": {
+      "turn": 9,
+      "act": 3,
+      "narrative_briefing": "Foreign intervention has transformed the succession crisis into an international war. Bulgar raiders probe the Danube frontier. Arab armies mass in Syria. The empire's very existence is threatened. Both factions must decide whether survival trumps ambition.",
+      "matrix_type": "volunteers_dilemma",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "defend_frontier",
+          "narrative_description": "Redirect your forces to defend against foreign invasion",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "propose_union",
+          "narrative_description": "Propose temporary union against the external threat",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "let_them_burn",
+          "narrative_description": "Let the foreign armies weaken your rival's territories",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "collaborate_invasion",
+          "narrative_description": "Secretly coordinate with your foreign allies against your domestic rival",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both factions turn to face the external threat. Roman armies unite against the invaders. Whatever happens to the succession, the empire will survive.",
+        "CD": "Your patriotic defense leaves your domestic position weakened. The other faction benefits while you bleed on the frontiers.",
+        "DC": "You preserve your strength while the other faction exhausts itself defending the empire. Cynical, but effective.",
+        "DD": "Both factions prioritize internal advantage over external defense. The frontiers collapse. Foreign armies pour into the heartland. The empire fragments into warring pieces while barbarians feast on the corpse."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_10",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Even with the empire burning, neither faction will accept terms. Your negotiators argue over titles while cities fall to the invaders."
+    },
+    "turn_11_reconciliation": {
+      "turn": 11,
+      "act": 3,
+      "narrative_briefing": "The joint plague response has created genuine bonds between the factions. Former enemies worked side by side in the hospital tents. The people now demand reconciliation. The council of magnates sees an opportunity for a lasting settlement that neither side could have imagined at the crisis's start.",
+      "matrix_type": "harmony",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.0,
+        "reward": 1.5,
+        "punishment": 0.0,
+        "sucker": 0.5,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "seal_alliance",
+          "narrative_description": "Propose a marriage alliance between the two families",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "joint_rule",
+          "narrative_description": "Commit to formal co-emperorship with equal powers",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "subtle_advantage",
+          "narrative_description": "Seek subtle advantages in any joint arrangement",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "future_position",
+          "narrative_description": "Ensure your faction's dominance in the next generation",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "A historic alliance is sealed. The two families will unite through marriage. The succession crisis ends in a new beginning.",
+        "CD": "Your genuine embrace of alliance is exploited for positioning. The other faction joins you but as the senior partner.",
+        "DC": "Your maneuvering secures advantages that will matter for generations. Alliance achieved, but on your terms.",
+        "DD": "Both sides seek advantage within the alliance framework. The resulting arrangement is unstable, unlikely to survive the generation."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_12",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Even after the shared ordeal of the plague, old suspicions resurface. The reconciliation that seemed so close slips away."
+    },
+    "turn_11_apocalypse": {
+      "turn": 11,
+      "act": 3,
+      "narrative_briefing": "The plague exploitation has destroyed both factions' legitimacy. The people curse both candidates. The Patriarch has excommunicated both faction leaders. Only raw military force remains as a path to power. The council of magnates meets in a last desperate attempt to prevent total collapse.",
+      "matrix_type": "deadlock",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 0.5,
+        "punishment": 1.0,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "submit_church",
+          "narrative_description": "Submit to the Patriarch's judgment and accept excommunication's terms",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "public_penance",
+          "narrative_description": "Perform public penance for the plague deaths",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "reject_church",
+          "narrative_description": "Reject church authority and prepare to rule by sword alone",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "destroy_rival",
+          "narrative_description": "Launch immediate attack to destroy the other faction before judgment falls",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both factions submit to church judgment. After harsh penance, absolution is granted. A new beginning is possible, though trust is minimal.",
+        "CD": "Your submission to the church is exploited. The other faction attacks while you're in penance. Your piety becomes your undoing.",
+        "DC": "Your rejection of church authority succeeds militarily as the other faction prays. You rule\u2014but as an excommunicate tyrant.",
+        "DD": "Both factions reject church authority and attack simultaneously. The empire descends into total war with no moral framework. Civilization itself begins to collapse."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_12",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Under the Patriarch's angry gaze, your negotiations collapse. He declares God has abandoned the empire to its fate."
+    },
+    "turn_12_peace": {
+      "turn": 12,
+      "act": 3,
+      "narrative_briefing": "The council's compromise has held. A power-sharing arrangement is taking shape that both factions can accept. The Patriarch prepares for a joint coronation\u2014something not seen in generations. All that remains is the final commitment.",
+      "matrix_type": "stag_hunt",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "final_commitment",
+          "narrative_description": "Make binding oaths to the power-sharing arrangement",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "celebrate_union",
+          "narrative_description": "Order public celebrations of the unity achieved",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "last_hedge",
+          "narrative_description": "Maintain some forces in reserve, just in case",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "position_heir",
+          "narrative_description": "Ensure your faction's candidate will ultimately dominate",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both factions commit fully. The joint coronation proceeds in glory. The empire enters a new era of shared rule and renewed strength.",
+        "CD": "Your full commitment is not reciprocated. The other faction hedges, preparing for future dominance. The arrangement is unequal.",
+        "DC": "Your hedging pays off as the other faction commits fully. The power-sharing begins, but you hold hidden advantages.",
+        "DD": "Neither faction commits fully. The 'compromise' is an armed truce. Everyone knows the struggle will resume within a generation."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_13",
+      "settlement_available": true,
+      "settlement_failed_narrative": "At the final moment, one side cannot bring themselves to trust the other. The peace that was within grasp dissolves like morning mist."
+    },
+    "turn_12_war": {
+      "turn": 12,
+      "act": 3,
+      "narrative_briefing": "The council session has ended in violence. Civil war is now open and total. Armies clash across Anatolia and Thrace. Both factions command roughly equal forces. The only question is whether one side can achieve decisive victory before the empire collapses entirely.",
+      "matrix_type": "war_of_attrition",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "sue_peace",
+          "narrative_description": "Seek peace terms even from a position of war",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "limited_war",
+          "narrative_description": "Fight defensively, avoiding unnecessary destruction",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "total_war",
+          "narrative_description": "Prosecute the war with maximum force",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "break_enemy",
+          "narrative_description": "Target enemy leadership for elimination",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both sides fight limited campaigns, preserving forces and infrastructure. An exhausted peace becomes possible. The empire survives, barely.",
+        "CD": "Your peace overtures are rejected. Total war is unleashed against your limited defense. You are overwhelmed.",
+        "DC": "Your total war overwhelms their limited resistance. Victory is yours\u2014but over a devastated realm.",
+        "DD": "Total war on both sides. The empire's military strength is annihilated in fratricidal slaughter. When the fighting ends, there is nothing left worth ruling."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_13",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Your negotiators meet amid the siege lines, but neither side will accept anything less than unconditional surrender. The war continues."
+    },
+    "turn_13_resolution": {
+      "turn": 13,
+      "act": 3,
+      "narrative_briefing": "The last-minute peace has created a fragile new order. The joint government takes shape, with both factions sharing power. But old wounds run deep, and the question of the next generation remains unresolved. How the consolidation proceeds will determine whether this peace lasts.",
+      "matrix_type": "prisoners_dilemma",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 1.0,
+        "punishment": 0.3,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "build_institutions",
+          "narrative_description": "Create shared institutions that require continued cooperation",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "invest_future",
+          "narrative_description": "Invest in the next generation's unified education and marriage alliances",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "maintain_separation",
+          "narrative_description": "Keep your faction's power base distinct and defensible",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "position_succession",
+          "narrative_description": "Ensure your line will dominate after the current arrangement ends",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "Both factions invest in genuine integration. Within a generation, the old divisions will be forgotten. A new, unified dynasty emerges.",
+        "CD": "Your integration efforts are undermined by the other faction's separatism. The arrangement becomes a cold peace.",
+        "DC": "Your maintained separation preserves future options while they integrate. The next crisis will favor you.",
+        "DD": "Both factions maintain separation. The 'joint rule' is a fiction covering continued rivalry. War will come again."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_14",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Even in victory, neither side can agree on the terms of their shared future. The peace becomes a truce, and the truce will not hold."
+    },
+    "turn_13_collapse": {
+      "turn": 13,
+      "act": 3,
+      "narrative_briefing": "Constantinople has fallen to fire and sword. The Hagia Sophia's dome has cracked. Foreign armies advance on multiple fronts. The empire as a unified state no longer exists. Both factions control fragments of what was once Rome's greatest heir. The question now is merely how complete the destruction will be.",
+      "matrix_type": "deadlock",
+      "matrix_parameters": {
+        "scale": 1.3,
+        "position_weight": 0.6,
+        "resource_weight": 0.2,
+        "risk_weight": 0.2,
+        "temptation": 1.5,
+        "reward": 0.5,
+        "punishment": 1.0,
+        "sucker": 0.0,
+        "swerve_payoff": 0.5,
+        "crash_payoff": -1.0,
+        "coordination_bonus": 1.0,
+        "miscoordination_penalty": 0.0,
+        "preference_a": 1.2,
+        "preference_b": 1.2,
+        "stag_payoff": 2.0,
+        "hare_temptation": 1.5,
+        "hare_safe": 1.0,
+        "stag_fail": 0.0,
+        "volunteer_cost": 0.3,
+        "free_ride_bonus": 0.5,
+        "disaster_penalty": 1.0,
+        "inspection_cost": 0.3,
+        "cheat_gain": 0.5,
+        "caught_penalty": 1.0,
+        "loss_if_exploited": 0.7
+      },
+      "actions": [
+        {
+          "action_id": "seek_truce",
+          "narrative_description": "Seek armistice to prevent total annihilation",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "preserve_remnant",
+          "narrative_description": "Focus on preserving what territory and people remain",
+          "action_type": "cooperative",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "fight_on",
+          "narrative_description": "Continue fighting to the bitter end",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        },
+        {
+          "action_id": "scorched_earth_final",
+          "narrative_description": "Destroy anything that might benefit your enemy",
+          "action_type": "competitive",
+          "resource_cost": 0.0
+        }
+      ],
+      "outcome_narratives": {
+        "CC": "An armistice emerges from exhaustion. Two rump empires survive in Anatolia and the Balkans. The glory is gone, but civilization persists.",
+        "CD": "Your armistice attempt is exploited. The other faction seizes the last strategic positions. You rule a fragment; they rule a larger fragment.",
+        "DC": "Your continued aggression during their armistice attempt succeeds. Victory of a sort\u2014over ruins.",
+        "DD": "Neither side will stop. The fighting continues until there is nothing left. Foreign powers divide the corpse of the empire. A thousand years of civilization ends in ash."
+      },
+      "branches": {
+        "CC": null,
+        "CD": null,
+        "DC": null,
+        "DD": null
+      },
+      "default_next": "turn_14",
+      "settlement_available": true,
+      "settlement_failed_narrative": "Among the ruins, your negotiators cannot agree even on how to divide the rubble. The killing continues."
+    }
+  },
+  "personas": {
+    "side_a": {
+      "persona": "theodora",
+      "role_name": "Imperial Faction Leader",
+      "role_description": "Head of the established imperial faction in Constantinople."
+    },
+    "side_b": {
+      "persona": "livia",
+      "role_name": "Challenger Faction",
+      "role_description": "Leader of the rival faction seeking the throne."
+    }
+  }
+}
