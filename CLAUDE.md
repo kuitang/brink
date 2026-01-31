@@ -56,10 +56,64 @@ uv run brinksmanship-web
 uv run python scripts/balance_simulation.py --games 100
 ```
 
-**Webapp E2E with Playwright MCP:**
+**Webapp E2E with Playwright MCP (local):**
 1. Start webapp: `uv run brinksmanship-web`
 2. Use `browser_navigate` to http://localhost:5000
 3. Use `browser_snapshot` to verify UI state
+
+---
+
+## Production Testing with Playwright
+
+**Production URL:** https://brink.fly.dev/
+
+### Running Playwright Tests Against Production
+
+Use Playwright MCP to interactively test the production deployment:
+
+1. Navigate to production:
+   ```
+   browser_navigate to https://brink.fly.dev/
+   ```
+
+2. Take snapshots to verify UI state:
+   ```
+   browser_snapshot
+   ```
+
+3. Interact with game elements using `browser_click`, `browser_type`, etc.
+
+### Monitoring Fly Logs While Testing
+
+Open a terminal to watch production logs in real-time:
+```bash
+~/.fly/bin/flyctl logs --app brink
+```
+
+This shows Flask request logs, errors, and any print/logging output from the app.
+
+### Closed-Loop Testing Workflow
+
+Follow this workflow for systematic production testing:
+
+1. **Run test** - Use Playwright MCP to perform an action on https://brink.fly.dev/
+2. **Check logs** - Watch `flyctl logs` output for errors or unexpected behavior
+3. **Take snapshot** - Use `browser_snapshot` to capture UI state
+4. **Fix issues** - If problems found, fix locally, test with `uv run pytest`, deploy
+5. **Repeat** - Continue testing until all flows work correctly
+
+**Example session:**
+```
+# Terminal 1: Watch logs
+~/.fly/bin/flyctl logs --app brink
+
+# Terminal 2 (Claude Code): Run Playwright tests
+browser_navigate to https://brink.fly.dev/
+browser_snapshot  # Verify home page
+browser_click on "New Game"
+browser_snapshot  # Verify game started
+# Check Terminal 1 for any errors
+```
 
 ---
 
