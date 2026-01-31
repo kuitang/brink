@@ -29,6 +29,11 @@ from brinksmanship.models.state import (
     GameState,
     clamp,
 )
+from brinksmanship.parameters import (
+    REJECTION_BASE_PENALTY,
+    REJECTION_ESCALATION,
+    calculate_rejection_penalty,
+)
 
 
 # =============================================================================
@@ -163,10 +168,17 @@ class SettlementProposal(BaseModel):
 
     From GAME_MANUAL.md Section 4.4.1:
     - Numeric Offer: VP split proposed
+    - Surplus Split: Percentage of cooperation surplus for proposer
     - Argument Text: Free-form rationale (max 500 characters)
     """
 
     offered_vp: int = Field(..., ge=0, le=100, description="VP proposed for the proposer (0-100)")
+    surplus_split_percent: int = Field(
+        default=50,
+        ge=0,
+        le=100,
+        description="Percentage of cooperation surplus for the proposer (0-100)",
+    )
     argument: str = Field(..., max_length=500, description="Free-text rationale for the offer")
 
 
@@ -182,14 +194,20 @@ class SettlementResponse(BaseModel):
     """Response to a settlement proposal.
 
     From GAME_MANUAL.md Section 4.4.3:
-    - Accept: Game ends at proposed VP split
-    - Counter: Propose alternative VP split (one counteroffer allowed)
-    - Reject: Game continues, Risk +1
+    - Accept: Game ends at proposed VP split + surplus split
+    - Counter: Propose alternative VP split + surplus split
+    - Reject: Game continues, escalating risk penalty applied
     """
 
     action: SettlementAction
     counter_vp: int | None = Field(
         default=None, ge=0, le=100, description="Counterproposal VP (if countering)"
+    )
+    counter_surplus_split_percent: int | None = Field(
+        default=None,
+        ge=0,
+        le=100,
+        description="Counterproposal surplus split percentage (if countering)",
     )
     counter_argument: str | None = Field(
         default=None, max_length=500, description="Counter-argument (if countering)"
@@ -214,6 +232,37 @@ class SettlementConstraints:
     min_vp: int
     max_vp: int
     suggested_vp: int
+
+
+@dataclass(frozen=True)
+class SettlementResult:
+    """Result of a settlement negotiation.
+
+    Attributes:
+        accepted: Whether the settlement was accepted
+        proposer_vp: VP for the proposer (if accepted)
+        recipient_vp: VP for the recipient (if accepted)
+        proposer_surplus: Surplus captured by proposer (if accepted)
+        recipient_surplus: Surplus captured by recipient (if accepted)
+        risk_penalty: Total risk penalty applied (if rejected)
+        exchange_number: Which exchange this was (1, 2, or 3)
+        negotiation_ended: Whether the negotiation has ended (accepted or 3 rejections)
+        narrative: Description of the outcome
+    """
+
+    accepted: bool
+    proposer_vp: int
+    recipient_vp: int
+    proposer_surplus: float
+    recipient_surplus: float
+    risk_penalty: float
+    exchange_number: int
+    negotiation_ended: bool
+    narrative: str
+
+
+# Maximum number of settlement exchanges allowed
+MAX_SETTLEMENT_EXCHANGES = 3
 
 
 # =============================================================================
@@ -532,6 +581,181 @@ def validate_settlement_proposal(
         return False, "Settlement proposal must include an argument"
 
     return True, None
+
+
+# =============================================================================
+# Settlement Resolution (GAME_MANUAL.md Section 4.3)
+# =============================================================================
+
+
+def handle_settlement_acceptance(
+    state: GameState,
+    proposer: Literal["A", "B"],
+    proposal: SettlementProposal,
+) -> tuple[GameState, SettlementResult]:
+    """Handle an accepted settlement, distributing VP and surplus.
+
+    When a settlement is accepted:
+    - VP is distributed according to the proposal
+    - Cooperation surplus is distributed according to surplus_split_percent
+    - The cooperation_surplus pool is emptied
+
+    Args:
+        state: Current game state
+        proposer: Which player proposed ("A" or "B")
+        proposal: The accepted settlement proposal
+
+    Returns:
+        Tuple of (new_state, settlement_result)
+    """
+    # Calculate surplus distribution
+    surplus_pool = state.cooperation_surplus
+    proposer_surplus = surplus_pool * (proposal.surplus_split_percent / 100.0)
+    recipient_surplus = surplus_pool - proposer_surplus
+
+    # Determine which player is A and which is B
+    if proposer == "A":
+        surplus_a = proposer_surplus
+        surplus_b = recipient_surplus
+        vp_a = proposal.offered_vp
+        vp_b = 100 - proposal.offered_vp
+    else:
+        surplus_a = recipient_surplus
+        surplus_b = proposer_surplus
+        vp_a = 100 - proposal.offered_vp
+        vp_b = proposal.offered_vp
+
+    # Create new state with surplus distributed
+    new_state = state.model_copy(
+        update={
+            "cooperation_surplus": 0.0,  # Pool is emptied
+            "surplus_captured_a": state.surplus_captured_a + surplus_a,
+            "surplus_captured_b": state.surplus_captured_b + surplus_b,
+        }
+    )
+
+    # Build result
+    result = SettlementResult(
+        accepted=True,
+        proposer_vp=proposal.offered_vp,
+        recipient_vp=100 - proposal.offered_vp,
+        proposer_surplus=proposer_surplus,
+        recipient_surplus=recipient_surplus,
+        risk_penalty=0.0,
+        exchange_number=0,  # Not relevant for acceptance
+        negotiation_ended=True,
+        narrative=f"Settlement accepted. Proposer receives {proposal.offered_vp} VP and "
+        f"{proposer_surplus:.1f} surplus. Recipient receives {100 - proposal.offered_vp} VP "
+        f"and {recipient_surplus:.1f} surplus.",
+    )
+
+    return new_state, result
+
+
+def handle_settlement_rejection(
+    state: GameState,
+    exchange_number: int,
+) -> tuple[GameState, SettlementResult]:
+    """Handle a settlement rejection with escalating risk penalty.
+
+    From GAME_MANUAL.md Section 4.3:
+    - Rejection penalty escalates: base * (1 + escalation * (exchange_number - 1))
+    - After 3rd rejection, negotiation ends automatically
+
+    Args:
+        state: Current game state
+        exchange_number: Which exchange this is (1, 2, or 3)
+
+    Returns:
+        Tuple of (new_state, settlement_result)
+    """
+    # Calculate escalating penalty
+    risk_penalty = calculate_rejection_penalty(exchange_number)
+
+    # Apply risk penalty
+    new_risk = clamp(state.risk_level + risk_penalty, 0.0, 10.0)
+
+    # Check if negotiation has ended (after 3rd rejection)
+    negotiation_ended = exchange_number >= MAX_SETTLEMENT_EXCHANGES
+
+    # Create new state
+    new_state = state.model_copy(
+        update={
+            "risk_level": new_risk,
+            "turn": state.turn + 1,  # Turn is consumed
+        }
+    )
+
+    # Build narrative
+    if negotiation_ended:
+        narrative = (
+            f"Settlement rejected (exchange {exchange_number}/{MAX_SETTLEMENT_EXCHANGES}). "
+            f"Risk increased by {risk_penalty:.2f}. Negotiation has ended - maximum exchanges reached."
+        )
+    else:
+        narrative = (
+            f"Settlement rejected (exchange {exchange_number}/{MAX_SETTLEMENT_EXCHANGES}). "
+            f"Risk increased by {risk_penalty:.2f}. "
+            f"{MAX_SETTLEMENT_EXCHANGES - exchange_number} exchange(s) remaining."
+        )
+
+    result = SettlementResult(
+        accepted=False,
+        proposer_vp=0,
+        recipient_vp=0,
+        proposer_surplus=0.0,
+        recipient_surplus=0.0,
+        risk_penalty=risk_penalty,
+        exchange_number=exchange_number,
+        negotiation_ended=negotiation_ended,
+        narrative=narrative,
+    )
+
+    return new_state, result
+
+
+def process_settlement_response(
+    state: GameState,
+    proposer: Literal["A", "B"],
+    proposal: SettlementProposal,
+    response: SettlementResponse,
+    exchange_number: int,
+) -> tuple[GameState, SettlementResult]:
+    """Process a settlement response (accept, counter, or reject).
+
+    Args:
+        state: Current game state
+        proposer: Which player made the proposal ("A" or "B")
+        proposal: The settlement proposal being responded to
+        response: The recipient's response
+        exchange_number: Which exchange this is (1, 2, or 3)
+
+    Returns:
+        Tuple of (new_state, settlement_result)
+    """
+    if response.action == SettlementAction.ACCEPT:
+        return handle_settlement_acceptance(state, proposer, proposal)
+
+    elif response.action == SettlementAction.REJECT:
+        return handle_settlement_rejection(state, exchange_number)
+
+    else:  # COUNTER
+        # Counter is treated as a new proposal from the other side
+        # The counter itself doesn't change state - the response to it will
+        # Return current state with a placeholder result
+        result = SettlementResult(
+            accepted=False,
+            proposer_vp=0,
+            recipient_vp=0,
+            proposer_surplus=0.0,
+            recipient_surplus=0.0,
+            risk_penalty=0.0,
+            exchange_number=exchange_number,
+            negotiation_ended=False,
+            narrative=f"Counter-proposal made: {response.counter_vp} VP, "
+            f"{response.counter_surplus_split_percent}% surplus split.",
+        )
+        return state, result
 
 
 # =============================================================================
@@ -867,21 +1091,28 @@ def resolve_inspection_turn(
     return new_state, result
 
 
-def handle_failed_settlement(state: GameState) -> GameState:
+def handle_failed_settlement(
+    state: GameState,
+    exchange_number: int = 1,
+) -> GameState:
     """Apply state changes for a failed settlement attempt.
 
-    From GAME_MANUAL.md Section 4.4.4:
-    - Risk +1
+    From GAME_MANUAL.md Section 4.3:
+    - Escalating risk penalty: base * (1 + escalation * (exchange_number - 1))
     - Turn is consumed
     - Matrix game is NOT played
 
     Args:
         state: Current game state
+        exchange_number: Which exchange this is (1, 2, or 3). Defaults to 1
+            for backward compatibility.
 
     Returns:
-        New game state with risk increased and turn advanced
+        New game state with escalating risk increased and turn advanced
     """
-    new_risk = clamp(state.risk_level + 1.0, 0.0, 10.0)
+    # Use escalating penalty based on exchange number
+    risk_penalty = calculate_rejection_penalty(exchange_number)
+    new_risk = clamp(state.risk_level + risk_penalty, 0.0, 10.0)
 
     return state.model_copy(
         update={

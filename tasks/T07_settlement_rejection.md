@@ -13,12 +13,12 @@ Settlement must now negotiate both VP split AND surplus split. Rejection penalty
 - T06 (VP calculation includes surplus)
 
 ## Acceptance Criteria
-- [ ] Settlement proposal includes surplus percentage split
-- [ ] Accepted settlement distributes surplus per agreement
-- [ ] Rejection adds escalating risk: `base * (1 + escalation * (n-1))`
-- [ ] 3 rejections end negotiation
-- [ ] Constants from parameters.py used
-- [ ] Tests verify rejection escalation math
+- [x] Settlement proposal includes surplus percentage split (surplus_split_percent field)
+- [x] Accepted settlement distributes surplus per agreement
+- [x] Rejection adds escalating risk: `base * (1 + escalation * (n-1))`
+- [x] 3 rejections end negotiation (MAX_SETTLEMENT_EXCHANGES = 3)
+- [x] Constants from parameters.py used
+- [x] Tests verify rejection escalation math (TestRejectionPenaltyEscalation, TestSettlementDistribution)
 
 ## Files to Modify
 - `src/brinksmanship/engine/resolution.py`

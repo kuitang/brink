@@ -33,11 +33,16 @@ from brinksmanship.engine.resolution import (
     SettlementAction,
     SettlementResponse,
     SettlementConstraints,
+    SettlementResult,
+    MAX_SETTLEMENT_EXCHANGES,
     resolve_matrix_game,
     resolve_reconnaissance,
     resolve_inspection,
     calculate_settlement_constraints,
     validate_settlement_proposal,
+    handle_settlement_acceptance,
+    handle_settlement_rejection,
+    process_settlement_response,
     get_act_multiplier,
     apply_state_deltas,
     apply_action_result_deltas,
@@ -47,6 +52,11 @@ from brinksmanship.engine.resolution import (
     handle_failed_settlement,
     determine_settlement_roles,
     _calculate_cooperation_delta,
+)
+from brinksmanship.parameters import (
+    REJECTION_BASE_PENALTY,
+    REJECTION_ESCALATION,
+    calculate_rejection_penalty,
 )
 from brinksmanship.models.actions import Action, ActionType
 from brinksmanship.models.matrices import (
@@ -484,6 +494,365 @@ class TestSettlementResponse:
         )
         assert response.action == SettlementAction.REJECT
         assert response.rejection_reason == "Your offer is unacceptable."
+
+    def test_counter_response_with_surplus_split(self) -> None:
+        """Test creating a counter response with surplus split."""
+        response = SettlementResponse(
+            action=SettlementAction.COUNTER,
+            counter_vp=45,
+            counter_surplus_split_percent=60,
+            counter_argument="I want more of the surplus.",
+        )
+        assert response.action == SettlementAction.COUNTER
+        assert response.counter_vp == 45
+        assert response.counter_surplus_split_percent == 60
+        assert response.counter_argument == "I want more of the surplus."
+
+
+# =============================================================================
+# Settlement Surplus Split Tests (GAME_MANUAL.md Section 4.3)
+# =============================================================================
+
+
+class TestSettlementSurplusSplit:
+    """Tests for surplus split in settlement proposals."""
+
+    def test_proposal_includes_surplus_split(self) -> None:
+        """Test that settlement proposals include surplus split percentage."""
+        proposal = SettlementProposal(
+            offered_vp=55,
+            surplus_split_percent=60,
+            argument="I deserve 60% of the surplus.",
+        )
+        assert proposal.offered_vp == 55
+        assert proposal.surplus_split_percent == 60
+        assert proposal.argument == "I deserve 60% of the surplus."
+
+    def test_proposal_surplus_split_defaults_to_50(self) -> None:
+        """Test that surplus split defaults to 50% if not specified."""
+        proposal = SettlementProposal(
+            offered_vp=50, argument="Even split."
+        )
+        assert proposal.surplus_split_percent == 50
+
+    def test_proposal_surplus_split_range_validation(self) -> None:
+        """Test that surplus split must be in [0, 100]."""
+        with pytest.raises(ValidationError):
+            SettlementProposal(
+                offered_vp=50, surplus_split_percent=-1, argument="Invalid"
+            )
+
+        with pytest.raises(ValidationError):
+            SettlementProposal(
+                offered_vp=50, surplus_split_percent=101, argument="Invalid"
+            )
+
+
+# =============================================================================
+# Rejection Penalty Escalation Tests (GAME_MANUAL.md Section 4.3)
+# =============================================================================
+
+
+class TestRejectionPenaltyEscalation:
+    """Tests for escalating rejection penalties."""
+
+    def test_rejection_penalty_escalates(self) -> None:
+        """Rejection penalty increases each exchange.
+
+        From GAME_MANUAL.md:
+        - 1st rejection: 1.5 * 1.0 = 1.5
+        - 2nd rejection: 1.5 * 1.5 = 2.25
+        - 3rd rejection: 1.5 * 2.0 = 3.0
+        """
+        penalty_1 = calculate_rejection_penalty(1)
+        penalty_2 = calculate_rejection_penalty(2)
+        penalty_3 = calculate_rejection_penalty(3)
+
+        # Verify exact values with default parameters
+        assert penalty_1 == pytest.approx(1.5)
+        assert penalty_2 == pytest.approx(2.25)
+        assert penalty_3 == pytest.approx(3.0)
+
+        # Verify escalation pattern
+        assert penalty_2 > penalty_1
+        assert penalty_3 > penalty_2
+
+    def test_handle_settlement_rejection_applies_escalating_penalty(self) -> None:
+        """Test that handle_settlement_rejection applies correct escalating penalty."""
+        state = GameState(
+            player_a=PlayerState(position=5.0, resources=5.0),
+            player_b=PlayerState(position=5.0, resources=5.0),
+            risk_level=2.0,
+            turn=5,
+        )
+
+        # First rejection: Risk +1.5
+        new_state_1, result_1 = handle_settlement_rejection(state, exchange_number=1)
+        assert new_state_1.risk_level == pytest.approx(3.5)
+        assert result_1.risk_penalty == pytest.approx(1.5)
+        assert result_1.exchange_number == 1
+        assert result_1.negotiation_ended is False
+
+        # Second rejection: Risk +2.25
+        new_state_2, result_2 = handle_settlement_rejection(state, exchange_number=2)
+        assert new_state_2.risk_level == pytest.approx(4.25)
+        assert result_2.risk_penalty == pytest.approx(2.25)
+        assert result_2.exchange_number == 2
+        assert result_2.negotiation_ended is False
+
+        # Third rejection: Risk +3.0, negotiation ends
+        new_state_3, result_3 = handle_settlement_rejection(state, exchange_number=3)
+        assert new_state_3.risk_level == pytest.approx(5.0)
+        assert result_3.risk_penalty == pytest.approx(3.0)
+        assert result_3.exchange_number == 3
+        assert result_3.negotiation_ended is True
+
+    def test_handle_failed_settlement_uses_escalating_penalty(self) -> None:
+        """Test that handle_failed_settlement uses escalating penalty."""
+        state = GameState(
+            player_a=PlayerState(position=5.0, resources=5.0),
+            player_b=PlayerState(position=5.0, resources=5.0),
+            risk_level=2.0,
+            turn=5,
+        )
+
+        # First exchange (default)
+        new_state_1 = handle_failed_settlement(state, exchange_number=1)
+        assert new_state_1.risk_level == pytest.approx(3.5)  # 2.0 + 1.5
+
+        # Second exchange
+        new_state_2 = handle_failed_settlement(state, exchange_number=2)
+        assert new_state_2.risk_level == pytest.approx(4.25)  # 2.0 + 2.25
+
+        # Third exchange
+        new_state_3 = handle_failed_settlement(state, exchange_number=3)
+        assert new_state_3.risk_level == pytest.approx(5.0)  # 2.0 + 3.0
+
+    def test_three_rejection_limit(self) -> None:
+        """Test that max 3 exchanges are allowed."""
+        assert MAX_SETTLEMENT_EXCHANGES == 3
+
+        state = GameState(
+            player_a=PlayerState(position=5.0, resources=5.0),
+            player_b=PlayerState(position=5.0, resources=5.0),
+            risk_level=2.0,
+            turn=5,
+        )
+
+        # After 3rd rejection, negotiation_ended should be True
+        _, result = handle_settlement_rejection(state, exchange_number=3)
+        assert result.negotiation_ended is True
+        assert "ended" in result.narrative.lower() or "maximum" in result.narrative.lower()
+
+
+# =============================================================================
+# Settlement Distribution Tests (GAME_MANUAL.md Section 4.3)
+# =============================================================================
+
+
+class TestSettlementDistribution:
+    """Tests for surplus distribution when settlement is accepted."""
+
+    def test_settlement_distributes_surplus(self) -> None:
+        """Accepted settlement splits surplus pool.
+
+        60/40 split of 10 surplus -> 6 to proposer, 4 to recipient.
+        """
+        state = GameState(
+            player_a=PlayerState(position=5.0, resources=5.0),
+            player_b=PlayerState(position=5.0, resources=5.0),
+            cooperation_surplus=10.0,
+            surplus_captured_a=0.0,
+            surplus_captured_b=0.0,
+            turn=5,
+        )
+
+        proposal = SettlementProposal(
+            offered_vp=55,
+            surplus_split_percent=60,  # Proposer gets 60%
+            argument="Fair deal.",
+        )
+
+        # Player A proposes
+        new_state, result = handle_settlement_acceptance(state, "A", proposal)
+
+        # Verify surplus distribution
+        assert result.accepted is True
+        assert result.proposer_surplus == pytest.approx(6.0)  # 60% of 10
+        assert result.recipient_surplus == pytest.approx(4.0)  # 40% of 10
+
+        # Verify state update
+        assert new_state.cooperation_surplus == 0.0  # Pool emptied
+        assert new_state.surplus_captured_a == pytest.approx(6.0)  # A was proposer
+        assert new_state.surplus_captured_b == pytest.approx(4.0)  # B was recipient
+
+    def test_settlement_distributes_surplus_player_b_proposer(self) -> None:
+        """Test surplus distribution when player B is proposer."""
+        state = GameState(
+            player_a=PlayerState(position=5.0, resources=5.0),
+            player_b=PlayerState(position=5.0, resources=5.0),
+            cooperation_surplus=10.0,
+            surplus_captured_a=0.0,
+            surplus_captured_b=0.0,
+            turn=5,
+        )
+
+        proposal = SettlementProposal(
+            offered_vp=55,
+            surplus_split_percent=70,  # Proposer (B) gets 70%
+            argument="I should get more.",
+        )
+
+        # Player B proposes
+        new_state, result = handle_settlement_acceptance(state, "B", proposal)
+
+        # Verify surplus distribution
+        assert result.proposer_surplus == pytest.approx(7.0)  # 70% of 10
+        assert result.recipient_surplus == pytest.approx(3.0)  # 30% of 10
+
+        # Verify state update (B was proposer, A was recipient)
+        assert new_state.cooperation_surplus == 0.0
+        assert new_state.surplus_captured_a == pytest.approx(3.0)  # A was recipient
+        assert new_state.surplus_captured_b == pytest.approx(7.0)  # B was proposer
+
+    def test_settlement_with_zero_surplus(self) -> None:
+        """Test settlement when surplus pool is empty."""
+        state = GameState(
+            player_a=PlayerState(position=5.0, resources=5.0),
+            player_b=PlayerState(position=5.0, resources=5.0),
+            cooperation_surplus=0.0,
+            turn=5,
+        )
+
+        proposal = SettlementProposal(
+            offered_vp=50,
+            surplus_split_percent=50,
+            argument="Even split.",
+        )
+
+        new_state, result = handle_settlement_acceptance(state, "A", proposal)
+
+        assert result.proposer_surplus == 0.0
+        assert result.recipient_surplus == 0.0
+        assert new_state.cooperation_surplus == 0.0
+
+    def test_settlement_adds_to_existing_captured_surplus(self) -> None:
+        """Test that settlement adds to existing captured surplus."""
+        state = GameState(
+            player_a=PlayerState(position=5.0, resources=5.0),
+            player_b=PlayerState(position=5.0, resources=5.0),
+            cooperation_surplus=10.0,
+            surplus_captured_a=5.0,  # Already captured some
+            surplus_captured_b=3.0,
+            turn=5,
+        )
+
+        proposal = SettlementProposal(
+            offered_vp=50,
+            surplus_split_percent=50,  # 50/50 split
+            argument="Split evenly.",
+        )
+
+        new_state, result = handle_settlement_acceptance(state, "A", proposal)
+
+        # New surplus should be added to existing
+        assert new_state.surplus_captured_a == pytest.approx(10.0)  # 5.0 + 5.0
+        assert new_state.surplus_captured_b == pytest.approx(8.0)   # 3.0 + 5.0
+
+    def test_settlement_vp_split(self) -> None:
+        """Test that VP split is correctly recorded."""
+        state = GameState(
+            player_a=PlayerState(position=5.0, resources=5.0),
+            player_b=PlayerState(position=5.0, resources=5.0),
+            cooperation_surplus=10.0,
+            turn=5,
+        )
+
+        proposal = SettlementProposal(
+            offered_vp=60,  # Proposer gets 60
+            surplus_split_percent=50,
+            argument="I want more VP.",
+        )
+
+        _, result = handle_settlement_acceptance(state, "A", proposal)
+
+        assert result.proposer_vp == 60
+        assert result.recipient_vp == 40
+        assert result.negotiation_ended is True
+
+
+# =============================================================================
+# Process Settlement Response Tests
+# =============================================================================
+
+
+class TestProcessSettlementResponse:
+    """Tests for processing complete settlement responses."""
+
+    @pytest.fixture
+    def game_state(self) -> GameState:
+        """Create a standard game state for testing."""
+        return GameState(
+            player_a=PlayerState(position=5.0, resources=5.0),
+            player_b=PlayerState(position=5.0, resources=5.0),
+            cooperation_surplus=10.0,
+            risk_level=2.0,
+            turn=5,
+        )
+
+    def test_process_accept_response(self, game_state: GameState) -> None:
+        """Test processing an accept response."""
+        proposal = SettlementProposal(
+            offered_vp=55, surplus_split_percent=60, argument="Good deal."
+        )
+        response = SettlementResponse(action=SettlementAction.ACCEPT)
+
+        new_state, result = process_settlement_response(
+            game_state, "A", proposal, response, exchange_number=1
+        )
+
+        assert result.accepted is True
+        assert result.negotiation_ended is True
+        assert new_state.cooperation_surplus == 0.0
+
+    def test_process_reject_response(self, game_state: GameState) -> None:
+        """Test processing a reject response."""
+        proposal = SettlementProposal(
+            offered_vp=55, surplus_split_percent=60, argument="Take it."
+        )
+        response = SettlementResponse(
+            action=SettlementAction.REJECT, rejection_reason="Too greedy."
+        )
+
+        new_state, result = process_settlement_response(
+            game_state, "A", proposal, response, exchange_number=1
+        )
+
+        assert result.accepted is False
+        assert result.risk_penalty == pytest.approx(1.5)
+        assert new_state.risk_level == pytest.approx(3.5)
+
+    def test_process_counter_response(self, game_state: GameState) -> None:
+        """Test processing a counter response."""
+        proposal = SettlementProposal(
+            offered_vp=55, surplus_split_percent=60, argument="My offer."
+        )
+        response = SettlementResponse(
+            action=SettlementAction.COUNTER,
+            counter_vp=45,
+            counter_surplus_split_percent=40,
+            counter_argument="I counter.",
+        )
+
+        new_state, result = process_settlement_response(
+            game_state, "A", proposal, response, exchange_number=1
+        )
+
+        # Counter doesn't change state, just creates a new proposal
+        assert result.accepted is False
+        assert result.negotiation_ended is False
+        assert result.risk_penalty == 0.0
+        assert new_state.cooperation_surplus == game_state.cooperation_surplus
 
 
 # =============================================================================
@@ -929,8 +1298,8 @@ class TestResolveInspectionTurn:
 class TestHandleFailedSettlement:
     """Tests for handling failed settlement attempts."""
 
-    def test_risk_increases_by_one(self) -> None:
-        """Test that risk increases by 1 on failed settlement."""
+    def test_risk_increases_with_escalating_penalty(self) -> None:
+        """Test that risk increases with escalating penalty on failed settlement."""
         state = GameState(
             player_a=PlayerState(position=5.0, resources=5.0),
             player_b=PlayerState(position=5.0, resources=5.0),
@@ -938,9 +1307,19 @@ class TestHandleFailedSettlement:
             turn=5,
         )
 
+        # First exchange (default) uses base penalty of 1.5
         new_state = handle_failed_settlement(state)
+        assert new_state.risk_level == pytest.approx(4.5)  # 3.0 + 1.5
 
-        assert new_state.risk_level == 4.0
+        # Explicit exchange numbers
+        new_state_1 = handle_failed_settlement(state, exchange_number=1)
+        assert new_state_1.risk_level == pytest.approx(4.5)  # 3.0 + 1.5
+
+        new_state_2 = handle_failed_settlement(state, exchange_number=2)
+        assert new_state_2.risk_level == pytest.approx(5.25)  # 3.0 + 2.25
+
+        new_state_3 = handle_failed_settlement(state, exchange_number=3)
+        assert new_state_3.risk_level == pytest.approx(6.0)  # 3.0 + 3.0
 
     def test_turn_incremented(self) -> None:
         """Test that turn is incremented on failed settlement."""
