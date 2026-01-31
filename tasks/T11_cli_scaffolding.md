@@ -13,12 +13,14 @@ Set up the basic CLI structure with main menu, scenario selection, and opponent 
 - T10 (Textual removed)
 
 ## Acceptance Criteria
-- [ ] Main menu: New Game, Load Game, Quit
-- [ ] Scenario selection from available scenarios
-- [ ] Opponent selection from all 6 deterministic types
-- [ ] Arrow key navigation works
-- [ ] Enter confirms selection
-- [ ] Clean terminal output
+- [x] Main menu: New Game, Load Game, Quit
+- [x] Scenario selection from available scenarios
+- [x] Opponent selection from all 6 deterministic types
+- [x] Arrow key navigation works
+- [x] Enter confirms selection
+- [x] Clean terminal output
+
+**Note**: Completed as part of T10 - CLI was fully rewritten with all these features.
 
 ## Files to Modify
 - `src/brinksmanship/cli/app.py`

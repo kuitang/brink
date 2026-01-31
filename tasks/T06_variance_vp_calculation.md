@@ -13,12 +13,12 @@ Modify the variance and VP calculation to incorporate surplus_captured into fina
 - T05 (engine tracks surplus)
 
 ## Acceptance Criteria
-- [ ] Final VP = position-based VP + surplus_captured
-- [ ] Settlement VP includes negotiated surplus split
-- [ ] Mutual destruction = 0 VP for both (not 20)
-- [ ] Remaining (unsettled) surplus is lost at game end
-- [ ] Variance calculation unchanged
-- [ ] Tests verify VP math
+- [x] Final VP = position-based VP + surplus_captured
+- [x] Settlement VP includes negotiated surplus split — Note: handled at settlement time
+- [x] Mutual destruction = 0 VP for both (not 20)
+- [x] Remaining (unsettled) surplus is lost at game end
+- [x] Variance calculation unchanged
+- [x] Tests verify VP math (TestVPWithCapturedSurplus class)
 
 ## Files to Modify
 - `src/brinksmanship/engine/variance.py`

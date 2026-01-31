@@ -10,8 +10,22 @@ See ENGINEERING_DESIGN.md Milestone 2.5 for implementation details.
 """
 
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
 from brinksmanship.models.matrices import MatrixParameters, MatrixType
+from brinksmanship.parameters import (
+    CAPTURE_RATE,
+    CC_RISK_REDUCTION,
+    DD_BURN_RATE,
+    DD_RISK_INCREASE,
+    EXPLOIT_POSITION_GAIN,
+    EXPLOIT_RISK_INCREASE,
+    SURPLUS_BASE,
+    SURPLUS_STREAK_BONUS,
+)
+
+if TYPE_CHECKING:
+    from brinksmanship.models.state import GameState
 
 
 @dataclass(frozen=True)
@@ -900,3 +914,101 @@ def validate_all_templates() -> dict[MatrixType, tuple[bool, list[str]]]:
     for matrix_type, template in DELTA_TEMPLATES.items():
         results[matrix_type] = validate_ordinal_consistency(matrix_type, template)
     return results
+
+
+# =============================================================================
+# Surplus Mechanics
+# =============================================================================
+
+
+def apply_surplus_effects(state: "GameState", outcome: str) -> "GameState":
+    """Apply surplus mechanics based on outcome.
+
+    Implements the Joint Investment model from GAME_MANUAL.md Section 3.4.
+    This function modifies the state in place and returns it.
+
+    Args:
+        state: Current game state (modified in place)
+        outcome: One of "CC", "CD", "DC", "DD"
+
+    Returns:
+        The modified game state
+
+    Raises:
+        ValueError: If outcome is not one of CC, CD, DC, DD
+
+    Outcome effects:
+        CC (Mutual Cooperation):
+            - Creates new surplus scaled by cooperation streak
+            - Increments cooperation streak
+            - Reduces risk
+
+        CD (A Cooperates, B Defects):
+            - B captures portion of accumulated surplus
+            - Position shifts toward B
+            - Streak resets, risk increases
+
+        DC (A Defects, B Cooperates):
+            - A captures portion of accumulated surplus
+            - Position shifts toward A
+            - Streak resets, risk increases
+
+        DD (Mutual Defection):
+            - Surplus is partially destroyed (deadweight loss)
+            - No position change
+            - Streak resets, risk spikes
+    """
+    outcome_upper = outcome.upper()
+
+    if outcome_upper == "CC":
+        # Create new surplus - scales with cooperation streak
+        new_surplus = SURPLUS_BASE * (1.0 + SURPLUS_STREAK_BONUS * state.cooperation_streak)
+        state.cooperation_surplus = state.cooperation_surplus + new_surplus
+        state.cooperation_streak = state.cooperation_streak + 1
+
+        # Risk decreases (situation safer)
+        new_risk = state.risk_level - CC_RISK_REDUCTION
+        state.risk_level = max(0.0, new_risk)
+
+    elif outcome_upper == "CD":
+        # B captures portion of surplus
+        captured = state.cooperation_surplus * CAPTURE_RATE
+        state.surplus_captured_b = state.surplus_captured_b + captured
+        state.cooperation_surplus = state.cooperation_surplus - captured
+
+        # Position shift toward B
+        state.position_b = min(10.0, state.player_b.position + EXPLOIT_POSITION_GAIN)
+        state.position_a = max(0.0, state.player_a.position - EXPLOIT_POSITION_GAIN)
+
+        # Reset streak, increase risk
+        state.cooperation_streak = 0
+        state.risk_level = min(10.0, state.risk_level + EXPLOIT_RISK_INCREASE)
+
+    elif outcome_upper == "DC":
+        # A captures portion of surplus
+        captured = state.cooperation_surplus * CAPTURE_RATE
+        state.surplus_captured_a = state.surplus_captured_a + captured
+        state.cooperation_surplus = state.cooperation_surplus - captured
+
+        # Position shift toward A
+        state.position_a = min(10.0, state.player_a.position + EXPLOIT_POSITION_GAIN)
+        state.position_b = max(0.0, state.player_b.position - EXPLOIT_POSITION_GAIN)
+
+        # Reset streak, increase risk
+        state.cooperation_streak = 0
+        state.risk_level = min(10.0, state.risk_level + EXPLOIT_RISK_INCREASE)
+
+    elif outcome_upper == "DD":
+        # Surplus is partially destroyed (deadweight loss)
+        state.cooperation_surplus = state.cooperation_surplus * (1.0 - DD_BURN_RATE)
+
+        # No position change
+
+        # Reset streak, spike risk
+        state.cooperation_streak = 0
+        state.risk_level = min(10.0, state.risk_level + DD_RISK_INCREASE)
+
+    else:
+        raise ValueError(f"Invalid outcome: {outcome}. Must be CC, CD, DC, or DD")
+
+    return state

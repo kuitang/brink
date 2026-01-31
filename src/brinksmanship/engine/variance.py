@@ -189,29 +189,32 @@ def final_resolution(
 ) -> tuple[float, float]:
     """Calculate final Victory Points for both players.
 
-    This implements the Final Resolution algorithm from GAME_MANUAL.md Section 4.3.
+    This implements the Final Resolution algorithm from GAME_MANUAL.md Section 6.3.
     The algorithm:
     1. Calculate expected VP from position ratio
     2. Apply symmetric noise (same noise value affects both players)
     3. Clamp to [5, 95]
-    4. Renormalize to sum to 100
+    4. Add captured surplus to final VP
 
     The symmetric noise ensures that variance is a property of the situation,
     not punishing one player for shared chaos.
+
+    Note: Total VP can exceed 100 if surplus was created and captured!
+    Remaining cooperation_surplus (unsettled) is LOST.
 
     Args:
         state: Final game state at resolution
         seed: Optional random seed for reproducibility (for testing)
 
     Returns:
-        Tuple of (vp_a, vp_b) where both sum to 100
+        Tuple of (vp_a, vp_b). Total can exceed 100 due to captured surplus.
 
     Example from GAME_MANUAL.md:
         >>> state = GameState(position_a=6, position_b=4, risk_level=5,
-        ...                   cooperation_score=5, stability=5, turn=9)
+        ...                   cooperation_score=5, stability=5, turn=9,
+        ...                   surplus_captured_a=10.0, surplus_captured_b=5.0)
         >>> vp_a, vp_b = final_resolution(state, seed=42)
-        >>> round(vp_a + vp_b, 6)
-        100.0
+        >>> # Base ~60/40 + captured surplus = ~70/45
     """
     if seed is not None:
         random.seed(seed)
@@ -240,10 +243,10 @@ def final_resolution(
     vp_a_clamped = clamp(vp_a_raw, 5.0, 95.0)
     vp_b_clamped = clamp(vp_b_raw, 5.0, 95.0)
 
-    # Renormalize to sum to 100
-    total = vp_a_clamped + vp_b_clamped
-    vp_a = vp_a_clamped * 100.0 / total
-    vp_b = vp_b_clamped * 100.0 / total
+    # Add captured surplus (can exceed 100 total!)
+    # Per GAME_MANUAL.md Section 6.3: vp = clamp(vp_raw, 5, 95) + surplus_captured
+    vp_a = vp_a_clamped + state.surplus_captured_a
+    vp_b = vp_b_clamped + state.surplus_captured_b
 
     return vp_a, vp_b
 

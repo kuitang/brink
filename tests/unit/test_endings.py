@@ -31,16 +31,21 @@ from brinksmanship.models.state import GameState, PlayerState
 class TestMutualDestruction:
     """Tests for check_mutual_destruction function.
 
-    From GAME_MANUAL.md:
-        Risk = 10: Mutual Destruction, both receive 20 VP
+    From GAME_MANUAL.md Section 4.5:
+        Risk = 10: Mutual Destruction
+        - Both players receive **0 VP** (worst possible outcome)
+        - All surplus is lost
+        - Game ends immediately
     """
 
-    def _make_state(self, risk_level: float) -> GameState:
+    def _make_state(self, risk_level: float, surplus_a: float = 0.0, surplus_b: float = 0.0) -> GameState:
         """Helper to create state with specific risk level."""
         return GameState(
             player_a=PlayerState(position=5.0, resources=5.0),
             player_b=PlayerState(position=5.0, resources=5.0),
             risk_level=risk_level,
+            surplus_captured_a=surplus_a,
+            surplus_captured_b=surplus_b,
         )
 
     def test_risk_ten_triggers_mutual_destruction(self):
@@ -50,8 +55,8 @@ class TestMutualDestruction:
 
         assert ending is not None
         assert ending.ending_type == EndingType.MUTUAL_DESTRUCTION
-        assert ending.vp_a == 20.0
-        assert ending.vp_b == 20.0
+        assert ending.vp_a == 0.0
+        assert ending.vp_b == 0.0
 
     def test_risk_above_ten_triggers_mutual_destruction(self):
         """Risk level > 10 also triggers (edge case from clamping)."""
@@ -75,12 +80,12 @@ class TestMutualDestruction:
             assert ending is None, f"Risk {risk} should not trigger mutual destruction"
 
     def test_mutual_destruction_vp_values(self):
-        """Both players receive exactly 20 VP on mutual destruction."""
+        """Both players receive exactly 0 VP on mutual destruction (worst outcome)."""
         state = self._make_state(risk_level=10.0)
         ending = check_mutual_destruction(state)
 
-        assert ending.vp_a == 20.0
-        assert ending.vp_b == 20.0
+        assert ending.vp_a == 0.0
+        assert ending.vp_b == 0.0
         assert ending.vp_a == ending.vp_b  # Symmetric
 
     def test_mutual_destruction_description(self):
@@ -90,19 +95,40 @@ class TestMutualDestruction:
 
         assert "destruction" in ending.description.lower()
 
+    def test_mutual_destruction_ignores_captured_surplus(self):
+        """Mutual destruction returns 0 VP even if players had captured surplus.
+
+        All surplus is lost in mutual destruction - this is the ultimate punishment.
+        """
+        state = self._make_state(risk_level=10.0, surplus_a=20.0, surplus_b=15.0)
+        ending = check_mutual_destruction(state)
+
+        assert ending.vp_a == 0.0
+        assert ending.vp_b == 0.0
+
 
 class TestPositionLoss:
     """Tests for check_position_loss function.
 
-    From GAME_MANUAL.md:
-        Position = 0: That player loses, 10 VP. Opponent: 90 VP
+    From GAME_MANUAL.md Section 4.5:
+        Position = 0: Eliminated player receives 10 VP
+        Surviving player receives 90 VP + all their captured surplus
+        Remaining cooperation surplus is lost
     """
 
-    def _make_state(self, pos_a: float, pos_b: float) -> GameState:
-        """Helper to create state with specific positions."""
+    def _make_state(
+        self,
+        pos_a: float,
+        pos_b: float,
+        surplus_captured_a: float = 0.0,
+        surplus_captured_b: float = 0.0,
+    ) -> GameState:
+        """Helper to create state with specific positions and surplus."""
         return GameState(
             player_a=PlayerState(position=pos_a, resources=5.0),
             player_b=PlayerState(position=pos_b, resources=5.0),
+            surplus_captured_a=surplus_captured_a,
+            surplus_captured_b=surplus_captured_b,
         )
 
     def test_player_a_position_zero_triggers_loss(self):
@@ -142,37 +168,72 @@ class TestPositionLoss:
             ending = check_position_loss(state)
             assert ending is None, f"Position {pos} should not trigger loss"
 
-    def test_position_loss_vp_values_a(self):
-        """Player A gets 10 VP, Player B gets 90 VP when A loses."""
+    def test_position_loss_vp_values_a_no_surplus(self):
+        """Player A gets 10 VP, Player B gets 90 VP when A loses (no surplus)."""
         state = self._make_state(pos_a=0.0, pos_b=5.0)
         ending = check_position_loss(state)
 
         assert ending.vp_a == 10.0
         assert ending.vp_b == 90.0
-        assert ending.vp_a + ending.vp_b == 100.0
 
-    def test_position_loss_vp_values_b(self):
-        """Player A gets 90 VP, Player B gets 10 VP when B loses."""
+    def test_position_loss_vp_values_b_no_surplus(self):
+        """Player A gets 90 VP, Player B gets 10 VP when B loses (no surplus)."""
         state = self._make_state(pos_a=5.0, pos_b=0.0)
         ending = check_position_loss(state)
 
         assert ending.vp_a == 90.0
         assert ending.vp_b == 10.0
-        assert ending.vp_a + ending.vp_b == 100.0
+
+    def test_position_loss_winner_gets_captured_surplus(self):
+        """Winner receives 90 VP + their captured surplus."""
+        # Player A wins, Player B eliminated
+        state = self._make_state(
+            pos_a=5.0,
+            pos_b=0.0,
+            surplus_captured_a=15.0,  # Winner's surplus
+            surplus_captured_b=10.0,  # Loser's surplus - lost
+        )
+        ending = check_position_loss(state)
+
+        assert ending.vp_a == 90.0 + 15.0  # 90 base + captured surplus
+        assert ending.vp_b == 10.0  # Loser always gets 10, no surplus
+
+    def test_position_loss_loser_surplus_is_lost(self):
+        """Loser's captured surplus is lost when eliminated."""
+        # Player B wins, Player A eliminated
+        state = self._make_state(
+            pos_a=0.0,
+            pos_b=5.0,
+            surplus_captured_a=20.0,  # Loser's surplus - lost
+            surplus_captured_b=5.0,   # Winner's surplus
+        )
+        ending = check_position_loss(state)
+
+        assert ending.vp_a == 10.0  # Loser gets flat 10 VP, no surplus
+        assert ending.vp_b == 90.0 + 5.0  # Winner gets 90 + captured
 
 
 class TestResourceLoss:
     """Tests for check_resource_loss function.
 
     From GAME_MANUAL.md:
-        Resources = 0: That player loses, 15 VP. Opponent: 85 VP
+        Resources = 0: That player loses, 15 VP. Opponent: 85 VP + captured surplus
+        Remaining cooperation surplus is lost
     """
 
-    def _make_state(self, res_a: float, res_b: float) -> GameState:
-        """Helper to create state with specific resources."""
+    def _make_state(
+        self,
+        res_a: float,
+        res_b: float,
+        surplus_captured_a: float = 0.0,
+        surplus_captured_b: float = 0.0,
+    ) -> GameState:
+        """Helper to create state with specific resources and surplus."""
         return GameState(
             player_a=PlayerState(position=5.0, resources=res_a),
             player_b=PlayerState(position=5.0, resources=res_b),
+            surplus_captured_a=surplus_captured_a,
+            surplus_captured_b=surplus_captured_b,
         )
 
     def test_player_a_resources_zero_triggers_loss(self):
@@ -212,23 +273,49 @@ class TestResourceLoss:
             ending = check_resource_loss(state)
             assert ending is None, f"Resources {res} should not trigger loss"
 
-    def test_resource_loss_vp_values_a(self):
-        """Player A gets 15 VP, Player B gets 85 VP when A loses."""
+    def test_resource_loss_vp_values_a_no_surplus(self):
+        """Player A gets 15 VP, Player B gets 85 VP when A loses (no surplus)."""
         state = self._make_state(res_a=0.0, res_b=5.0)
         ending = check_resource_loss(state)
 
         assert ending.vp_a == 15.0
         assert ending.vp_b == 85.0
-        assert ending.vp_a + ending.vp_b == 100.0
 
-    def test_resource_loss_vp_values_b(self):
-        """Player A gets 85 VP, Player B gets 15 VP when B loses."""
+    def test_resource_loss_vp_values_b_no_surplus(self):
+        """Player A gets 85 VP, Player B gets 15 VP when B loses (no surplus)."""
         state = self._make_state(res_a=5.0, res_b=0.0)
         ending = check_resource_loss(state)
 
         assert ending.vp_a == 85.0
         assert ending.vp_b == 15.0
-        assert ending.vp_a + ending.vp_b == 100.0
+
+    def test_resource_loss_winner_gets_captured_surplus(self):
+        """Winner receives base VP + their captured surplus."""
+        # Player A wins (B exhausted), A has captured surplus
+        state = self._make_state(
+            res_a=5.0,
+            res_b=0.0,
+            surplus_captured_a=12.0,  # Winner's surplus
+            surplus_captured_b=8.0,   # Loser's surplus - lost
+        )
+        ending = check_resource_loss(state)
+
+        assert ending.vp_a == 85.0 + 12.0  # 85 base + captured surplus
+        assert ending.vp_b == 15.0  # Loser always gets 15, no surplus
+
+    def test_resource_loss_loser_surplus_is_lost(self):
+        """Loser's captured surplus is lost when they run out of resources."""
+        # Player B wins (A exhausted)
+        state = self._make_state(
+            res_a=0.0,
+            res_b=5.0,
+            surplus_captured_a=25.0,  # Loser's surplus - lost
+            surplus_captured_b=3.0,   # Winner's surplus
+        )
+        ending = check_resource_loss(state)
+
+        assert ending.vp_a == 15.0  # Loser gets flat 15 VP, no surplus
+        assert ending.vp_b == 85.0 + 3.0  # Winner gets 85 + captured
 
 
 class TestCrisisTerminationProbability:
@@ -371,8 +458,9 @@ class TestCrisisTermination:
         for seed in range(1000):
             ending = check_crisis_termination(state, seed=seed)
             if ending is not None:
-                # VP should sum to 100 (from final resolution)
-                assert ending.vp_a + ending.vp_b == pytest.approx(100.0)
+                # VP should sum to ~100 (from final resolution with no surplus)
+                # No surplus captured in this state, so should be ~100
+                assert 90.0 <= ending.vp_a + ending.vp_b <= 110.0
                 break
 
     def test_termination_probability_statistical(self):
@@ -442,7 +530,8 @@ class TestMaxTurns:
         ending = check_max_turns(state, seed=42)
 
         assert ending is not None
-        assert ending.vp_a + ending.vp_b == pytest.approx(100.0)
+        # No surplus captured in this state, so should be ~100
+        assert 90.0 <= ending.vp_a + ending.vp_b <= 110.0
 
     def test_max_turns_deterministic_with_seed(self):
         """MAX_TURNS VP are deterministic with seed."""
@@ -635,8 +724,14 @@ class TestCheckAllEndings:
         assert check_all_endings(state_rlb).ending_type == EndingType.RESOURCE_LOSS_B
 
 
-class TestVPSumsTo100:
-    """Tests verifying that all endings produce VP summing to 100."""
+class TestVPSumsAndSurplus:
+    """Tests verifying VP sums and surplus handling for endings.
+
+    Key rules from GAME_MANUAL.md:
+    - Mutual destruction: Both get 0 VP (worst outcome, all surplus lost)
+    - Position/Resource loss: Winner gets base + captured surplus
+    - Normal endings: VP can exceed 100 due to captured surplus
+    """
 
     def _make_state(
         self,
@@ -647,6 +742,8 @@ class TestVPSumsTo100:
         risk: float = 5.0,
         turn: int = 5,
         max_turns: int = 14,
+        surplus_captured_a: float = 0.0,
+        surplus_captured_b: float = 0.0,
     ) -> GameState:
         """Helper to create state."""
         return GameState(
@@ -655,18 +752,20 @@ class TestVPSumsTo100:
             risk_level=risk,
             turn=turn,
             max_turns=max_turns,
+            surplus_captured_a=surplus_captured_a,
+            surplus_captured_b=surplus_captured_b,
         )
 
-    def test_mutual_destruction_vp_sum(self):
-        """Mutual destruction VP sum to 40 (20 + 20)."""
+    def test_mutual_destruction_vp_sum_is_zero(self):
+        """Mutual destruction VP sum to 0 (worst possible outcome)."""
         state = self._make_state(risk=10.0)
         ending = check_mutual_destruction(state)
 
-        # Note: Mutual destruction is special - both get 20 VP
-        assert ending.vp_a + ending.vp_b == 40.0
+        # Note: Mutual destruction is worst outcome - both get 0 VP
+        assert ending.vp_a + ending.vp_b == 0.0
 
-    def test_position_loss_vp_sum(self):
-        """Position loss VP sum to 100."""
+    def test_position_loss_vp_sum_no_surplus(self):
+        """Position loss VP sum to 100 when no surplus captured."""
         state_a = self._make_state(pos_a=0.0)
         state_b = self._make_state(pos_b=0.0)
 
@@ -676,8 +775,18 @@ class TestVPSumsTo100:
         assert ending_a.vp_a + ending_a.vp_b == 100.0
         assert ending_b.vp_a + ending_b.vp_b == 100.0
 
-    def test_resource_loss_vp_sum(self):
-        """Resource loss VP sum to 100."""
+    def test_position_loss_vp_exceeds_100_with_surplus(self):
+        """Position loss VP can exceed 100 when winner has surplus."""
+        state = self._make_state(pos_b=0.0, surplus_captured_a=20.0)
+        ending = check_position_loss(state)
+
+        # Winner (A) gets 90 + 20 surplus = 110
+        assert ending.vp_a == 110.0
+        assert ending.vp_b == 10.0
+        assert ending.vp_a + ending.vp_b == 120.0
+
+    def test_resource_loss_vp_sum_no_surplus(self):
+        """Resource loss VP sum to 100 when no surplus captured."""
         state_a = self._make_state(res_a=0.0)
         state_b = self._make_state(res_b=0.0)
 
@@ -687,21 +796,42 @@ class TestVPSumsTo100:
         assert ending_a.vp_a + ending_a.vp_b == 100.0
         assert ending_b.vp_a + ending_b.vp_b == 100.0
 
-    def test_max_turns_vp_sum(self):
-        """Max turns VP sum to 100."""
-        state = self._make_state(turn=14, max_turns=14)
+    def test_resource_loss_vp_exceeds_100_with_surplus(self):
+        """Resource loss VP can exceed 100 when winner has surplus."""
+        state = self._make_state(res_a=0.0, surplus_captured_b=15.0)
+        ending = check_resource_loss(state)
 
-        for seed in range(10):
-            ending = check_max_turns(state, seed=seed)
-            assert ending.vp_a + ending.vp_b == pytest.approx(100.0)
+        # Winner (B) gets 85 + 15 surplus = 100
+        assert ending.vp_a == 15.0
+        assert ending.vp_b == 100.0
+        assert ending.vp_a + ending.vp_b == 115.0
 
-    def test_crisis_termination_vp_sum(self):
-        """Crisis termination VP sum to 100."""
-        state = self._make_state(risk=9.0, turn=10)
+    def test_max_turns_vp_includes_surplus(self):
+        """Max turns ending includes captured surplus in VP."""
+        state = self._make_state(
+            turn=14,
+            max_turns=14,
+            surplus_captured_a=10.0,
+            surplus_captured_b=5.0,
+        )
+
+        ending = check_max_turns(state, seed=42)
+        # Total should exceed 100 due to surplus (100 base + 15 captured)
+        assert ending.vp_a + ending.vp_b > 100.0
+
+    def test_crisis_termination_vp_includes_surplus(self):
+        """Crisis termination includes captured surplus in VP."""
+        state = self._make_state(
+            risk=9.0,
+            turn=10,
+            surplus_captured_a=8.0,
+            surplus_captured_b=7.0,
+        )
 
         # Find a seed that triggers termination
         for seed in range(1000):
             ending = check_crisis_termination(state, seed=seed)
             if ending is not None:
-                assert ending.vp_a + ending.vp_b == pytest.approx(100.0)
+                # Total should exceed 100 due to surplus
+                assert ending.vp_a + ending.vp_b > 100.0
                 break

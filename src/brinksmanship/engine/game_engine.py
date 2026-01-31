@@ -30,6 +30,7 @@ from brinksmanship.models.actions import (
     get_action_menu,
     validate_action_availability,
 )
+from brinksmanship.engine.state_deltas import apply_surplus_effects
 from brinksmanship.models.matrices import (
     MatrixParameters,
     MatrixType,
@@ -1139,8 +1140,20 @@ class GameEngine:
         - Cooperation score update
         - Stability update
         - Previous action type tracking
+
+        Then applies surplus effects based on outcome code:
+        - CC: Creates surplus, increments streak, reduces risk
+        - CD/DC: Captures surplus, resets streak, increases risk
+        - DD: Burns surplus, resets streak, spikes risk
         """
-        return apply_action_result(self.state, result)
+        new_state = apply_action_result(self.state, result)
+
+        # Apply surplus mechanics for standard matrix outcomes
+        outcome_code = result.outcome_code.upper()
+        if outcome_code in ("CC", "CD", "DC", "DD"):
+            new_state = apply_surplus_effects(new_state, outcome_code)
+
+        return new_state
 
     # =========================================================================
     # Ending Checks

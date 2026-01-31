@@ -3,15 +3,15 @@
 This module implements all game ending conditions as specified in GAME_MANUAL.md.
 
 Ending Types:
-- MUTUAL_DESTRUCTION: Risk = 10, both get 20 VP
-- POSITION_LOSS_A/B: Position = 0, loser gets 10 VP, winner gets 90 VP
-- RESOURCE_LOSS_A/B: Resources = 0, loser gets 15 VP, winner gets 85 VP
+- MUTUAL_DESTRUCTION: Risk = 10, both get 0 VP (worst possible outcome)
+- POSITION_LOSS_A/B: Position = 0, loser gets 10 VP, winner gets 90 VP + captured surplus
+- RESOURCE_LOSS_A/B: Resources = 0, loser gets 15 VP, winner gets 85 VP + captured surplus
 - CRISIS_TERMINATION: Probabilistic ending when Risk > 7 and Turn >= 10
 - MAX_TURNS: Natural ending when turn reaches max_turns
 - SETTLEMENT: Negotiated ending (handled separately by settlement system)
 
 Deterministic Endings (checked in order):
-1. Risk = 10 -> Mutual Destruction
+1. Risk = 10 -> Mutual Destruction (0 VP for both, all surplus lost)
 2. Position = 0 -> Position Loss
 3. Resources = 0 -> Resource Loss
 
@@ -73,8 +73,11 @@ class GameEnding:
 def check_mutual_destruction(state: GameState) -> GameEnding | None:
     """Check if Risk = 10 (Mutual Destruction).
 
-    From GAME_MANUAL.md:
-        Risk = 10: Mutual Destruction, both receive 20 VP
+    From GAME_MANUAL.md Section 4.5:
+        Risk = 10: Mutual Destruction
+        - Both players receive **0 VP** (worst possible outcome)
+        - All surplus is lost
+        - Game ends immediately
 
     Args:
         state: Current game state
@@ -85,9 +88,9 @@ def check_mutual_destruction(state: GameState) -> GameEnding | None:
     if state.risk_level >= 10.0:
         return GameEnding(
             ending_type=EndingType.MUTUAL_DESTRUCTION,
-            vp_a=20.0,
-            vp_b=20.0,
-            description="The crisis has spiraled out of control. Mutual destruction ensues. Both players receive 20 VP.",
+            vp_a=0.0,
+            vp_b=0.0,
+            description="The crisis has spiraled out of control. Mutual destruction ensues. Both players receive 0 VP - all value is lost.",
         )
     return None
 
@@ -95,8 +98,10 @@ def check_mutual_destruction(state: GameState) -> GameEnding | None:
 def check_position_loss(state: GameState) -> GameEnding | None:
     """Check if either player's Position = 0.
 
-    From GAME_MANUAL.md:
-        Position = 0: That player loses, 10 VP. Opponent: 90 VP
+    From GAME_MANUAL.md Section 4.5:
+        Position = 0: Eliminated player receives 10 VP
+        Surviving player receives 90 VP + all their captured surplus
+        Remaining cooperation surplus is lost
 
     Args:
         state: Current game state
@@ -105,18 +110,24 @@ def check_position_loss(state: GameState) -> GameEnding | None:
         GameEnding if either position is 0, None otherwise
     """
     if state.position_a <= 0.0:
+        # Player A eliminated, Player B wins
+        # Winner gets 90 VP + their captured surplus
+        vp_b = 90.0 + state.surplus_captured_b
         return GameEnding(
             ending_type=EndingType.POSITION_LOSS_A,
             vp_a=10.0,
-            vp_b=90.0,
-            description="Player A's position has collapsed. Player A receives 10 VP, Player B receives 90 VP.",
+            vp_b=vp_b,
+            description=f"Player A's position has collapsed. Player A receives 10 VP, Player B receives {vp_b:.1f} VP (90 + {state.surplus_captured_b:.1f} captured surplus).",
         )
     if state.position_b <= 0.0:
+        # Player B eliminated, Player A wins
+        # Winner gets 90 VP + their captured surplus
+        vp_a = 90.0 + state.surplus_captured_a
         return GameEnding(
             ending_type=EndingType.POSITION_LOSS_B,
-            vp_a=90.0,
+            vp_a=vp_a,
             vp_b=10.0,
-            description="Player B's position has collapsed. Player A receives 90 VP, Player B receives 10 VP.",
+            description=f"Player B's position has collapsed. Player A receives {vp_a:.1f} VP (90 + {state.surplus_captured_a:.1f} captured surplus), Player B receives 10 VP.",
         )
     return None
 
@@ -125,7 +136,8 @@ def check_resource_loss(state: GameState) -> GameEnding | None:
     """Check if either player's Resources = 0.
 
     From GAME_MANUAL.md:
-        Resources = 0: That player loses, 15 VP. Opponent: 85 VP
+        Resources = 0: That player loses, 15 VP. Opponent: 85 VP + captured surplus
+        Remaining cooperation surplus is lost
 
     Args:
         state: Current game state
@@ -134,18 +146,22 @@ def check_resource_loss(state: GameState) -> GameEnding | None:
         GameEnding if either resources is 0, None otherwise
     """
     if state.resources_a <= 0.0:
+        # Player A loses, Player B wins
+        vp_b = 85.0 + state.surplus_captured_b
         return GameEnding(
             ending_type=EndingType.RESOURCE_LOSS_A,
             vp_a=15.0,
-            vp_b=85.0,
-            description="Player A has exhausted all resources. Player A receives 15 VP, Player B receives 85 VP.",
+            vp_b=vp_b,
+            description=f"Player A has exhausted all resources. Player A receives 15 VP, Player B receives {vp_b:.1f} VP (85 + {state.surplus_captured_b:.1f} captured surplus).",
         )
     if state.resources_b <= 0.0:
+        # Player B loses, Player A wins
+        vp_a = 85.0 + state.surplus_captured_a
         return GameEnding(
             ending_type=EndingType.RESOURCE_LOSS_B,
-            vp_a=85.0,
+            vp_a=vp_a,
             vp_b=15.0,
-            description="Player B has exhausted all resources. Player A receives 85 VP, Player B receives 15 VP.",
+            description=f"Player B has exhausted all resources. Player A receives {vp_a:.1f} VP (85 + {state.surplus_captured_a:.1f} captured surplus), Player B receives 15 VP.",
         )
     return None
 

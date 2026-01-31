@@ -13,12 +13,12 @@ Modify the outcome effect system to implement the Joint Investment model from GA
 - T03 (GameState has surplus fields)
 
 ## Acceptance Criteria
-- [ ] CC outcome creates surplus: `SURPLUS_BASE * (1 + SURPLUS_STREAK_BONUS * streak)`
-- [ ] CD/DC outcome captures surplus: `surplus * CAPTURE_RATE`
-- [ ] DD outcome burns surplus: `surplus *= (1 - DD_BURN_RATE)`
-- [ ] Risk changes use constants from parameters.py
-- [ ] All 14 matrix types updated
-- [ ] Unit tests verify surplus math
+- [x] CC outcome creates surplus: `SURPLUS_BASE * (1 + SURPLUS_STREAK_BONUS * streak)`
+- [x] CD/DC outcome captures surplus: `surplus * CAPTURE_RATE`
+- [x] DD outcome burns surplus: `surplus *= (1 - DD_BURN_RATE)`
+- [x] Risk changes use constants from parameters.py
+- [x] All 14 matrix types updated — Note: surplus mechanics apply uniformly via `apply_surplus_effects()` function
+- [x] Unit tests verify surplus math (5 tests in TestSurplusMechanics class)
 
 ## Files to Modify
 - `src/brinksmanship/engine/state_deltas.py`

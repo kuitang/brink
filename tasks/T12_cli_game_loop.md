@@ -14,13 +14,13 @@ Create the main game loop displaying state, accepting actions, and showing resul
 - T11 (CLI scaffolding)
 
 ## Acceptance Criteria
-- [ ] Display crisis status: Risk, Cooperation, Stability, Surplus Pool
-- [ ] Display briefing text from scenario
-- [ ] Display turn history (outcome per turn)
-- [ ] Action selection via menu
-- [ ] Show outcome after each turn
-- [ ] Loop until game ends
-- [ ] Handle all ending types
+- [x] Display crisis status: Risk, Cooperation, Stability, Surplus Pool
+- [x] Display briefing text from scenario
+- [x] Display turn history (outcome per turn)
+- [x] Action selection via menu
+- [x] Show outcome after each turn
+- [x] Loop until game ends
+- [x] Handle all ending types
 
 ## Files to Modify
 - `src/brinksmanship/cli/app.py`

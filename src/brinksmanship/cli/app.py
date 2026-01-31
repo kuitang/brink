@@ -287,6 +287,15 @@ class BrinksmanshipCLI:
         print(f"  Risk Level:   {state.risk_level:.1f}/10")
         print(f"  Cooperation:  {state.cooperation_score:.1f}/10")
         print(f"  Stability:    {state.stability:.1f}/10")
+        print(f"  Surplus Pool: {state.cooperation_surplus:.1f} VP")
+        # Show captured VP from perspective of human player
+        if self.human_is_player_a:
+            your_captured = state.surplus_captured_a
+            opp_captured = state.surplus_captured_b
+        else:
+            your_captured = state.surplus_captured_b
+            opp_captured = state.surplus_captured_a
+        print(f"  Your Captured: {your_captured:.1f} VP  Opponent Captured: {opp_captured:.1f} VP")
 
         # Recent history
         print_section("RECENT HISTORY")

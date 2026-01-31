@@ -840,6 +840,141 @@ class TestEdgeCases:
 # =============================================================================
 
 
+# =============================================================================
+# Surplus Mechanics Integration Tests
+# =============================================================================
+
+
+class TestSurplusMechanics:
+    """Tests for surplus mechanics integration into game engine."""
+
+    def test_engine_surplus_mechanics(self, mock_repo):
+        """Verify engine applies surplus effects during turn resolution.
+
+        This integration test verifies:
+        1. CC outcomes create surplus and increment streak
+        2. CD outcomes capture surplus for the defector
+        3. Streak resets on non-CC outcomes
+        """
+        engine = GameEngine(
+            scenario_id="test-scenario",
+            scenario_repo=mock_repo,
+            max_turns=14,
+            random_seed=42,
+        )
+
+        # Initial state - no surplus, no streak
+        assert engine.state.cooperation_surplus == 0.0
+        assert engine.state.cooperation_streak == 0
+        assert engine.state.surplus_captured_a == 0.0
+        assert engine.state.surplus_captured_b == 0.0
+
+        # Play CC turn - should create surplus and increment streak
+        result = engine.submit_actions(DEESCALATE, DEESCALATE)
+        assert result.success is True
+
+        # After CC: surplus created, streak incremented
+        assert engine.state.cooperation_surplus > 0.0
+        assert engine.state.cooperation_streak == 1
+
+        # Play another CC turn - surplus should grow, streak should be 2
+        initial_surplus = engine.state.cooperation_surplus
+        engine.submit_actions(DEESCALATE, DEESCALATE)
+
+        assert engine.state.cooperation_surplus > initial_surplus
+        assert engine.state.cooperation_streak == 2
+
+        # Play CD turn (A cooperates, B defects) - B captures surplus
+        surplus_before_capture = engine.state.cooperation_surplus
+        engine.submit_actions(DEESCALATE, ESCALATE)
+
+        # B should have captured some surplus
+        assert engine.state.surplus_captured_b > 0.0
+        # Surplus pool should be reduced
+        assert engine.state.cooperation_surplus < surplus_before_capture
+        # Streak should reset
+        assert engine.state.cooperation_streak == 0
+        # A should not have captured anything
+        assert engine.state.surplus_captured_a == 0.0
+
+    def test_dc_captures_surplus_for_a(self, mock_repo):
+        """Verify DC outcome captures surplus for player A."""
+        engine = GameEngine(
+            scenario_id="test-scenario",
+            scenario_repo=mock_repo,
+            max_turns=14,
+            random_seed=42,
+        )
+
+        # Build some surplus with CC
+        engine.submit_actions(DEESCALATE, DEESCALATE)
+        engine.submit_actions(DEESCALATE, DEESCALATE)
+
+        surplus_before = engine.state.cooperation_surplus
+        assert surplus_before > 0.0
+
+        # DC - A defects, B cooperates
+        engine.submit_actions(ESCALATE, DEESCALATE)
+
+        # A should have captured surplus
+        assert engine.state.surplus_captured_a > 0.0
+        assert engine.state.cooperation_surplus < surplus_before
+        assert engine.state.cooperation_streak == 0
+
+    def test_dd_burns_surplus(self, mock_repo):
+        """Verify DD outcome burns surplus without capturing."""
+        engine = GameEngine(
+            scenario_id="test-scenario",
+            scenario_repo=mock_repo,
+            max_turns=14,
+            random_seed=42,
+        )
+
+        # Build some surplus with CC
+        engine.submit_actions(DEESCALATE, DEESCALATE)
+        engine.submit_actions(DEESCALATE, DEESCALATE)
+
+        surplus_before = engine.state.cooperation_surplus
+        assert surplus_before > 0.0
+
+        # DD - both defect
+        engine.submit_actions(ESCALATE, ESCALATE)
+
+        # Surplus should be reduced (burned)
+        assert engine.state.cooperation_surplus < surplus_before
+        # But neither player captured anything
+        assert engine.state.surplus_captured_a == 0.0
+        assert engine.state.surplus_captured_b == 0.0
+        # Streak should reset
+        assert engine.state.cooperation_streak == 0
+
+    def test_streak_bonus_increases_surplus_creation(self, mock_repo):
+        """Verify cooperation streak increases surplus creation rate."""
+        engine = GameEngine(
+            scenario_id="test-scenario",
+            scenario_repo=mock_repo,
+            max_turns=14,
+            random_seed=42,
+        )
+
+        # First CC - base surplus
+        engine.submit_actions(DEESCALATE, DEESCALATE)
+        surplus_after_1 = engine.state.cooperation_surplus
+
+        # Second CC - streak=1, should get bonus
+        engine.submit_actions(DEESCALATE, DEESCALATE)
+        surplus_after_2 = engine.state.cooperation_surplus
+        increment_2 = surplus_after_2 - surplus_after_1
+
+        # Third CC - streak=2, should get more bonus
+        engine.submit_actions(DEESCALATE, DEESCALATE)
+        surplus_after_3 = engine.state.cooperation_surplus
+        increment_3 = surplus_after_3 - surplus_after_2
+
+        # Each increment should be larger due to streak bonus
+        assert increment_3 > increment_2 > surplus_after_1
+
+
 class TestFinalResolution:
     """Tests for final VP resolution calculation."""
 
