@@ -22,8 +22,9 @@ RUN uv pip install gunicorn
 # Copy application code
 COPY src/ src/
 
-# Copy scenarios (now tracked in git)
+# Copy scenarios and game manual (now tracked in git)
 COPY scenarios/ scenarios/
+COPY GAME_MANUAL.md .
 
 # Copy and run manual generation script
 COPY scripts/generate_manual.py scripts/generate_manual.py
