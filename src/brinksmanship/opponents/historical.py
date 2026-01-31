@@ -4,13 +4,25 @@ This module implements the HistoricalPersona class that uses LLM with persona-sp
 prompts to make strategic decisions. Each persona embodies a historical figure's
 documented strategic patterns and decision-making style.
 
+Each HistoricalPersona maintains a ClaudeSDKClient instance that preserves conversation
+history across turns, allowing the LLM to reference its prior reasoning and adapt
+strategy based on observed opponent patterns.
+
 See GAME_MANUAL.md for authoritative game mechanics.
 See prompts.py for persona definitions (PERSONA_BISMARCK, PERSONA_NIXON, etc.).
 """
 
+import logging
 from typing import Any
 
-from brinksmanship.llm import generate_json
+from claude_agent_sdk import (
+    AssistantMessage,
+    ClaudeAgentOptions,
+    ClaudeSDKClient,
+    ResultMessage,
+    TextBlock,
+)
+
 from brinksmanship.models.actions import Action, ActionType
 from brinksmanship.models.state import ActionResult, GameState
 from brinksmanship.opponents.base import (
@@ -24,10 +36,11 @@ from brinksmanship.prompts import (
     PERSONA_ACTION_SELECTION_PROMPT,
     PERSONA_SETTLEMENT_PROPOSAL_PROMPT,
     SETTLEMENT_EVALUATION_SCHEMA,
-    SETTLEMENT_EVALUATION_SYSTEM_PROMPT,
     SETTLEMENT_PROPOSAL_SCHEMA,
     format_settlement_evaluation_prompt,
 )
+
+logger = logging.getLogger(__name__)
 
 # Mapping from persona name to prompt constant name in prompts.py
 PERSONA_PROMPTS: dict[str, str] = {
@@ -135,6 +148,9 @@ class HistoricalPersona(Opponent):
     Uses LLM with persona-specific prompts to make decisions. The persona
     influences action selection, settlement evaluation, and negotiation style.
 
+    Maintains a ClaudeSDKClient instance for conversation continuity, allowing
+    the LLM to reference its prior reasoning across turns within a game.
+
     Attributes:
         persona_name: The lowercase key for the persona (e.g., 'bismarck')
         persona_description: The full persona description from prompts.py
@@ -143,6 +159,8 @@ class HistoricalPersona(Opponent):
         is_player_a: Whether this opponent is playing as Player A
         role_name: The scenario-specific role name (e.g., "Soviet Premier")
         role_description: Description of the role in the scenario
+        _client: Lazily-initialized ClaudeSDKClient for conversation continuity
+        _conversation_turn_count: Number of LLM interactions in this game
     """
 
     def __init__(
@@ -185,6 +203,10 @@ class HistoricalPersona(Opponent):
         self.action_history: list[tuple[Action, GameState]] = []
         self.settlement_history: list[tuple[SettlementProposal, SettlementResponse, GameState]] = []
 
+        # ClaudeSDKClient for conversation continuity (lazy initialized)
+        self._client: ClaudeSDKClient | None = None
+        self._conversation_turn_count: int = 0
+
     def _get_my_state(self, state: GameState) -> tuple[float, float, ActionType | None]:
         """Get this persona's position, resources, and previous action type."""
         if self.is_player_a:
@@ -206,6 +228,101 @@ class HistoricalPersona(Opponent):
         info_state = state.player_a.information if self.is_player_a else state.player_b.information
 
         return info_state.get_position_estimate(state.turn)
+
+    def _get_client(self) -> ClaudeSDKClient:
+        """Lazily initialize and return the ClaudeSDKClient.
+
+        The client maintains conversation history across all LLM calls within
+        a single game, allowing the persona to reference prior reasoning.
+
+        Returns:
+            The ClaudeSDKClient instance for this persona's game session.
+        """
+        if self._client is None:
+            options = ClaudeAgentOptions(
+                max_turns=10,
+                allowed_tools=["Read"],  # Enable file reading for GAME_MANUAL.md
+                system_prompt=HISTORICAL_PERSONA_SYSTEM_PROMPT,
+            )
+            self._client = ClaudeSDKClient(options=options)
+            logger.debug(f"{self.display_name}: Initialized ClaudeSDKClient for conversation continuity")
+        return self._client
+
+    async def _query_llm(
+        self,
+        prompt: str,
+        schema: dict[str, Any],
+    ) -> dict[str, Any]:
+        """Query the LLM with conversation continuity.
+
+        Uses the persistent ClaudeSDKClient to maintain conversation history
+        across turns, allowing the persona to reference prior reasoning.
+
+        Args:
+            prompt: The prompt to send to the LLM
+            schema: JSON schema for structured output validation
+
+        Returns:
+            The parsed JSON response as a dictionary
+
+        Raises:
+            ValueError: If the response cannot be parsed as JSON
+        """
+        import json
+        import re
+
+        client = self._get_client()
+        self._conversation_turn_count += 1
+
+        logger.debug(f"{self.display_name}: LLM query #{self._conversation_turn_count}, prompt={len(prompt)} chars")
+
+        # Enter client context if not already active
+        if not client._active:
+            await client.__aenter__()
+
+        # Send the prompt with schema request
+        schema_instruction = f"\n\nRespond with valid JSON matching this schema:\n{json.dumps(schema, indent=2)}"
+        await client.query(prompt + schema_instruction)
+
+        # Collect the response
+        response_text = ""
+        structured_output = None
+
+        async for message in client.receive_response():
+            if isinstance(message, AssistantMessage):
+                for block in message.content:
+                    if isinstance(block, TextBlock):
+                        response_text += block.text
+            elif isinstance(message, ResultMessage):
+                if hasattr(message, "structured_output") and message.structured_output:
+                    structured_output = message.structured_output
+
+        # If we got structured output, use it
+        if structured_output is not None:
+            logger.debug(f"{self.display_name}: Received structured_output")
+            return structured_output
+
+        # Fall back to text parsing
+        text = response_text.strip()
+
+        # Try to extract JSON from markdown code blocks
+        json_block_match = re.search(r"```json\s*\n(.*?)\n```", text, re.DOTALL)
+        if json_block_match:
+            text = json_block_match.group(1).strip()
+        else:
+            code_block_match = re.search(r"```\s*\n(.*?)\n```", text, re.DOTALL)
+            if code_block_match:
+                text = code_block_match.group(1).strip()
+            else:
+                json_obj_match = re.search(r"\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}", text, re.DOTALL)
+                if json_obj_match:
+                    text = json_obj_match.group(0).strip()
+
+        try:
+            return json.loads(text)
+        except json.JSONDecodeError as e:
+            logger.error(f"{self.display_name}: Failed to parse JSON: {e}\nResponse: {response_text[:500]}")
+            raise ValueError(f"Failed to parse JSON response: {e}") from e
 
     async def choose_action(self, state: GameState, available_actions: list[Action]) -> Action:
         """Choose an action using LLM with persona prompt.
@@ -244,10 +361,9 @@ class HistoricalPersona(Opponent):
             action_list=_format_action_list(available_actions),
         )
 
-        # Call LLM with structured output
-        response = await generate_json(
+        # Call LLM with conversation continuity
+        response = await self._query_llm(
             prompt=prompt,
-            system_prompt=HISTORICAL_PERSONA_SYSTEM_PROMPT,
             schema=ACTION_SELECTION_SCHEMA,
         )
 
@@ -319,10 +435,9 @@ class HistoricalPersona(Opponent):
             persona_description=self.persona_description,
         )
 
-        # Call LLM with structured output
-        response = await generate_json(
+        # Call LLM with conversation continuity
+        response = await self._query_llm(
             prompt=prompt,
-            system_prompt=SETTLEMENT_EVALUATION_SYSTEM_PROMPT,
             schema=SETTLEMENT_EVALUATION_SCHEMA,
         )
 
@@ -401,10 +516,9 @@ class HistoricalPersona(Opponent):
             max_vp=max_vp,
         )
 
-        # Call LLM with structured output
-        response = await generate_json(
+        # Call LLM with conversation continuity
+        response = await self._query_llm(
             prompt=prompt,
-            system_prompt=HISTORICAL_PERSONA_SYSTEM_PROMPT,
             schema=SETTLEMENT_PROPOSAL_SCHEMA,
         )
 
@@ -443,10 +557,13 @@ class HistoricalPersona(Opponent):
         """Get a summary of this persona's action history.
 
         Returns:
-            Dictionary with history statistics
+            Dictionary with history statistics including conversation turn count
         """
         if not self.action_history:
-            return {"turns_played": 0}
+            return {
+                "turns_played": 0,
+                "conversation_turns": self._conversation_turn_count,
+            }
 
         cooperative_count = sum(1 for action, _ in self.action_history if action.action_type == ActionType.COOPERATIVE)
         competitive_count = len(self.action_history) - cooperative_count
@@ -457,7 +574,22 @@ class HistoricalPersona(Opponent):
             "competitive_actions": competitive_count,
             "cooperation_rate": cooperative_count / len(self.action_history),
             "settlements_evaluated": len(self.settlement_history),
+            "conversation_turns": self._conversation_turn_count,
         }
+
+    async def cleanup(self) -> None:
+        """Clean up resources, including the ClaudeSDKClient.
+
+        Should be called when the game ends to properly close the client connection.
+        """
+        if self._client is not None:
+            try:
+                await self._client.__aexit__(None, None, None)
+            except Exception as e:
+                logger.warning(f"{self.display_name}: Error closing client: {e}")
+            finally:
+                self._client = None
+                logger.debug(f"{self.display_name}: ClaudeSDKClient closed after {self._conversation_turn_count} turns")
 
     def __repr__(self) -> str:
         """String representation of this persona."""
