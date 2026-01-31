@@ -24,9 +24,7 @@ Currently, each LLM call for action selection/settlement evaluation is stateless
 - [ ] No regression in existing playtest performance
 
 ## Files to Modify
-- `src/brinksmanship/llm.py` - Add `ConversationalClient` class
-- `src/brinksmanship/opponents/historical.py` - Use ConversationalClient
-- `scripts/playtest/run_matchup.py` - Ensure fresh client per game
+- `src/brinksmanship/opponents/historical.py` - Hold ClaudeSDKClient instance, reuse across turns
 
 ## Files to Add
 - `tests/unit/test_llm_conversation.py` - Unit tests for conversation history
@@ -35,12 +33,43 @@ Currently, each LLM call for action selection/settlement evaluation is stateless
 
 ## Implementation Plan
 
-### BARRIER 1: ConversationalClient Infrastructure
+### Key Insight: Use ClaudeSDKClient Directly
+
+The Claude SDK already tracks conversation history internally. No wrapper class needed:
+- `ClaudeSDKClient` maintains message history across calls
+- Each `HistoricalPersona` holds its own client instance (lazy initialized)
+- Reuse the same client for all turns within a game
+- At game end, client is garbage collected when persona is discarded
+
+### BARRIER 1: ClaudeSDKClient Instance in HistoricalPersona
 **Tasks:**
-1. Create `ConversationalClient` class in `llm.py` that wraps `ClaudeSDKClient`
-2. Track message history as list of (role, content) tuples
-3. Provide `query()` method that appends to history and returns response
-4. Provide `reset()` method to clear history (for new game)
+1. Add `_client: ClaudeSDKClient | None` attribute to HistoricalPersona
+2. Lazy initialize client on first LLM call
+3. Reuse same client instance for all subsequent calls in the game
+
+**Code Pattern:**
+```python
+class HistoricalPersona:
+    def __init__(self, ...):
+        ...
+        self._client: ClaudeSDKClient | None = None
+
+    def _get_client(self) -> ClaudeSDKClient:
+        """Lazy initialize and return the client."""
+        if self._client is None:
+            self._client = ClaudeSDKClient()
+        return self._client
+
+    def choose_action(self, state: GameState) -> Action:
+        client = self._get_client()
+        # Use client.query() - history accumulates automatically
+        ...
+
+    def evaluate_settlement(self, state: GameState, proposal: Settlement) -> bool:
+        client = self._get_client()
+        # Same client, so LLM sees prior reasoning
+        ...
+```
 
 **Verification:**
 ```bash
@@ -48,40 +77,17 @@ uv run pytest tests/unit/test_llm_conversation.py -v
 ```
 
 **Tests to Add:**
-- `test_conversation_history_accumulates`: Verify messages accumulate
-- `test_conversation_reset_clears_history`: Verify reset works
-- `test_query_includes_prior_context`: Verify prior context sent to LLM
+- `test_persona_reuses_client_across_turns`: Verify same client instance used
+- `test_persona_conversation_persists`: Mock client, verify history accumulates
 
-**Commit:** `"Barrier 1: ConversationalClient infrastructure (T26)"`
-
----
-
-### BARRIER 2: Integrate with HistoricalPersona
-**Tasks:**
-1. Add `_conversation_client: ConversationalClient | None` to HistoricalPersona
-2. Initialize client lazily on first LLM call
-3. Modify `choose_action()` to use conversational client
-4. Modify `evaluate_settlement()` to use same client
-5. Add `reset_conversation()` method for game restart
-
-**Verification:**
-```bash
-uv run pytest tests/unit/test_historical_persona.py -v -k conversation
-```
-
-**Tests to Add:**
-- `test_persona_uses_conversation_client`: Verify client is used
-- `test_persona_conversation_persists_across_turns`: Multi-turn test
-- `test_persona_reset_clears_conversation`: Verify reset between games
-
-**Commit:** `"Barrier 2: HistoricalPersona conversation integration (T26)"`
+**Commit:** `"Barrier 1: HistoricalPersona holds ClaudeSDKClient instance (T26)"`
 
 ---
 
-### BARRIER 3: Playtest Integration & Manual Test
+### BARRIER 2: Playtest Integration & Manual Test
 **Tasks:**
-1. Update `run_matchup.py` to reset conversation between games
-2. Add logging to show conversation history length
+1. Verify playtest creates fresh persona (and thus fresh client) per game
+2. Add logging to show conversation turn count
 3. Manual test: Run single game with verbose logging, verify LLM references prior turns
 
 **Manual CLI Test:**
@@ -107,17 +113,26 @@ uv run pytest tests/ -v --ignore=tests/test_real_llm_integration.py
 bash scripts/playtest/driver.sh --parallel 1 --games-per-matchup 1 --scenarios cuban_missile_crisis
 ```
 
-**Commit:** `"Barrier 3: Playtest integration and manual test (T26)"`
+**Commit:** `"Barrier 2: Playtest integration and manual test (T26)"`
 
 ---
 
 ## Design Notes
 
-### Why ClaudeSDKClient over query()?
-The `query()` function is stateless - each call starts fresh. `ClaudeSDKClient` (used in `generate_and_fix_json`) maintains conversation state via `async with` context.
+### Why No Wrapper Class?
+The original plan called for a `ConversationalClient` wrapper class. This is unnecessary:
+- `ClaudeSDKClient` already tracks message history internally
+- No need for a `reset()` method - create new client for new game
+- Simpler code, fewer abstractions
+
+### Why Not Prompt Prefix Caching?
+Prompt prefix caching was considered but rejected:
+- Games are ~15 turns - not enough repetition to benefit significantly
+- Adds complexity for minimal gain
+- SDK handles caching internally where beneficial
 
 ### Memory Considerations
 Conversation history grows linearly with game length (~15 turns typical). Each turn adds ~500-1000 tokens of context. This is manageable but should be monitored.
 
-### Rollback Strategy
-If conversation history causes issues (OOM, degraded quality), can be disabled by setting `use_conversation_history=False` on HistoricalPersona.
+### Fresh Client Per Game
+The playtest infrastructure creates new persona instances per game, so each game automatically gets a fresh client with empty history. No explicit reset needed.
