@@ -26,10 +26,6 @@ COPY src/ src/
 COPY scenarios/ scenarios/
 COPY GAME_MANUAL.md .
 
-# Copy and run manual generation script
-COPY scripts/generate_manual.py scripts/generate_manual.py
-RUN uv run python scripts/generate_manual.py || echo "Manual generation skipped"
-
 # Create data directory for SQLite (will be mounted as volume in production)
 RUN mkdir -p /data
 
