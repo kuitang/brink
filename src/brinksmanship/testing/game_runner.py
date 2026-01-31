@@ -190,92 +190,83 @@ class GameRunner:
         """Try settlement negotiation between opponents.
 
         Checks if either opponent wants to propose settlement, then
-        evaluates the proposal.
-
-        Returns:
-            GameEnding if settlement reached, None otherwise
+        evaluates the proposal. Returns GameEnding if settlement reached.
         """
-        # Check if opponent A wants to propose
-        if hasattr(self.opponent_a, "propose_settlement"):
-            proposal_a = await self.opponent_a.propose_settlement(state)
-            if proposal_a:
-                # A proposes, B evaluates
-                if hasattr(self.opponent_b, "evaluate_settlement"):
-                    response = await self.opponent_b.evaluate_settlement(
-                        proposal_a, state, is_final_offer=False
-                    )
-                    if response.action == "accept":
-                        # Settlement accepted - A's offer to B
-                        vp_b = proposal_a.offered_vp
-                        vp_a = 100 - vp_b
-                        return GameEnding(
-                            ending_type=EndingType.SETTLEMENT,
-                            vp_a=vp_a,
-                            vp_b=vp_b,
-                            turn=state.turn,
-                            description="Settlement accepted",
-                        )
-                    elif response.action == "counter" and response.counter_vp:
-                        # Counter-offer - let A evaluate
-                        counter = SettlementProposal(
-                            offered_vp=response.counter_vp,
-                            argument=response.counter_argument or "",
-                        )
-                        if hasattr(self.opponent_a, "evaluate_settlement"):
-                            counter_response = await self.opponent_a.evaluate_settlement(
-                                counter, state, is_final_offer=True
-                            )
-                            if counter_response.action == "accept":
-                                vp_a = counter.offered_vp
-                                vp_b = 100 - vp_a
-                                return GameEnding(
-                                    ending_type=EndingType.SETTLEMENT,
-                                    vp_a=vp_a,
-                                    vp_b=vp_b,
-                                    turn=state.turn,
-                                    description="Counter-offer accepted",
-                                )
+        # Try A proposing to B, then B proposing to A
+        for proposer, evaluator, proposer_is_a in [
+            (self.opponent_a, self.opponent_b, True),
+            (self.opponent_b, self.opponent_a, False),
+        ]:
+            ending = await self._negotiate_settlement(
+                proposer, evaluator, proposer_is_a, state
+            )
+            if ending:
+                return ending
+        return None
 
-        # Check if opponent B wants to propose
-        if hasattr(self.opponent_b, "propose_settlement"):
-            proposal_b = await self.opponent_b.propose_settlement(state)
-            if proposal_b:
-                # B proposes, A evaluates
-                if hasattr(self.opponent_a, "evaluate_settlement"):
-                    response = await self.opponent_a.evaluate_settlement(
-                        proposal_b, state, is_final_offer=False
-                    )
-                    if response.action == "accept":
-                        # Settlement accepted - B's offer to A
-                        vp_a = proposal_b.offered_vp
-                        vp_b = 100 - vp_a
-                        return GameEnding(
-                            ending_type=EndingType.SETTLEMENT,
-                            vp_a=vp_a,
-                            vp_b=vp_b,
-                            turn=state.turn,
-                            description="Settlement accepted",
-                        )
-                    elif response.action == "counter" and response.counter_vp:
-                        # Counter-offer - let B evaluate
-                        counter = SettlementProposal(
-                            offered_vp=response.counter_vp,
-                            argument=response.counter_argument or "",
-                        )
-                        if hasattr(self.opponent_b, "evaluate_settlement"):
-                            counter_response = await self.opponent_b.evaluate_settlement(
-                                counter, state, is_final_offer=True
-                            )
-                            if counter_response.action == "accept":
-                                vp_b = counter.offered_vp
-                                vp_a = 100 - vp_b
-                                return GameEnding(
-                                    ending_type=EndingType.SETTLEMENT,
-                                    vp_a=vp_a,
-                                    vp_b=vp_b,
-                                    turn=state.turn,
-                                    description="Counter-offer accepted",
-                                )
+    async def _negotiate_settlement(
+        self,
+        proposer: Opponent,
+        evaluator: Opponent,
+        proposer_is_a: bool,
+        state: GameState,
+    ) -> Optional[GameEnding]:
+        """Handle settlement negotiation between proposer and evaluator."""
+        if not hasattr(proposer, "propose_settlement"):
+            return None
+
+        proposal = await proposer.propose_settlement(state)
+        if not proposal:
+            return None
+
+        if not hasattr(evaluator, "evaluate_settlement"):
+            return None
+
+        response = await evaluator.evaluate_settlement(proposal, state, is_final_offer=False)
+
+        if response.action == "accept":
+            # Proposer offers VP to evaluator
+            if proposer_is_a:
+                vp_b = proposal.offered_vp
+                vp_a = 100 - vp_b
+            else:
+                vp_a = proposal.offered_vp
+                vp_b = 100 - vp_a
+            return GameEnding(
+                ending_type=EndingType.SETTLEMENT,
+                vp_a=vp_a,
+                vp_b=vp_b,
+                turn=state.turn,
+                description="Settlement accepted",
+            )
+
+        if response.action == "counter" and response.counter_vp:
+            # Counter-offer: evaluator offers back to proposer
+            if not hasattr(proposer, "evaluate_settlement"):
+                return None
+
+            counter = SettlementProposal(
+                offered_vp=response.counter_vp,
+                argument=response.counter_argument or "",
+            )
+            counter_response = await proposer.evaluate_settlement(
+                counter, state, is_final_offer=True
+            )
+            if counter_response.action == "accept":
+                # Evaluator's counter-offer VP goes to proposer
+                if proposer_is_a:
+                    vp_a = counter.offered_vp
+                    vp_b = 100 - vp_a
+                else:
+                    vp_b = counter.offered_vp
+                    vp_a = 100 - vp_b
+                return GameEnding(
+                    ending_type=EndingType.SETTLEMENT,
+                    vp_a=vp_a,
+                    vp_b=vp_b,
+                    turn=state.turn,
+                    description="Counter-offer accepted",
+                )
 
         return None
 

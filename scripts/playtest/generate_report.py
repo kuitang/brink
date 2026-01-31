@@ -21,14 +21,30 @@ def load_results(work_dir: Path) -> list[dict]:
     all_results = []
 
     for result_file in results_dir.glob("*.json"):
-        try:
-            with open(result_file) as f:
-                data = json.load(f)
-                all_results.append(data)
-        except Exception as e:
-            print(f"Warning: Could not load {result_file}: {e}")
+        data = json.loads(result_file.read_text())
+        all_results.append(data)
 
     return all_results
+
+
+def _calculate_stats(games: list[dict]) -> dict:
+    """Calculate statistics for a list of games."""
+    if not games:
+        return {}
+    return {
+        "count": len(games),
+        "settlements": sum(1 for g in games if g.get("ending_type") == "settlement"),
+        "md": sum(1 for g in games if g.get("ending_type") == "mutual_destruction"),
+        "a_wins": sum(1 for g in games if g.get("winner") == "A"),
+        "b_wins": sum(1 for g in games if g.get("winner") == "B"),
+        "avg_turns": sum(g.get("turns", 0) for g in games) / len(games),
+        "avg_risk": sum(g.get("final_risk", 0) for g in games) / len(games),
+    }
+
+
+def _format_percent(count: int, total: int) -> str:
+    """Format a count as a percentage."""
+    return f"{count / total * 100:.1f}%" if total > 0 else "0%"
 
 
 def generate_report(results: list[dict], output_path: Path) -> None:
@@ -42,7 +58,7 @@ def generate_report(results: list[dict], output_path: Path) -> None:
         "",
     ]
 
-    # Aggregate all games
+    # Aggregate all games with matchup metadata
     all_games = []
     for result in results:
         for game in result.get("games", []):
@@ -57,6 +73,7 @@ def generate_report(results: list[dict], output_path: Path) -> None:
         return
 
     valid_games = [g for g in all_games if g.get("error") is None]
+    stats = _calculate_stats(valid_games)
 
     # Overall summary
     lines.extend([
@@ -69,60 +86,39 @@ def generate_report(results: list[dict], output_path: Path) -> None:
     ])
 
     if valid_games:
-        settlements = sum(1 for g in valid_games if g.get("ending_type") == "settlement")
-        md = sum(1 for g in valid_games if g.get("ending_type") == "mutual_destruction")
-        a_wins = sum(1 for g in valid_games if g.get("winner") == "A")
-        b_wins = sum(1 for g in valid_games if g.get("winner") == "B")
-        avg_turns = sum(g.get("turns", 0) for g in valid_games) / len(valid_games)
-        avg_risk = sum(g.get("final_risk", 0) for g in valid_games) / len(valid_games)
-
         lines.extend([
             "| Metric | Value |",
             "|--------|-------|",
-            f"| Settlement Rate | {settlements / len(valid_games) * 100:.1f}% |",
-            f"| Mutual Destruction Rate | {md / len(valid_games) * 100:.1f}% |",
-            f"| Player A Win Rate | {a_wins / len(valid_games) * 100:.1f}% |",
-            f"| Player B Win Rate | {b_wins / len(valid_games) * 100:.1f}% |",
-            f"| Average Game Length | {avg_turns:.1f} turns |",
-            f"| Average Final Risk | {avg_risk:.2f} |",
+            f"| Settlement Rate | {_format_percent(stats['settlements'], stats['count'])} |",
+            f"| Mutual Destruction Rate | {_format_percent(stats['md'], stats['count'])} |",
+            f"| Player A Win Rate | {_format_percent(stats['a_wins'], stats['count'])} |",
+            f"| Player B Win Rate | {_format_percent(stats['b_wins'], stats['count'])} |",
+            f"| Average Game Length | {stats['avg_turns']:.1f} turns |",
+            f"| Average Final Risk | {stats['avg_risk']:.2f} |",
             "",
         ])
 
         # By matchup type
-        lines.extend([
-            "## Results by Matchup Type",
-            "",
-        ])
+        lines.extend(["## Results by Matchup Type", ""])
 
-        matchup_types = {
-            "historical_vs_historical": [],
-            "smart_vs_historical": [],
-        }
+        historical_games = [
+            g for g in valid_games
+            if "smart" not in g.get("matchup_player_a", "") and "smart" not in g.get("matchup_player_b", "")
+        ]
+        smart_games = [g for g in valid_games if g not in historical_games]
 
-        for g in valid_games:
-            pa = g.get("matchup_player_a", "")
-            pb = g.get("matchup_player_b", "")
-            if "smart" in pa or "smart" in pb:
-                matchup_types["smart_vs_historical"].append(g)
-            else:
-                matchup_types["historical_vs_historical"].append(g)
-
-        for matchup_name, games in matchup_types.items():
+        for matchup_name, games in [("Historical vs Historical", historical_games), ("Smart vs Historical", smart_games)]:
             if not games:
                 continue
-
-            lines.append(f"### {matchup_name.replace('_', ' ').title()}")
-            lines.append("")
-
-            settlements = sum(1 for g in games if g.get("ending_type") == "settlement")
-            md = sum(1 for g in games if g.get("ending_type") == "mutual_destruction")
-
+            game_stats = _calculate_stats(games)
             lines.extend([
+                f"### {matchup_name}",
+                "",
                 "| Metric | Value |",
                 "|--------|-------|",
-                f"| Games | {len(games)} |",
-                f"| Settlement Rate | {settlements / len(games) * 100:.1f}% |",
-                f"| MD Rate | {md / len(games) * 100:.1f}% |",
+                f"| Games | {game_stats['count']} |",
+                f"| Settlement Rate | {_format_percent(game_stats['settlements'], game_stats['count'])} |",
+                f"| MD Rate | {_format_percent(game_stats['md'], game_stats['count'])} |",
                 "",
             ])
 
@@ -139,18 +135,13 @@ def generate_report(results: list[dict], output_path: Path) -> None:
             by_scenario[g.get("matchup_scenario", "unknown")].append(g)
 
         for scenario, games in sorted(by_scenario.items()):
-            settlements = sum(1 for g in games if g.get("ending_type") == "settlement")
-            md = sum(1 for g in games if g.get("ending_type") == "mutual_destruction")
-            a_wins = sum(1 for g in games if g.get("winner") == "A")
-            b_wins = sum(1 for g in games if g.get("winner") == "B")
-
+            s = _calculate_stats(games)
             lines.append(
-                f"| {scenario} | {len(games)} | "
-                f"{settlements} ({settlements/len(games)*100:.0f}%) | "
-                f"{md} ({md/len(games)*100:.0f}%) | "
-                f"{a_wins} | {b_wins} |"
+                f"| {scenario} | {s['count']} | "
+                f"{s['settlements']} ({s['settlements'] * 100 // s['count']}%) | "
+                f"{s['md']} ({s['md'] * 100 // s['count']}%) | "
+                f"{s['a_wins']} | {s['b_wins']} |"
             )
-
         lines.append("")
 
         # Detailed results table
@@ -162,36 +153,23 @@ def generate_report(results: list[dict], output_path: Path) -> None:
         ])
 
         for result in results:
-            scenario = result.get("scenario", "unknown")
-            player_a = result.get("player_a", "unknown")
-            player_b = result.get("player_b", "unknown")
             games = [g for g in result.get("games", []) if g.get("error") is None]
-
             if not games:
                 continue
 
-            a_wins = sum(1 for g in games if g.get("winner") == "A")
-            b_wins = sum(1 for g in games if g.get("winner") == "B")
-            settlements = sum(1 for g in games if g.get("ending_type") == "settlement")
-            md = sum(1 for g in games if g.get("ending_type") == "mutual_destruction")
-
-            # Simplify player names
-            pa_short = player_a.replace("historical:", "").replace("smart", "Smart")
-            pb_short = player_b.replace("historical:", "").replace("smart", "Smart")
+            s = _calculate_stats(games)
+            pa_short = result.get("player_a", "unknown").replace("historical:", "").replace("smart", "Smart")
+            pb_short = result.get("player_b", "unknown").replace("historical:", "").replace("smart", "Smart")
 
             lines.append(
-                f"| {scenario} | {pa_short} | {pb_short} | "
-                f"{len(games)} | {a_wins} | {b_wins} | {settlements} | {md} |"
+                f"| {result.get('scenario', 'unknown')} | {pa_short} | {pb_short} | "
+                f"{s['count']} | {s['a_wins']} | {s['b_wins']} | {s['settlements']} | {s['md']} |"
             )
 
     # Errors
     error_games = [g for g in all_games if g.get("error")]
     if error_games:
-        lines.extend([
-            "",
-            "## Errors",
-            "",
-        ])
+        lines.extend(["", "## Errors", ""])
         for g in error_games[:20]:
             lines.append(f"- {g.get('scenario_id', 'unknown')}: {g.get('error', 'unknown error')}")
         if len(error_games) > 20:
@@ -202,19 +180,16 @@ def generate_report(results: list[dict], output_path: Path) -> None:
     print(f"Report written to: {output_path}")
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="Generate playtest report")
     parser.add_argument("--work-dir", required=True, help="Work directory with results")
     parser.add_argument("--output", required=True, help="Output markdown file")
     args = parser.parse_args()
 
-    work_dir = Path(args.work_dir)
-    output_path = Path(args.output)
-
-    results = load_results(work_dir)
+    results = load_results(Path(args.work_dir))
     print(f"Loaded {len(results)} result files")
 
-    generate_report(results, output_path)
+    generate_report(results, Path(args.output))
 
 
 if __name__ == "__main__":

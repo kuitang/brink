@@ -72,23 +72,19 @@ class RealGameEngine:
         scenario = self._scenario_repo.get_scenario(scenario_id)
         scenario_name = scenario.get("name", scenario_id) if scenario else scenario_id
 
-        # Get positions/resources based on which side the player is
+        # Map A/B state to player/opponent based on which side the player is
         if player_is_a:
             player_position = engine.state.position_a
             player_resources = engine.state.resources_a
             opponent_position = engine.state.position_b
             opponent_resources = engine.state.resources_b
+            surplus_captured_player = engine.state.surplus_captured_a
+            surplus_captured_opponent = engine.state.surplus_captured_b
         else:
             player_position = engine.state.position_b
             player_resources = engine.state.resources_b
             opponent_position = engine.state.position_a
             opponent_resources = engine.state.resources_a
-
-        # Get surplus captured based on which side the player is
-        if player_is_a:
-            surplus_captured_player = engine.state.surplus_captured_a
-            surplus_captured_opponent = engine.state.surplus_captured_b
-        else:
             surplus_captured_player = engine.state.surplus_captured_b
             surplus_captured_opponent = engine.state.surplus_captured_a
 
@@ -342,37 +338,32 @@ class RealGameEngine:
 
         engine = create_game(scenario_id, self._scenario_repo)
 
-        # Sync engine state to stored values
+        # Sync turn state
         saved_turn = state.get("turn", 1)
         engine.state.turn = saved_turn
         engine._current_turn_key = f"turn_{saved_turn}"
 
-        # Map player/opponent positions back to A/B based on which side player is
-        player_is_a = state.get("player_is_a", True)
-        if player_is_a:
-            engine.state.player_a.position = state.get("position_player", 5.0)
-            engine.state.player_b.position = state.get("position_opponent", 5.0)
-            engine.state.player_a.resources = state.get("resources_player", 5.0)
-            engine.state.player_b.resources = state.get("resources_opponent", 5.0)
-        else:
-            engine.state.player_b.position = state.get("position_player", 5.0)
-            engine.state.player_a.position = state.get("position_opponent", 5.0)
-            engine.state.player_b.resources = state.get("resources_player", 5.0)
-            engine.state.player_a.resources = state.get("resources_opponent", 5.0)
-
+        # Sync shared state
         engine.state.risk_level = state.get("risk_level", 2.0)
         engine.state.cooperation_score = float(state.get("cooperation_score", 5))
         engine.state.stability = float(state.get("stability", 5))
-
-        # Sync surplus fields (critical for surplus mechanics to work across turns)
         engine.state.cooperation_surplus = state.get("cooperation_surplus", 0.0)
         engine.state.cooperation_streak = state.get("cooperation_streak", 0)
 
-        # Map surplus captured back to A/B based on which side player is
+        # Map player/opponent state back to A/B based on which side player is
+        player_is_a = state.get("player_is_a", True)
         if player_is_a:
+            engine.state.player_a.position = state.get("position_player", 5.0)
+            engine.state.player_a.resources = state.get("resources_player", 5.0)
+            engine.state.player_b.position = state.get("position_opponent", 5.0)
+            engine.state.player_b.resources = state.get("resources_opponent", 5.0)
             engine.state.surplus_captured_a = state.get("surplus_captured_player", 0.0)
             engine.state.surplus_captured_b = state.get("surplus_captured_opponent", 0.0)
         else:
+            engine.state.player_b.position = state.get("position_player", 5.0)
+            engine.state.player_b.resources = state.get("resources_player", 5.0)
+            engine.state.player_a.position = state.get("position_opponent", 5.0)
+            engine.state.player_a.resources = state.get("resources_opponent", 5.0)
             engine.state.surplus_captured_b = state.get("surplus_captured_player", 0.0)
             engine.state.surplus_captured_a = state.get("surplus_captured_opponent", 0.0)
 

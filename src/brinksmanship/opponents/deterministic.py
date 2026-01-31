@@ -59,28 +59,27 @@ class DeterministicOpponent(Opponent):
 
     def _get_my_position(self, state: GameState) -> float:
         """Get this opponent's position from state."""
-        if self._is_player_a is None:
-            # Default to player B if not set
-            return state.position_b
-        return state.position_a if self._is_player_a else state.position_b
+        if self._is_player_a:
+            return state.position_a
+        return state.position_b
 
     def _get_opponent_position(self, state: GameState) -> float:
         """Get the human player's position from state."""
-        if self._is_player_a is None:
-            return state.position_a
-        return state.position_b if self._is_player_a else state.position_a
+        if self._is_player_a:
+            return state.position_b
+        return state.position_a
 
     def _get_my_resources(self, state: GameState) -> float:
         """Get this opponent's resources from state."""
-        if self._is_player_a is None:
-            return state.resources_b
-        return state.resources_a if self._is_player_a else state.resources_b
+        if self._is_player_a:
+            return state.resources_a
+        return state.resources_b
 
     def _get_opponent_previous_type(self, state: GameState) -> ActionType | None:
         """Get the human player's previous action type."""
-        if self._is_player_a is None:
-            return state.previous_type_a
-        return state.previous_type_b if self._is_player_a else state.previous_type_a
+        if self._is_player_a:
+            return state.previous_type_b
+        return state.previous_type_a
 
     def _get_cooperative_actions(self, available_actions: list[Action]) -> list[Action]:
         """Filter to cooperative actions only."""
@@ -123,38 +122,27 @@ class DeterministicOpponent(Opponent):
     ) -> SettlementResponse:
         """Evaluate a settlement proposal using simple deterministic rules.
 
-        Simple policy: Accept if offer is within threshold of fair value.
-
-        Args:
-            proposal: The settlement proposal to evaluate
-            state: Current game state
-            is_final_offer: Whether this is a final offer (no counter allowed)
-
-        Returns:
-            Response to the proposal
+        Accept if offer is within threshold of fair value.
         """
         my_vp = 100 - proposal.offered_vp
-        fair_vp = self.get_position_fair_vp(
-            state, self._is_player_a if self._is_player_a is not None else False
-        )
-
-        # Simple rule: accept if offer is at least (fair - threshold)
+        fair_vp = self.get_position_fair_vp(state, self._is_player_a or False)
         vp_diff = my_vp - fair_vp
 
         if vp_diff >= self.settlement_threshold:
             return SettlementResponse(action="accept")
-        elif not is_final_offer and vp_diff >= self.counter_threshold:
+
+        if not is_final_offer and vp_diff >= self.counter_threshold:
             counter_vp = max(20, min(80, int(fair_vp + self.counter_adjustment)))
             return SettlementResponse(
                 action="counter",
                 counter_vp=counter_vp,
                 counter_argument="Consider this fair counter-offer.",
             )
-        else:
-            return SettlementResponse(
-                action="reject",
-                rejection_reason="This offer is unacceptable.",
-            )
+
+        return SettlementResponse(
+            action="reject",
+            rejection_reason="This offer is unacceptable.",
+        )
 
     async def propose_settlement(self, state: GameState) -> SettlementProposal | None:
         """Optionally propose settlement based on strategy.
@@ -252,34 +240,28 @@ class NashCalculator(DeterministicOpponent):
                 )
 
     async def propose_settlement(self, state: GameState) -> SettlementProposal | None:
-        """Propose settlement when position advantage is clear or risk is high.
-
-        Nash reasoning: lock in gains when ahead, or preserve value at high risk.
-        """
+        """Propose settlement when position advantage is clear or risk is high."""
         if state.turn <= 4 or state.stability <= 2:
             return None
 
         my_position = self._get_my_position(state)
         opponent_position = self._get_opponent_position(state)
 
-        # Propose when: (1) clearly ahead, or (2) risk is elevated
-        should_propose = (
-            (my_position > opponent_position + 1.0 and state.risk_level >= 3) or
-            (state.risk_level >= 5)  # High risk: propose to preserve value
+        clearly_ahead = my_position > opponent_position + 1.0 and state.risk_level >= 3
+        high_risk = state.risk_level >= 5
+
+        if not (clearly_ahead or high_risk):
+            return None
+
+        fair_vp = self.get_position_fair_vp(state, self._is_player_a or False)
+        return SettlementProposal(
+            offered_vp=fair_vp,
+            argument=(
+                "The current position advantage suggests this is a fair division. "
+                "Continued play introduces variance that benefits neither party. "
+                "A rational settlement now locks in expected value."
+            ),
         )
-        if should_propose:
-            fair_vp = self.get_position_fair_vp(
-                state, self._is_player_a if self._is_player_a is not None else False
-            )
-            return SettlementProposal(
-                offered_vp=fair_vp,
-                argument=(
-                    "The current position advantage suggests this is a fair division. "
-                    "Continued play introduces variance that benefits neither party. "
-                    "A rational settlement now locks in expected value."
-                ),
-            )
-        return None
 
 
 class SecuritySeeker(DeterministicOpponent):
@@ -349,29 +331,23 @@ class SecuritySeeker(DeterministicOpponent):
             )
 
     async def propose_settlement(self, state: GameState) -> SettlementProposal | None:
-        """Propose settlement proactively to ensure stability.
-
-        Security seekers strongly value stability - propose early and often.
-        """
+        """Propose settlement proactively to ensure stability."""
         if state.turn <= 4 or state.stability <= 2:
             return None
 
-        # Propose when risk is even slightly elevated, or after several turns
-        if state.risk_level >= 3 or state.turn >= 7:
-            fair_vp = self.get_position_fair_vp(
-                state, self._is_player_a if self._is_player_a is not None else False
-            )
-            # Willing to accept slightly less for peace
-            offer_vp = max(20, fair_vp - 5)
-            return SettlementProposal(
-                offered_vp=offer_vp,
-                argument=(
-                    "The escalating risk threatens us both. Neither side benefits "
-                    "from mutual destruction. I propose a fair settlement that "
-                    "acknowledges our positions while ending this dangerous spiral."
-                ),
-            )
-        return None
+        if state.risk_level < 3 and state.turn < 7:
+            return None
+
+        fair_vp = self.get_position_fair_vp(state, self._is_player_a or False)
+        offer_vp = max(20, fair_vp - 5)  # Willing to accept slightly less for peace
+        return SettlementProposal(
+            offered_vp=offer_vp,
+            argument=(
+                "The escalating risk threatens us both. Neither side benefits "
+                "from mutual destruction. I propose a fair settlement that "
+                "acknowledges our positions while ending this dangerous spiral."
+            ),
+        )
 
 
 class Opportunist(DeterministicOpponent):
@@ -459,36 +435,29 @@ class Opportunist(DeterministicOpponent):
                 )
 
     async def propose_settlement(self, state: GameState) -> SettlementProposal | None:
-        """Propose settlement when dominant, or at high risk to preserve gains.
-
-        Opportunists prefer to lock in victories, but will settle at high risk.
-        """
+        """Propose settlement when dominant, or at high risk to preserve gains."""
         if state.turn <= 4 or state.stability <= 2:
             return None
 
         my_position = self._get_my_position(state)
         opponent_position = self._get_opponent_position(state)
 
-        # Propose when: (1) significantly ahead, or (2) high risk
-        should_propose = (
-            (my_position > opponent_position + 2.0) or
-            (state.risk_level >= 6 and my_position >= opponent_position)
+        significantly_ahead = my_position > opponent_position + 2.0
+        high_risk_advantage = state.risk_level >= 6 and my_position >= opponent_position
+
+        if not (significantly_ahead or high_risk_advantage):
+            return None
+
+        fair_vp = self.get_position_fair_vp(state, self._is_player_a or False)
+        offer_vp = min(80, fair_vp + 5)  # Demand more than fair
+        return SettlementProposal(
+            offered_vp=offer_vp,
+            argument=(
+                "Your position has deteriorated significantly. This offer "
+                "reflects the reality on the ground. Accept now or face "
+                "further losses. The terms will only get worse from here."
+            ),
         )
-        if should_propose:
-            fair_vp = self.get_position_fair_vp(
-                state, self._is_player_a if self._is_player_a is not None else False
-            )
-            # Demand more than fair due to dominance
-            offer_vp = min(80, fair_vp + 5)
-            return SettlementProposal(
-                offered_vp=offer_vp,
-                argument=(
-                    "Your position has deteriorated significantly. This offer "
-                    "reflects the reality on the ground. Accept now or face "
-                    "further losses. The terms will only get worse from here."
-                ),
-            )
-        return None
 
 
 class Erratic(DeterministicOpponent):
@@ -572,29 +541,23 @@ class Erratic(DeterministicOpponent):
             )
 
     async def propose_settlement(self, state: GameState) -> SettlementProposal | None:
-        """Randomly propose settlement.
-
-        Erratic behavior includes random settlement proposals.
-        """
+        """Randomly propose settlement (20% chance each turn)."""
         if state.turn <= 4 or state.stability <= 2:
             return None
 
-        # 20% chance to propose each turn
-        if random.random() < 0.2:
-            fair_vp = self.get_position_fair_vp(
-                state, self._is_player_a if self._is_player_a is not None else False
-            )
-            # Random deviation from fair
-            deviation = random.randint(-15, 15)
-            offer_vp = max(20, min(80, fair_vp + deviation))
-            return SettlementProposal(
-                offered_vp=offer_vp,
-                argument=(
-                    "Let's end this now. I'm tired of the back and forth. "
-                    "Take it or leave it - who knows what I'll do next."
-                ),
-            )
-        return None
+        if random.random() >= 0.2:
+            return None
+
+        fair_vp = self.get_position_fair_vp(state, self._is_player_a or False)
+        deviation = random.randint(-15, 15)
+        offer_vp = max(20, min(80, fair_vp + deviation))
+        return SettlementProposal(
+            offered_vp=offer_vp,
+            argument=(
+                "Let's end this now. I'm tired of the back and forth. "
+                "Take it or leave it - who knows what I'll do next."
+            ),
+        )
 
 
 class TitForTat(DeterministicOpponent):
@@ -695,31 +658,25 @@ class TitForTat(DeterministicOpponent):
             )
 
     async def propose_settlement(self, state: GameState) -> SettlementProposal | None:
-        """Propose settlement when cooperation has been established.
-
-        Tit-for-Tat values mutual cooperation - propose when it's working.
-        """
+        """Propose settlement when cooperation has been established."""
         if state.turn <= 4 or state.stability <= 2:
             return None
 
-        # Propose when: (1) cooperation is good, or (2) after several turns
-        should_propose = (
-            (state.cooperation_score >= 5 and state.risk_level >= 2) or
-            (state.turn >= 8)  # Proactively settle in later game
+        good_cooperation = state.cooperation_score >= 5 and state.risk_level >= 2
+        late_game = state.turn >= 8
+
+        if not (good_cooperation or late_game):
+            return None
+
+        fair_vp = self.get_position_fair_vp(state, self._is_player_a or False)
+        return SettlementProposal(
+            offered_vp=fair_vp,
+            argument=(
+                "We've shown we can work together. This fair settlement "
+                "reflects our mutual cooperation and positions. Let's "
+                "formalize what we've built rather than risk destroying it."
+            ),
         )
-        if should_propose:
-            fair_vp = self.get_position_fair_vp(
-                state, self._is_player_a if self._is_player_a is not None else False
-            )
-            return SettlementProposal(
-                offered_vp=fair_vp,
-                argument=(
-                    "We've shown we can work together. This fair settlement "
-                    "reflects our mutual cooperation and positions. Let's "
-                    "formalize what we've built rather than risk destroying it."
-                ),
-            )
-        return None
 
 
 class GrimTrigger(DeterministicOpponent):
@@ -806,63 +763,46 @@ class GrimTrigger(DeterministicOpponent):
         state: GameState,
         is_final_offer: bool,
     ) -> SettlementResponse:
-        """Evaluate settlement - harsh after betrayal, but self-preserving.
+        """Evaluate settlement - harsh after betrayal, but self-preserving at extreme risk."""
+        if not self._triggered:
+            return await super().evaluate_settlement(proposal, state, is_final_offer)
 
-        After betrayal, GrimTrigger usually rejects, but will consider
-        settlement at extreme risk to avoid mutual destruction.
-        """
-        if self._triggered:
-            # Self-preservation: accept fair+ offers at extreme risk
-            if state.risk_level >= 7:
-                my_vp = 100 - proposal.offered_vp
-                fair_vp = self.get_position_fair_vp(
-                    state, self._is_player_a if self._is_player_a is not None else False
-                )
-                # Accept if offer is at least fair (no worse than 5 below fair)
-                if my_vp >= fair_vp - 5:
-                    return SettlementResponse(action="accept")
-            # Otherwise, reject with grudge
-            return SettlementResponse(
-                action="reject",
-                rejection_reason=(
-                    "You betrayed my trust. There will be no negotiation. "
-                    "No settlement. Only consequences."
-                ),
-            )
-        # If not triggered, use deterministic evaluation (generous thresholds)
-        return await super().evaluate_settlement(proposal, state, is_final_offer)
+        # Self-preservation: accept fair offers at extreme risk
+        if state.risk_level >= 7:
+            my_vp = 100 - proposal.offered_vp
+            fair_vp = self.get_position_fair_vp(state, self._is_player_a or False)
+            if my_vp >= fair_vp - 5:
+                return SettlementResponse(action="accept")
+
+        return SettlementResponse(
+            action="reject",
+            rejection_reason=(
+                "You betrayed my trust. There will be no negotiation. "
+                "No settlement. Only consequences."
+            ),
+        )
 
     async def propose_settlement(self, state: GameState) -> SettlementProposal | None:
-        """Propose settlement only if trust is intact.
-
-        GrimTrigger proposes when cooperation is working well.
-        """
-        if state.turn <= 4 or state.stability <= 2:
+        """Propose settlement only if trust is intact."""
+        if state.turn <= 4 or state.stability <= 2 or self._triggered:
             return None
 
-        # Never propose after trigger
-        if self._triggered:
+        good_cooperation = state.cooperation_score >= 5
+        trust_held_long = state.turn >= 8
+
+        if not (good_cooperation or trust_held_long):
             return None
 
-        # Propose when: (1) cooperation is good, or (2) after several turns with trust intact
-        should_propose = (
-            (state.cooperation_score >= 5) or
-            (state.turn >= 8)  # Trust has held for many turns
+        fair_vp = self.get_position_fair_vp(state, self._is_player_a or False)
+        return SettlementProposal(
+            offered_vp=fair_vp,
+            argument=(
+                "Our cooperation has been exemplary. I propose we seal "
+                "this partnership with a fair settlement. Trust maintained "
+                "is trust rewarded. But know this - betrayal would change "
+                "everything."
+            ),
         )
-        if should_propose:
-            fair_vp = self.get_position_fair_vp(
-                state, self._is_player_a if self._is_player_a is not None else False
-            )
-            return SettlementProposal(
-                offered_vp=fair_vp,
-                argument=(
-                    "Our cooperation has been exemplary. I propose we seal "
-                    "this partnership with a fair settlement. Trust maintained "
-                    "is trust rewarded. But know this - betrayal would change "
-                    "everything."
-                ),
-            )
-        return None
 
 
 # Export all opponent classes

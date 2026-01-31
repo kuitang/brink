@@ -20,7 +20,6 @@ import sys
 from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
@@ -29,11 +28,7 @@ from brinksmanship.engine.game_engine import EndingType, GameEngine
 from brinksmanship.llm import generate_json
 from brinksmanship.models.actions import Action, ActionType
 from brinksmanship.models.state import GameState
-from brinksmanship.opponents.base import (
-    Opponent,
-    SettlementProposal,
-    SettlementResponse,
-)
+from brinksmanship.opponents.base import Opponent, SettlementProposal, SettlementResponse
 from brinksmanship.opponents.historical import HistoricalPersona
 from brinksmanship.storage import get_scenario_repository
 
@@ -54,7 +49,7 @@ GAME MECHANICS:
 CURRENT STATE:
 - Turn: {turn}, Risk: {risk_level}, Cooperation: {coop_score}
 - Your Position: {my_position}, Resources: {my_resources}
-- Opponent Position (est): {opp_position_est} (±{opp_uncertainty})
+- Opponent Position (est): {opp_position_est} (+/-{opp_uncertainty})
 - Your Last Action: {my_last_type}, Opponent's Last: {opp_last_type}
 
 ACTIONS:
@@ -62,9 +57,18 @@ ACTIONS:
 
 Choose wisely based on game state and opponent patterns."""
 
+SMART_RATIONAL_ACTION_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "action": {"type": "string"},
+        "reason": {"type": "string"},
+    },
+    "required": ["action"],
+}
+
 
 class SmartRationalPlayer(Opponent):
-    """Opus 4.5 with game-theoretic understanding."""
+    """LLM-based player with game-theoretic understanding."""
 
     def __init__(self, is_player_a: bool = True):
         super().__init__(name="Smart Rational Player")
@@ -73,17 +77,18 @@ class SmartRationalPlayer(Opponent):
     def set_player_side(self, is_player_a: bool) -> None:
         self._is_player_a = is_player_a
 
+    def _get_player_state(self, state: GameState) -> tuple[float, float, ActionType | None]:
+        """Get this player's position, resources, and previous action type."""
+        if self._is_player_a:
+            return state.position_a, state.resources_a, state.previous_type_a
+        return state.position_b, state.resources_b, state.previous_type_b
+
     async def choose_action(
         self, state: GameState, available_actions: list[Action]
     ) -> Action:
-        if self._is_player_a:
-            my_pos, my_res, my_last = state.position_a, state.resources_a, state.previous_type_a
-            info = state.player_a.information
-        else:
-            my_pos, my_res, my_last = state.position_b, state.resources_b, state.previous_type_b
-            info = state.player_b.information
-
+        my_pos, my_res, my_last = self._get_player_state(state)
         opp_last = state.previous_type_b if self._is_player_a else state.previous_type_a
+        info = state.player_a.information if self._is_player_a else state.player_b.information
         opp_est, opp_unc = info.get_position_estimate(state.turn)
 
         action_list = "\n".join(
@@ -107,15 +112,26 @@ class SmartRationalPlayer(Opponent):
         response = await generate_json(
             prompt=prompt,
             system_prompt="You're playing a strategy game. Pick an action. Return JSON: {\"action\": \"exact action name\", \"reason\": \"brief\"}",
-            schema={"type": "object", "properties": {"action": {"type": "string"}, "reason": {"type": "string"}}, "required": ["action"]},
+            schema=SMART_RATIONAL_ACTION_SCHEMA,
         )
 
-        selected = response.get("action", "").strip().lower()
+        return self._find_matching_action(response.get("action", ""), available_actions)
+
+    def _find_matching_action(self, selected: str, available_actions: list[Action]) -> Action:
+        """Find the best matching action from available actions."""
+        selected_lower = selected.strip().lower()
+
+        # Exact match first
         for action in available_actions:
-            if action.name.lower() == selected or selected in action.name.lower():
+            if action.name.lower() == selected_lower:
                 return action
 
-        # Fallback: cooperative if available, else first
+        # Partial match
+        for action in available_actions:
+            if selected_lower in action.name.lower():
+                return action
+
+        # Fallback: first cooperative action or first action
         for action in available_actions:
             if action.action_type == ActionType.COOPERATIVE:
                 return action
@@ -133,14 +149,17 @@ class SmartRationalPlayer(Opponent):
             return SettlementResponse(action="counter", counter_vp=max(20, min(80, int(fair_vp))))
         return SettlementResponse(action="reject")
 
-    async def propose_settlement(self, state: GameState) -> Optional[SettlementProposal]:
+    async def propose_settlement(self, state: GameState) -> SettlementProposal | None:
         if state.turn <= 4 or state.stability <= 2:
             return None
+
         fair_vp = self.get_position_fair_vp(state, self._is_player_a)
         my_pos = state.position_a if self._is_player_a else state.position_b
         opp_pos = state.position_b if self._is_player_a else state.position_a
+
         if my_pos > opp_pos or state.risk_level > 5:
-            return SettlementProposal(offered_vp=max(25, min(75, int(100 - fair_vp + 5))), argument="Fair settlement")
+            offered_vp = max(25, min(75, int(100 - fair_vp + 5)))
+            return SettlementProposal(offered_vp=offered_vp, argument="Fair settlement")
         return None
 
 
@@ -152,11 +171,10 @@ def create_player(player_spec: str, is_player_a: bool) -> Opponent:
     """Create a player from a spec like 'historical:nixon' or 'smart'."""
     if player_spec == "smart":
         return SmartRationalPlayer(is_player_a=is_player_a)
-    elif player_spec.startswith("historical:"):
+    if player_spec.startswith("historical:"):
         persona_name = player_spec.split(":", 1)[1]
         return HistoricalPersona(persona_name=persona_name, is_player_a=is_player_a)
-    else:
-        raise ValueError(f"Unknown player spec: {player_spec}")
+    raise ValueError(f"Unknown player spec: {player_spec}")
 
 
 # =============================================================================
@@ -165,6 +183,8 @@ def create_player(player_spec: str, is_player_a: bool) -> Opponent:
 
 @dataclass
 class GameResult:
+    """Result of a single game."""
+
     scenario_id: str
     player_a: str
     player_b: str
@@ -174,7 +194,56 @@ class GameResult:
     vp_a: float
     vp_b: float
     final_risk: float
-    error: Optional[str] = None
+    error: str | None = None
+
+
+def _determine_winner(ending: EndingType | None, vp_a: float, vp_b: float) -> str:
+    """Determine the winner string from ending type and VP scores."""
+    if ending == EndingType.MUTUAL_DESTRUCTION:
+        return "md"
+    if vp_a > vp_b:
+        return "A"
+    if vp_b > vp_a:
+        return "B"
+    return "tie"
+
+
+async def _try_settlement(
+    proposer: Opponent,
+    evaluator: Opponent,
+    state: GameState,
+    proposer_is_a: bool,
+) -> GameResult | None:
+    """Try to reach a settlement between proposer and evaluator."""
+    if not hasattr(proposer, "propose_settlement") or not hasattr(evaluator, "evaluate_settlement"):
+        return None
+
+    proposal = await proposer.propose_settlement(state)
+    if not proposal:
+        return None
+
+    response = await evaluator.evaluate_settlement(proposal, state, False)
+    if response.action != "accept":
+        return None
+
+    if proposer_is_a:
+        vp_b = proposal.offered_vp
+        vp_a = 100 - vp_b
+    else:
+        vp_a = proposal.offered_vp
+        vp_b = 100 - vp_a
+
+    return GameResult(
+        scenario_id=state.scenario_id,
+        player_a=proposer.name if proposer_is_a else evaluator.name,
+        player_b=evaluator.name if proposer_is_a else proposer.name,
+        winner="A" if vp_a > vp_b else "B",
+        ending_type="settlement",
+        turns=state.turn,
+        vp_a=vp_a,
+        vp_b=vp_b,
+        final_risk=state.risk_level,
+    )
 
 
 async def run_single_game(
@@ -182,44 +251,29 @@ async def run_single_game(
     player_a: Opponent,
     player_b: Opponent,
 ) -> GameResult:
-    """Run a single game."""
+    """Run a single game between two players."""
     repo = get_scenario_repository()
     engine = GameEngine(scenario_id, repo)
 
-    if hasattr(player_a, 'set_player_side'):
+    if hasattr(player_a, "set_player_side"):
         player_a.set_player_side(is_player_a=True)
-    if hasattr(player_b, 'set_player_side'):
+    if hasattr(player_b, "set_player_side"):
         player_b.set_player_side(is_player_a=False)
 
     try:
         while not engine.is_game_over():
             state = engine.get_current_state()
 
-            # Settlement check
+            # Try settlement negotiations
             if state.turn > 4 and state.stability > 2:
-                for proposer, evaluator, is_a in [(player_a, player_b, True), (player_b, player_a, False)]:
-                    if hasattr(proposer, 'propose_settlement') and hasattr(evaluator, 'evaluate_settlement'):
-                        proposal = await proposer.propose_settlement(state)
-                        if proposal:
-                            response = await evaluator.evaluate_settlement(proposal, state, False)
-                            if response.action == "accept":
-                                if is_a:
-                                    vp_b = proposal.offered_vp
-                                    vp_a = 100 - vp_b
-                                else:
-                                    vp_a = proposal.offered_vp
-                                    vp_b = 100 - vp_a
-                                return GameResult(
-                                    scenario_id=scenario_id,
-                                    player_a=player_a.name,
-                                    player_b=player_b.name,
-                                    winner="A" if vp_a > vp_b else "B",
-                                    ending_type="settlement",
-                                    turns=state.turn,
-                                    vp_a=vp_a, vp_b=vp_b,
-                                    final_risk=state.risk_level,
-                                )
+                settlement = await _try_settlement(player_a, player_b, state, proposer_is_a=True)
+                if settlement:
+                    return settlement
+                settlement = await _try_settlement(player_b, player_a, state, proposer_is_a=False)
+                if settlement:
+                    return settlement
 
+            # Execute turn
             actions_a = engine.get_available_actions("A")
             actions_b = engine.get_available_actions("B")
             action_a = await player_a.choose_action(state, actions_a)
@@ -237,21 +291,36 @@ async def run_single_game(
                 scenario_id=scenario_id,
                 player_a=player_a.name,
                 player_b=player_b.name,
-                winner="md" if ending.ending_type == EndingType.MUTUAL_DESTRUCTION else ("A" if ending.vp_a > ending.vp_b else "B"),
+                winner=_determine_winner(ending.ending_type, ending.vp_a, ending.vp_b),
                 ending_type=ending.ending_type.value,
                 turns=final_state.turn,
-                vp_a=ending.vp_a, vp_b=ending.vp_b,
+                vp_a=ending.vp_a,
+                vp_b=ending.vp_b,
                 final_risk=final_state.risk_level,
             )
+
         return GameResult(
-            scenario_id=scenario_id, player_a=player_a.name, player_b=player_b.name,
-            winner="tie", ending_type="unknown", turns=final_state.turn,
-            vp_a=50, vp_b=50, final_risk=final_state.risk_level,
+            scenario_id=scenario_id,
+            player_a=player_a.name,
+            player_b=player_b.name,
+            winner="tie",
+            ending_type="unknown",
+            turns=final_state.turn,
+            vp_a=50,
+            vp_b=50,
+            final_risk=final_state.risk_level,
         )
     except Exception as e:
         return GameResult(
-            scenario_id=scenario_id, player_a=player_a.name, player_b=player_b.name,
-            winner="error", ending_type="error", turns=0, vp_a=0, vp_b=0, final_risk=0,
+            scenario_id=scenario_id,
+            player_a=player_a.name,
+            player_b=player_b.name,
+            winner="error",
+            ending_type="error",
+            turns=0,
+            vp_a=0,
+            vp_b=0,
+            final_risk=0,
             error=str(e),
         )
 
@@ -269,11 +338,11 @@ async def run_matchup(
         player_b = create_player(player_b_spec, is_player_a=False)
         result = await run_single_game(scenario_id, player_a, player_b)
         results.append(asdict(result))
-        print(f"  Game {i+1}/{num_games}: {result.winner} ({result.ending_type})")
+        print(f"  Game {i + 1}/{num_games}: {result.winner} ({result.ending_type})")
     return results
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="Run a single matchup")
     parser.add_argument("--scenario", required=True, help="Scenario ID")
     parser.add_argument("--player-a", required=True, help="Player A spec (e.g., historical:nixon or smart)")
@@ -286,12 +355,14 @@ def main():
     print(f"  {args.player_a} vs {args.player_b}")
     print(f"  {args.games} games")
 
-    results = asyncio.run(run_matchup(
-        scenario_id=args.scenario,
-        player_a_spec=args.player_a,
-        player_b_spec=args.player_b,
-        num_games=args.games,
-    ))
+    results = asyncio.run(
+        run_matchup(
+            scenario_id=args.scenario,
+            player_a_spec=args.player_a,
+            player_b_spec=args.player_b,
+            num_games=args.games,
+        )
+    )
 
     output = {
         "scenario": args.scenario,
