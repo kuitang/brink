@@ -29,6 +29,7 @@ body:not([class*="theme-"]) {
     --border: #8b7355;
     --border-light: #c4b59d;
     --accent: #5c4a32;
+    --accent-text: #f5f0e6; /* Light text on dark accent */
     --link: #4a6741;
     --link-hover: #2d3f28;
 
@@ -53,7 +54,7 @@ body:not([class*="theme-"]) {
     --font-body: Georgia, "Times New Roman", serif;
     --font-heading: Georgia, "Times New Roman", serif;
     --font-mono: "Courier New", Courier, monospace;
-    --font-size-base: 15px;
+    --font-size-base: 1rem; /* Standardized base font */
     --line-height: 1.5;
 
     /* Theme-specific styling */
@@ -73,6 +74,7 @@ body.theme-cold-war {
     --border: #666666;
     --border-light: #999999;
     --accent: #333333;
+    --accent-text: #ffffff; /* High contrast text for accent backgrounds */
     --link: #1a4a7a;
     --link-hover: #0a2a4a;
 
@@ -97,7 +99,7 @@ body.theme-cold-war {
     --font-body: "Courier New", Courier, "Liberation Mono", monospace;
     --font-heading: "Courier New", Courier, "Liberation Mono", monospace;
     --font-mono: "Courier New", Courier, monospace;
-    --font-size-base: 14px;
+    --font-size-base: 1rem; /* Standardized base font */
     --line-height: 1.6;
 
     /* Theme-specific styling */
@@ -116,7 +118,8 @@ body.theme-renaissance {
     --text-muted: #6b5d4d;
     --border: #8b7355;
     --border-light: #c9b896;
-    --accent: #8b6914;
+    --accent: #5c4610; /* Darker gold for better contrast */
+    --accent-text: #f8f4e8; /* Light text on darkened gold */
     --link: #5c3d1e;
     --link-hover: #3d280f;
 
@@ -141,7 +144,7 @@ body.theme-renaissance {
     --font-body: Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif;
     --font-heading: Garamond, "EB Garamond", "Times New Roman", serif;
     --font-mono: "Courier New", Courier, monospace;
-    --font-size-base: 16px;
+    --font-size-base: 1rem; /* Standardized base font */
     --line-height: 1.6;
 
     /* Theme-specific styling */
@@ -161,6 +164,7 @@ body.theme-byzantine {
     --border: #6b4a8b;
     --border-light: #9a7ab8;
     --accent: #4a2a6b;
+    --accent-text: #ffffff; /* High contrast text for purple backgrounds */
     --link: #8b6914;
     --link-hover: #5c4a0a;
 
@@ -185,7 +189,7 @@ body.theme-byzantine {
     --font-body: "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
     --font-heading: "Palatino Linotype", Palatino, Georgia, serif;
     --font-mono: "Courier New", Courier, monospace;
-    --font-size-base: 15px;
+    --font-size-base: 1rem; /* Standardized base font */
     --line-height: 1.55;
 
     /* Theme-specific styling */
@@ -205,6 +209,7 @@ body.theme-corporate {
     --border: #dee2e6;
     --border-light: #e9ecef;
     --accent: #2563eb;
+    --accent-text: #ffffff; /* High contrast text for blue backgrounds */
     --link: #2563eb;
     --link-hover: #1d4ed8;
 
@@ -229,7 +234,7 @@ body.theme-corporate {
     --font-body: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --font-heading: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --font-mono: "SF Mono", SFMono-Regular, ui-monospace, Menlo, Consolas, monospace;
-    --font-size-base: 14px;
+    --font-size-base: 1rem; /* Standardized base font */
     --line-height: 1.5;
 
     /* Theme-specific styling */
@@ -355,6 +360,8 @@ body.theme-corporate header {
 
 html {
     font-size: var(--font-size-base);
+    /* Prevent horizontal scroll on mobile */
+    overflow-x: hidden;
 }
 
 body {
@@ -364,6 +371,9 @@ body {
     line-height: var(--line-height);
     color: var(--text);
     background-color: var(--bg);
+    /* Prevent horizontal scroll on mobile */
+    overflow-x: hidden;
+    max-width: 100vw;
 }
 
 a {
@@ -431,17 +441,43 @@ header .container {
 
 nav {
     display: flex;
-    gap: var(--spacing-md);
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
 }
 
 nav a {
     color: var(--text);
     text-decoration: none;
     padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: 0.9rem;
 }
 
 nav a:hover {
     text-decoration: underline;
+}
+
+/* Mobile navigation */
+@media (max-width: 600px) {
+    header .container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-sm);
+    }
+
+    nav {
+        width: 100%;
+        justify-content: flex-start;
+        gap: var(--spacing-xs);
+    }
+
+    nav a {
+        font-size: 0.85rem;
+        padding: var(--spacing-xs);
+    }
+
+    .site-title {
+        font-size: 1.25rem;
+    }
 }
 
 /* ===== BOX COMPONENTS ===== */
@@ -459,7 +495,7 @@ nav a:hover {
     margin-bottom: var(--spacing-md);
     padding: var(--spacing-sm) var(--box-padding);
     background-color: var(--accent);
-    color: var(--bg);
+    color: var(--accent-text);
     font-weight: bold;
     border-bottom: var(--border-width) solid var(--border);
 }
@@ -491,7 +527,7 @@ nav a:hover {
 
 .btn-primary {
     background-color: var(--accent);
-    color: var(--bg);
+    color: var(--accent-text);
     border-color: var(--accent);
 }
 
@@ -501,7 +537,7 @@ nav a:hover {
 
 .btn-cooperative {
     background-color: var(--cooperative);
-    color: var(--bg);
+    color: #ffffff;
     border-color: var(--cooperative);
 }
 
@@ -511,7 +547,7 @@ nav a:hover {
 
 .btn-competitive {
     background-color: var(--competitive);
-    color: var(--bg);
+    color: #ffffff;
     border-color: var(--competitive);
 }
 
@@ -916,12 +952,13 @@ textarea:focus {
 
 .surplus-info-box .info-header {
     background-color: var(--info);
+    color: #ffffff;
 }
 
 .info-header {
     padding: var(--spacing-xs) var(--spacing-sm);
     background-color: var(--accent);
-    color: var(--bg);
+    color: var(--accent-text);
     font-weight: bold;
     font-size: 0.8rem;
     text-transform: uppercase;
@@ -929,10 +966,12 @@ textarea:focus {
 
 .player-info-box .info-header {
     background-color: var(--cooperative);
+    color: #ffffff;
 }
 
 .opponent-info-box .info-header {
     background-color: var(--competitive);
+    color: #ffffff;
 }
 
 .info-stats {
@@ -1280,7 +1319,7 @@ footer {
 
 .manual-content th {
     background-color: var(--accent);
-    color: var(--bg);
+    color: var(--accent-text);
     font-weight: bold;
 }
 
@@ -1396,7 +1435,7 @@ footer {
     padding: var(--spacing-xs) var(--spacing-sm);
     margin-bottom: var(--spacing-md);
     background-color: var(--accent);
-    color: var(--bg);
+    color: var(--accent-text);
     font-weight: bold;
 }
 
@@ -1520,7 +1559,7 @@ footer {
     align-items: center;
     padding: var(--spacing-sm) var(--spacing-md);
     background-color: var(--accent);
-    color: var(--bg);
+    color: var(--accent-text);
     border-bottom: var(--border-width) solid var(--border);
 }
 
@@ -1532,7 +1571,7 @@ footer {
 .close-btn {
     background: none;
     border: none;
-    color: var(--bg);
+    color: var(--accent-text);
     font-size: 1.5rem;
     cursor: pointer;
     padding: 0;
@@ -1742,7 +1781,7 @@ footer {
     font-family: var(--font-body);
     font-size: 0.875rem;
     background-color: var(--info);
-    color: var(--bg);
+    color: #ffffff;
     border: var(--border-width) solid var(--info);
     cursor: pointer;
 }
@@ -1755,7 +1794,7 @@ footer {
 /* Button variants */
 .btn-success {
     background-color: var(--success);
-    color: var(--bg);
+    color: #ffffff;
     border-color: var(--success);
 }
 
@@ -1765,7 +1804,7 @@ footer {
 
 .btn-danger {
     background-color: var(--danger);
-    color: var(--bg);
+    color: #ffffff;
     border-color: var(--danger);
 }
 
@@ -1805,4 +1844,54 @@ footer {
 @keyframes thinking-blink {
     0%, 60%, 100% { opacity: 1; }
     30% { opacity: 0; }
+}
+
+/* ===== MOBILE RESPONSIVENESS ===== */
+/* Prevent horizontal scroll and handle small screens */
+
+/* Tables on mobile - make them scrollable within their container */
+@media (max-width: 600px) {
+    table {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        max-width: 100%;
+    }
+
+    /* Scenario table: stack cells vertically */
+    .scenarios-table td,
+    .scenarios-table th {
+        display: block;
+        width: 100%;
+        text-align: left;
+    }
+
+    .scenarios-table tr {
+        display: block;
+        margin-bottom: var(--spacing-md);
+        border: 1px solid var(--border-light);
+        padding: var(--spacing-sm);
+    }
+
+    .scenarios-table thead {
+        display: none;
+    }
+
+    /* Prevent content from causing horizontal scroll */
+    .container {
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+    pre, code {
+        max-width: 100%;
+        overflow-x: auto;
+        word-wrap: break-word;
+    }
+}
+
+/* Ensure images and media don't overflow */
+img, video, iframe, embed, object {
+    max-width: 100%;
+    height: auto;
 }
