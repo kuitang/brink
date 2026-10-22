@@ -1,6 +1,7 @@
 # syntax=docker/dockerfile:1
 
-FROM python:3.11-slim
+FROM python:3.11.17-slim-trixie
+RUN python -m pip install --no-cache-dir --upgrade "pip>=26.2.0" "setuptools>=83.0.0" "wheel>=0.46.2"
 
 # Install curl for Claude Code native installer
 RUN apt-get update && apt-get install -y --no-install-recommends \
