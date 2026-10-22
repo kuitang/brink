@@ -55,9 +55,7 @@ async def check_claude_api_credentials():
     credentials_path = Path.home() / ".claude" / ".credentials.json"
 
     if oauth_token:
-        masked = oauth_token[:20] + "..." if len(oauth_token) > 20 else "***"
-        logger.info(f"CLAUDE_CODE_OAUTH_TOKEN is set: {masked}")
-        logger.info(f"Token length: {len(oauth_token)} chars")
+        logger.info("CLAUDE_CODE_OAUTH_TOKEN is configured")
     elif credentials_path.exists():
         logger.info(f"Claude credentials file found at {credentials_path}")
     else:
