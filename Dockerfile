@@ -35,6 +35,9 @@ COPY src/ src/
 COPY scenarios/ scenarios/
 COPY GAME_MANUAL.md .
 
+# Install the application after its source is present; never resolve at startup.
+RUN uv sync --extra webapp --no-dev --frozen
+
 # Create data directory for SQLite (will be mounted as volume in production)
 RUN mkdir -p /data
 
@@ -53,4 +56,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8080/')" || exit 1
 
 # Start command - gunicorn with Flask app factory
-CMD ["uv", "run", "--frozen", "gunicorn", "--bind", "0.0.0.0:8080", "--workers", "2", "--timeout", "120", "brinksmanship.webapp.app:create_app()"]
+CMD ["uv", "run", "--frozen", "--no-sync", "gunicorn", "--bind", "0.0.0.0:8080", "--workers", "2", "--timeout", "120", "brinksmanship.webapp.app:create_app()"]
