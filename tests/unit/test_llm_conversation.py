@@ -81,39 +81,24 @@ class TestConversationHistory:
     """Tests for conversation history accumulation."""
 
     @pytest.mark.asyncio
-    @pytest.mark.skipif(not HAS_CLAUDE_CLI, reason="Requires Claude Code CLI with valid credentials")
     async def test_conversation_turn_count_increments(self):
-        """Test that conversation turn count increments on each query."""
+        """Exercise the actual SDK query API without credentials or network."""
         from claude_agent_sdk import AssistantMessage, TextBlock
 
         persona = HistoricalPersona("nixon", is_player_a=True)
 
-        # Create a mock client that simulates the SDK behavior
-        mock_client = MagicMock()
-        mock_client._active = True
-        mock_client.query = AsyncMock()
+        async def mock_query(**kwargs):
+            assert kwargs["options"].allowed_tools == ["Read"]
+            yield AssistantMessage(
+                content=[TextBlock(text='{"selected_action": "De-escalate", "reasoning": "test"}')],
+                model="test",
+            )
 
-        # Mock the response iterator to yield a simple response
-        async def mock_receive():
-            msg = MagicMock(spec=AssistantMessage)
-            msg.content = [MagicMock(spec=TextBlock, text='{"selected_action": "De-escalate", "reasoning": "test"}')]
-            yield msg
-
-        mock_client.receive_response = mock_receive
-
-        persona._client = mock_client
-
-        # Simulate multiple queries
-        initial_count = persona._conversation_turn_count
-
-        await persona._query_llm("test prompt 1", {"type": "object"})
-        assert persona._conversation_turn_count == initial_count + 1
-
-        await persona._query_llm("test prompt 2", {"type": "object"})
-        assert persona._conversation_turn_count == initial_count + 2
-
-        await persona._query_llm("test prompt 3", {"type": "object"})
-        assert persona._conversation_turn_count == initial_count + 3
+        with patch("claude_agent_sdk.query", mock_query):
+            for expected in range(1, 4):
+                result = await persona._query_llm("test prompt", {"type": "object"})
+                assert result["selected_action"] == "De-escalate"
+                assert persona._conversation_turn_count == expected
 
     @pytest.mark.asyncio
     async def test_history_summary_includes_conversation_turns(self):
