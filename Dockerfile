@@ -19,15 +19,13 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 WORKDIR /app
 
 # Copy dependency files first for better caching
-COPY pyproject.toml .
+COPY pyproject.toml uv.lock ./
 COPY README.md .
 
 # Install dependencies with webapp extras
-# Try frozen first (for reproducible builds), fall back to non-frozen
-RUN uv sync --extra webapp --no-dev --frozen || uv sync --extra webapp --no-dev
+# Fail if the reviewed lock is stale or absent.
+RUN uv sync --extra webapp --no-dev --frozen --no-install-project
 
-# Install gunicorn for production WSGI server
-RUN uv pip install gunicorn
 
 # Copy application code
 COPY src/ src/
@@ -54,4 +52,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8080/')" || exit 1
 
 # Start command - gunicorn with Flask app factory
-CMD ["uv", "run", "gunicorn", "--bind", "0.0.0.0:8080", "--workers", "2", "--timeout", "120", "brinksmanship.webapp.app:create_app()"]
+CMD ["uv", "run", "--frozen", "gunicorn", "--bind", "0.0.0.0:8080", "--workers", "2", "--timeout", "120", "brinksmanship.webapp.app:create_app()"]
