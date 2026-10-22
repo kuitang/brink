@@ -38,6 +38,9 @@ COPY GAME_MANUAL.md .
 # Install the application after its source is present; never resolve at startup.
 RUN uv sync --extra webapp --no-dev --frozen
 
+# Package installers are build-only; keep the production runtime free of their vendored libraries.
+RUN /usr/local/bin/python -m pip uninstall -y pip setuptools wheel
+
 # Create data directory for SQLite (will be mounted as volume in production)
 RUN mkdir -p /data
 
