@@ -34,7 +34,7 @@ dev = [
     "pytest-cov>=4.0.0",
     "pytest-playwright>=0.4.0",
     "mypy>=1.0.0",
-    "ruff==0.14.13",
+    "ruff==0.17.2",
     "pre-commit>=3.0.0",
 ]
 webapp = [
