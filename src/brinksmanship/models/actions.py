@@ -5,13 +5,13 @@ and the action menus available at different Risk Levels. See GAME_MANUAL.md Sect
 for the authoritative action classification.
 """
 
-from enum import Enum
+from enum import Enum, StrEnum
 from typing import Literal
 
 from pydantic import BaseModel, Field, field_validator
 
 
-class ActionType(str, Enum):
+class ActionType(StrEnum):
     """Classification of actions as Cooperative or Competitive.
 
     This classification determines:

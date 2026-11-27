@@ -13,7 +13,7 @@ See ENGINEERING_DESIGN.md Milestone 2.2 for implementation specifications.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 from typing import Literal
 
 from pydantic import BaseModel, Field
@@ -37,7 +37,7 @@ from brinksmanship.parameters import (
 # =============================================================================
 
 
-class MatrixChoice(str, Enum):
+class MatrixChoice(StrEnum):
     """Matrix game choice: Cooperate or Defect.
 
     Maps to the standard 2x2 game theory notation.
@@ -63,7 +63,7 @@ class MatrixChoice(str, Enum):
 # =============================================================================
 
 
-class ReconnaissanceChoice(str, Enum):
+class ReconnaissanceChoice(StrEnum):
     """Player choices in the Reconnaissance game.
 
     Probe: Attempt to gather intelligence on opponent's position.
@@ -74,7 +74,7 @@ class ReconnaissanceChoice(str, Enum):
     MASK = "mask"
 
 
-class ReconnaissanceOpponentChoice(str, Enum):
+class ReconnaissanceOpponentChoice(StrEnum):
     """Opponent choices in the Reconnaissance game.
 
     Vigilant: Active counterintelligence, watching for probes.
@@ -111,7 +111,7 @@ class ReconnaissanceResult:
 # =============================================================================
 
 
-class InspectionChoice(str, Enum):
+class InspectionChoice(StrEnum):
     """Player choices in the Inspection game.
 
     Inspect: Actively verify opponent's claims/resources.
@@ -122,7 +122,7 @@ class InspectionChoice(str, Enum):
     TRUST = "trust"
 
 
-class InspectionOpponentChoice(str, Enum):
+class InspectionOpponentChoice(StrEnum):
     """Opponent choices in the Inspection game.
 
     Comply: Honestly reveal true resource state.
@@ -178,7 +178,7 @@ class SettlementProposal(BaseModel):
     argument: str = Field(..., max_length=500, description="Free-text rationale for the offer")
 
 
-class SettlementAction(str, Enum):
+class SettlementAction(StrEnum):
     """Possible responses to a settlement proposal."""
 
     ACCEPT = "accept"
